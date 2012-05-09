@@ -1,0 +1,36 @@
+Pre-requisites for INDDGO:
+  - For parallel versions:
+    - an MPI compiler (tested with OpenMPI and Cray MPI)
+    - a C++ compiler capable of compiling OpenMP code (tested with GCC >= 4.4.3)
+
+  - For building versions with MADNESS:
+    - autoconf
+    - automake
+
+Configuration:
+  To configure INDDGO, a make.inc file must be created, containing
+  the various options for compilers and optional software packages.
+
+  We provide two example files, make.inc.paralle and make.inc.serial
+  to get you started.  Simply copy one of these files to make.inc.
+  Next, edit it and set the "SRC_DIR" variable to the directory where
+  you unpacked INDDGO. 
+  
+  Various HAS_<PACKAGENAME> variables may be set.  If set, you must also
+  set the corresponding directory variable further on in the make.inc.
+
+  We provide a copy of the MADNESS runtime library, however other
+  dependencies must be installed manually.
+
+  For details on where to obtain optional dependencies and their required
+  versions, see the thirdparty.txt file.
+
+Compilation:
+  To compile INDDGO, follow these steps:
+
+make deps
+make
+
+  Resulting binaries will be places in SRC_DIR/bin.  INDDGO also provides
+  various non-default binaries that may be built for testing purposes.
+  These will be placed in the appropriate sub-package's /bin directory.

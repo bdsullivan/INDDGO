@@ -1,0 +1,43 @@
+INDDGO is compatible and can be enhanced by functionality from a number of 
+third-party software packages. 
+
+You can enable and disable all optional third party software via the 
+HAS_XXX variables in your make.inc. 
+Please set the associated directory variables in make.inc 
+appropriately so the needed libraries and source can be found for linking. 
+
+Below are the download locations for the third-party software packages, 
+and which versions we have tested with:
+
+AMD: /*tested with 2.2.3 (also known compatible with 2.2.0)*/
+http://www.cise.ufl.edu/research/sparse/amd/
+
+UFconfig (required by AMD) /*tested with 3.7.0 (also known compatible with 3.4.0)*/
+http://www.cise.ufl.edu/research/sparse/UFconfig/
+
+ARPACK: /*Note we do not use ARPACK++*/
+http://www.caam.rice.edu/software/ARPACK/
+
+Goblin: /*Tested with 2.8b30 for Linux and Windows*/
+http://sourceforge.net/projects/goblin2/
+
+Igraph: /*Tested with 0.5.4*/
+http://igraph.sourceforge.net/
+
+SNAP: /*Tested with 0.4*/
+http://snap-graph.sourceforge.net/
+ 
+CSDP: /*Tested with 6.1.1*/
+https://projects.coin-or.org/Csdp/
+
+METIS: /*Tested with 5.0.2 - INCOMPATIBLE with 4.x*/
+ParMETIS: /*Tested with 4.0.2 - INCOMPATIBLE with 4.x; Contains METIS 5.0.2 in metis subdirectory*/
+http://glaros.dtc.umn.edu/gkhome/views/metis
+
+GMP: /*Tested with 5.0.2*/
+http://gmplib.org/
+
+
+WARNING: Known issues with builds: 
+1. AMD does not seem to compile on the most recent Mac OS. No serious attempts at debugging have been made.
+2. You must have cmake installed for METIS/ParMETIS to build. The latter also needs MPI.

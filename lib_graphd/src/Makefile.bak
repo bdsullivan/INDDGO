@@ -1,0 +1,39 @@
+# compiler
+CC = g++
+# source files.
+OBJ = $(SRC:.cpp=.o)
+OUTLIB=../lib/libgraphdecomp.a
+
+# C++ compiler flags (-g -O2 -Wall)
+CCFLAGS =  -g -O0 -Werror -Wall -D__LOG_ENABLE__ -DHAS_METIS -DHAS_AMD
+# compile flags
+LDFLAGS =  -g -O0 -Werror -Wall -D__LOG_ENABLE__ -DHAS_METIS -DHAS_AMD
+
+# include directories
+INCLUDES = -I../inc/ -I/usr/local/include -I/home/d8w/research/code/metis-4.0/Lib -I/home/d8w/research/code/AMD/Include -I/home/d8w/research/code/UFconfig
+# library paths
+LIBDIR=-L.. -L/usr/local/lib -L/home/d8w/research/code/metis-4.0 -L/home/d8w/research/code/AMD/Lib 
+LIBS = $(LIBDIR)-lamd -lm -lmetis
+# source
+SRC = Log.cpp GraphReader.cpp DIMACSGraphReader.cpp AdjMatrixGraphReader.cpp Node.cpp GraphReaderWriterFactory.cpp \
+	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp WeightedGraph.cpp MutableGraph.cpp WeightedMutableGraph.cpp GraphProperties.cpp\
+	GraphUtil.cpp Debug.cpp GraphEOUtil.cpp GraphDisplay.cpp RndNumGen.cpp Util.cpp AdjMatrixGraphWriter.cpp GraphWriter.cpp\
+	DIMACSGraphWriter.cpp GraphVizGraphWriter.cpp
+
+.SUFFIXES: .cpp
+
+default: $(OUTLIB)
+
+.cpp.o:
+	$(CC) $(INCLUDES) $(CCFLAGS) -c $< 	$(LIBS)
+
+$(OUT): $(OBJ)
+	$(CC) $(INCLUDES) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+
+$(OUTLIB): $(OBJ)
+	ar -rv $(OUTLIB) $^
+
+clean:
+	rm -f *.o \#* PI* ${EXECUTABLES} core *~ $(OBJ) $(OUT) $(OUTLIB)
+
+# makefile tutorial: http://www.cs.duke.edu/~ola/courses/programming/Makefiles/node1.html

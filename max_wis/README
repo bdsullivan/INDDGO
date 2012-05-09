@@ -1,0 +1,82 @@
+See the README in INDDGO's main directory for examples of how to run 
+serial_wis and parallel_wis. This document provides more
+details on some of the options and output related to these executables.
+
+# Two sample input graph files, as well as an example tree decomposition
+# file and elimination order file can be found in the sample_graphs directory.
+# All examples use these files. The optimal MWIS value for each is in the 
+# comments at the top of the DIMACS file.
+
+==Input Graphs==
+
+We would like to emphasize that it is assumed the input graph is connected. If it is not, 
+these executables will find and run on the largest connected component. 
+All components will be written to separate .comp files, and the one used
+will be identified through a message to standard out. 
+
+Input files are generally assumed to be in DIMACS format (see http://dimacs.rutgers.edu/Challenges/), 
+which is essentially an undirected edge list. The first line should read 'p edge n m', with n and m the 
+number of nodes and edges in the graph. Each subsequent line specifies an edge as 'e start end'. The vertices
+are assumed to be labelled 1, 2, ... n and start,end must be in [1,n]. Each edge need only be 
+specified once (i.e. 'e start end' and 'e end start' do not need to both appear). Further, duplicate
+edges and self loops are ignored (graphs are assumed to be simple). We offer a utility to "standardize" 
+graphs which have non-sequential vertex labels, etc as part of serial_wis - use the 
+
+Example of a 10-cycle in DIMACS format: 
+--c10.dimacs--
+p edge 10 10 
+e 1 2 
+e 2 3
+e 3 4 
+e 4 5 
+e 5 6 
+e 6 7 
+e 7 8 
+e 8 9 
+e 9 10 
+e 10 1
+--end c10.dimacs--
+
+===Interpreting Output (General) ===
+Both executables are able to write the elimination ordering and 
+tree decomposition to a file. The latter is in modified DIMACS format, as described below. 
+
+A tree decomposition (T,X) with tree nodes 1, ... t and bags of vertices from G (which has n nodes)
+will have a DIMACS file that starts with the line 'p treed t t-1', followed by t-1 edge lines of the form 
+'e start end' (with start,end in [1,t]), and t bag lines of the form 'B id k n_1 n_2 .. n_k' (representing
+the bag associated with tree node id holding the k vertices listed from G with n_i in [1,n]).
+
+Example of a tree decomposition for the cycle on 10 vertices: 
+--c10.tree--
+p treed 5 4 
+e 1 2 
+e 2 3 
+e 3 4 
+e 4 5
+B 1 3 1 2 10 
+B 2 4 2 3 9 10 
+B 3 4 3 4 8 9 
+B 4 4 4 5 7 8 
+B 5 3 6 7 8 
+--end c10.tree--
+
+
+===Interpreting Output (Serial Only) ===
+
+A single line of output to stdout provides the objective value along with timing and other statistics about the run:
+
+filename G_n G_m td_type PC/NPC MN/NMN width refined_width #treenodes #leafs leaf_time nonleaf_time introtime forgettime jointime total_pc _entries total_entries MEM reconsruct_time avg_pc_proportion objective
+
+PC/NPC indicates whether or not parent-child intersection tables were used to store partial solutions (-pc option to exe)
+MN/NMN indicates whether or not the tree was "made nice" with -make_nice 
+refined_width should be the same as width unless you've run the -refine_td flag, in which case it could be smaller
+
+If reconstruction of the set was done, the results can be found in <inputfile>.WIS.sol
+
+===Interpreting Output (Parallel Only) ===
+
+A single line of output to stdout provides a summary of the timing, as well as the objective value. 
+Values are separated by colons. Reconstruction of the set itself if not available at this time.
+
+filename num_mpi_tasks xPTD_THREADS decomposition_time xOMP_THREADS preparenode_time xMAD_THREADS total_dp_time elapsed_time memHWM objective
+
