@@ -28,9 +28,11 @@ Configuration:
 Compilation:
   To compile INDDGO, follow these steps:
 
-make deps
 make
 
   Resulting binaries will be places in SRC_DIR/bin.  INDDGO also provides
   various non-default binaries that may be built for testing purposes.
   These will be placed in the appropriate sub-package's /bin directory.
+
+  Tested with the GNU compilers (g++, gcc) and OpenMPI. Please 
+  report problems encountered when using alternatives.
