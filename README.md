@@ -69,7 +69,7 @@ file and elimination order file can be found in the sample_graphs directory.
 
 #Run MWIS (serial, find objective) 
  Computes objective (set weight) only, but reduces memory use drastically. 
-./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -no_reconstruct -del_ch
+* ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -no_reconstruct -del_ch
 
 #Run MWIS (all parallel) 
  Complete run from graph to final solution. Requires PARMETIS.
