@@ -22,9 +22,9 @@ The main INDDGO binaries are placed in the "bin" subdirectory of your
 source tree.
 
 The default binaries created by INSTALL include executables to:
-- generate partial k-trees (./bin/gen_pkt)
-- compute elimination orderings, tree decompositions, and maximum weighted independent sets (./bin/serial_wis and/or ./bin/parallel_wis)
-- provide various visualization output (./bin/td_viz)
+* generate partial k-trees (./bin/gen_pkt)
+* compute elimination orderings, tree decompositions, and maximum weighted independent sets (./bin/serial_wis and/or ./bin/parallel_wis)
+* provide various visualization output (./bin/td_viz)
 
 Currently, all tree decomposition functionality is accessible through the 
 weighted independent set executables - flags are provided to disable the 
