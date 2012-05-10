@@ -57,27 +57,27 @@ endif
 all: $(ALL)
 
 .cpp.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR) $< -o $@
+	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR) $< -o $@
 
 # Binaries
 
 $(WEIGHTED_IND_SET_EXE): $(SHAREDOBJ) 
-	$(CC) $(CFLAGS) $(WEIGHTED_IND_SET_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -o $(WEIGHTED_IND_SET_EXE)
+	$(CXX) $(CFLAGS) $(WEIGHTED_IND_SET_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -o $(WEIGHTED_IND_SET_EXE)
 
 val_wis: $(SHAREDOBJ)  #depends on valgrind TD library having been prepared 
-	$(CC) $(VALGRIND_FLAGS) $(WEIGHTED_IND_SET_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) -lvaltd -lm -lgd $(LIBS) -o $(VAL_WEIGHTED_IND_SET_EXE)
+	$(CXX) $(VALGRIND_FLAGS) $(WEIGHTED_IND_SET_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) -lvaltd -lm -lgd $(LIBS) -o $(VAL_WEIGHTED_IND_SET_EXE)
 
 $(MAD_WIS_EXE): $(SHAREDOBJ) $(MAD_WIS_SRC)
-	$(CC) $(CFLAGS) $(MAD_WIS_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -lptreed -o $(MAD_WIS_EXE)
+	$(CXX) $(CFLAGS) $(MAD_WIS_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -lptreed -o $(MAD_WIS_EXE)
 
 parmetiseo:
-	$(CC) $(CFLAGS) $(PARMETIS_EO_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -o $(PARMETIS_EO_EXE)
+	$(CXX) $(CFLAGS) $(PARMETIS_EO_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -o $(PARMETIS_EO_EXE)
 
 pgavril: $(SHAREDOBJ)
-	$(CC) $(CFLAGS) $(PGAVRIL_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -lptreed -o $(PGAVRIL_EXE)
+	$(CXX) $(CFLAGS) $(PGAVRIL_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -lptreed -o $(PGAVRIL_EXE)
 
 parallel_wis: $(SHAREDOBJ)
-	$(CC) $(CFLAGS) $(PARALLEL_WIS_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -o $(PARALLEL_WIS_EXE)
+	$(CXX) $(CFLAGS) $(PARALLEL_WIS_SRC) $(SHAREDOBJ) $(INC_DIR) $(LIB_DIR) $(LIBS) -o $(PARALLEL_WIS_EXE)
 clean:
 	-rm -rf $(OBJS)
 	-rm -rf $(EXES)

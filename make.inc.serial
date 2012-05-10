@@ -65,7 +65,8 @@ GTEST_DIR=
 # Compilers, Flags and System Tools
 #
 
-CC     = g++
+CC	= gcc
+CXX     = g++
 CFLAGS = -O3
 CPPFLAGS = -std=c++0x 
 LDFLAGS = 
@@ -75,17 +76,17 @@ CFLAGS := $(CFLAGS) -D__LOG_ENABLE__
 endif
 
 ifeq ($(HAS_MADNESS),1)
-CC     = mpicxx
+CXX     = mpicxx
 CFLAGS := $(CFLAGS) -D__MADNESS__ -std=c++0x -Wno-strict-aliasing -Wno-deprecated -ffast-math -march=native
 endif
 
 ifeq ($(IS_PARALLEL),1)
-CC     = mpicxx
+CXX     = mpicxx
 CFLAGS := $(CFLAGS) -D__PARALLEL__ -D__OPENMP__ -fopenmp
 endif
 
 ifeq ($(HAS_PARMETIS),1)
-CC     = mpicxx
+CXX     = mpicxx
 endif
 
 FC      = gfortran

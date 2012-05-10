@@ -22,7 +22,7 @@ OBJS=$(SRCS:.cpp=.o)
 all: $(INDDGO_LIB)/$(TD_LIB_NAME)
 
 .cpp.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
+	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
 # The "normal" TD library
 $(INDDGO_LIB)/$(TD_LIB_NAME): $(OBJS) $(PARMETISOBJ)
@@ -34,13 +34,13 @@ locallib: $(INDDGO_LIB)/$(TD_LIB_NAME)
 
 # The profiled library
 td_profiled: $(OBJS) $(PARMETISOBJ)
-	$(CC) -c $(PFLAGS) $(INC_DIR) $(LIB_DIR) $(SRCS)
+	$(CXX) -c $(PFLAGS) $(INC_DIR) $(LIB_DIR) $(SRCS)
 	$(AR) $(ARFLAGS) $(TD_PROF_LIB) $(OBJS) $(PARMETISOBJ)
 	ranlib $(TD_PROF_LIB)
 
 # The valgrind-prepared library
 td_valgrind: $(OBJS) $(PARMETISOBJ)
-	$(CC) -c $(VALGRIND_FLAGS) $(INC_DIR) $(LIB_DIR) $(SRCS)
+	$(CXX) -c $(VALGRIND_FLAGS) $(INC_DIR) $(LIB_DIR) $(SRCS)
 	$(AR) $(ARFLAGS) $(TD_VALGRIND_LIB) $(OBJS) $(PARMETISOBJ)
 	ranlib $(TD_VALGRIND_LIB)
 

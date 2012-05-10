@@ -38,12 +38,12 @@ graph:
 	$(MAKE) ;\
 	$(CD) ..;)
 
-tree:
+tree: deps
 	@($(CD) $(TREE);\
 	$(MAKE) ;\
 	$(CD) ..;)
 
-ptree:
+ptree: 
 	@($(CD) $(PTREE);\
 	$(MAKE) ;\
 	$(CD) ..;)
@@ -134,7 +134,7 @@ clean:
 		$(MAKE) clean;\
 		$(CD) ..; \
 	done );
-	find . -name '*~' | xargs rm -f
+	find . -name '*~' -print0 | xargs -0 rm -f
 
 cleandeps: cleanmad
 

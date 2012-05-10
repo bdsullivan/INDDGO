@@ -13,10 +13,10 @@ PKT_EXE = $(INDDGO_BIN)/gen_pkt
 all: $(PKT_EXE)
 
 .cpp.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
+	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
 $(PKT_EXE): $(PKT_OBJ) 
-	$(CC) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIB_DIR) $(LIBS) -o $@ 
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIB_DIR) $(LIBS) -o $@ 
 
 clean: 
-	-rm -rf $(PKT_OBJ)
+	-rm -rf $(PKT_OBJ) $(PKT_EXE)

@@ -14,7 +14,7 @@ OBJS = $(SRCS:.cpp=.o)
 all: $(INDDGO_LIB)/$(PTD_LIB_NAME)
 
 .cpp.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
+	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
 $(INDDGO_LIB)/$(PTD_LIB_NAME): $(OBJS) 
 	$(AR) $(ARFLAGS) $@ $(OBJS) 

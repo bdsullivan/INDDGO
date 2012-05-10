@@ -20,7 +20,7 @@
 include ../../make.inc
 #-----Macros---------------------------------
 # set up compiler and options
-#CC = g++
+#CXX = g++
 #-----------------------------------------------------------------------------
 # To build the test library
 
@@ -42,21 +42,21 @@ SRC=TDTreeTest.cpp $(WIS)/src/weighted_ind_set.cpp
 all : ${EXECUTABLES}
 
 %.o : $(WIS)/src/%.cpp 
-	$(CC) $(INC_DIR) $(CFLAGS) -c $<
+	$(CXX) $(INC_DIR) $(CFLAGS) -c $<
 
 .cpp.o:
-	$(CC) $(INC_DIR) $(CFLAGS) -c $<
+	$(CXX) $(INC_DIR) $(CFLAGS) -c $<
 
 testTDTree: TDTreeTest.o $(WIS)/src/weighted_ind_set.o
-	${CC} ${LFLAGS} -o bin/$@ $^ ${INC_DIR} $(LIBS) $(LIB_DIR)
+	${CXX} ${LFLAGS} -o bin/$@ $^ ${INC_DIR} $(LIBS) $(LIB_DIR)
 
 #---- no change below this line--------------------------------------------------
 CXXFLAGS = $(INC_DIR) -O3
 gtest-all.o: ${GTEST_DIR}/src/gtest-all.cc
-	$(CC) -c $< $(CXXFLAGS)	
+	$(CXX) -c $< $(CXXFLAGS)	
 
 gtest_main.o: ${GTEST_DIR}/src/gtest_main.cc
-	$(CC) -c $< $(CXXFLAGS)	
+	$(CXX) -c $< $(CXXFLAGS)	
 
 $(LIBGTEST): gtest-all.o gtest_main.o
 	ar -rv ./lib/$(LIBGTEST) $^

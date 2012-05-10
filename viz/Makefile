@@ -14,10 +14,10 @@ VIZ_OBJ=$(VIZ_SRC:.cpp=.o)
 all: $(VIZ_EXE)
 
 .cpp.o:
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
+	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
 $(VIZ_EXE): $(VIZ_OBJ)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIB_DIR) $(LIBS) -o $(VIZ_EXE)
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIB_DIR) $(LIBS) -o $(VIZ_EXE)
 
 clean: 
 	-rm -rf $(VIZ_OBJ)

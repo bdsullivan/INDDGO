@@ -22,7 +22,7 @@ include ../../make.inc
 
 #-----Macros---------------------------------
 # set up compiler and options
-#CC = g++
+#CXX = g++
 #-----------------------------------------------------------------------------
 # To build the test library
 
@@ -55,67 +55,67 @@ ifeq ($(HAS_GTEST), 1)
 all : ${EXECUTABLES}
 
 .cpp.o:
-	$(CC) $(INCLUDES) $(CFLAGS) -c $<
+	$(CXX) $(INCLUDES) $(CFLAGS) -c $<
 
 testDimacsReader: DIMACSReaderTest.o 
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraphReader: GraphReaderTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraphCreatorFile: GraphCreatorFileTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraphReaderWriterFactory: GraphReaderWriterFactoryTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraph: GraphTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 testWeightedGraph: WeightedGraphTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testMutableGraph: MutableGraphTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testWeightedMutableGraph: WeightedMutableGraphTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testAdjMatrixGraphWriter: AdjMatrixGraphWriterTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testAdjMatrixGraphReader: AdjMatrixGraphReaderTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testDIMACSGraphWriter: DIMACSGraphWriterTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraphVizGraphWriter: GraphVizGraphWriterTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraphProperty: GraphPropertyTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraphUtil: GraphUtilTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraphEOUtil: GraphEOUtilTest.o
-	${CC} ${LFLAGS} -o bin/$@ $< $(LIBGRAPHDECOMP) $(PARMETISOBJ)  ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@ $< $(LIBGRAPHDECOMP) $(PARMETISOBJ)  ${INCLUDES} $(LIB) $(LIBDIR)
 
 testMetisGraphWriter: MetisGraphWriterTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testMetisGraphReader: MetisGraphReaderTest.o
-	${CC} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testParMetis: ParmetisTest.o 
-	${CC} ${LFLAGS} -o bin/$@ $^ $(LIBGRAPHDECOMP) $(PARMETISOBJ) ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@ $^ $(LIBGRAPHDECOMP) $(PARMETISOBJ) ${INCLUDES} $(LIB) $(LIBDIR)
 #---- no change below this line--------------------------------------------------
 
 gtest-all.o: ${GTEST_DIR}/src/gtest-all.cc
-	$(CC) -c $< $(CXXFLAGS)	
+	$(CXX) -c $< $(CXXFLAGS)	
 
 gtest_main.o: ${GTEST_DIR}/src/gtest_main.cc
-	$(CC) -c $< $(CXXFLAGS)	
+	$(CXX) -c $< $(CXXFLAGS)	
 
 $(LIBGTEST): gtest-all.o gtest_main.o
 	ar -rv ../lib/$(LIBGTEST) $^

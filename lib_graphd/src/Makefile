@@ -37,11 +37,12 @@ endif
 
 all: $(INDDGO_LIB)/$(LIBNAME)  $(GVIZ)
 
+#This is a problem if they're not using gcc 
 %.o: $(METIS_PROG_DIR)/%.c
-	gcc $(INCLUDES) $(CFLAGS) -U__GNUC__ -c $< 
+	$(CC) $(INCLUDES) $(CFLAGS) -U__GNUC__ -c $< 
 
 .cpp.o:
-	$(CC) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -c $< 	
+	$(CXX) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -c $< 	
 
 $(INDDGO_LIB)/$(LIBNAME): $(OBJ) $(POBJ)
 	ar -rv $(INDDGO_LIB)/$(LIBNAME) $^
@@ -52,7 +53,7 @@ locallib: $(INDDGO_LIB)/$(LIBNAME)
 
 
 $(GVIZ): gviz.cpp
-	$(CC) -I../inc $(CFLAGS) $< -o $@ $(INCLUDES) $(LIBS) -L$(INDDGO_LIB) -lgraphd
+	$(CXX) -I../inc $(CFLAGS) $< -o $@ $(INCLUDES) $(LIBS) -L$(INDDGO_LIB) -lgraphd
 
 clean:
 	rm -f *.o \#* PI* ${EXECUTABLES} core *~ $(OBJ) $(OUT) $(INDDGO_LIB)/$(LIBNAME) ../lib/$(LIBNAME) $(GVIZ)

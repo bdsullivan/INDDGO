@@ -1,5 +1,5 @@
-CC=g++
-CCC=gcc
+CXX=g++
+CXXC=gcc
 CFLAGS= -Wall -O3 -DHAS_GOBLIN -g 
 VALGRIND_FLAGS= -O0 -g
 PFLAGS= -O3 -pg
@@ -78,15 +78,15 @@ OBJS=$(SRCS:.cpp=.o)
 all: #$(OBJS)
 	$(error	This code is deprecated, and incompatible with the current lib_graphd. It was written using a previous version of the graph decomposition library. Most functionality should be re-attainable, but new GraphEOUtil classes, etc need to be incorporated into the code) 
 	gcc ./src/pathfinder.c ./src/paths.c -I./inc -o bin/pathfinder
-	$(CC) $(CFLAGS) $(INC_DIR) $(BDTEST_SRC) $(OBJS) -L$(ARPACK_LIBDIR) -L$(GOBLIN_DIR) $(LIB_DIR) $(LIBS) -lgoblin -larpack_x86_64 -lgfortran   -o $(BDTEST_EXE)
-	$(CC) $(CFLAGS) $(INC_DIR) $(GEN_BD_SPLIT_SRC) $(OBJS) -L$(ARPACK_LIBDIR) -L$(GOBLIN_DIR) $(LIB_DIR) $(LIBS) -lgoblin -larpack_x86_64 -lgfortran  -o $(GEN_BD_SPLIT_EXE)
-	$(CC) $(CFLAGS) $(INC_DIR) $(GEN_BD_SPAWN_SRC) $(OBJS) -L$(ARPACK_LIBDIR) -L$(GOBLIN_DIR) $(LIB_DIR) $(LIBS) -lgoblin -larpack_x86_64 -lgfortran  -o $(GEN_BD_SPAWN_EXE)
+	$(CXX) $(CFLAGS) $(INC_DIR) $(BDTEST_SRC) $(OBJS) -L$(ARPACK_LIBDIR) -L$(GOBLIN_DIR) $(LIB_DIR) $(LIBS) -lgoblin -larpack_x86_64 -lgfortran   -o $(BDTEST_EXE)
+	$(CXX) $(CFLAGS) $(INC_DIR) $(GEN_BD_SPLIT_SRC) $(OBJS) -L$(ARPACK_LIBDIR) -L$(GOBLIN_DIR) $(LIB_DIR) $(LIBS) -lgoblin -larpack_x86_64 -lgfortran  -o $(GEN_BD_SPLIT_EXE)
+	$(CXX) $(CFLAGS) $(INC_DIR) $(GEN_BD_SPAWN_SRC) $(OBJS) -L$(ARPACK_LIBDIR) -L$(GOBLIN_DIR) $(LIB_DIR) $(LIBS) -lgoblin -larpack_x86_64 -lgfortran  -o $(GEN_BD_SPAWN_EXE)
 
 
 .cpp.o  :
-	$(CC) -c $(CFLAGS) $(INC_DIR) $< -o $@
+	$(CXX) -c $(CFLAGS) $(INC_DIR) $< -o $@
 .c.o	:	
-	$(CCC) -c $(CFLAGS) $(INC_DIR) $< -o $@
+	$(CXXC) -c $(CFLAGS) $(INC_DIR) $< -o $@
 
 docs: $(DOXYFILE)
 	doxygen $(DOXYFILE)
