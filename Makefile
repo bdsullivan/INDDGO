@@ -24,7 +24,7 @@ include make.inc
 MADLIB = ./madness/deploy/lib/libMADworld.a
 
 .PHONY : deps all wis viz util cleandeps cleanwis cleanviz cleanmisc clean cleangraph cleantree testgraph testtree cleanutil
-all: libs wis viz util 
+all: wis viz util 
 deps: $(MADLIB)
 libs: graph tree ptree
 test: testgraph testtree
@@ -44,9 +44,11 @@ tree: deps
 	$(CD) ..;)
 
 ptree: 
+ifeq ($(HAS_MADNESS), 1)
 	@($(CD) $(PTREE);\
 	$(MAKE) ;\
 	$(CD) ..;)
+endif
 
 valtree:
 	@($(CD) $(TREE);\
