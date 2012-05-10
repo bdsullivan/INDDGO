@@ -35,9 +35,9 @@ All binaries respect the -h flag for printing a comprehensive usage message deta
 When running parallel versions of INDDGO, you must set the following
 environment variables:
 
-PTD_NUM_THREADS
-OMP_NUM_THREADS
-MAD_NUM_THREADS
+* PTD_NUM_THREADS
+* OMP_NUM_THREADS
+* MAD_NUM_THREADS
 
 NOTE: It is assumed the input graph for weighted independent set is connected. If it is not, 
 these executables will find and run on the largest connected component. 
@@ -55,17 +55,17 @@ file and elimination order file can be found in the sample_graphs directory.
  Create 3 partial k-trees on 1000 vertices with width 20, 60 percent of 
  full k-tree edges, randomized vertex labels, and names of the form 
  mygraph.1000.20.60_.dimacs
-./bin/gen_pkt -t 3 -n 1000 -k 20 -p 60 -r -fn ./sample_graphs/mygraph
+* ./bin/gen_pkt -t 3 -n 1000 -k 20 -p 60 -r -fn ./sample_graphs/mygraph
 
 #Find Tree Decomposition
  Generate a tree decomposition (serial) and save elimination ordering
  and decomposition to file for future use.
-./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -decompose_only -w sample_graphs/1dc.64.tree -eorder sample_graphs/1dc.64.mind.eorder
+* ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -decompose_only -w sample_graphs/1dc.64.tree -eorder sample_graphs/1dc.64.mind.eorder
 
 #Run MWIS (serial, find set)
  Computes max weighted independent set and saves vertices to solution file 
  named <inputfile>.WIS.sol
-./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind 
+* ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind 
 
 #Run MWIS (serial, find objective) 
  Computes objective (set weight) only, but reduces memory use drastically. 
@@ -73,23 +73,23 @@ file and elimination order file can be found in the sample_graphs directory.
 
 #Run MWIS (all parallel) 
  Complete run from graph to final solution. Requires PARMETIS.
-export MAD_NUM_THREADS=4
-export OMP_NUM_THREADS=4
-export PTD_NUM_THREADS=4 
-mpirun -n 4 ./bin/parallel_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -pbag -parmetis
+* export MAD_NUM_THREADS=4
+* export OMP_NUM_THREADS=4
+* export PTD_NUM_THREADS=4 
+* mpirun -n 4 ./bin/parallel_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -pbag -parmetis
 
 #Run MWIS (only DP parallel) 
  Reads EO from file, serial tree decomposition, parallel (MADNESS) DP.  
-export MAD_NUM_THREADS=4
-export OMP_NUM_THREADS=4
-export PTD_NUM_THREADS=4 
-mpirun -n 4 ./bin/parallel_wis -ord sample_graphs/1dc.64.mind.eorder -f sample_graphs/1dc.64.dimacs -gavril 
+* export MAD_NUM_THREADS=4
+* export OMP_NUM_THREADS=4
+* export PTD_NUM_THREADS=4 
+* mpirun -n 4 ./bin/parallel_wis -ord sample_graphs/1dc.64.mind.eorder -f sample_graphs/1dc.64.dimacs -gavril 
 
 #Generate visualization
  Create a basic DOT file of the tree decomposition for use with graphviz where
  bags are labelled with the vertices they contain 
  (sample graphviz command: neato -Tpdf -o tree.pdf tree.dot). 
-./bin/td_viz -f ./sample_graphs/1dc.64.dimacs -t ./sample_graphs/1dc.64.tree -e 
+* ./bin/td_viz -f ./sample_graphs/1dc.64.dimacs -t ./sample_graphs/1dc.64.tree -e 
 
 More information on the output formats for the weighted independent set executables is in the README in max_wis.
 
