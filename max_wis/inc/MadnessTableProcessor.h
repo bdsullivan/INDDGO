@@ -114,13 +114,13 @@ class MadnessTableProcessor: public WorldObject<MadnessTableProcessor>
     // d8w: 04/20/2012
     // Had occasional segfaults with larger graphs since map
     // operations are not thread safe therefore replaced maps with arrays.
-	//map<int, list<pair<bigint_t, int>>*> ind_sets;
+	//map<int, list< pair< bigint_t, int> > *> ind_sets;
     //map<int, MutexFair *> nodelocks;
     //map<int, TDSolution *> hashtbl_ptr;
 
     MutexFair **vec_lock;
     TDSolution **vec_hashtbl;
-    list<pair<bigint_t,int>> **vec_ind_sets;
+    list< pair<bigint_t,int> > **vec_ind_sets;
 
     MutexFair lock;
 	int num_mask_words;
@@ -130,11 +130,11 @@ class MadnessTableProcessor: public WorldObject<MadnessTableProcessor>
 	TDMadTreeNode compute_table_leaf(int inode, int p);
 	int update_table(int inode, TDMadTreeNode cnode, int cindex, int child);
 	int create_new_table(int inode);
-	Future<TDMadTreeNode> check_updates(vector<Future<int>> status, int inode);
+	Future<TDMadTreeNode> check_updates(vector< Future<int> > status, int inode);
 	TDMadTreeNode create_intersection_table(int inode, int p);
 	vector<bigint_t *> generate_masks(int w, int nchunks);
-	vector<pair<bigint_t, int>> search_region(int inode, bigint_t& start, bigint_t &end);
-	vector<pair<bigint_t, int>> get_final_list(vector<Future<vector<pair<bigint_t, int>>> > futlist);
+	vector< pair<bigint_t, int> > search_region(int inode, bigint_t& start, bigint_t &end);
+	vector< pair<bigint_t, int> > get_final_list(vector< Future< vector< pair<bigint_t, int> > > > futlist);
 
   public:
     MadnessTableProcessor(World& world, int num_nodes, int n, int seed);

@@ -38,7 +38,7 @@ MadnessTableProcessor::MadnessTableProcessor(World& world, int num_nodes, int n,
     //node_container = new WorldContainer<TDKey, TDMadTreeNode> (world, pmap);
     vec_lock = (MutexFair **) malloc(sizeof(MutexFair *) * num_nodes);
     vec_hashtbl = (TDSolution **)malloc(sizeof(TDSolution *) * num_nodes);
-    vec_ind_sets = (list<pair<bigint_t, int>> **) malloc (sizeof(list<pair<bigint_t,int>> *)*num_nodes);
+    vec_ind_sets = (list< pair<bigint_t, int> > **) malloc (sizeof(list< pair<bigint_t,int> > *)*num_nodes);
 
 	process_pending();
 }
@@ -279,7 +279,7 @@ int MadnessTableProcessor::create_new_table(int inode)
     bigint_t current_mask(num_mask_words);
     long num_ind_sets;
 
-    list<pair<bigint_t, int>> *mvs = new list<pair<bigint_t, int>>();
+    list< pair<bigint_t, int> > *mvs = new list< pair<bigint_t, int> >();
     // We already have all the necessary information inside the TDTreeNode
     current_mask = 0;
     // Find out when to stop the loop
@@ -404,8 +404,8 @@ int MadnessTableProcessor::update_table(int inode, TDMadTreeNode cnode,
 
     //while(!(ind_sets.count(inode) > 0)) usleep(100);
 
-    list<pair<bigint_t, int> >::iterator itl;
-    list<pair<bigint_t, int>> *mvs = vec_ind_sets[inode];
+    list< pair<bigint_t, int> >::iterator itl;
+    list< pair<bigint_t, int> > *mvs = vec_ind_sets[inode];
 
     if (!mvs)
     {
@@ -490,8 +490,8 @@ TDMadTreeNode MadnessTableProcessor::create_intersection_table(int inode, int p)
 
     //while(!(ind_sets.count(inode) > 0)) usleep(100);
 
-    list<pair<bigint_t, int> >::iterator itl;
-    list<pair<bigint_t, int>> *mvs = vec_ind_sets[inode];
+    list< pair<bigint_t, int> >::iterator itl;
+    list< pair<bigint_t, int> > *mvs = vec_ind_sets[inode];
     UTHashWrapper uth(node.hash_table, num_mask_words);
 
     if (!mvs)
@@ -570,7 +570,7 @@ TDMadTreeNode MadnessTableProcessor::create_intersection_table(int inode, int p)
 } 
 
 Future<TDMadTreeNode> MadnessTableProcessor::check_updates(
-    vector<Future<int>> status, int inode)
+    vector< Future<int> > status, int inode)
 {
 	int ssize = status.size();
 	int i = 0;
@@ -604,8 +604,8 @@ Future<TDMadTreeNode> MadnessTableProcessor::compute_table(int inode)
     }
 	int i = 0;
     Future<int> a;
-	vector<Future<TDMadTreeNode> > ch_sol;
-	vector<Future<int>> status_vec;
+	vector< Future<TDMadTreeNode> > ch_sol;
+	vector< Future<int> > status_vec;
 	
     list<int>::iterator it = node.adj.begin();
 	++it; // first entry is the parent

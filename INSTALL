@@ -11,7 +11,7 @@ Configuration:
   To configure INDDGO, a make.inc file must be created, containing
   the various options for compilers and optional software packages.
 
-  We provide two example files, make.inc.paralle and make.inc.serial
+  We provide two example files, make.inc.parallel and make.inc.serial
   to get you started.  Simply copy one of these files to make.inc.
   Next, edit it and set the "SRC_DIR" variable to the directory where
   you unpacked INDDGO. 
@@ -34,5 +34,11 @@ make
   various non-default binaries that may be built for testing purposes.
   These will be placed in the appropriate sub-package's /bin directory.
 
-  Tested with the GNU compilers (g++, gcc) and OpenMPI. Please 
-  report problems encountered when using alternatives.
+  Tested with the GNU compilers (g++, gcc, version >= 4.4.3) and OpenMPI. 
+  Please report problems encountered when using alternatives.
+
+Mac users: 
+  Tested with default xcode gcc 4.2.1. You will need to remove 
+  -std=c++0x and -march=native from the CPPFLAGS and CFLAGS variables, 
+  respectively in make.inc. 
+  

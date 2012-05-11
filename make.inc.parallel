@@ -88,8 +88,8 @@ ifeq ($(HAS_PARMETIS),1)
 CXX     = mpicxx
 endif
 
-FC      = gfortran
-FFLAGS	= -O3 -m64
+#FC      = gfortran
+#FFLAGS	= -O3 -m64
 
 CD      = cd
 ECHO    = echo
