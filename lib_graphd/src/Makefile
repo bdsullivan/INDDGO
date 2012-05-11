@@ -6,15 +6,13 @@ ifeq ($(HAS_METIS),1)
 CFILES = $(METIS_PROG_DIR)/smbfactor.c 
 endif
 
-
 LIBNAME = libgraphd.a
 
 GVIZ=../bin/gviz
 # include directories
 INCLUDES = -I../inc/ -I/usr/local/include $(METIS_INCLUDES) -I$(AMD)/Include -I$(AMD)/../UFconfig $(PARMETIS_INCDIR) 
-# library paths
-LIBDIR= -L$(INDDGO_LIB) -L/usr/local/lib -L$(METIS_LIB_DIR) -L$(AMD)/Lib  -L$(PARMETIS_LIBDIR)
-LIBS = $(LIBDIR) $(AMD_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB)
+# libraries
+LIBS = -L/usr/local/lib $(INDDGO_LIB) $(AMD_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB)
 # source
 SRC := Log.cpp GraphReader.cpp DIMACSGraphReader.cpp AdjMatrixGraphReader.cpp Node.cpp GraphReaderWriterFactory.cpp \
 	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp WeightedGraph.cpp MutableGraph.cpp WeightedMutableGraph.cpp GraphProperties.cpp\
@@ -45,18 +43,18 @@ all: $(INDDGO_LIB)/$(LIBNAME)  $(GVIZ)
 	$(CXX) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -c $< 	
 
 $(INDDGO_LIB)/$(LIBNAME): $(OBJ) $(POBJ)
-	ar -rv $(INDDGO_LIB)/$(LIBNAME) $^
+	ar -rv $(INDDGO_LIB_DIR)/$(LIBNAME) $^
 
 #builds the library to the lib directory inside lib_graphd
-locallib: $(INDDGO_LIB)/$(LIBNAME)
-	cp $(INDDGO_LIB)/$(LIBNAME) ../lib/$(LIBNAME)
+locallib: $(INDDGO_LIB_DIR)/$(LIBNAME)
+	cp $(INDDGO_LIB_DIR)/$(LIBNAME) ../lib/$(LIBNAME)
 
 
 $(GVIZ): gviz.cpp
-	$(CXX) -I../inc $(CFLAGS) $< -o $@ $(INCLUDES) $(LIBS) -L$(INDDGO_LIB) -lgraphd
+	$(CXX) -I../inc $(CFLAGS) $< -o $@ $(INCLUDES) $(LIBS)  -lgraphd
 
 clean:
-	rm -f *.o \#* PI* ${EXECUTABLES} core *~ $(OBJ) $(OUT) $(INDDGO_LIB)/$(LIBNAME) ../lib/$(LIBNAME) $(GVIZ)
+	rm -f *.o \#* PI* ${EXECUTABLES} core *~ $(OBJ) $(OUT) $(INDDGO_LIB_DIR)/$(LIBNAME) ../lib/$(LIBNAME) $(GVIZ)
 
 # makefile tutorial: http://www.cs.duke.edu/~ola/courses/programming/Makefiles/node1.html
 

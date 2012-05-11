@@ -47,7 +47,7 @@ UFCONFIG = #FILL IN
 
 #NOTE: the build directory is usually platform dependent.
 PARMETIS_SRC_DIR =
-PARMETIS_LIBDIR =  
+PARMETIS_LIB_DIR =  
 METIS_SRC_DIR  = #FILL IN
 METIS_LIB_DIR = #FILL IN
 
@@ -125,7 +125,8 @@ PTREE	= $(SRC_DIR)/lib_ptreed
 WIS 	= $(SRC_DIR)/max_wis
 VIZ	= $(SRC_DIR)/viz
 UTIL	= $(SRC_DIR)/util 
-INDDGO_LIB = $(SRC_DIR)/lib
+INDDGO_LIB_DIR = $(SRC_DIR)/lib
+INDDGO_LIB = -L$(INDDGO_LIB_DIR)
 INDDGO_BIN = $(SRC_DIR)/bin
 SUBDIRS = $(GRAPH) $(TREE) $(PTREE)  $(VIZ) $(WIS) $(UTIL)
 MADNESS	= $(SRC_DIR)/madness
@@ -158,8 +159,8 @@ ifeq ($(HAS_PARMETIS),1)
 ifeq ($(HAS_METIS),0)
 $(error When HAS_PARMETIS = 1, HAS_METIS must also be 1)
 endif
-ifeq ($(PARMETIS_LIBDIR), )
-$(error When HAS_PARMETIS = 1, you must define the PARMETIS_LIBDIR directory variable)  
+ifeq ($(PARMETIS_LIB_DIR), )
+$(error When HAS_PARMETIS = 1, you must define the PARMETIS_LIB_DIR directory variable)  
 endif
 ifeq ($(PARMETIS_SRC_DIR), )
 $(error When HAS_PARMETIS = 1, you must define the PARMETIS_SRC_DIR directory variable)  
@@ -199,11 +200,6 @@ endif
 # If you have non-default third party builds, you may need to edit this.
 #
 
-ARPACK_LIB=
-ifeq ($(HAS_ARPACK),1)
-ARPACK_LIB= -larpack_x86_64 -lgfortran
-endif 
-
 MPILIBS =
 MADLIBS = -lMADworld
 
@@ -221,6 +217,12 @@ PARMETIS_INCDIR=
 ifeq ($(HAS_PARMETIS),1)
 PARMETIS_INCDIR= -I$(PARMETIS_SRC_DIR)/include
 endif
+
+ARPACK_LIB=
+ifeq ($(HAS_ARPACK),1)
+ARPACK_LIB= -larpack_x86_64 -lgfortran
+endif 
+
 
 #-----------------------------------------------------------------
 #
@@ -268,71 +270,62 @@ ALIBS =  $(ARPACKLIB) $(LAPACKLIB) $(BLASLIB)
 # You should not need to edit these in almost all cases.
 #
 
+ifeq ($(HAS_ARPACK),1)
+CFLAGS := $(CFLAGS) -DHAS_ARPACK
+VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_ARPACK
+ARPACK_LIB := -L $(ARPACK) $(ARPACK_LIB)
+endif
 
 METIS_LIB =
 VALGRIND_FLAGS= 
 ifeq ($(HAS_METIS),1)
 CFLAGS := $(CFLAGS) -DHAS_METIS -D_FILE_OFFSET_BITS=64
 VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_METIS
-METIS_LIB := -lmetis
+METIS_LIB := -L$(METIS_LIB_DIR) -lmetis
 endif
 
 PARMETIS_LIB=
 PARMETISOBJ= 
 ifeq ($(HAS_PARMETIS),1)
 CFLAGS := $(CFLAGS) -DHAS_PARMETIS
-PARMETISOBJ = $(METIS_LIB_DIR)/libmetis.a $(PARMETIS_LIBDIR)/libparmetis.a
-PARMETIS_LIB := -lparmetis
+PARMETISOBJ = $(METIS_LIB_DIR)/libmetis.a $(PARMETIS_LIB_DIR)/libparmetis.a
+PARMETIS_LIB := -L$(PARMETIS_LIB_DIR) -lparmetis
 endif
 
-
-ARPACK_LIBDIR=
-ifeq ($(HAS_ARPACK),1)
-CFLAGS := $(CFLAGS) -DHAS_ARPACK
-VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_ARPACK
-ARPACK_LIBDIR= -L $(ARPACK)
-endif
 
 GMP_INCDIR=
-GMP_LIBDIR=
 GMP_LIB=
 ifeq ($(HAS_GMP),1)
 CFLAGS := $(CFLAGS) -DHAS_GMP
 VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_GMP
 GMP_INCDIR=-I$(GMP)/include
-GMP_LIBDIR=-L$(GMP)/lib
-GMP_LIB= -lgmp
+GMP_LIB= -L$(GMP)/lib -lgmp
 
 endif
 
 
 AMD_INCDIR=
-AMD_LIBDIR=
 AMD_LIB=
 ifeq ($(HAS_AMD),1)
 CFLAGS := $(CFLAGS) -DHAS_AMD
 VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_AMD
 AMD_INCDIR= -I$(AMD)/Include -I$(UFCONFIG)
-AMD_LIBDIR= -L$(AMD)/Lib
-AMD_LIB= -lamd
-
+AMD_LIB= -L$(AMD)/Lib -lamd
 endif
 
 MADNESS_INCDIR= 
-MADNESS_LIBDIR= 
 MADNESS_LIB= 
 ifeq ($(HAS_MADNESS),1)
 MADNESS_INCDIR= -I$(MADNESS_INSTALL_DIR)/include
-MADNESS_LIBDIR= -L$(MADNESS_INSTALL_DIR)/lib
-MADNESS_LIB= $(MADLIBS) -lpthread
+MADNESS_LIB= -L$(MADNESS_INSTALL_DIR)/lib $(MADLIBS) -lpthread
 SUBDIRS := $(SUBDIRS) $(MADNESS) 
 endif
 
+IGRAPH_LIB=
+IGRAPH_INCDIR=
 ifeq ($(HAS_IGRAPH),1)
 CFLAGS := $(CFLAGS) -DHAS_IGRAPH
-IGRAPH_LIBDIR= -L $(IGRAPH_INSTALL_DIR)/lib
-IGRAPH_LIB= -ligraph
+IGRAPH_LIB= -L $(IGRAPH_INSTALL_DIR)/lib -ligraph
 IGRAPH_INCDIR = -I $(IGRAPH_INSTALL_DIR)/include/igraph
-
 endif
 
