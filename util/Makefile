@@ -14,7 +14,7 @@ all: $(PKT_EXE)
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
 $(PKT_EXE): $(PKT_OBJ) 
-	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) -o $@ 
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 clean: 
 	-rm -rf $(PKT_OBJ) $(PKT_EXE)

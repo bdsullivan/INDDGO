@@ -16,7 +16,7 @@ all: $(VIZ_EXE)
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
 $(VIZ_EXE): $(VIZ_OBJ)
-	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) -o $(VIZ_EXE)
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $(VIZ_EXE)
 
 clean: 
 	-rm -rf $(VIZ_OBJ)
