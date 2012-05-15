@@ -57,11 +57,21 @@ static void prepare(TDTree *T, int k, bool x)
 
 int main(int argc, char** argv)
 {
+  int mad_threads;
+  char *env;
+  env = getenv("MAD_NUM_THREADS");
+  if(env != NULL){
+    mad_threads = atoi(env);
+  } else {
+    fprintf(stderr,"ERROR: MAD_NUM_THREADS must be set in your environment\n");
+    //finalize();
+    exit(1);
+  }
+
   initialize(argc, argv);
   World world(MPI::COMM_WORLD);
   // For debugging uncomment following line.
   //redirectio(world);
-  char *env;
   
   Graph::WeightedMutableGraph *G;
   TDTree *T = NULL;
@@ -70,11 +80,7 @@ int main(int argc, char** argv)
   
   char lfname[100];
   char efname[100];
-  
-  int ptd_threads;
-  int mad_threads;
-  int omp_threads;
-  
+    
   int rank = world.rank();
   ostringstream os;
 
@@ -96,15 +102,8 @@ int main(int argc, char** argv)
       exit(-1);
     }
 
-
-  env = getenv("MAD_NUM_THREADS");
-  if(env != NULL){
-    mad_threads = atoi(env);
-  } else {
-    fprintf(stderr,"ERROR: MAD_NUM_THREADS must be set in your environment\n");
-    finalize();
-    exit(1);
-  }
+  int ptd_threads;  
+  int omp_threads;
   
   env = getenv("PTD_NUM_THREADS");
   if(env != NULL){
