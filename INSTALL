@@ -35,10 +35,16 @@ make
   These will be placed in the appropriate sub-package's /bin directory.
 
   Tested with the GNU compilers (g++, gcc, version >= 4.4.3) and OpenMPI. 
-  Please report problems encountered when using alternatives.
+  No support is provided for non-GCC compilers.
 
 Mac users: 
-  Tested with default xcode gcc 4.2.1. You will need to remove 
-  -std=c++0x and -march=native from the CPPFLAGS and CFLAGS variables, 
-  respectively in make.inc. 
+  Tested with default xcode gcc 4.2.1. You need to set the OLDGCC variable
+  in your make.inc file. 
+  WARNING: Some MADNESS developers have reported problems
+  with the new Lion (10.7) MacOS version causing runtime errors, including segmentation 
+  faults and incorrect results in upper-level MADNESS functionality. Since
+  INDDGO's parallel dynamic programming relies on the MADNESS runtime, similar 
+  problems may occur (we have not done extensive testing). One possible solution
+  is to compile for Snow Leopard (10.6), which can be done by setting an environment
+  variable. 
   
