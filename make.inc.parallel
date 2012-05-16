@@ -66,10 +66,10 @@ GTEST_DIR=
 CC	= gcc
 CXX     = g++
 # Set the following flag to 1 if you are compiling with a gcc version < 4.4
-OLDGCC	= 0 
+OLDGCC	= 0
 
 CFLAGS = -O3
-CPPFLAGS = -std=c++0x 
+CPPFLAGS =
 LDFLAGS = 
 
 ifeq ($(LOG_ENABLED), 1)
@@ -80,7 +80,9 @@ ifeq ($(HAS_MADNESS),1)
 CXX     = mpicxx
 ifeq ($(OLDGCC), 1)
 CFLAGS := $(CFLAGS) -D__MADNESS__ -D_OLDGCC -Wno-strict-aliasing -Wno-deprecated -ffast-math 
-else
+endif
+ifeq ($(OLDGCC), 0)
+CPPFLAGS := $(CPPFLAGS) -std=c++0x 
 CFLAGS := $(CFLAGS) -D__MADNESS__ -std=c++0x -Wno-strict-aliasing -Wno-deprecated -ffast-math -march=native
 endif
 endif
