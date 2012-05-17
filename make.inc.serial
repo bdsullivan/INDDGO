@@ -48,6 +48,7 @@ UFCONFIG = #FILL IN
 #NOTE: the build directory is usually platform dependent.
 PARMETIS_SRC_DIR =
 PARMETIS_LIB_DIR =  
+#NOTE: the METIS_SRC_DIR should be the directory containing programs and GKLib
 METIS_SRC_DIR  = #FILL IN
 METIS_LIB_DIR = #FILL IN
 
