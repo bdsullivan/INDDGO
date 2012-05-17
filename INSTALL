@@ -19,6 +19,10 @@ Configuration:
   Various HAS_<PACKAGENAME> variables may be set.  If set, you must also
   set the corresponding directory variable further on in the make.inc.
 
+  Note that trailing spaces in your variable declarations may cause 
+  Make to fail in seemingly random ways (directories and 0/1 values are 
+  particularly susceptable).
+
   We provide a copy of the MADNESS runtime library, however other
   dependencies must be installed manually.
 
@@ -41,10 +45,10 @@ Mac users:
   Tested with default xcode gcc 4.2.1. You need to set the OLDGCC variable
   in your make.inc file. 
   WARNING: Some MADNESS developers have reported problems
-  with the new Lion (10.7) MacOS version causing runtime errors, including segmentation 
-  faults and incorrect results in upper-level MADNESS functionality. Since
-  INDDGO's parallel dynamic programming relies on the MADNESS runtime, similar 
-  problems may occur (we have not done extensive testing). One possible solution
-  is to compile for Snow Leopard (10.6), which can be done by setting an environment
-  variable. 
+  with the new Lion (10.7) MacOS version causing runtime errors, including 
+  segmentation faults and incorrect results in upper-level MADNESS 
+  functionality. Since INDDGO's parallel dynamic programming relies on 
+  the MADNESS runtime, similar problems may occur (we have not done extensive 
+  testing). One possible solution is to compile for Snow Leopard (10.6), 
+  which can be done by setting an environment variable. 
   

@@ -34,24 +34,24 @@ test: testgraph testtree
 #
 
 graph:
-	@($(CD) $(GRAPH)/src;\
+	@($(CD) "$(GRAPH)/src";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
 tree: deps
-	@($(CD) $(TREE);\
+	@($(CD) "$(TREE)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
 ptree: 
 ifeq ($(HAS_MADNESS), 1)
-	@($(CD) $(PTREE);\
+	@($(CD) "$(PTREE)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 endif
 
 valtree:
-	@($(CD) $(TREE);\
+	@($(CD) "$(TREE)";\
 	$(MAKE) td_valgrind ;\
 	$(CD) ..;)
 
@@ -60,7 +60,7 @@ valtree:
 #  Targets for weighted independent set
 #
 wis: libs deps
-	@($(CD) $(WIS);\
+	@($(CD) "$(WIS)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
@@ -70,7 +70,7 @@ wis: libs deps
 #
 
 viz: graph tree 
-	@($(CD) $(VIZ);\
+	@($(CD) "$(VIZ)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
@@ -78,7 +78,7 @@ viz: graph tree
 #  Targets for utilities
 #
 util: graph 
-	@($(CD) $(UTIL);\
+	@($(CD) "$(UTIL)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
@@ -90,7 +90,7 @@ util: graph
 
 $(MADLIB):
 ifeq ($(HAS_MADNESS), 1)
-	@($(CD) $(MADNESS);\
+	@($(CD) "$(MADNESS)";\
 	$(AUTOGEN);\
 	$(CONFIGURE) --prefix=$(MADNESS_INSTALL_DIR);\
 	$(MAKE) -j 4 libraries; $(MAKE) install;\
@@ -104,7 +104,7 @@ endif
 
 testgraph:
 ifeq ($(HAS_GTEST), 1)
-	@($(CD) $(GRAPH)/test;\
+	@($(CD) "$(GRAPH)/test";\
 	$(MAKE) ;\
 	$(RUN_TEST) ;\
 	$(CD) ..;)
@@ -114,7 +114,7 @@ endif
 
 testtree:
 ifeq ($(HAS_GTEST), 1)
-	@($(CD) $(TREE)/test;\
+	@($(CD) "$(TREE)/test";\
 	$(MAKE) ;\
 	$(RUN_TEST) ;\
 	$(CD) ..;)
@@ -132,7 +132,7 @@ clean:
 	@( \
 	for f in $(GRAPH)/src $(GRAPH)/test $(PTREE) $(TREE) $(WIS) $(VIZ) $(UTIL); \
 	do \
-		$(CD) $$f; \
+		$(CD) "$$f"; \
 		$(MAKE) clean;\
 		$(CD) ..; \
 	done );
@@ -143,33 +143,33 @@ cleandeps: cleanmad
 
 # Targets for cleaning INDDGO-distributed subdirectories
 cleanmad:
-	@($(CD) $(MADNESS);\
+	@($(CD) "$(MADNESS)";\
 	$(MAKE) distclean;\
 	$(CD) ..;)
 	rm -f $(MADLIB)
 
 cleangraph: 
-	@($(CD) $(GRAPH);\
+	@($(CD) "$(GRAPH)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
 cleantree:
-	@($(CD) $(TREE);\
+	@($(CD) "$(TREE)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
 cleanwis: 
-	@($(CD) $(WIS);\
+	@($(CD) "$(WIS)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
 cleanviz: 
-	@($(CD) $(VIZ);\
+	@($(CD) "$(VIZ)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
 cleanutil: 
-	@($(CD) $(UTIL);\
+	@($(CD) "$(UTIL)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
