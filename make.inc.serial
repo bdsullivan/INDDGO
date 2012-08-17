@@ -48,6 +48,9 @@ UFCONFIG = #FILL IN
 #NOTE: the build directory is usually platform dependent.
 PARMETIS_SRC_DIR =
 PARMETIS_LIB_DIR =  
+#NOTE: the METIS_SRC_DIR should be the directory containing programs/ and GKLib/ dirs
+#NOTE: when building Metis, we have seen cases where setting IDXTYPEWIDTH=64 in
+#metis.h on a 64-bit system fails, so we recommend leaving IDXTYPEWIDTH=32
 METIS_SRC_DIR  = #FILL IN
 METIS_LIB_DIR = #FILL IN
 
