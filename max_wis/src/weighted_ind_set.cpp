@@ -53,6 +53,7 @@ void usage(const char *s)
 			"\t        post-processing the tree decomposition\n"
 			"\t -check will manually verify the TD (can be slow!)\n"
 			"\t --- Elimination Order Options ---\n"
+			"\t -lower_bounds : Runs two lower bound heuristics and prints results. Can be used in combination with all other EO options."
 			"\t -s start_v : uses start_v as first vertex in ordering\n"
 			"\t -mind : generates an elim. ordering using min degree heuristic\n"
 			"\t -mmd: generates an elim. ordering using multiple min degree heuristic\n"
@@ -2704,6 +2705,19 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
     }
 
 	Graph::WeightedMutableGraph H = *G;
+
+	//Run (optional) lower bound heuristics and print information
+	if(info->lower_bounds)
+	  {
+	    int lb; 
+	    
+	    lb = eoutil.get_tw_lower_bound(G, GD_MAX_MIN_DEGREE_LB, 0); 
+	    printf("%s: MMD Lower Bound %d\n", info->DIMACS_file, lb);
+	    lb = eoutil.get_tw_lower_bound(G, GD_MCS_LB, 0); 
+	    printf("%s: MCS Lower Bound %d\n", info->DIMACS_file, lb);
+	    
+	  }
+
 	(*T) = new TDTree(&H);
 	// Set the name of T's graph file
 	sprintf((*T)->graph_file, "%s", info->DIMACS_file);

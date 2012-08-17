@@ -43,6 +43,9 @@ int DP_info::process_DP_info(int num_args, char **args)
 			this->decompose_only = true;
 		if (strcmp(args[i], "-fix_DIMACS")==0)
 			this->fix_DIMACS=true;
+		// ELIM ORDER LOWER BOUNDS
+		if (strcmp(args[i], "-lower_bounds")==0)
+		        this->lower_bounds=true;
 		// ELIM ORDER TYPES
 		if (strcmp(args[i], "-lexm") == 0)
 			this->elim_order_type = GD_LEXM_BFS;

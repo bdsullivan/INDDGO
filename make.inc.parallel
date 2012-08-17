@@ -42,7 +42,7 @@ LOG_ENABLED = 1
 ARPACK = 
 
 AMD    = #FILL IN
-#UFconfig is assumed (and required) with AMD
+#SuiteSparse_config, aka UFconfig, is assumed (and required) with AMD
 UFCONFIG = #FILL IN
 
 #NOTE: the build directory is usually platform dependent.

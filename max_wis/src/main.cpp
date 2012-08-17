@@ -140,7 +140,7 @@ int main(int argc, char **argv)
         if (info.decompose_only)
         {
             printf("%s: Treewidth %d\n", info.DIMACS_file, T->width);
-            delete G;
+	    delete G;
             delete T;
             return 1;
         }

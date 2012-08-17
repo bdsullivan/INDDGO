@@ -45,7 +45,7 @@ public:
 	char *DIMACS_file, *model_file, *ord_file, *gviz_file, 
 		*scotch_ord_file, *tree_infile, *tree_outfile, *sol_file, *eorder;
 
-	bool has_graph, read_ordering, read_scotch_ordering,
+	bool lower_bounds, has_graph, read_ordering, read_scotch_ordering,
 		 write_mod, solve_mip, gviz, nice,
 	    gavril, BK, check, nonniceDP, read_tree, write_tree, write_ordered_tree,
 		make_histogram, decompose_only, parent_child, make_nice,

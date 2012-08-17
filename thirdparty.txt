@@ -12,8 +12,8 @@ and which versions we have tested with:
 AMD: /*tested with 2.2.3 (also known compatible with 2.2.0)*/
 http://www.cise.ufl.edu/research/sparse/amd/
 
-UFconfig (required by AMD) /*tested with 3.7.0 (also known compatible with 3.4.0)*/
-http://www.cise.ufl.edu/research/sparse/UFconfig/
+SuiteSparse_config (required by AMD) /*tested with 3.7.0 (also known compatible with 3.4.0), which was named UFconfig; initial testing shows compatibility with version 4.0.0*/
+http://www.cise.ufl.edu/research/sparse/SuiteSparse_config/
 
 ARPACK: /*Note we do not use ARPACK++*/
 http://www.caam.rice.edu/software/ARPACK/
