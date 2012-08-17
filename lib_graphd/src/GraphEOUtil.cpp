@@ -1456,48 +1456,51 @@ namespace Graph
 #endif
     }
 
-    int GraphEOUtil::find_metis_edge_nd_ordering(MutableGraph *mg,
-                                                 vector<int> *ordering)
-    {
-#if !HAS_METIS
-      fatal_error("Called METIS edge_nd without HAS_METIS.\n");
-#else
-        GraphUtil util;
-        util.populate_CRS(mg);
-        vector<int> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
-        int nvtxs = mg->num_nodes;
-        int numflag = 0;
-        //	int options[10];
-        //options[0] = 0;
-        //METIS_EdgeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), &numflag, options,
-        //		&(ordering->at(0)), &(metis_order[0]));
 
-        //BDS 04/03/11 - testing with Metis5.0.2. numflag is now set within ctrl structure
-        //via options array, and default is 0, so no changes. New NULL parameter 
-        // is for vertex weights.
+//DEPRECATED in Metis 5.0.2 as per discussion with G. Karypis. 
+//Removed from INDDGO Aug 17, 2012.
+//     int GraphEOUtil::find_metis_edge_nd_ordering(MutableGraph *mg,
+//                                                  vector<int> *ordering)
+//     {
+// #if !HAS_METIS
+//       fatal_error("Called METIS edge_nd without HAS_METIS.\n");
+// #else
+//         GraphUtil util;
+//         util.populate_CRS(mg);
+//         vector<int> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
+//         int nvtxs = mg->num_nodes;
+//         int numflag = 0;
+//         //	int options[10];
+//         //options[0] = 0;
+//         //METIS_EdgeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), &numflag, options,
+//         //		&(ordering->at(0)), &(metis_order[0]));
 
-        //WARNING -- 
-        //4/04 These options were chosen to (1) try and match what was being set 
-        //as default for OEMETIS before and (2) satisfy the checkParams function
-        //in 5.0.2. They do NOT currently exactly replicate old behaviour.
-        int options[METIS_NOPTIONS];
-        options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_NODE; 
-        options[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM; 
-        options[METIS_OPTION_IPTYPE] = METIS_IPTYPE_EDGE; 
-        options[METIS_OPTION_RTYPE] = METIS_RTYPE_SEP1SIDED; 
-        options[METIS_OPTION_DBGLVL] = 0; 
-        options[METIS_OPTION_NSEPS] = 1;
-        options[METIS_OPTION_SEED] = -1; 
-        options[METIS_OPTION_CCORDER] = 0; 
-        options[METIS_OPTION_NITER] = 10; 
-        options[METIS_OPTION_PFACTOR] = 0; 
-        options[METIS_OPTION_COMPRESS] = 1;
-        METIS_NodeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), NULL, options,
-                     &(ordering->at(0)), &(metis_order[0]));
-        util.free_CRS(mg);
-        return 1;
-#endif
-    }
+//         //BDS 04/03/11 - testing with Metis5.0.2. numflag is now set within ctrl structure
+//         //via options array, and default is 0, so no changes. New NULL parameter 
+//         // is for vertex weights.
+
+//         //WARNING -- 
+//         //4/04 These options were chosen to (1) try and match what was being set 
+//         //as default for OEMETIS before and (2) satisfy the checkParams function
+//         //in 5.0.2. They do NOT currently exactly replicate old behaviour.
+//         int options[METIS_NOPTIONS];
+//         options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_NODE; 
+//         options[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM; 
+//         options[METIS_OPTION_IPTYPE] = METIS_IPTYPE_EDGE; 
+//         options[METIS_OPTION_RTYPE] = METIS_RTYPE_SEP1SIDED; 
+//         options[METIS_OPTION_DBGLVL] = 0; 
+//         options[METIS_OPTION_NSEPS] = 1;
+//         options[METIS_OPTION_SEED] = -1; 
+//         options[METIS_OPTION_CCORDER] = 0; 
+//         options[METIS_OPTION_NITER] = 10; 
+//         options[METIS_OPTION_PFACTOR] = 0; 
+//         options[METIS_OPTION_COMPRESS] = 1;
+//         METIS_NodeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), NULL, options,
+//                      &(ordering->at(0)), &(metis_order[0]));
+//         util.free_CRS(mg);
+//         return 1;
+// #endif
+//     }
 
     int GraphEOUtil::find_amd_ordering(MutableGraph *mg, vector<int> *ordering)
     {
@@ -1766,7 +1769,8 @@ namespace Graph
                                                 vector<int> *ordering, int algorithm, bool triangulate)
     {
         // Valid algorithms: GD_MIN_DEGREE, GD_MCS, GD_MCSM, GD_LEXM_BFS, GD_LEXP_BFS, GD_MIN_FILL, PKT_SORT,
-        // GD_BATCH_MF, GD_METIS_MMD, GD_METIS_NODE_ND, GD_METIS_EDGE_ND, GD_BETA, GD_MINMAX_DEGREE
+        // GD_BATCH_MF, GD_METIS_MMD, GD_METIS_NODE_ND, GD_BETA, GD_MINMAX_DEGREE
+        // Removed GD_METIS_EDGE_ND Aug 17
 
         if (!mg->canonical)
             print_message(0, "%s:  Graph must be in canonical form\n",
@@ -1831,9 +1835,9 @@ namespace Graph
                 this->find_metis_node_nd_ordering(mg, ordering);
                 break;
 
-            case GD_METIS_EDGE_ND:
-                this->find_metis_edge_nd_ordering(mg, ordering);
-                break;
+		//case GD_METIS_EDGE_ND:
+                //this->find_metis_edge_nd_ordering(mg, ordering);
+                //break;
 
             case GD_AMD:
                 this->find_amd_ordering(mg, ordering);

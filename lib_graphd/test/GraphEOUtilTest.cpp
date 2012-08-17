@@ -349,30 +349,30 @@ TEST_F(GraphEOUtilTest, testFindMetisNodeNdOrdering)
 	}
 }
 
-TEST_F(GraphEOUtilTest, testFindMetisEdgeNdOrdering)
-{
-	vector<int> ordering(mg->get_num_nodes(), -1);
-	//	eoutil.find_metis_edge_nd_ordering(mg, &ordering);
-	eoutil.find_elimination_ordering(mg, &ordering, GD_METIS_EDGE_ND, false);
-	int mcs_output[] =
-	{ 0, 112, 7, 28, 1, 96, 11, 2, 70, 49, 26, 84, 4, 19, 8, 16, 104, 100, 21,
-			14, 13, 22, 88, 37, 25, 35, 38, 41, 42, 44, 50, 52, 56, 67, 69, 73,
-			74, 76, 81, 82, 97, 98, 12, 3, 5, 6, 9, 10, 17, 18, 20, 24, 32, 33,
-			34, 36, 40, 48, 64, 65, 66, 68, 72, 80, 127, 124, 31, 115, 122, 47,
-			107, 79, 91, 55, 59, 87, 103, 126, 125, 119, 61, 62, 63, 93, 94,
-			95, 109, 110, 111, 117, 118, 121, 123, 120, 108, 114, 15, 78, 102,
-			101, 106, 99, 105, 90, 89, 86, 71, 83, 85, 46, 75, 77, 92, 58, 57,
-			51, 53, 54, 39, 23, 43, 45, 30, 116, 27, 29, 113, 60 };
+// TEST_F(GraphEOUtilTest, testFindMetisEdgeNdOrdering)
+// {
+// 	vector<int> ordering(mg->get_num_nodes(), -1);
+// 	//	eoutil.find_metis_edge_nd_ordering(mg, &ordering);
+// 	eoutil.find_elimination_ordering(mg, &ordering, GD_METIS_EDGE_ND, false);
+// 	int mcs_output[] =
+// 	{ 0, 112, 7, 28, 1, 96, 11, 2, 70, 49, 26, 84, 4, 19, 8, 16, 104, 100, 21,
+// 			14, 13, 22, 88, 37, 25, 35, 38, 41, 42, 44, 50, 52, 56, 67, 69, 73,
+// 			74, 76, 81, 82, 97, 98, 12, 3, 5, 6, 9, 10, 17, 18, 20, 24, 32, 33,
+// 			34, 36, 40, 48, 64, 65, 66, 68, 72, 80, 127, 124, 31, 115, 122, 47,
+// 			107, 79, 91, 55, 59, 87, 103, 126, 125, 119, 61, 62, 63, 93, 94,
+// 			95, 109, 110, 111, 117, 118, 121, 123, 120, 108, 114, 15, 78, 102,
+// 			101, 106, 99, 105, 90, 89, 86, 71, 83, 85, 46, 75, 77, 92, 58, 57,
+// 			51, 53, 54, 39, 23, 43, 45, 30, 116, 27, 29, 113, 60 };
 
-	int i = 0;
-	int n = mg->get_num_nodes();
+// 	int i = 0;
+// 	int n = mg->get_num_nodes();
 
-	for (i = 0; i < n; i++)
-	{
-		EXPECT_EQ(mcs_output[i], ordering[i])
-			;
-	}
-}
+// 	for (i = 0; i < n; i++)
+// 	{
+// 		EXPECT_EQ(mcs_output[i], ordering[i])
+// 			;
+// 	}
+// }
 
 TEST_F(GraphEOUtilTest, testFindAmdOrdering)
 {

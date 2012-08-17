@@ -95,14 +95,14 @@ extern "C"{
 #define     GD_BATCH_MF             7
 #define     GD_METIS_MMD            8
 #define     GD_METIS_NODE_ND        9
-#define     GD_METIS_EDGE_ND        10
+//#define     GD_METIS_EDGE_ND        10
 #define     GD_BETA                 11
 #define     GD_AMD                  12
 #define     GD_MUL_MIN_DEGREE       13
 #define     GD_MINMAX_DEGREE        14
 
 //array of names for the elimination ordering routines defined above
-static const char EO_NAMES[][30] = {"MinDegree", "MCS", "MCS-M", "LEX-M", "LEX-P", "MinFill", "PKT_sort", "Batch-MinFill", "MetisMMD", "MetisNodeND", "MetisEdgeND", "BetaOrdering", "AMDOrdering", "MultipleMinDegree", "MinMaxDegree", "Unknown"};
+static const char EO_NAMES[][30] = {"MinDegree", "MCS", "MCS-M", "LEX-M", "LEX-P", "MinFill", "PKT_sort", "Batch-MinFill", "MetisMMD", "MetisNodeND", "DEPRECATED" /*"MetisEdgeND"*/, "BetaOrdering", "AMDOrdering", "MultipleMinDegree", "MinMaxDegree", "Unknown"};
 
 
 // Update the # of heuristics as new ones are added

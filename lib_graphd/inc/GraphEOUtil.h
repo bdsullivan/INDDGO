@@ -39,50 +39,50 @@ private:
     //int fs;
 	// Private elimination ordering routines
 	// The versions without a start_v find a random "good" vertex (just low degree for now)
-	// TD_MCS
+	// GD_MCS
 	int find_mcs_ordering(MutableGraph *mg, vector<int> *ordering, int start_v);
 	int find_mcs_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_MIN_DEGREE
+	// GD_MIN_DEGREE
 	int find_min_degree_ordering(MutableGraph *mg, vector<int> *ordering,
 			int start_v);
 	int find_min_degree_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_MUL_MIN_DEGREE
+	// GD_MUL_MIN_DEGREE
 	int find_mul_min_degree_ordering(MutableGraph *mg, vector<int> *ordering,
 			int start_v);
 	int find_mul_min_degree_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_PKT_SORT
+	// GD_PKT_SORT
 	int find_pkt_sort_ordering(MutableGraph *mg, vector<int> *ordering,
 			int start_v);
 	int find_pkt_sort_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_LEXM
+	// GD_LEXM
 	int find_lexm_bfs_ordering(MutableGraph *mg, vector<int> *ordering,
 			int start_v);
 	int find_lexm_bfs_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_LEXP
+	// GD_LEXP
 	int find_lexp_bfs_ordering(MutableGraph *mg, vector<int> *ordering,
 			int start_v);
 	int find_lexp_bfs_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_MCSM
+	// GD_MCSM
 	int
 	find_mcsm_ordering(MutableGraph *mg, vector<int> *ordering, int start_v);
 	int find_mcsm_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_MIN_FILL
+	// GD_MIN_FILL
 	int find_min_fill_ordering(MutableGraph *mg, vector<int> *ordering);
 	int find_min_fill_ordering(MutableGraph *mg, vector<int> *ordering,
 			int start_v);
-	// TD_BATCH_FILL
+	// GD_BATCH_FILL
 	int find_batch_min_fill_ordering(MutableGraph *mg, vector<int> *ordering);
 	int find_batch_min_fill_ordering(MutableGraph *mg, vector<int> *ordering,
 			int start_v);
-	// TD_BETA
+	// GD_BETA
 	int find_beta_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_METIS_MMD
+	// GD_METIS_MMD
 	// We currently don't control any of the parameters (including start_v)
 	int find_metis_mmd_ordering(MutableGraph *mg, vector<int> *ordering);
-	/// TD_METIS_NODE_ND
+	/// GD_METIS_NODE_ND
 	int find_metis_node_nd_ordering(MutableGraph *mg, vector<int> *ordering);
-	// TD_METIS_EDGE_ND
-	int find_metis_edge_nd_ordering(MutableGraph *mg, vector<int> *ordering);
+	// GD_METIS_EDGE_ND
+	//int find_metis_edge_nd_ordering(MutableGraph *mg, vector<int> *ordering);
 
 	int find_amd_ordering(MutableGraph *mg, vector<int> *ordering);
 	//GD_MAXMIN_DEGREE
