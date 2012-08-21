@@ -40,7 +40,7 @@ public:
 	  *scotch_ord_file, *tree_infile, *tree_outfile, *score_infile; 
 
 	bool has_graph, read_ordering, read_scotch_ordering,
-	   nice, gavril, BK, 
+	  nice, gavril, BK, superetree,
 	  read_tree, write_tree, write_ordered_tree,
 	  make_histogram, make_nice, use_scores, subtree, log_range;
 

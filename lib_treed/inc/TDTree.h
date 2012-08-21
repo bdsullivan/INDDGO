@@ -129,6 +129,11 @@ public:
     // Boolean indicates whether or not to push new node creation down the tree when 
     // possible when encountering a one-child node.
     void construct_knice(vector<int> *elim_order, int k, bool descend_one); 
+
+    //Construct a tree decomposition from supernodal elimination tree.
+    //FUTURE WORK: If elim_order is NULL, elimination order to be determined using methods in SuiteSparse
+    //specified by integer parmaeter using constants defined in GraphDecomposition.h 
+    void construct_superetree(vector<int> *elim_order);
     
     //Converts a given rooted tree decomposition into a nice TD of equal width.
     void make_nice();

@@ -1001,6 +1001,108 @@ void TDTree::construct_gavril(vector<int> *elim_order)
 }
 
 
+/** Constructs a tree decomposition of this->G from supernodal elimination tree.   
+ * Uses cholmod, a part of SuiteSparse by Tim Davis. Exits with errors if not installed.
+ * IMPORTANT: The graph does not need to be triangulated for this! Saves a huge amount of time and space, 
+ * so please update calling routines to avoid triangulation when creating trees this way.
+ * The graph G is assumed to have  a single connected component since tree decompositions
+ * of disconnected components can be joined together in an arbitrary way.
+ */
+void TDTree::construct_superetree(vector<int> *elim_order)
+{  
+  if(!HAS_SUITESPARSE)
+	{
+		fatal_error("%s:  Superetree construction only available with SuiteSparse installed and configured in make.inc"
+			    , __FUNCTION__);
+	}
+  
+  // First make sure this->G has one connected component
+	if(this->G->get_num_components()!=1)
+	{
+		fatal_error("%s:  Tree decomposition routines operate only on connected graphs."
+                    "  This graph has %d connected components\n",__FUNCTION__,
+                    this->G->get_num_components());
+	}
+
+	cholmod_common Common ;
+	SuperTree *S ;
+	int j; 
+
+	//input graph in suitesparse format.
+	Long n = (Long)G->get_num_nodes(); 
+	       
+	Graph::GraphUtil util; 
+	util.populate_CRS(G);
+	// Nodes are numbered 0,1,...,n-1
+	// The neighbors of node i are adjncy[xadj[i]],adjncy[xadj[i]+1],...adjncy[xadj[i+1]-1]
+	vector<int> xadj = G->get_xadj(); 
+	vector<int> adjncy = G->get_adjncy();
+	util.free_CRS(G);
+	
+	Long *Ap =new Long[xadj.size()];
+	for(int i= 0; i < xadj.size(); i++){
+	    Ap[i] = xadj.at(i);
+	}
+	
+	Long *Ai =new Long[adjncy.size()];
+	for(int i= 0; i < adjncy.size(); i++){
+	  Ai[i] = adjncy.at(i);
+	}
+
+	Long *perm =new Long[G->get_num_nodes()];
+	for(int i= 0; i < G->get_num_nodes(); i++){
+	  perm[i] = elim_order->at(i);
+	}
+	
+	cholmod_l_start (&Common) ;             // creates Common for CHOLMOD
+	//set up the methods for superwrap.
+	Common.nmethods = 1 ;
+	Common.method [0].ordering = CHOLMOD_GIVEN ;
+
+	
+	S = SuperWrap (n, Ap, Ai, perm, &Common) ;  // allocates and creates S
+	
+
+	//Populate the tree decomposition from S
+	this->tree_nodes.resize(S->ns,NULL);	
+	for(int k = 0; k < S->ns; k++)
+	  { 
+	  // Create the k^th tree_node
+	  TDTreeNode *next_tree_node;
+	  next_tree_node=new TDTreeNode;
+	  next_tree_node->id=k;	
+	  this->tree_nodes[k]=next_tree_node;
+	  //set up the bag of the tree_node, sorted
+	  for(int l = S->Sp[k]; l < S->Sp[k+1]; l++)
+	    {
+	      this->tree_nodes[k]->bag.push_back(S->Si[l]);
+	    }
+	  this->tree_nodes[k]->bag.sort();
+	}
+	
+
+	//add all the edges
+	for(int i = 0; i < S->ns; i++){
+	  j =  S->Sparent[i];
+	  if(j == -1){
+	    //this is the root, it is its own parent
+	    (this->tree_nodes[i])->adj.push_front(i);
+	  }
+	  else
+	    {
+	      (this->tree_nodes[i])->adj.push_front(j);
+	      (this->tree_nodes[j])->adj.push_back(i);
+	    }
+	}
+
+	SuperFree (&S, &Common) ;                   // frees S
+	cholmod_l_finish (&Common) ;                   // frees contents of Common
+	delete[] perm;
+}
+
+
+
+
 /**
  * Fills up the node_locations[] array so that node_locations[i] is a list of
  * the indices of the tree nodes whose bags contain connected node i.

@@ -37,6 +37,7 @@ TD_info::TD_info()
   this->read_ordering = false;
   this->read_scotch_ordering = false;
     this->nice = false;
+    this->superetree = false;
   this->gavril = false;
   this->BK = false;
   this->read_tree = false;
@@ -109,8 +110,10 @@ void TD_info::process_TD_info(int num_args, char **args,
 			this->elim_order_type = GD_METIS_NODE_ND;
 		if (strcmp(args[i], "-amd") == 0)
 			this->elim_order_type = GD_AMD;
+		if(strcmp(args[i], "-superetree") == 0)
+		  this->superetree = true;
 		if (strcmp(args[i], "-gavril") == 0)
-			this->gavril = true;
+		  this->gavril = true;
 		if (strcmp(args[i], "-bk") == 0)
 			this->BK = true;
 		if (strcmp(args[i], "-nice") == 0)
@@ -202,9 +205,9 @@ void TD_info::process_TD_info(int num_args, char **args,
 					__FUNCTION__);
 
 	// Make sure either nice gavril or bk was selected
-	if (!this->nice && !this->gavril && !this->BK && !this->read_tree)
+	if (!this->nice && !this->gavril && !this->BK && !this->superetree && !this->read_tree)
 		fatal_error(
-				"Have to choose either -nice, -gavril, -BK for the TD type or read tree from file\n");
+				"Have to choose either -superetree, -nice, -gavril, -BK for the TD type or read tree from file\n");
 
 	// Make sure we have at least one method of selecting the elimination ordering
 	if (this->elim_order_type == GD_UNDEFINED && !this->read_ordering
@@ -441,9 +444,17 @@ void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G,
 	    }
 	}
       
-      
+
+			      
+
+
       // Triangulate the graph
       clock_t tri_start = clock(), tri_stop;
+      if(info->superetree){
+	//no need to triangulate
+	tri_stop = tri_start;	
+      }
+      
 #if HAS_METIS
       (*T)->width = eoutil.METIS_triangulate(&H, &ordering);
 #else
@@ -454,6 +465,9 @@ void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G,
       
       // Now create the tree
       info->start=clock();
+      if(info->superetree){
+	(*T)->construct_superetree(&ordering);
+      }
       if (info->gavril)
 	{
 	  (*T)->construct_gavril(&ordering);
