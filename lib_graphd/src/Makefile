@@ -10,7 +10,7 @@ LIBNAME = libgraphd.a
 
 GVIZ=../bin/gviz
 # include directories
-INCLUDES = -I../inc/ -I/usr/local/include $(METIS_INCLUDES) -I$(AMD)/Include -I$(AMD)/../UFconfig $(PARMETIS_INCDIR) 
+INCLUDES = -I../inc/ -I/usr/local/include $(METIS_INCLUDES) $(AMD_INCDIR) $(PARMETIS_INCDIR) 
 # libraries
 LIBS = -L/usr/local/lib $(INDDGO_LIB) $(AMD_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB)
 # source

@@ -20,7 +20,7 @@ SRC_DIR =
 #included in the parmetis install).
 
 HAS_ARPACK	= 0
-HAS_AMD		= 1
+HAS_SUITESPARSE = 1
 HAS_PARMETIS	= 0
 HAS_METIS	= 1
 HAS_IGRAPH	= 0
@@ -41,9 +41,13 @@ LOG_ENABLED = 0
 
 ARPACK = 
 
-AMD    = #FILL IN
-#SuiteSparse_config, aka UFconfig, is assumed (and required) with AMD
-UFCONFIG = #FILL IN
+#directory containing SuiteSparse installation. This includes AMD and SuiteSparse_config/UFconfig.
+SUITESPARSE = #FILL IN
+#AMD is assumed to be in the default subdirectory of SuiteSparse. 
+HAS_AMD = 1
+AMD    = $(SUITESPARSE)/AMD
+#SuiteSparse_config, aka UFconfig, is assumed (and required) with AMD/SuiteSparse
+UFCONFIG = $(SUITESPARSE)/SuiteSparse_config
 
 #NOTE: the build directory is usually platform dependent.
 PARMETIS_SRC_DIR =
@@ -157,15 +161,13 @@ $(error When HAS_ARPACK = 1, you must define the ARPACK directory variable)
 endif
 endif
 
-ifeq ($(HAS_AMD),1)
-ifeq ($(AMD), )
-$(error When HAS_AMD = 1, you must define the AMD directory variable)  
+
+ifeq ($(HAS_SUITESPARSE),1)
+ifeq ($(SUITESPARSE), )
+$(error When HAS_SUITESPARSE = 1, you must define the SUITESPARSE directory variable)  
 endif
-ifeq ($(UFCONFIG), )
-$(error When HAS_AMD = 1, you must define the UFCONFIG directory variable)  
 endif
 
-endif
 
 ifeq ($(HAS_PARMETIS),1)
 ifeq ($(HAS_METIS),0)
@@ -315,12 +317,11 @@ GMP_LIB= -L$(GMP)/lib -lgmp
 
 endif
 
-
 AMD_INCDIR=
 AMD_LIB=
-ifeq ($(HAS_AMD),1)
-CFLAGS := $(CFLAGS) -DHAS_AMD
-VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_AMD
+ifeq ($(HAS_SUITESPARSE),1)
+CFLAGS := $(CFLAGS) -DHAS_SUITESPARSE -DHAS_AMD
+VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_SUITE_SPARSE -DHAS_AMD
 AMD_INCDIR= -I$(AMD)/Include -I$(UFCONFIG)
 AMD_LIB= -L$(AMD)/Lib -lamd
 endif
