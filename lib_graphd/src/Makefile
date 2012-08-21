@@ -10,9 +10,9 @@ LIBNAME = libgraphd.a
 
 GVIZ=../bin/gviz
 # include directories
-INCLUDES = -I../inc/ -I/usr/local/include $(METIS_INCLUDES) $(AMD_INCDIR) $(PARMETIS_INCDIR) 
+INCLUDES = -I../inc/ -I/usr/local/include $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR) 
 # libraries
-LIBS = -L/usr/local/lib $(INDDGO_LIB) $(AMD_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB)
+LIBS = -L/usr/local/lib $(INDDGO_LIB) $(SSPARSE_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB)
 # source
 SRC := Log.cpp GraphReader.cpp DIMACSGraphReader.cpp AdjMatrixGraphReader.cpp Node.cpp GraphReaderWriterFactory.cpp \
 	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp WeightedGraph.cpp MutableGraph.cpp WeightedMutableGraph.cpp GraphProperties.cpp\

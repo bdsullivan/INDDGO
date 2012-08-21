@@ -43,11 +43,6 @@ ARPACK =
 
 #directory containing SuiteSparse installation. This includes AMD and SuiteSparse_config/UFconfig.
 SUITESPARSE = #FILL IN
-#AMD is assumed to be in the default subdirectory of SuiteSparse. 
-HAS_AMD = 1
-AMD    = $(SUITESPARSE)/AMD
-#SuiteSparse_config, aka UFconfig, is assumed (and required) with AMD/SuiteSparse
-UFCONFIG = $(SUITESPARSE)/SuiteSparse_config
 
 #NOTE: the build directory is usually platform dependent.
 PARMETIS_SRC_DIR = #FILL IN
@@ -310,13 +305,18 @@ GMP_LIB= -L$(GMP)/lib -lgmp
 
 endif
 
-AMD_INCDIR=
-AMD_LIB=
+
+SSPARSE_INCDIR=
+SSPARSE_LIB=
 ifeq ($(HAS_SUITESPARSE),1)
-CFLAGS := $(CFLAGS) -DHAS_SUITESPARSE -DHAS_AMD
-VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_SUITE_SPARSE -DHAS_AMD
+AMD    = $(SUITESPARSE)/AMD
+UFCONFIG = $(SUITESPARSE)/SuiteSparse_config
+CFLAGS := $(CFLAGS) -DHAS_SUITESPARSE 
+VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_SUITESPARSE
 AMD_INCDIR= -I$(AMD)/Include -I$(UFCONFIG)
 AMD_LIB= -L$(AMD)/Lib -lamd
+SSPARSE_INCDIR= -I$(SUITESPARSE)/CHOLMOD/Include -I$(SUITESPARSE)/COLAMD/Include $(AMD_INCDIR)
+SSPARSE_LIB= -L$(SUITESPARSE)/CHOLMOD/Lib -lcholmod -L$(SUITESPARSE)/COLAMD/Lib -lcolamd $(AMD_LIB)
 endif
 
 MADNESS_INCDIR= 

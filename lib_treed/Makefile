@@ -3,9 +3,9 @@ include ../make.inc
 DOCS_DIR = ./doc/*
 DOXYFILE = ./Doxyfile
 
-INC_DIR= -I./inc -I$(GRAPH)/inc  $(METIS_INCLUDES) $(AMD_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) $(PARMETIS_INCDIR)
+INC_DIR= -I./inc -I$(GRAPH)/inc  $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) $(PARMETIS_INCDIR)
 
-LIBS = -L./lib -lm -L$(GRAPH)/lib -lgraphd $(INDDGO_LIB) $(METIS_LIB) $(AMD_LIB) $(ARPACK_LIB) $(MPILIBS) $(MADNESS_LIB) $(GMP_LIB) $(PARMETIS_LIB)
+LIBS = -L./lib -lm -L$(GRAPH)/lib -lgraphd $(INDDGO_LIB) $(METIS_LIB) $(SSPARSE_LIB) $(ARPACK_LIB) $(MPILIBS) $(MADNESS_LIB) $(GMP_LIB) $(PARMETIS_LIB)
 
 TD_LIB_NAME = libtreed.a
 
@@ -13,13 +13,20 @@ TD_LIB_NAME = libtreed.a
 TD_PROF_LIB = ./lib/libproftd.a
 TD_VALGRIND_LIB = ./lib/libvaltd.a
 
-SRCS=  ./src/TDTree.cpp ./src/TDTreeNode.cpp ./src/TDSolution.cpp ./src/TDDynamicProgramming.cpp ./src/TDMadTreeNode.cpp
+SRCS=  ./src/TDTree.cpp ./src/TDTreeNode.cpp ./src/TDSolution.cpp ./src/TDDynamicProgramming.cpp ./src/TDMadTreeNode.cpp 
 OBJS=$(SRCS:.cpp=.o)
+
+ifeq ($(HAS_SUITESPARSE),1)
+OBJS = $(SRCS:.cpp=.o) ./src/SuperWrap.o
+endif
 
 all: $(INDDGO_LIB_DIR)/$(TD_LIB_NAME)
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
+
+.c.o:
+	$(CC) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
 # The "normal" TD library
 $(INDDGO_LIB_DIR)/$(TD_LIB_NAME): $(OBJS) $(PARMETISOBJ)

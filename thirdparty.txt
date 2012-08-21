@@ -9,9 +9,14 @@ appropriately so the needed libraries and source can be found for linking.
 Below are the download locations for the third-party software packages, 
 and which versions we have tested with:
 
+SUITESPARSE /*tested with 4.0.0*/
+/*NOTE: As of right now, METIS-4.0 usage inside SUITESPARSE is not supported; you must compile with -DNPARTITION, which can be added to a compile flag in SuiteSparse_config.mk*/
+http://www.cise.ufl.edu/research/sparse/ 
+
+
+/*THESE ARE SUPERCEDED BY SUITESPARSE COMPLETE PACKAGE*/
 AMD: /*tested with 2.2.3 (also known compatible with 2.2.0)*/
 http://www.cise.ufl.edu/research/sparse/amd/
-
 SuiteSparse_config (required by AMD) /*tested with 3.7.0 (also known compatible with 3.4.0), which was named UFconfig; initial testing shows compatibility with version 4.0.0*/
 http://www.cise.ufl.edu/research/sparse/SuiteSparse_config/
 

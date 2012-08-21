@@ -1504,7 +1504,7 @@ namespace Graph
 
     int GraphEOUtil::find_amd_ordering(MutableGraph *mg, vector<int> *ordering)
     {
-#if !HAS_AMD
+#if !HAS_SUITESPARSE
         return 0;
 #else
         GraphUtil util;

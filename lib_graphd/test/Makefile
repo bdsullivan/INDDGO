@@ -28,9 +28,9 @@ include ../../make.inc
 
 CXXFLAGS = $(INCLUDES) -g
 
-INCLUDES = -I ../inc -I. -I $(GTEST_DIR)/include -I$(GTEST_DIR) -I.. $(METIS_INCLUDES) $(AMD_INCDIR) $(PARMETIS_INCDIR)
-LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(AMD_LIB) -L../lib -L $(INDDGO_LIB)
-LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest $(METIS_LIB) $(AMD_LIB)
+INCLUDES = -I ../inc -I. -I $(GTEST_DIR)/include -I$(GTEST_DIR) -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
+LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib -L $(INDDGO_LIB)
+LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest $(METIS_LIB) 
 LFLAGS = $(CFLAGS)
 LIBGRAPHDECOMP=$(GRAPH)/lib/libgraphd.a
 

@@ -27,7 +27,7 @@
  // Define these here if using Windows
  // Otherwise, define them in the makefile
  #define HAS_METIS   1
- #define HAS_AMD     1
+ #define HAS_SUITESPARSE     1
  #define HAS_GOBLIN  1
 #endif
 

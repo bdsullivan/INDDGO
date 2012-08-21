@@ -30,7 +30,7 @@
  // Define these here if using Windows
  // Otherwise, they are set in the makefile
  #define HAS_METIS   1
- #define HAS_AMD     1
+ #define HAS_SUITESPARSE     1
  //#define HAS_ARPACK 1
 #endif
 
@@ -62,7 +62,7 @@ extern "C"{
 
 #endif
 
-#if HAS_AMD
+#if HAS_SUITESPARSE
 extern "C"{
 #include <amd.h>
 }

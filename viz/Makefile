@@ -3,9 +3,9 @@ include ../make.inc
 VIZ_SRC = ./src/viz_main.cpp ./src/viz.cpp
 VIZ_EXE = $(INDDGO_BIN)/td_viz
 
-INC_DIR=  -I./inc -I$(GRAPH)/inc -I$(TREE)/inc $(METIS_INCLUDES) $(AMD_INCDIR) $(UTHASH_INCDIR) $(GMP_INCDIR) $(MADNESS_INCDIR) $(PARMETIS_INCDIR)
+INC_DIR=  -I./inc -I$(GRAPH)/inc -I$(TREE)/inc $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(UTHASH_INCDIR) $(GMP_INCDIR) $(MADNESS_INCDIR) $(PARMETIS_INCDIR)
 
-LIBS = -lm $(INDDGO_LIB) -lgraphd -ltreed $(METIS_LIB) $(AMD_LIB) $(ARPACK_LIB) $(GMP_LIB) 
+LIBS = -lm $(INDDGO_LIB) -lgraphd -ltreed $(METIS_LIB) $(SSPARSE_LIB) $(ARPACK_LIB) $(GMP_LIB) 
 
 
 VIZ_OBJ=$(VIZ_SRC:.cpp=.o)

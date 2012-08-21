@@ -60,5 +60,13 @@
 #include "TDDynamicProgramming.h"
 #include "TDMadTreeNode.h"
 
+#if HAS_SUITESPARSE
+extern "C"{
+#include "SuperWrap.h"
+}
+#endif
+
+
+
 #endif
 

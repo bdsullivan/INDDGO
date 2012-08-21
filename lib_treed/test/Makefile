@@ -27,11 +27,11 @@ include ../../make.inc
 LIBGTEST=libgtest.a
 
 #-----------------------------------------------------------------------------
-INC_DIR= -I./inc -I$(WIS)/inc -I$(TREE)/inc -I$(GRAPH)/inc  $(METIS_INCLUDES) $(AMD_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) -I$(GTEST_DIR)/include -I$(GTEST_DIR) 
+INC_DIR= -I./inc -I$(WIS)/inc -I$(TREE)/inc -I$(GRAPH)/inc  $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) -I$(GTEST_DIR)/include -I$(GTEST_DIR) 
 
-LIBS = -lm -lgraphd -ltreed $(METIS_LIB) $(AMD_LIB) $(ARPACK_LIB) $(MPILIBS) $(MADNESS_LIB) $(GMP_LIB) -lgtest -lpthread
+LIBS = -lm -lgraphd -ltreed $(METIS_LIB) $(SSPARSE_LIB) $(ARPACK_LIB) $(MPILIBS) $(MADNESS_LIB) $(GMP_LIB) -lgtest -lpthread
 
-LIB_DIR = -L./lib -L$(TREE)/lib -L$(GRAPH)/lib/ $(METIS_LIB_DIR) $(AMD_LIBDIR) $(ARPACK_LIBDIR) -L$(GRAPH)/lib $(MADNESS_LIBDIR) $(GMP_LIBDIR) 
+LIB_DIR = -L./lib -L$(TREE)/lib -L$(GRAPH)/lib/ $(METIS_LIB_DIR) $(ARPACK_LIBDIR) -L$(GRAPH)/lib $(MADNESS_LIBDIR) $(GMP_LIBDIR) 
 
 #----changes are below this line----------------------------------------------
 

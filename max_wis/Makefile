@@ -3,9 +3,9 @@ include ../make.inc
 # Optimal WIS for this one is 79 
 TEST_GRAPH = $(SRC_DIR)/sample_graphs/pkt.200.70.75_0.dimacs
 
-INC_DIR=  -I./inc -I$(GRAPH)/inc -I$(TREE)/inc/  $(METIS_INCLUDES) $(AMD_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) $(PARMETIS_INCDIR) -I$(PTREE)/inc/
+INC_DIR=  -I./inc -I$(GRAPH)/inc -I$(TREE)/inc/  $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) $(PARMETIS_INCDIR) -I$(PTREE)/inc/
 
-LIBS = -lm $(INDDGO_LIB) -lgraphd -ltreed $(AMD_LIB) $(ARPACK_LIB) $(MPILIBS) $(MADNESS_LIB) $(GMP_LIB) $(METIS_LIB)
+LIBS = -lm $(INDDGO_LIB) -lgraphd -ltreed $(SSPARSE_LIB) $(ARPACK_LIB) $(MPILIBS) $(MADNESS_LIB) $(GMP_LIB) $(METIS_LIB)
 
 WEIGHTED_IND_SET_SRC = ./src/weighted_ind_set.cpp ./src/main.cpp
 WEIGHTED_IND_SET_EXE = $(INDDGO_BIN)/serial_wis
