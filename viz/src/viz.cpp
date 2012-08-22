@@ -389,14 +389,14 @@ void create_TDviz_graph(TD_info *info, Graph::WeightedMutableGraph *&G)
 void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G,
 		TDTree **T)
 {
-  // Create a copy of G to do the triangulation and elim order
   Graph::GraphEOUtil eoutil;
   
   if (!G)
     {
       return;
     }
-  
+ 
+  // Create a copy of G to do the triangulation and elim order 
   Graph::WeightedMutableGraph H = *G;
   (*T) = new TDTree(&H);
   // Set the name of T's graph file
@@ -453,24 +453,22 @@ void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G,
 	    }
 	}
       
-
-			      
-
-
+		 
       // Triangulate the graph
       clock_t tri_start = clock(), tri_stop;
       if(info->superetree){
 	//no need to triangulate
 	tri_stop = tri_start;	
       }
-      
+      else
+	{
 #if HAS_METIS
-      (*T)->width = eoutil.METIS_triangulate(&H, &ordering);
+	  (*T)->width = eoutil.METIS_triangulate(&H, &ordering);
 #else
-      (*T)->width = eoutil.triangulate(&H, &ordering);
+	  (*T)->width = eoutil.triangulate(&H, &ordering);
 #endif
-      tri_stop = clock();
-
+	  tri_stop = clock();
+	}
       
       // Now create the tree
       info->start=clock();
