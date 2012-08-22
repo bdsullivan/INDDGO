@@ -1095,17 +1095,19 @@ void TDTree::construct_superetree(vector<int> *elim_order)
 	      (this->tree_nodes[j])->adj.push_back(i);
 	    }
 	}
-
+	
+	this->num_tree_nodes=S->ns;
+	for(int i=0;i<this->num_tree_nodes;i++)
+	  {
+	    if(this->tree_nodes[i] && this->tree_nodes[i]->adj.size()==1)
+	      this->num_leafs++;
+	  }
+	
 	SuperFree (&S, &Common) ;                   // frees S
 	cholmod_l_finish (&Common) ;                   // frees contents of Common
 	delete[] perm;
 
-	this->num_tree_nodes=S->ns;
-	for(int i=0;i<this->num_tree_nodes;i++)
-	{
-	  if(this->tree_nodes[i] && this->tree_nodes[i]->adj.size()==1)
-	    this->num_leafs++;
-	}
+
 }
 
 
