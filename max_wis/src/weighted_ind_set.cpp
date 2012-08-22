@@ -2830,18 +2830,6 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 		if(!suppress_timing)
 		  print_message(0, "%.2f:", (double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
 
-		if (info->verbose)
-		{
-			print_message(0, "Triangulation took %f secs\n",
-				(double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
-			print_message(0, "Width=%d\n", (*T)->width);
-		}
-
-        if (info->width)
-        {
-            DEBUG("%s: Width=%d\n", info->DIMACS_file, (*T)->width);
-            return;
-        }
 
 		// Now create the tree
 		info->start=clock();
@@ -2865,6 +2853,22 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 			(*T)->construct_knice(&ordering, (*T)->width, false);
 		}
 		info->stop=clock();
+
+		//moved information about triangulation and width below construction since width in superetree is unknown until here.
+		if (info->verbose)
+		  {
+		    print_message(0, "Triangulation took %f secs\n",
+				  (double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
+		    print_message(0, "Width=%d\n", (*T)->width);
+		  }
+		
+		if (info->width)
+		  {
+		    DEBUG("%s: Width=%d\n", info->DIMACS_file, (*T)->width);
+		    return;
+		  }
+		
+		
 		if(!suppress_timing)
 		  print_message(0, "%.2f:", (double) (info->stop - info->start) / CLOCKS_PER_SEC);
 
@@ -2874,6 +2878,9 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 				(double) (info->stop - info->start) / CLOCKS_PER_SEC);
 		}
 	}
+	
+
+
 	if (!info->nice)
 	{
 		// Root the tree
