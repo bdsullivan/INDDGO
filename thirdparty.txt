@@ -10,7 +10,10 @@ Below are the download locations for the third-party software packages,
 and which versions we have tested with:
 
 SUITESPARSE /*tested with 4.0.0*/
-/*NOTE: As of right now, METIS-4.0 usage inside SUITESPARSE is not supported; you must compile with -DNPARTITION, which can be added to a compile flag in SuiteSparse_config.mk*/
+/*NOTE: As of right now, METIS-4.0 usage inside SuiteSparse is not supported;
+ * you must compile with -DNPARTITION, which can be added to a compile flag 
+ * in SuiteSparse_config.mk. For use with INDDGO 'make library' is sufficient. 
+ */
 http://www.cise.ufl.edu/research/sparse/ 
 
 

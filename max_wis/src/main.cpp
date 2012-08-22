@@ -111,8 +111,19 @@ int main(int argc, char **argv)
         }
 
         int max_tree_nodes=T->tree_nodes.size();
-        // Create the post_order walk - we don't need to do this if we are doing
-        // decompose_only but want to give user the option of doing memory estimate
+
+
+	// Check to see if decompose_only and no memory estimation
+        if (info.decompose_only && !info.mem_est)
+        {
+            printf("%s: Treewidth %d\n", info.DIMACS_file, T->width);
+	    delete G;
+            delete T;
+            return 1;
+        }
+
+
+        // Create the post_order walk - gives user the option of doing memory estimate
         // and then not doing the DP - the mem estimate requires the walk
         vector<int> walk(T->num_tree_nodes, GD_UNDEFINED);
         if (T->info->DFS)
@@ -136,7 +147,7 @@ int main(int argc, char **argv)
             estimate_memory_usage(T, &walk, (const char *)mem_output);
         }
 
-        // Check to see if decompose_only
+        // Check to see if decompose_only (
         if (info.decompose_only)
         {
             printf("%s: Treewidth %d\n", info.DIMACS_file, T->width);
