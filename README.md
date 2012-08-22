@@ -96,3 +96,6 @@ More information on the output formats for the weighted independent set executab
 ##Getting Help
 
 To get help with or discuss INDDGO, join the mailing list at inddgo-info@googlegroups.com
+
+##Licensing
+The INDDGO software suite is generally covered by the BSD 3-clause license found in LICENSE. The madness runtime snapshot is included under the terms found in madness/LICENSE. The SuperWrap functionality for interfacing with CHOLMOD from SuiteSparse is included under the terms found in lib_treed/SuperWrap_LICENSE. 
