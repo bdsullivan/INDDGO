@@ -47,7 +47,7 @@ public:
 
 	bool lower_bounds, has_graph, read_ordering, read_scotch_ordering,
 		 write_mod, solve_mip, gviz, nice,
-	    gavril, BK, check, nonniceDP, read_tree, write_tree, write_ordered_tree,
+	  superetree, gavril, BK, check, nonniceDP, read_tree, write_tree, write_ordered_tree,
 		make_histogram, decompose_only, parent_child, make_nice,
 		very_verbose, free_children, verbose, no_reconstruct, split_bag,
 		asp_root, child_root, refine_td, DFS, async_tbl, mem_est, width, fix_DIMACS, parmetis, pbag;

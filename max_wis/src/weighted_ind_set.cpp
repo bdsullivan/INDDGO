@@ -43,6 +43,7 @@ void usage(const char *s)
 			"\t -sol <sol_file> will write the weighted independent set solution to the given file.\n"
 			"\t      If not given, then solution is written to <DIMACS_file>.WIS.sol\n"
 			"\t --- Decomposition Construction Options ---\n" 
+			"\t -superetree : constructs a non-nice TD using CHOLMOD and supernodal etrees (fast; no triangulation)\n"
 			"\t -gavril : constructs a non-nice TD using Gavril's algorithm\n"
 			"\t -bk : constructs a non-nice TD using BK algorithm\n"
             "\t -pbag : parallel bag generation, non-nice TD using Gavril's algorithm\n"
@@ -2810,14 +2811,22 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 			print_message(0, "\n\n");
 		}
 
-		// Triangulate the graph
+		// Triangulate the graph for methods requiring it.
 		clock_t tri_start = clock(), tri_stop;
+		if(info->superetree){
+		  //no need to triangulate; width set in construction.
+		  tri_stop = tri_start;	
+		}
+		else
+		  {
 #if HAS_METIS
 		(*T)->width = eoutil.METIS_triangulate(&H, &ordering);
 #else
 		(*T)->width = eoutil.triangulate(&H, &ordering);
 #endif
 		tri_stop = clock();
+		
+		  }
 		if(!suppress_timing)
 		  print_message(0, "%.2f:", (double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
 
@@ -2836,6 +2845,10 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 
 		// Now create the tree
 		info->start=clock();
+		if(info->superetree)
+		  {
+		    (*T)->construct_superetree(&ordering);
+		  }
 		if (info->gavril)
 		{
 			(*T)->construct_gavril(&ordering);
@@ -2878,12 +2891,14 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 
 	// Sort the bags
 	int num_tree_nodes=(int) (*T)->tree_nodes.size();
-	for (i = 0; i < num_tree_nodes; i++)
-	{
+	if(!info->superetree)//bags already sorted
+	  {
+	    for (i = 0; i < num_tree_nodes; i++)
+	      {
 		if ((*T)->tree_nodes[i])
-			(*T)->tree_nodes[i]->bag.sort();
-	}
-
+		  (*T)->tree_nodes[i]->bag.sort();
+	      }
+	  }
 	// Reset (*T)'s graph is the original, non-triangulated graph!
 	(*T)->G = G;
 

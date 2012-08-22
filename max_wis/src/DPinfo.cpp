@@ -28,6 +28,7 @@
 */
 int DP_info::process_DP_info(int num_args, char **args)
 {
+  int num_td_methods = 0;
 	if (num_args == 1 || (num_args == 2 && strcmp(args[1], "-h") == 0)
 			|| (num_args == 2 && strcmp(args[1], "--help") == 0) || (num_args
 										 == 2 && strcmp(args[1], "--h") == 0) || (num_args == 2 && strcmp(args[1], "-help")==0))
@@ -76,15 +77,29 @@ int DP_info::process_DP_info(int num_args, char **args)
 		if (strcmp(args[i], "-amd") == 0)
 			this->elim_order_type = GD_AMD;
 		if (strcmp(args[i], "-parmetis") == 0)
-            this->parmetis = true;
+		  this->parmetis = true;
 		if (strcmp(args[i], "-gavril") == 0)
+		  {
 			this->gavril = true;
-        if (strcmp(args[i], "-pbag") == 0)
+			num_td_methods++;
+		  }
+		if (strcmp(args[i], "-superetree") == 0)
+		  {
+		    this->superetree = true;
+		    num_td_methods++;
+		  }
+		if (strcmp(args[i], "-pbag") == 0)
 			this->pbag = true;
 		if (strcmp(args[i], "-bk") == 0)
-			this->BK = true;
+		  {
+		    this->BK = true;
+		    num_td_methods++;
+		  }
 		if (strcmp(args[i], "-nice") == 0)
+		  {
 			this->nice = true;
+			num_td_methods++;
+		  }
 		if (strcmp(args[i], "-check") == 0)
 			this->check = true;
 		if (strcmp(args[i], "-nonniceDP") == 0)
@@ -129,6 +144,7 @@ int DP_info::process_DP_info(int num_args, char **args)
 		{
 			this->tree_infile = args[i + 1];
 			this->read_tree = true;
+			num_td_methods++;
 		}
 		if (strcmp(args[i], "-w") == 0)
 		{
@@ -139,10 +155,10 @@ int DP_info::process_DP_info(int num_args, char **args)
 		{
 			this->write_ordered_tree = true;
 		}
-        if (strcmp(args[i], "-eorder") == 0)
-            this->eorder = args[i + 1];
-        if (strcmp(args[i], "-width") == 0)
-            this->width = true;
+		if (strcmp(args[i], "-eorder") == 0)
+		  this->eorder = args[i + 1];
+		if (strcmp(args[i], "-width") == 0)
+		  this->width = true;
 		if (strcmp(args[i], "-hist") == 0)
 			this->make_histogram = true;
 		if (strcmp(args[i], "-pc") == 0)
@@ -206,10 +222,12 @@ int DP_info::process_DP_info(int num_args, char **args)
 					"%s: -w option requires an output file name. -tpreord must be used with -w <filename>.\n",
 					__FUNCTION__);
 
-	// Make sure either nice gavril or bk was selected
-	if (!this->nice && !this->gavril && !this->BK && !this->write_mod && !this->read_tree && !this->pbag)
+	// Make sure either nice gavril or bk or superetree was selected AND only one tree decomposition option
+	if (num_td_methods != 1 && !this->write_mod)
+	  //!this->nice && !this->gavril && !this->superetree && !this->BK && !this->write_mod && !this->read_tree && !this->pbag)
 		fatal_error(
-				"Have to choose either -nice, -gavril, -BK for the TD type or read tree from file\n");
+				"Have to choose exactly one of -superetree, -nice, -gavril or -BK for the TD type or read tree from file\n");
+
 
 	// Make sure we have at least one method of selecting the elimination ordering
 	if (this->elim_order_type == GD_UNDEFINED && !this->read_ordering

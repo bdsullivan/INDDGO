@@ -41,6 +41,7 @@ DP_info::DP_info()
 	this->gviz = false;
 	this->nice = false;
 	this->gavril = false;
+	this->superetree = false;
 	this->BK = false;
 	this->check = false;
 	this->nonniceDP = false;
