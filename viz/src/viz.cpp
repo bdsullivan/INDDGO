@@ -155,6 +155,7 @@ void TD_info::process_TD_info(int num_args, char **args,
 		if (strcmp(args[i], "-gviz_file") == 0)
 		{
 		  this->gviz_outfile = args[i + 1];
+		    
 		}
 		if (strcmp(args[i], "-hist") == 0)
 			this->make_histogram = true;
@@ -204,6 +205,13 @@ void TD_info::process_TD_info(int num_args, char **args,
 					"%s: -w option requires an output file name. -tpreord must be used with -w <filename>.\n",
 					__FUNCTION__);
 
+	//check gviz_outfile non null
+		if (this->gviz_outfile == NULL)
+			fatal_error(
+					"%s: -gviz_file option requires an output file name.\n",
+					__FUNCTION__);
+
+
 	// Make sure either nice gavril or bk was selected
 	if (!this->nice && !this->gavril && !this->BK && !this->superetree && !this->read_tree)
 		fatal_error(
@@ -238,6 +246,7 @@ void usage(const char *s)
 			        "\t -subtree <nodeid> : Highlight the subtree containing the specified vertex (given by node id). Implies -labels style.\n"
 			        "\t *NOTE* If none of the above are specified, the tree will be rendered with no bag labels and no score information  - just a black & white tree structure\n"
 			        "\t --- Decomposition Construction Options ---\n" 
+				"\t -superetree : constructs a non-nice TD using supernodal elimination trees and CHOLMOD\n"
 				"\t -gavril : constructs a non-nice TD using Gavril's algorithm\n"
 				"\t -bk : constructs a non-nice TD using BK algorithm\n"
 				"\t -nice : constructs a nice TD\n"
