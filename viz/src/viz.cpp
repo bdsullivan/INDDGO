@@ -501,10 +501,13 @@ void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G,
   
   // Sort the bags
   int num_tree_nodes=(int) (*T)->tree_nodes.size();
-  for (i = 0; i < num_tree_nodes; i++)
+  if(!info->superetree)//bags already sorted
     {
-      if ((*T)->tree_nodes[i])
-	(*T)->tree_nodes[i]->bag.sort();
+      for (i = 0; i < num_tree_nodes; i++)
+	{
+	  if ((*T)->tree_nodes[i])
+	    (*T)->tree_nodes[i]->bag.sort();
+	}
     }
   
   // Reset (*T)'s graph is the original, non-triangulated graph!

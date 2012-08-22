@@ -989,6 +989,7 @@ void TDTree::construct_gavril(vector<int> *elim_order)
 		}
 	}
 
+
 	this->num_tree_nodes=k+1; // This was k!
 	// CSG changing loop below upper index from: (int)this->tree_nodes.size()
 	for(i=0;i<this->num_tree_nodes;i++)
@@ -1061,9 +1062,9 @@ void TDTree::construct_superetree(vector<int> *elim_order)
 
 	
 	S = SuperWrap (n, Ap, Ai, perm, &Common) ;  // allocates and creates S
-	
-
+		
 	//Populate the tree decomposition from S
+	this->width = S->maxsuper-1;
 	this->tree_nodes.resize(S->ns,NULL);	
 	for(int k = 0; k < S->ns; k++)
 	  { 
@@ -1085,8 +1086,8 @@ void TDTree::construct_superetree(vector<int> *elim_order)
 	for(int i = 0; i < S->ns; i++){
 	  j =  S->Sparent[i];
 	  if(j == -1){
-	    //this is the root, it is its own parent
-	    (this->tree_nodes[i])->adj.push_front(i);
+	    //this is the root, don't add a parent.
+	    //(this->tree_nodes[i])->adj.push_front(i);
 	  }
 	  else
 	    {
@@ -1098,6 +1099,13 @@ void TDTree::construct_superetree(vector<int> *elim_order)
 	SuperFree (&S, &Common) ;                   // frees S
 	cholmod_l_finish (&Common) ;                   // frees contents of Common
 	delete[] perm;
+
+	this->num_tree_nodes=S->ns;
+	for(int i=0;i<this->num_tree_nodes;i++)
+	{
+	  if(this->tree_nodes[i] && this->tree_nodes[i]->adj.size()==1)
+	    this->num_leafs++;
+	}
 }
 
 
