@@ -60,7 +60,7 @@ namespace Graph
 		vector<Node> nodes = g->get_nodes();
 		list<int> nbrs;
 
-		for (i = 0; i < g->get_num_nodes(); i++)
+		for (i = 0; i < nodes.size(); i++)
 		{
 			nbrs = nodes[i].get_nbrs();
 			it = nbrs.begin();
