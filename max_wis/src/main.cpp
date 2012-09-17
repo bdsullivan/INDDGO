@@ -144,7 +144,7 @@ int main(int argc, char **argv)
         {
             char mem_output[100];
             sprintf(mem_output,"%s.mem_est",info.DIMACS_file);
-            estimate_memory_usage(T, &walk, (const char *)mem_output);
+            info.mem_estimate=estimate_memory_usage(T, &walk, (const char *)mem_output);
         }
 
         // Check to see if decompose_only (

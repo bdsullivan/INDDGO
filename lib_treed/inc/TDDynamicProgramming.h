@@ -65,6 +65,7 @@ public:
 	clock_t start, stop;
 	int opt_obj;
 	int process_DP_info(int num_args, char **args);
+	double mem_estimate;
 };
 
 void DP_prepare_node(TDTree *T, int k);

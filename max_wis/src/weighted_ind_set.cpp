@@ -3029,7 +3029,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 	(*T)->fill_bag_vecs();
 
 	// Create the aux_info vector - for WIS, use this to contain the # of ind. sets
-	// found when processing each tree node (invalid for nice nonleaf nodes since all ind.
+	/// found when processing each tree node (invalid for nice nonleaf nodes since all ind.
 	// sets are not actually found in this case)
 	info->aux_info = new int[(*T)->num_tree_nodes];
 	for (i = 0; i < (*T)->num_tree_nodes; i++)
@@ -3090,6 +3090,7 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 #else
 	fprintf(stream," -1 ");
 #endif
+	fprintf(stream,"%3.1f ", info->mem_estimate);
 	fprintf(stream, "%3.3f ", info->reconstruct_time);
 	fprintf(stream, "%0.3f ", info->avg_pc_proportion);
 	// obj is last entry
@@ -3139,14 +3140,16 @@ int get_optimal_obj(TDTree *T, list<int> *root_intersection,
 
 /**
 * Estimates the memory usage in a given tree decomposition by computing the actual
-* sum of the binomail coefficients using exact arithmetic and GMP.
+* sum of the binomial coefficients using exact arithmetic and GMP. Returns the
+* estimated number of independent sets to be found in all nodes in the tree.
+* Writes details to provided outfile
 */
-void estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
+double estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
 {
 #if !HAS_GMP
 	fprintf(stderr,"HAS_GMP is set to 0\nCannot run %s!",__FUNCTION__);
-	exit(-1);
-#else
+	return 0;
+#endif
 
 	FILE *out=fopen(outfile,"w");
 	if(!out)
@@ -3216,8 +3219,8 @@ void estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
 	mpq_clear(grand_total);
 	
 	fclose(out);
-	return;
-#endif
+
+	return final_ans;
 }
 
 /**

@@ -30,8 +30,8 @@ DP_info::DP_info()
 	this->DIMACS_file = this->model_file = this->ord_file = this->gviz_file
 	  = this->scotch_ord_file = this->tree_infile = this->tree_outfile
 	  = this->sol_file = this->eorder = NULL;
-    this->pbag = false;
-    this->parmetis = false;
+	this->pbag = false;
+	this->parmetis = false;
 	this->fix_DIMACS=false;
 	this->has_graph = false;
 	this->read_ordering = false;
@@ -71,6 +71,7 @@ DP_info::DP_info()
 	// set timers to 0
 	this->leaf_time = this->introduce_time = this->forget_time
 			= this->join_time = this->nonleaf_time = this->reconstruct_time = 0;
+	this->mem_est=0;
 	// set obj val to 0
 	opt_obj = 0;
 	aux_info = NULL;
