@@ -41,7 +41,8 @@ LOG_ENABLED = 0
 
 ARPACK = 
 
-#directory containing SuiteSparse installation. This includes AMD and SuiteSparse_config/UFconfig.
+# Directory containing SuiteSparse source code - not the directory where it
+# is installed 
 SUITESPARSE = #FILL IN
 
 #NOTE: the build directory is usually platform dependent.
