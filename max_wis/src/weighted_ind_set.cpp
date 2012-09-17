@@ -43,10 +43,11 @@ void usage(const char *s)
 			"\t -sol <sol_file> will write the weighted independent set solution to the given file.\n"
 			"\t      If not given, then solution is written to <DIMACS_file>.WIS.sol\n"
 			"\t --- Decomposition Construction Options ---\n" 
-			"\t -superetree : constructs a non-nice TD using CHOLMOD and supernodal etrees (fast; no triangulation)\n"
+			"\t -superetree : constructs a non-nice TD using CHOLMOD and supernodal etrees\n"
+			"\t      (fast; no triangulation)\n"
 			"\t -gavril : constructs a non-nice TD using Gavril's algorithm\n"
 			"\t -bk : constructs a non-nice TD using BK algorithm\n"
-            "\t -pbag : parallel bag generation, non-nice TD using Gavril's algorithm\n"
+			"\t -pbag : parallel bag generation, non-nice TD using Gavril's algorithm\n"
 			"\t -nice : constructs a nice TD\n"
 			"\t -make_nice will take a non-nice tree and niceify it by adding new\n"
 			"\t        tree nodes\n"
@@ -54,7 +55,8 @@ void usage(const char *s)
 			"\t        post-processing the tree decomposition\n"
 			"\t -check will manually verify the TD (can be slow!)\n"
 			"\t --- Elimination Order Options ---\n"
-			"\t -lower_bounds : Runs two lower bound heuristics and prints results. Can be used in combination with all other EO options."
+			"\t -lower_bounds : Runs two lower bound heuristics and prints results.\n"
+			"\t        Can be used in combination with all other EO options.\n"
 			"\t -s start_v : uses start_v as first vertex in ordering\n"
 			"\t -mind : generates an elim. ordering using min degree heuristic\n"
 			"\t -mmd: generates an elim. ordering using multiple min degree heuristic\n"
@@ -2687,7 +2689,7 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 		TDTree **T)
 {
-  create_tree_decomposition(info, G, T, false);
+	create_tree_decomposition(info, G, T, true);
 }
 
 /**

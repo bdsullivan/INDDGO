@@ -162,8 +162,8 @@ int main(int argc, char **argv)
         double dstart = clock();
         for (i = 0; i < T->num_tree_nodes; i++)
             T->compute_table(compute_weighted_ind_set_table, walk[i]);
-        print_message(0, "%.2f\n", (clock() - dstart) / CLOCKS_PER_SEC);
-        printf("%s: Treewidth %d\n", info.DIMACS_file, T->width);
+        //print_message(0, "%.2f\n", (clock() - dstart) / CLOCKS_PER_SEC);
+        //printf("%s: Treewidth %d\n", info.DIMACS_file, T->width);
 
         // Store and reset info's table stats 
         info.orig_total_pc_table_entries = info.total_pc_table_entries;
@@ -294,10 +294,12 @@ int main(int argc, char **argv)
 	//if(T->info->opt_obj>0)
 	//		retval=T->info->opt_obj;
 	//else
-		retval= 0;
+	retval= 0;
 
 	delete T;
 	delete G;
 
 	return retval;
 }
+
+
