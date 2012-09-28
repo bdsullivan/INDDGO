@@ -144,7 +144,12 @@ TREE   	= $(SRC_DIR)/lib_treed
 PTREE	= $(SRC_DIR)/lib_ptreed
 WIS 	= $(SRC_DIR)/max_wis
 VIZ	= $(SRC_DIR)/viz
+<<<<<<< HEAD
 UTIL	= $(SRC_DIR)/util
+=======
+UTIL	= $(SRC_DIR)/util 
+DG	= $(SRC_DIR)/dg 
+>>>>>>> layering tree work in progress
 INDDGO_LIB_DIR = $(SRC_DIR)/lib
 INDDGO_LIB = -L$(INDDGO_LIB_DIR)
 INDDGO_BIN = $(SRC_DIR)/bin

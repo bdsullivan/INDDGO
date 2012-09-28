@@ -794,6 +794,7 @@ int TDTree::replace_by_join_tree(int old_node, int max_id)
 }
 
 
+<<<<<<< HEAD
 /** 
 * Constructs a tree decomposition of the graph in the current TDTree using
 * Bodlaender-Koster's algorithm 2 from Treewidth Computations I, Upper Bounds.   
@@ -802,6 +803,430 @@ int TDTree::replace_by_join_tree(int old_node, int max_id)
 * of disconnected components can be joined together in
 * an arbitrary way.
 */
+=======
+
+
+/** Constructs a tree decomposition of this->G using
+ * Dourisboure & Gavoille's bfs based algorithm
+ * The graph G is assumed to have a single connected
+ * component since tree decompositions of
+ * disconnected components can be joined together in
+ * an arbitrary way.
+ */
+void TDTree::construct_dg(int root)
+{
+	// First make sure this->G has one connected component
+	if(this->G->get_num_components()!=1)
+	{
+		fatal_error("%s:  Tree decomposition routines operate only on connected graphs."
+                    "  This graph has %d connected components\n",__FUNCTION__,
+                    this->G->get_num_components());
+	}
+
+	// We change the graph G, so we should use a copy. Note that this is potentially
+	// expensive for large graphs
+	// H will be modified to give the tree structure, G modified to make label = tree node index
+	Graph::WeightedMutableGraph H=*(this->G);
+
+	/// stuff for debugging, testing
+	Graph::GraphUtil util;
+	int step = 0;
+	char debugfilename[100];
+
+	// more declarations, initializations
+	bool *allowed;
+	allowed = new bool[H.get_capacity()];
+	memset(allowed,true,H.get_capacity());
+	int num_levs = 0;
+	int *reached;
+	reached = &num_levs;
+
+    int *levels = util.bfs_dist1(&H,root-1,allowed,reached); // set 2nd arg to desired root
+    int tempnumlevs = 0;  
+    for(int j = 0; j < H.get_capacity();j++)
+    {
+        if(levels[j]>tempnumlevs) tempnumlevs = levels[j];
+    }
+    tempnumlevs++;
+    num_levs = tempnumlevs;
+
+    //making list for each level
+    vector< list < int > > levelbags(num_levs); // each level has a list of points
+    vector<int> sizebags(num_levs,0); // number of vertices at each level
+    vector<int> bagsperlevel(num_levs,0); // number of bags at each level
+    for(int j = 0; j < H.get_capacity(); j++)
+    {
+        levelbags[levels[j]].push_back(j);
+        sizebags[levels[j]]+=1;
+    }
+
+    list<int>::iterator it;
+
+    // initial step
+    int level = num_levs-1;
+    int temp =0;
+    int numbags = 0;
+
+    list<TDTreeNode*> treenodelist; 
+    list<int> newbag;
+
+    list<list<int> >::iterator baglistiter;
+    list<TDTreeNode*>::iterator nodelistiter;
+    list<int>::iterator level_it;
+    list<int>::iterator nbr_it;
+    list<int>::iterator nbr_it2;
+
+    bool inbag = false;
+    Graph::Node *n;
+    Graph::Node *n2;
+    list<int> nbrs;
+    list<int> nbrs2;
+    int bagsize = 0;
+    vector<Graph::Node> nodes;
+
+
+    for(level = num_levs-1; level >=0;level--)
+    {
+        while(!levelbags[level].empty())
+        {
+            //set up a new bag, with an initial element
+            temp = *levelbags[level].begin();
+            levelbags[level].pop_front();
+            newbag.clear();
+            newbag.push_back(temp);
+            numbags++;
+            bagsize=1;
+    
+            //go through rest of levelbags[level], looking for more elements for newbag
+            if(!levelbags[level].empty())
+            {
+                // go through the current bag's elements,
+                // during loop we may add to the bag, increasing the value of end().
+                for(it = newbag.begin();it!= newbag.end();it++)
+                {
+                    n = H.get_node(*it);
+                    nbrs = n->get_nbrs();
+    
+                    // this loop goes through the remaining elements in the levelbags[level] list
+                    for(level_it =  levelbags[level].begin();level_it!=levelbags[level].end();)
+                    {
+                        // it points to an element of newbag
+                        // level_it points to the level list, i.e. candidates for newbag
+    
+                        nbr_it = nbrs.begin();
+    
+                        while ((nbr_it != nbrs.end()) && (!inbag))// stop searching if match is found
+                        {
+                            if (*nbr_it == *level_it)
+                            {
+                                inbag = true;
+                            }
+                            else if (level < num_levs-1 )
+                            {
+                                n2 = H.get_node(*level_it);
+                                nbrs2 = n2->get_nbrs();
+                                nbr_it2 = nbrs2.begin();
+                                while( (nbr_it2 != nbrs2.end() ) && (!inbag) )
+                                {
+                                    if (*nbr_it == *nbr_it2)
+                                    {
+                                        if( H.get_node(*nbr_it)->get_label() > (level) )
+                                        {
+                                            inbag = true;
+                                        }
+                                    }
+                                    ++nbr_it2;
+                                }
+                            }
+                            ++nbr_it;
+                        }
+    
+                        if(inbag)
+                        {
+                            // remove level_it from level bag, add to newbag
+                            newbag.push_back(*level_it);
+                            level_it = levelbags[level].erase(level_it);
+                            bagsize++;
+                        }
+                        else
+                        {
+                            // leave level_it, move on to next candidate
+                            ++level_it;
+                        }
+                        inbag = false;
+                    }
+                }
+            }
+    
+            //fuse bag contents, in H, to get tree
+            if( bagsize > 1 ) 
+            { 
+                it=newbag.begin();
+                nbr_it=newbag.begin();
+                nbr_it++;
+                for(;nbr_it!=newbag.end();nbr_it++)
+                {
+                    if(*nbr_it < *it)
+                    {
+                        temp = H.fuse_vertices(*nbr_it,*it);
+                    }
+                    else if(*it <= *nbr_it)
+                    {
+                        temp = H.fuse_vertices(*it,*nbr_it);
+                    }
+                }
+            }
+    
+            // make nodes here
+            // assign bag, and id fields
+            TDTreeNode *next_tree_node;
+            next_tree_node = new TDTreeNode;
+            next_tree_node->id = temp; //id of bag is lowest vertex label in prebag
+            next_tree_node->bag = newbag; //copy bag over
+    
+            //also modify G's labels so each node.label = prebag id
+            for(it=newbag.begin();it!=newbag.end();it++)
+            {
+                this->G->get_node(*it)->set_label(temp);
+            }
+    
+            treenodelist.push_back(next_tree_node); 
+            bagsize =0;
+        }
+        bagsperlevel[level]=numbags;
+        numbags =0;
+    }
+    //end loop to build bags
+
+	//build TDTree (i.e. add parent, child lists from H, take unions of bags)
+	temp = treenodelist.size();
+	this->num_tree_nodes = temp;
+
+	/// resize tree node vector
+	/// each node in original tree has even index and a reserved node at +1 index in case of splitting
+	this->tree_nodes.resize(2*temp,NULL); 
+
+	// resize H to fit new nodes we will add to it
+	H.resize_graph(2*this->G->get_capacity());
+
+	// an array for tracking parents.
+	// traversing tree from root to leafs, set to true once node has been reached
+	reached = new int[H.get_capacity()];
+	allowed = new bool[H.get_capacity()];
+	memset(allowed,false,H.get_capacity());
+	memset(reached,0,H.get_capacity());
+
+	// root node
+	this->root_node = treenodelist.back()->id;
+	this->rooted = true;
+	this->tree_nodes[0] = treenodelist.back();
+    //use all_ind_set_values to store 2nd list on each node
+	this->tree_nodes[0]->all_ind_set_values=this->tree_nodes[0]->bag;
+	this->width = this->tree_nodes[0]->bag.size();
+
+	treenodelist.pop_back();
+	this->tree_nodes[0]->adj = H.get_node(this->root_node)->get_nbrs();
+
+	nodelistiter = treenodelist.end();
+	nodelistiter--;
+
+	allowed[this->root_node]=true;
+	reached[this->root_node]=1;//may need to do +1 on indices so that root node isn't = 0
+
+	// loop through list of nodes, temp = # of prebags in intermediate tree
+	// # of bags in final tree will be greater, due to splitting
+	int split = 0;
+	for(int prebagcounter = 1; prebagcounter < temp; prebagcounter++) 
+	{
+		this->tree_nodes[2*prebagcounter] = treenodelist.back();// add node, reverse order
+		reached[this->tree_nodes[2*prebagcounter]->id]=2*prebagcounter+1; 
+		treenodelist.pop_back();// delete from list
+	
+		//fill adjacency list, parent at front, children at back          
+		n2 = H.get_node(this->tree_nodes[2*prebagcounter]->id);
+		nbrs2 = n2->get_nbrs();
+
+		// make the adj list of the node
+		for(it=nbrs2.begin();it!=nbrs2.end();it++)
+		{
+			
+			if(allowed[*it]) //parent
+			{
+				this->tree_nodes[2*prebagcounter]->adj.push_front(*it);
+				//copy bag for children to have access to original
+				this->tree_nodes[2*prebagcounter]->all_ind_set_values=this->tree_nodes[2*prebagcounter]->bag; 
+			}
+			else // children 
+			{
+				this->tree_nodes[2*prebagcounter]->adj.push_back(*it);
+			}
+		}
+		
+		if(this->tree_nodes[2*prebagcounter]->bag.size() > 1 && this->tree_nodes[2*prebagcounter]->adj.size()>1)
+		{
+			// create node at +1 index
+			this->tree_nodes[2*prebagcounter+1] = new TDTreeNode;
+			this->tree_nodes[2*prebagcounter+1]->bag = this->tree_nodes[2*prebagcounter]->bag;
+			this->tree_nodes[2*prebagcounter+1]->id = this->tree_nodes[2*prebagcounter]->id + this->G->get_capacity();
+		}
+
+		// decide if we are separatign the bag into two bags
+		// contruct P(L) subset of prebag from parent node
+		list<int> parentbaglist = tree_nodes[reached[this->tree_nodes[2*prebagcounter]->adj.front()]-1]->all_ind_set_values; 
+
+		list<int> templist; 
+		bool ishfwilf = true; //i still haven't found what i'm looking for
+		for(it = parentbaglist.begin(); it!=parentbaglist.end();it++)
+		{
+			n2 = G->get_node(*it); /// go to original graph, get nbrs
+			nbrs2 = n2->get_nbrs();
+			nbr_it2 = nbrs2.begin();
+
+			// loop through nbrs of element from parent prebag
+			while(ishfwilf && nbr_it2!= nbrs2.end())
+			{
+				
+				nbr_it = this->tree_nodes[2*prebagcounter]->bag.begin();
+
+				//loop through current prebag
+				while((ishfwilf) && (nbr_it!= this->tree_nodes[2*prebagcounter]->bag.end()) )
+				{
+					if(*nbr_it2 == *nbr_it)
+					{
+						ishfwilf = false;
+						templist.push_back(*it);
+					}
+					nbr_it++;
+				}
+				nbr_it2++;
+			}
+			ishfwilf = true;// reset bool
+		}
+
+		if(templist.size() < parentbaglist.size()) // create two nodes
+		{
+			int w = this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->id;
+			list<int>::iterator it;
+			// modify H graph, maybe
+
+			// add node  if it hasn't already been added
+			// if it already exists, change edge from parent to w
+			if(this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->adj.empty())
+			{
+				// this isn't needed - currently
+				H.edge_subdivision(this->tree_nodes[2*prebagcounter]->adj.front(),this->tree_nodes[2*prebagcounter]->id, w);// order = parent, child, new node
+
+				//fix the adj lists
+				//new node
+		    	this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->adj.push_back(this->tree_nodes[2*prebagcounter]->id);
+			    this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->adj.push_front(this->tree_nodes[2*prebagcounter]->adj.front());
+				it = this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.begin();
+
+				while(it != this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.end())
+				//old parent's adj list, replace child  with new node
+				{
+					if(*it == tree_nodes[2*prebagcounter]->id)
+					{
+						*it = w;
+						break;
+					}
+					it++;
+				}
+			}
+			else
+			{
+				// this isn't needed - currently
+				H.remove_edge(this->tree_nodes[2*prebagcounter]->id,this->tree_nodes[2*prebagcounter]->adj.front());
+				H.add_edge(this->tree_nodes[2*prebagcounter]->id,w);
+
+				//new node, already connected to parent
+				this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->adj.push_back(this->tree_nodes[2*prebagcounter]->id);
+				//old parent, already connected to new node, just delete child from adj list
+				it = this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.begin();
+				while(it != this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.end())
+				{
+					if(*it == tree_nodes[2*prebagcounter]->id)
+					{
+						it = this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.erase(it);
+						break;
+					}
+					it++;
+				}
+			}
+
+
+///  separator goes here
+//   use templist, and bag to construct new Graph to send to separator function 
+// possibly using get_node to copy nodes over, or just starting from scratch creating new nodes using get_label only
+Graph::GraphCreatorFile *creator;
+creator = new Graph::GraphCreatorFile();
+list<int> H1_members(this->tree_nodes[2*prebagcounter]->bag);
+H1_members.insert(H1_members.begin(),templist.begin(),templist.end());
+Graph::WeightedMutableGraph *H1;
+H1 = creator->separator_prep(this->G, &templist,&this->tree_nodes[2*prebagcounter]->bag, true); //  <<-- this is creating the graph correctly, but its labels are all off...
+
+util.metis_ConstructSeparator(H1);
+
+//test
+/*
+Graph::GraphWriter *writer;
+Graph::GraphReaderWriterFactory rwf;
+writer = rwf.create_writer("graphviz");
+char filename[100];
+sprintf(filename,"debugH%d.gviz",prebagcounter);
+writer->set_out_file_name(filename);
+writer->write_graph(H1); 
+*/
+
+/////////////////////////
+
+			// construct bag
+			this->tree_nodes[2*prebagcounter]->bag.insert(this->tree_nodes[2*prebagcounter]->bag.begin(),templist.begin(),templist.end());
+
+            if(this->width < this->tree_nodes[2*prebagcounter]->bag.size() )
+				this->width = this->tree_nodes[2*prebagcounter]->bag.size();
+
+			//child adj list
+			this->tree_nodes[2*prebagcounter]->adj.pop_front();
+			this->tree_nodes[2*prebagcounter]->adj.push_front(w);
+			split++;
+		}
+
+		else // creat a single node
+		{
+			// construct bag
+			this->tree_nodes[2*prebagcounter]->bag.insert(this->tree_nodes[2*prebagcounter]->bag.begin(),this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->all_ind_set_values.begin(),this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->all_ind_set_values.end());
+
+            if(this->width < this->tree_nodes[2*prebagcounter]->bag.size() )
+				this->width = this->tree_nodes[2*prebagcounter]->bag.size();
+		}
+
+		allowed[this->tree_nodes[2*prebagcounter]->id]=true;
+	}
+
+	//the correct solution might be to resize the vector and eliminate both NULL and unused nodes
+	for(int k = 0; k < 2*temp-1; k++)
+	{
+		if(this->tree_nodes[k]!=NULL)
+		{
+			if(this->tree_nodes[k]->adj.empty())
+			{
+				this->tree_nodes[k]=NULL;
+			}
+		}
+	}
+	return;
+}
+
+
+/** Constructs a tree decomposition of this->G using
+ * Bodlaender-Koster's algorithm 2 from Treewidth Computations I, Upper Bounds.   
+ * The graph G is assumed to have 
+ * a single connected component since tree decompositions
+ * of disconnected components can be joined together in
+ * an arbitrary way.
+ */
+>>>>>>> layering tree work in progress
 void TDTree::construct_BK(vector<int> *elim_order)
 {
 	// First make sure this->G has one connected component
@@ -1825,8 +2250,10 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 		{
 			if(style == GV_BAG_LABELS)
 			{
-				fprintf(out,"%d [label=\"",i+1);
-				print_message(10, "Bag %d:\n", i+1);
+				//fprintf(out,"%d [label=\"",i+1);
+				fprintf(out,"%d [label=\"",this->tree_nodes[i]->id+1);
+				//print_message(10, "Bag %d:\n", i+1);
+				print_message(10, "Bag %d:\n", this->tree_nodes[i]->id +1);
 				// Sort the bags before outputting
 				this->tree_nodes[i]->bag.sort();
 				for(L=this->tree_nodes[i]->bag.begin();
@@ -1834,12 +2261,15 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 				{
 					// Get the actual node label if necessary (we have a pointer to G)
 					j=*L;
-					print_message(10, "Looking for %d\n", j);
+					//print_message(10, "Looking for %d\n", j);
+					print_message(10, "Looking for %d\n", j+1);
 					n1=this->G->get_node(j);
 					j=n1->get_label();
 					//j=G->nodes[j].label;
-					print_message(10, "Found %d\n", j);
-					fprintf(out,"%d ",j);
+					//print_message(10, "Found %d\n", j);
+					print_message(10, "Found %d\n", j+1);
+					//fprintf(out,"%d ",j);
+					fprintf(out,"%d ",*L+1);
 					// NOTE!! The bags store the DIMACS labels (1,2,..,num_total_nodes) so if there
 					// are disconnected nodes, then the union of all the bags
 					// will NOT be equal to (1,2,...,num_total_nodes)
@@ -1854,7 +2284,8 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 			}
 			else if(style == GV_TREE_ONLY)
 			{
-				fprintf(out,"%d;\n",i+1);
+				//fprintf(out,"%d;\n",i+1);
+				fprintf(out,"%d;\n",this->tree_nodes[i]->id + 1);
 			}
 			else if(style == GV_COLORS)
 			{
@@ -1886,9 +2317,11 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 			for(L=this->tree_nodes[i]->adj.begin();L!=this->tree_nodes[i]->adj.end();++L)
 			{
 				j=*L;
-				if(i < j)
+				//if(i < j)
+				if(this->tree_nodes[i]->id < j)
 					// Make this 1-based in true DIMACS spirit
-					fprintf(out,"%d -- %d;\n",i+1,j+1);
+					//fprintf(out,"%d -- %d;\n",i+1,j+1);
+					fprintf(out,"%d -- %d;\n",this->tree_nodes[i]->id + 1,j+1);
 			}
 		}
 	}

@@ -633,6 +633,270 @@ namespace Graph {
         return k;
     }
 
+	/**
+     * Calls CreateSeparator from metis
+     * top and bottom cannot have any overlap coming in, going out they will share the elements of the separator
+     * they bring in the top and bottom pre-bags, and take out the top and bottom bags
+     */
+	void GraphUtil::metis_ConstructSeparator(VertexWeightedGraph *g, list<int> *top, list<int> *bottom)
+	{
+#if !HAS_METIS
+    	fatal_error("Called METIS CreateSeparator without HAS_METIS.\n");
+		return;
+#else
+
+        GraphUtil util;
+        util.populate_CRS(g); /// construct xadj, adjncy
+
+		graph_t *graph;
+        ctrl_t *ctrl;
+
+        list<int> temp;
+
+        int topsize = top->size();
+        int bottomsize = bottom->size();
+        int *originalid = new int[bottomsize+topsize];
+
+		list<int>::iterator ii, jj, kk;
+        int id=0;
+
+		for(ii = bottom->begin(); ii != bottom->end(); ++ii){
+            originalid[id] = *ii;
+            id++;
+        }
+        for(ii = top->begin(); ii != top->end(); ++ii){
+            originalid[id] = *ii;
+            id++;
+        }
+        idx_t nvtxs = topsize + bottomsize;
+
+        int sizexa = topsize + bottomsize+1;
+        idx_t *xadj = new idx_t[sizexa];
+        int sizead = (sizexa-1)*(sizexa-2);
+        idx_t *adjncy = new idx_t[sizead];
+        
+        id=0; // position of ii iterator in originalid[], and position in xadj[]
+        int jd=0; // position of jj iterator in originalid[]
+        int j = 0; // position in adjncy
+
+        bool include = false;
+
+        // construct xadj, edges come from completion of each list, plus edges between lists
+        for(ii = bottom->begin(); ii != bottom->end(); ++ii)
+        {
+            xadj[id] = j;
+
+            jd=0;
+            for(jj = bottom->begin(); jj!= bottom->end(); ++jj)
+            {
+                if(*jj != *ii)
+                {
+                    temp.push_back(jd);
+                    j++;
+                } 
+                jd++;
+            }
+            for(jj = top->begin(); jj != top->end(); ++jj)
+            {
+                include=false;
+                for(kk = g->nodes[*jj].nbrs.begin(); kk!= g->nodes[*jj].nbrs.end() && !include; ++kk)
+                {
+                    if(*kk == *ii)
+                    {
+                        include = true;
+                    }
+                }
+                if(include)
+                {
+                    temp.push_back(jd);
+                    j++;
+                }
+                jd++;
+            }
+            temp.sort();// ?unnecessary?
+            
+            // adjncy[] needs to be filled from position xadj[id] to j inclusive
+            jj = temp.begin();
+            for(int k=xadj[id]; k < j; k++){
+                adjncy[k]=*jj;
+                jj++;
+            }
+            temp.clear();
+            id++;
+        }
+        for(ii = top->begin(); ii != top->end(); ++ii)
+        {
+            xadj[id] = j;
+
+            jd=bottomsize; // adjncy already contains bottom list's elements
+            for(jj = top->begin(); jj!= top->end(); jj++)
+            {
+                if(*jj != *ii)
+                {
+                    temp.push_back(jd);
+                    j++;
+                } 
+                jd++;
+            }
+            jd = 0;
+
+            for(jj = bottom->begin(); jj != bottom->end(); ++jj)
+            {
+                include=false;
+                for(kk = g->nodes[*jj].nbrs.begin(); kk!= g->nodes[*jj].nbrs.end() && !include; ++kk)
+                {
+                    if(*kk == *ii)
+                    {
+                        include = true;
+                    }
+                }
+                if(include)
+                {
+                    temp.push_back(jd);
+                    j++;
+                }
+                jd++;
+            }
+            temp.sort();
+            
+            jj = temp.begin();
+            for(int k=xadj[id]; k < j; k++){
+                adjncy[k] = *jj;
+                jj++;
+            }
+            temp.clear();
+            id++;
+        }
+        xadj[id]=j;
+
+        //copy to an array of correct size
+        idx_t *adjncysmall = new idx_t[j];
+        for(id = 0; id<j; ++id){
+            adjncysmall[id] = adjncy[id];
+        }
+
+        top->clear();
+        bottom->clear();
+
+        //initialization using METIS functions
+        ctrl = SetupCtrl(METIS_OP_OMETIS, NULL, 1, 3, NULL, NULL);
+        graph = SetupGraph(ctrl,nvtxs,1,xadj,adjncy,NULL,NULL,NULL);
+        // allocate workspace memory //
+        AllocateWorkSpace(ctrl, graph);
+        //real_t ntpwgts[2] = {0.5, 0.5};
+        //Setup2WayBalMultipliers(ctrl, graph, ntpwgts);
+        //RandomBisection(ctrl, graph, ntpwgts, 3);
+        //Compute2WayPartitionParams(ctrl, graph);
+
+		//ConstructSeparator(ctrl, graph);
+        SetupGraph_tvwgt(graph);
+        MlevelNodeBisectionMultiple(ctrl, graph);
+
+        /// where = 0 is left set, =1 is right, =2 is separator
+        idx_t *where;
+        where = graph->where;
+
+        // need to test if a separator was created, i.e. are there 3 sets?
+        // and also test to see if left = bottom or right = bottom
+        int bot_i=0;
+        bool keepgoing = true;
+        bool bottom0;
+        bool leftexists = false;
+        bool rightexists = false;
+        bool separatorexists = false;
+
+        while((bot_i < bottomsize) && keepgoing)
+        {
+          if(where[bot_i]==0)
+          {
+            bottom0 = true;
+			leftexists = true;
+            keepgoing=false;
+          }
+          else if(where[bot_i]==1)
+          {
+            bottom0=false;
+            rightexists = true;
+            keepgoing=false;
+          }
+          else if(where[bot_i]==2)
+          {
+            separatorexists = true;
+          }
+          bot_i++;
+        }
+
+        while( !(separatorexists && leftexists && rightexists) && (bot_i < bottomsize + topsize) )
+        {
+          if(where[bot_i]==2)
+          {
+            separatorexists=true;
+          }
+          else if(where[bot_i]==0)
+          {
+            leftexists=true;
+          }
+          else if(where[bot_i]==1)
+          {
+            rightexists=true;
+          }
+          bot_i++;
+        }
+
+        // if don't have all 3 sets, then return everything in a bottom list, with top list empty.
+        if(separatorexists && leftexists && rightexists)
+        {
+          // get original position in larger graph g from originalid[s]
+          for(int s = 0; s<nvtxs;s++)
+          {
+            if(where[s] == 0)
+            {
+              if(bottom0)
+              {
+                bottom->push_back(originalid[s]);
+              }
+              else
+              {
+                top->push_back(originalid[s]);
+              }
+            }
+            else if(where[s] == 1)
+            {
+              if(bottom0)
+              {
+                top->push_back(originalid[s]);
+              }
+              else
+              {
+                bottom->push_back(originalid[s]);
+              }  
+            }
+            else if(where[s] == 2)
+            {
+              top->push_back(originalid[s]);
+              bottom->push_back(originalid[s]);
+            }
+          }
+        }
+        else
+        {
+          for(int s = 0; s<nvtxs;s++)
+          {
+             bottom->push_back(originalid[s]);
+          }
+        }
+
+        FreeWorkSpace(ctrl);
+        FreeGraph(&graph); 
+        util.free_CRS(g);
+        delete [] xadj;
+        delete [] adjncy;
+        return;
+#endif
+	}
+
+
+
     //runs a BFS from start using only vertices with allowed[v] = true.
     //Returns an array of integers giving distance from the source (0 for source).
     //Unreachable vertices have value GD_INFINITY.
@@ -677,7 +941,7 @@ namespace Graph {
             j = S.front();
             S.pop_front();
             left_in_level--;
-            if(dists[j] == GD_INFINITY){
+            if(dists[j] == GD_INFINITY || dists[j] == -1){
                 // We have now visited j
                 dists[j] = curr_level;
                 num_found++;
@@ -690,13 +954,15 @@ namespace Graph {
                         // We haven't seen *ii before and it is an "acceptable" vertex,
                         // so it is a candidate to be in the path - add it to the Stack
                         S.push_back(*ii);                         // must be push_back since we pop_front and need FIFO.
+                        dists[*ii]=-1;
                         next_level++;
                     }
                 }
             }
         }
 
-        *ecc = curr_level - 1;
+        //*ecc = curr_level - 1;
+        *ecc = curr_level;
         *num_reached = num_found;
         // We emptied the stack.
         return dists;
