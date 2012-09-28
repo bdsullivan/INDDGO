@@ -136,6 +136,7 @@ PTREE	= $(SRC_DIR)/lib_ptreed
 WIS 	= $(SRC_DIR)/max_wis
 VIZ	= $(SRC_DIR)/viz
 UTIL	= $(SRC_DIR)/util 
+DG	= $(SRC_DIR)/dg 
 INDDGO_LIB_DIR = $(SRC_DIR)/lib
 INDDGO_LIB = -L$(INDDGO_LIB_DIR)
 INDDGO_BIN = $(SRC_DIR)/bin

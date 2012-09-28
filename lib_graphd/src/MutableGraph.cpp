@@ -217,6 +217,72 @@ namespace Graph
 		num_nodes--;
 	}
 
+
+	// doesn't currently check that uv is an edge
+	int MutableGraph::edge_subdivision(int u, int v, int w)
+	{
+		int temp=0;
+		Node *new_graph_node;
+		if (nodes[u].label == -1 || nodes[v].label == -1)
+	    {
+			fatal_error(
+				"%s: Cannot remove edge (%d, %d) as one of its vertices is undefined!\n",
+				__FUNCTION__, u, v);
+	    }
+
+		// if w provided, check that it is in bounds
+		if(w > capacity)
+		{
+			nodes.resize(2*capacity);
+			capacity*=2;
+//                 FERROR("%s: element is out of bounds", __FUNCTION__);
+//                 throw GraphException("element is out of bounds\n");
+		}
+
+		// add a node if necessary
+		if(w==-1)
+		{
+			return w;
+                //temp=nodes.size()+1;
+                //Node newnode
+                //
+                // not yet implemented
+		}
+
+		else
+		{
+			nodes[w].nbrs.clear();
+			if(!nodes[w].nbrs.empty())
+			{
+				FERROR("%s: node is not empty", __FUNCTION__);
+				throw GraphException("node is not empty\n");
+			}
+			else
+			{
+				nodes[w].label=w;
+				degree[w] = 2;
+				nodes[w].nbrs.push_back(u);
+				nodes[w].nbrs.push_back(v);
+
+				list<int>::iterator it;
+				// remove u from v's nbrs list and vice versa
+				for(it = nodes[u].nbrs.begin() ; it != nodes[u].nbrs.end();it++)
+				{
+					if(*it=v) {*it=w; break;}
+				}
+				for(it = nodes[v].nbrs.begin() ; it != nodes[v].nbrs.end();it++)
+				{
+					if(*it=u) {*it=w;break;}
+				}
+			}
+		}
+		num_edges++;
+		next_label++;
+		num_nodes++;
+		return w;
+	}
+
+
 	int MutableGraph::contract_edge(int u, int v)
 	{
 		int i;
@@ -276,6 +342,88 @@ namespace Graph
 		return u;
 	}
 
+//////DAG: fuse_vertices(int, int)
+////// similar to contract_edge, but u,v don't need to have an edge between them
+	int MutableGraph::fuse_vertices(int u, int v)
+	{
+		int i;
+		if (simple != true)
+		{
+			fatal_error("%s: called on a non-simple graph!\n", __FUNCTION__);
+		}
+		if (nodes[u].label == -1 || nodes[v].label == -1)
+		{
+			fatal_error(
+				"%s: Cannot remove edge (%d, %d) as one of its vertices is undefined!\n",
+				__FUNCTION__, u, v);
+		}
+		vector<bool> neighbors(capacity); //what is capacity?
+		fill(neighbors.begin(), neighbors.end(), false);
+		list<int>::iterator it;
+
+		if (v == u)
+			return false;
+
+		it = nodes[u].nbrs.begin();
+		while (it != nodes[u].nbrs.end())
+		{
+			neighbors[*it] = true;
+			++it;
+		}
+		it = nodes[v].nbrs.begin();
+		while (it != nodes[v].nbrs.end())
+		{
+			neighbors[*it] = true;
+			++it;
+		}
+		int templabel = nodes[u].label;
+		list<int> singlepoint;
+		list<int> anothersinglepoint;
+
+		remove_vertex(u);
+		remove_vertex(v);
+		nodes[u].label = next_label;
+		next_label++;
+		num_nodes++;
+
+		for (i = 0; i < capacity; i++)
+		{
+			if (i != u && i != v)
+			{
+				if (neighbors[i] == true)
+				{
+					nodes[i].nbrs.push_back(u);
+					nodes[u].nbrs.push_back(i);
+					degree[u]++;
+					degree[i]++;
+					num_edges++;
+				}
+			}
+
+		}
+
+		return u;
+	}
+
+	void MutableGraph::resize_graph(int size)
+	{
+		if(size < capacity)
+		//if(size < 1)
+		{
+			fatal_error(
+			//"%s:  resize_graph() called with new size %d less than 1\n",
+			//__FUNCTION__, size);
+			"%s:  resize_graph() called with new size %d less than capacity %d\n",
+			__FUNCTION__, size, capacity);
+		}
+		else
+		{
+			nodes.resize(size,Node());
+			degree.resize(size,0);
+	        this->set_capacity(size);
+		}
+	}
+
 	void MutableGraph::set_simple(bool si)
 	{
 		simple = si;
@@ -306,6 +454,7 @@ namespace Graph
 
 		num_edges++;
 	}
+
 	void MutableGraph::resize_adj_vec(int n)
 	{
 		adj_vec.resize(n, 0);

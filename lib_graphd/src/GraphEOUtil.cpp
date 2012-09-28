@@ -1162,6 +1162,7 @@ namespace Graph
         delete[] fill;
         return 1;
     }
+
     int GraphEOUtil::find_batch_min_fill_ordering(MutableGraph *mg,
                                                   vector<int> *ordering, int start_v)
     {
@@ -1411,6 +1412,7 @@ namespace Graph
         return 1;
 #endif
     }
+
     int GraphEOUtil::find_metis_node_nd_ordering(MutableGraph *mg,
                                                  vector<int> *ordering)
     {

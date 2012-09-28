@@ -3,7 +3,8 @@ include ../../make.inc
 METIS_PROG_DIR=$(METIS_SRC_DIR)/programs
 
 ifeq ($(HAS_METIS),1)
-CFILES = $(METIS_PROG_DIR)/smbfactor.c 
+CFILES = $(METIS_PROG_DIR)/smbfactor.c
+#CFILES = $(METIS_LIB_DIR)/separator.c
 endif
 
 LIBNAME = libgraphd.a
@@ -23,7 +24,8 @@ OBJ = $(SRC:.cpp=.o)
 POBJ =  
 #compile smbfactor only if using metis.
 ifeq ($(HAS_METIS),1)
-OBJ = $(SRC:.cpp=.o)  smbfactor.o 
+#OBJ = $(SRC:.cpp=.o)  smbfactor.o separator.o
+OBJ = $(SRC:.cpp=.o)  smbfactor.o
 endif
 
 ifeq ($(HAS_PARMETIS),1)

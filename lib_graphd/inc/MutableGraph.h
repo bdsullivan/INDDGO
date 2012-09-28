@@ -46,13 +46,19 @@ public:
     void add_edge_advance(int u, int v);
     bool remove_edge(int u, int v);
     void remove_vertex(int u);
+    int edge_subdivision(int u, int v, int w=-1); // optional reuse of empty vertex w
     int contract_edge(int u, int v);
+    int fuse_vertices(int u, int v); //similar to contract edge
+    
     bool is_canonical() const;
     bool is_simple() const;
     void set_canonical(bool canonical);
     void set_simple(bool simple);
     void resize_adj_vec(int n);
     void eliminate_vertex(int v, list<int> *forward_neighbors, bool remove);
+
+    void resize_graph(int n); // resize graph to size n > current size
+	
     vector<int> get_adjncy() const;
     vector<int> get_xadj() const;
     void set_adjncy(vector<int> adjncy);

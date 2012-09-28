@@ -70,6 +70,9 @@ public:
 	int vertex_separator(MutableGraph *mg, list<int>* V,
 			vector<list<int>*> *members);
 
+	//ConstructSeparator from metis
+    void metis_ConstructSeparator(MutableGraph *mg);
+
 	//runs a BFS from start using
 	//only vertices with allowed[v] = true.
 	//you need to delete the memory in the returned bool array.
@@ -78,6 +81,7 @@ public:
 	bool* bfs(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 	bool* bfs_old(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 	int* bfs_dist(MutableGraph *mg, int start, bool *allowed, int *num_reached);
+	int* bfs_dist1(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 };
 
 }

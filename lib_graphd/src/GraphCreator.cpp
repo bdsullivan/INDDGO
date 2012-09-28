@@ -180,6 +180,186 @@ namespace Graph
 		return wmg;
 	}
 
+
+	/**
+	* Creates a graph G with vertex set equal to the set in two members lists.
+	* The entries in the members lists are the positions in the nodes[] array.
+	* The edges in G are created by constructing the subgraph induced
+	* by the members list and adding the completion of each members list.
+	* If make_simple is true, then the resulting graph is guaranteed to be simple.
+	* Modified from create_induced_subgraph()
+	*/
+	WeightedMutableGraph *GraphCreator::separator_prep(
+		WeightedMutableGraph *g, list<int> *parent_members, list<int> *child_members, bool make_simple)
+	{
+		WeightedMutableGraph *wmg = new WeightedMutableGraph(child_members->size()+parent_members->size());
+		// The caller of g function is responsible for allocating a Graph
+		// of the appropriate size - make sure!
+
+   /// is this next part needed??
+		if (wmg->capacity != (int) (((child_members->size()+parent_members->size()))))
+			fatal_error(
+			"%s:  Graph of child_members->size()+parent_members->size() must be allocated before calling\ncreate_component\n",
+			__FUNCTION__);
+
+        list<int> bag(*child_members);
+        bag.insert(bag.begin(),parent_members->begin(),parent_members->end()); // bag = (parent elements, child elements)
+		int div = parent_members->size();
+		// Create a subgraph_labels[] array and a graph_indices[] array
+		int *subgraph_labels = new int[bag.size()];
+		memset(subgraph_labels, GD_UNDEFINED, bag.size() * sizeof(int));
+		int *graph_indices = new int[g->capacity];
+		memset(graph_indices, GD_UNDEFINED, g->capacity * sizeof(int));
+		list<int>::iterator it, jt;
+		int k = 0;
+		for (it = bag.begin(); it != bag.end(); ++it)
+		{
+			subgraph_labels[k] = *it;
+			//subgraph_labels[k] = g->nodes[*it].label; 
+			graph_indices[*it] = k;
+			k++;
+		}
+
+		k = 0;
+		int new_i, new_j;
+        int i = 0;
+        int j = 0;
+		// Use g for make_simple checking
+		char *neighbor_vec = new char[g->capacity];
+		bool multiple_edges = false;
+		wmg->num_edges = 0;
+
+
+		for (it = bag.begin(); it != bag.end(); ++it)
+		{
+			memset(neighbor_vec, 0, g->capacity * sizeof(char));
+			new_i = graph_indices[*it];
+			if (new_i == GD_UNDEFINED)
+				fatal_error(
+				"%s: Encountered GD_UNDEFINED entry for new_i at position %d in graph_indices array\n",
+				__FUNCTION__, *it);
+
+			wmg->nodes[new_i].label = subgraph_labels[k];
+			// CSG - 2/24: added g as we are losing weights when
+			// creating components!
+            wmg->weight[new_i] = g->weight[*it];
+
+
+
+			for (jt = g->nodes[*it].nbrs.begin(); jt != g->nodes[*it].nbrs.end(); ++jt)
+			{
+				// We have an edge between *it and *jt in the original graph
+				// g should be stored as an edge between
+				// graph_indices[*it] and graph_indices[*jt] in the subgraph
+
+				new_j = graph_indices[*jt];
+				print_message(1, "Translating old edge %d-%d to new edge %d-%d\n",
+					*it, *jt, new_i, new_j);
+
+				if (new_j == GD_UNDEFINED)
+					print_message(
+					1,
+					"%s: Encountered GD_UNDEFINED entry for new_j at position %d in graph_indices array\n",
+					__FUNCTION__, *jt);
+				else
+				{
+					if (new_i < new_j)
+					{
+						// add an edge if *jt and *it are neighbours in G
+						if (!make_simple || neighbor_vec[*jt] == 0 )
+						{
+							if (neighbor_vec[*jt] == 1)
+								// We are adding a duplicate edge to G - G will not be simple
+								multiple_edges = true;
+							// CSG added make_simple functionality - just check if we have seen g edge before by checking
+							// the neighbor_vec
+							wmg->num_edges++;
+							wmg->nodes[new_i].nbrs.push_back(new_j);
+							if (new_i != new_j) // added check Dec 29
+								wmg->nodes[new_j].nbrs.push_back(new_i);
+						}
+					}
+				}
+				neighbor_vec[*jt] = 1;
+			}
+
+			// now add edges to complete subgraph corresponding to each list
+			// loop through all points, add edges for i,j belonging to the same list
+			j=0;
+		    for (jt = bag.begin(); jt != bag.end(); ++jt)
+			{
+				// *it and *jt are in the same prebag
+				// g should be stored as an edge between
+				// graph_indices[*it] and graph_indices[*jt] in the subgraph
+
+				new_j = graph_indices[*jt];
+				print_message(1, "Translating old edge %d-%d to new edge %d-%d\n",
+					*it, *jt, new_i, new_j);
+
+				if (new_j == GD_UNDEFINED)
+					print_message(
+					1,
+					"%s: Encountered GD_UNDEFINED entry for new_j at position %d in graph_indices array\n",
+					__FUNCTION__, *jt);
+				else
+				{
+					if (new_i < new_j)
+					{
+						// add an edge if *jt and *it are neighbours in G, or if they are members of same list parent or child
+						if ((!make_simple || neighbor_vec[*jt] == 0) && (( j < div && i < div) || (j >= div && i >= div)) )
+						{
+							if (neighbor_vec[*jt] == 1)
+								// We are adding a duplicate edge to G - G will not be simple
+								multiple_edges = true;
+							// CSG added make_simple functionality - just check if we have seen g edge before by checking
+							// the neighbor_vec
+							wmg->num_edges++;
+							wmg->nodes[new_i].nbrs.push_back(new_j);
+							if (new_i != new_j) // added check Dec 29
+								wmg->nodes[new_j].nbrs.push_back(new_i);
+						}
+					}
+				}
+				neighbor_vec[*jt] = 1;
+                j++;
+			}
+
+			// k is used for the subgraph labels
+			k++;
+			// i is used to keep track of membership in parent or child lists
+            i++;
+		}
+
+		// If the original was simple, G will be. If make_simple, then it had better be simple!
+		// Otherwise, unknown.
+		if (g->simple == GD_TRUE || make_simple)
+			wmg->simple = GD_TRUE;
+		else
+		{
+			wmg->simple = false;
+			wmg->canonical = false;
+		}
+		if (multiple_edges)
+		{
+			wmg->simple = false;
+			wmg->canonical = false;
+		}
+		// We don't know number of components
+		wmg->num_connected_components = GD_UNDEFINED;
+		GraphUtil util;
+		util.recompute_degrees(wmg);
+
+		delete[] subgraph_labels;
+		delete[] graph_indices;
+		delete[] neighbor_vec;
+
+		return wmg;
+	}
+
+
+
+
+
 	/**
 	* Creates a graph G with vertex set equal to the set in the members list.
 	* The entries in the members list are the positions in the nodes[] array.
@@ -212,6 +392,7 @@ namespace Graph
 		int k = 0;
 		for (i = members->begin(); i != members->end(); ++i)
 		{
+			//subgraph_labels[k] = *i;
 			subgraph_labels[k] = g->nodes[*i].label;
 			graph_indices[*i] = k;
 			k++;
@@ -299,6 +480,7 @@ namespace Graph
 
 		return wmg;
 	}
+
 
 	/**
 	* Creates the subgraph G induced by the members list where it is known

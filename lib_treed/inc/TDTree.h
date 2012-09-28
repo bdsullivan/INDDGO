@@ -145,6 +145,10 @@ public:
     void remove_subset_bags();
     void refine();
 
+    // Constructs a tree dcomposition using Dourisboure-Gavoille's BFS-Layering algorithm
+    // doesn't require an elimination ordering
+    void construct_dg(int root = 1);
+
     // Constructs a tree decomposition using Bodlaender-Koster's "Algorithm 2"
     // with the provided elimination order
     void construct_BK(vector<int> *elim_order);

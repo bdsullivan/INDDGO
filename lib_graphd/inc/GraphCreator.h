@@ -42,6 +42,11 @@ namespace Graph
         // Does not check connectedness. Caller must allocate space for the graph G.
         virtual WeightedMutableGraph *create_induced_subgraph(
 			WeightedMutableGraph *wmg, list<int> *members, bool make_simple);
+        // Creates a graph needed for constructing a separator for tree decomposition
+        // The induced subgraph on the given lists of vertices is extended by the completion of both lists.
+        // Caller must allocate space for the graph G.
+        virtual WeightedMutableGraph *separator_prep(
+			WeightedMutableGraph *wmg, list<int> *parent_members, list<int> *child_members, bool make_simple);
 
         // Specialized induced subgraph functionality for components. Sets num_connected_components to 1.
         virtual WeightedMutableGraph* create_component(WeightedMutableGraph *g,

@@ -426,7 +426,7 @@ namespace Graph
 	/**
 	* Uses a recursive function to populate the members list with the
 	* positions in the nodes[] array of those
-	* nodes that belong to the saem component as v.
+	* nodes that belong to the same component as v.
 	* Returns the number of nodes in mg component.
 	*/
 	int GraphUtil::rec_find_component(MutableGraph *mg, int v,
@@ -636,6 +636,67 @@ namespace Graph
 		return components;
 	}
 
+
+
+
+
+	//Calls CreateSeparator from metis
+	void GraphUtil::metis_ConstructSeparator(MutableGraph *mg)
+	{
+#if !HAS_METIS
+      fatal_error("Called METIS CreateSeparator without HAS_METIS.\n");
+#else
+       int i;
+        GraphUtil util;
+        util.populate_CRS(mg); /// construct xadj, adjncy
+
+        //BDS April 3, 2012 switched from GraphType, ControlType with metis4->metis5 
+        graph_t graph;
+        ctrl_t *ctrl;
+
+        graph.nvtxs = mg->get_num_nodes();
+        graph.nedges = mg->get_num_edges();
+        graph.label = imalloc(graph.nvtxs, (char *) "TD Graph: graph label");
+        for (i = 0; i < graph.nvtxs; i++)
+            graph.label[i] = mg->get_node(i)->get_label();
+            //graph.label[i] = i;
+
+        graph.adjncy = &(mg->adjncy[0]);
+        graph.xadj = &(mg->xadj[0]);
+        //workspace mem alloc uses graph->ncon, which we were not setting before
+        graph.ncon = 1;
+
+        //cannot leave ctrl completely uninitialized
+//        ctrl = SetupCtrl(METIS_OP_OMETIS, NULL, 1, 3, NULL, NULL);
+        /* allocate workspace memory */
+        AllocateWorkSpace(ctrl, &graph);
+
+real_t ntpwgts[2] = {0.5, 0.5};
+//ctrl->nseps=1;
+Setup2WayBalMultipliers(ctrl, &graph, ntpwgts);
+
+RandomBisection(ctrl, &graph, ntpwgts, 1);
+//RandomBisection(ctrl, &graph, ntpwgts, niparts);
+Compute2WayPartitionParams(ctrl, &graph);
+
+
+        // metis_order a vector related to ordering vector. nvtxs not passed directly, but lets just leave it there
+        //MMDOrder(ctrl, &graph, &(metis_order[0]), graph.nvtxs);
+
+
+
+
+		ConstructSeparator(ctrl, &graph);
+        util.free_CRS(mg);
+
+        return;
+        //return 1;
+#endif
+	}
+
+
+
+
 	//runs a BFS from start using
 	//only vertices with allowed[v] = true. If a vertex u  is reachable,
 	//Returns an array of booleans which is true for vertices which are found in the search.
@@ -751,6 +812,87 @@ namespace Graph
 		// We emptied the stack.
 		return dists;
 	}
+
+
+	//DAG: modified bfs_dist
+	//returns max distance in the num_reached value, needs testing
+	//
+	//runs a BFS from start using only vertices with allowed[v] = true.
+	//Modifies mg. makes each node's label = dist
+	//Returns an array of integers giving distance from the source (0 for source).
+	//Unreachable vertices have value GD_INFINITY.
+	//num_reached is the number of vertices which are reachable. mg does not include
+	//disallowed vertices, and does include the start.
+
+	int *GraphUtil::bfs_dist1(MutableGraph *mg, int start, bool *allowed,
+		int *num_reached)
+	{
+
+		// We need the graph to be symmetric, as we're going to walk through a neighbor list
+		if (!mg->canonical)
+			fatal_error("%s:  must be in canonical format\n", __FUNCTION__);
+		int num_found = 0;
+		int max_dist = 0;
+
+		int j;
+		int *dists = new int[mg->capacity];
+		for (j = 0; j < mg->capacity; j++)
+			dists[j] = GD_INFINITY;
+
+		// S is a stack that will contain the nodes we have visited -
+		// take the first one off, and then add its unvisited neighbors to the end
+		list<int> S;
+		list<int>::iterator ii;
+
+		int curr_level = 0;
+		int left_in_level = 1;
+		int next_level = 0;
+
+		// Put start on the stack
+		S.clear();
+		S.push_front(start);
+		while (!(S.empty()))
+		{
+			if (left_in_level == 0)
+			{
+				curr_level++;
+				left_in_level = next_level;
+				next_level = 0;
+			}
+
+			// Remove the oldest element from the stack
+			j = S.front();
+			S.pop_front();
+			left_in_level--;
+			if (dists[j] == GD_INFINITY)
+			{
+				// We have now visited j
+				dists[j] = curr_level;
+				mg->nodes[j].label = curr_level;
+				num_found++;
+
+				// Check j's neighbors
+				for (ii = mg->nodes[j].nbrs.begin(); ii != mg->nodes[j].nbrs.end();
+					++ii)
+				{
+					if (dists[*ii] == GD_INFINITY && allowed[*ii] == true)
+					{
+						// Note - mg is the only place that we refer to the allowed[] vector
+						// We haven't seen *ii before and it is an "acceptable" vertex,
+						// so it is a candidate to be in the path - add it to the Stack
+						S.push_back(*ii); // must be push_back since we pop_front and need FIFO.
+						next_level++;
+					}
+				}
+			}
+		}
+
+		//*num_reached = num_found;
+		*num_reached = curr_level;//test this
+		// We emptied the stack.
+		return dists;
+        }
+
 
 }
 
