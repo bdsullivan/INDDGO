@@ -3149,7 +3149,7 @@ double estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
 #if !HAS_GMP
 	fprintf(stderr,"HAS_GMP is set to 0\nCannot run %s!",__FUNCTION__);
 	return 0;
-#endif
+#else
 
 	FILE *out=fopen(outfile,"w");
 	if(!out)
@@ -3221,6 +3221,7 @@ double estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
 	fclose(out);
 
 	return final_ans;
+#endif
 }
 
 /**

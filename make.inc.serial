@@ -19,6 +19,12 @@ SRC_DIR =
 #WARNING: If HAS_PARMETIS=1, you must also set HAS_METIS=1 (metis is
 #included in the parmetis install).
 
+# Set to 1 if building on CYGWIN
+# This then defines the variable _GK_ERROR_C_ which
+# cures a compile error when building with gcc and g++ 
+# under cygwin 
+CYGWIN = 1
+
 HAS_ARPACK	= 0
 HAS_SUITESPARSE = 1
 HAS_PARMETIS	= 0
@@ -76,6 +82,11 @@ OLDGCC	= 0
 CFLAGS = -O3
 CPPFLAGS = 
 LDFLAGS = 
+
+ifeq ($(CYGWIN), 1)
+CFLAGS:= $(CFLAGS) -D_GK_ERROR_C_
+CPPFLAGS:= $(CFLAGS) -D_GK_ERROR_C_
+endif
 
 ifeq ($(LOG_ENABLED), 1)
 CFLAGS := $(CFLAGS) -D__LOG_ENABLE__ 
