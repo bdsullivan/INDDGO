@@ -52,7 +52,7 @@ public:
 		very_verbose, free_children, verbose, no_reconstruct, split_bag,
 		asp_root, child_root, refine_td, DFS, async_tbl, mem_est, width, fix_DIMACS, parmetis, pbag;
 
-	int elim_order_type, root_node, start_v;
+	int elim_order_type, root_node, start_v, max_width;
 	// CSG adding orig_ fields to handle stats for refined tree
 	unsigned long long total_table_entries, total_pc_table_entries, 
 		orig_total_table_entries, orig_total_pc_table_entries;

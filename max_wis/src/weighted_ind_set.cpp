@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -29,84 +29,87 @@ void usage(const char *s)
 {
 	fprintf(stderr, "Usage: %s [options]\n", s);
 	fprintf(
-			stderr,
-			"\t --- Input/Output Options ---\n"
-			"\t -f DIMACS_file : loads in the file with symmetric adj lists\n"
-			"\t -t <tree_infile> will read in the tree from a file\n"
-			"\t -w <tree_outfile> will write the tree to a file\n"
-			"\t -gviz <gviz_file>: writes a graphviz version of the tree decomposition\n"
-			"\t        to gviz_file, and the DIMACS form to gviz_file.dimacs\n"
-			"\t -tpreord may be used in conjunction with -w to write the tree so bags \n"
-			"\t        are labeled with a preordering (1 is root, i > j means i is \n"
-			"\t        farther from root than j\n"
-			"\t -eorder <eo_file> writes elimination ordering into specified file.\n"
-			"\t -sol <sol_file> will write the weighted independent set solution to the given file.\n"
-			"\t      If not given, then solution is written to <DIMACS_file>.WIS.sol\n"
-			"\t --- Decomposition Construction Options ---\n" 
-			"\t -superetree : constructs a non-nice TD using CHOLMOD and supernodal etrees\n"
-			"\t      (fast; no triangulation)\n"
-			"\t -gavril : constructs a non-nice TD using Gavril's algorithm\n"
-			"\t -bk : constructs a non-nice TD using BK algorithm\n"
-			"\t -pbag : parallel bag generation, non-nice TD using Gavril's algorithm\n"
-			"\t -nice : constructs a nice TD\n"
-			"\t -make_nice will take a non-nice tree and niceify it by adding new\n"
-			"\t        tree nodes\n"
-			"\t -refine_td will try to reduce the sizes of the bag intersections by \n"
-			"\t        post-processing the tree decomposition\n"
-			"\t -check will manually verify the TD (can be slow!)\n"
-			"\t --- Elimination Order Options ---\n"
-			"\t -lower_bounds : Runs two lower bound heuristics and prints results.\n"
-			"\t        Can be used in combination with all other EO options.\n"
-			"\t -s start_v : uses start_v as first vertex in ordering\n"
-			"\t -mind : generates an elim. ordering using min degree heuristic\n"
-			"\t -mmd: generates an elim. ordering using multiple min degree heuristic\n"
-			"\t -minf : generates an elim. ordering using min fill heuristic\n"
-			"\t -bmf: generates an elim. ordering using a batched min fill heuristic\n"
-			"\t -beta: generates an elim. ordering using the beta heuristic\n"
-			"\t -metmmd: generates an elim. ordering using METIS mmd heuristic\n"
-			"\t -metnnd: generates an elim. ordering using METS node ND heuristic\n"
-			"\t -mcsm : generates an elim. ordering using mcsm euristic\n"
-			"\t -mcs  : generates an elim. ordering using mcs\n"
-			"\t -lexm : generates an elim. ordering using lex-m bfs heuristic\n"
-			"\t -pktsort : generates the elim ordering corresponding to partial\n"
-			"\t            ktree generation\n"
-			"\t -amd: generates the elim. ordering using UFs approximate min\n"
-			"\t       degree heuristic (AMD)\n"
-			"\t -minmaxd: generates the elim. ordering using the minimum maximum\n"
-			"\t           degree heuristic.\n"
-			"\t -parmetis: generates an elim. ordering using ParMETIS\n"
-			"\t -ord <ordering_file> reads in an elimination ordering (1-based as in \n"
-			"\t      DIMACS file)\n"
-			"\t -sord <scotch ordering file> reads in an elimination ordering produced\n"
-			"\t                              by Scotch\n"
-			"\t --- Dynamic Programming Options ---\n"
-			"\t -nonniceDP will use the non-nice Dynamic Programming routines\n"
-			"\t -root <root_node> will set the TD's root node (default is 0)\n"
-			"\t                   (Only works for Gavril and BK trees)\n"
-			"\t -asp_root will use the Aspvall algorithm to find a root node\n"
-			"\t -child_root will use the All My Children algorithm to find a root node\n"
-			"\t -pc will use the child sets to help construct the parent\n\n"			
-			"\t -del_ch will delete a tree node's table once its parent is processed\n"
-			"\t         NOTE: you cannot reconstruct the solution if you do this!\n"
-			"\t -no_reconstruct will not reconstruct the solution\n"
-			"\t -split_bag will search for solutions by splitting the bag in half\n"
-			"\t      and then merging the two halves\n"
-			"\t -async_tbl will do the DP one child at a time rather than looping over\n"
-			"\t      all children at once\n"
-			"\t -dfs will generate a post-order walk using a DFS (BFS is default)\n"
-			"\t      DIMACS_file.mem_est\n"
-			"\t --- Miscellaneous Options ---\n"
-			"\t -decompose_only will just generate the tree decomposition and will\n"
-			"\t        *not* run MWIS\n"
-			"\t -width will compute and print width of the specified decomposition and will *not* proceed\n"
-			"\t -hist will print out a histogram of bag sizes prior to running DP\n"
-			"\t -mem_est will estimate the memory usage at each treenode\n"
-			"\t -mod <model_file> : writes a GMPL MIP formulation of the problem\n"
-			"\t                     to model_file.\n"
-			"\t -mip : solves the problem by runing GLPK's glpsol solver\n"
-			"\t        via a system() call to glpsol -m model_file\n"
-			"\t -v : runs in verbose mode\n"
-			"\t -vv : runs in very verbose mode - lots of output about the ind. sets\n");
+		stderr,
+		"\t --- Input/Output Options ---\n"
+		"\t -f DIMACS_file : loads in the file with symmetric adj lists\n"
+		"\t -t <tree_infile> will read in the tree from a file\n"
+		"\t -w <tree_outfile> will write the tree to a file\n"
+		"\t -gviz <gviz_file>: writes a graphviz version of the tree decomposition\n"
+		"\t        to gviz_file, and the DIMACS form to gviz_file.dimacs\n"
+		"\t -tpreord may be used in conjunction with -w to write the tree so bags \n"
+		"\t        are labeled with a preordering (1 is root, i > j means i is \n"
+		"\t        farther from root than j\n"
+		"\t -eorder <eo_file> writes elimination ordering into specified file.\n"
+		"\t -sol <sol_file> will write the weighted independent set solution to the\n:"
+		"\t        given file.  If not given, then solution is written \n"
+		"\t        to <DIMACS_file>.WIS.sol\n"
+		"\t --- Decomposition Construction Options ---\n" 
+		"\t -superetree : constructs a non-nice TD using CHOLMOD and supernodal\n"
+		"etrees (fast; no triangulation)\n"
+		"\t -gavril : constructs a non-nice TD using Gavril's algorithm\n"
+		"\t -bk : constructs a non-nice TD using BK algorithm\n"
+		"\t -pbag : parallel bag generation, non-nice TD using Gavril's algorithm\n"
+		"\t -nice : constructs a nice TD\n"
+		"\t -make_nice will take a non-nice tree and niceify it by adding new\n"
+		"\t        tree nodes\n"
+		"\t -refine_td will try to reduce the sizes of the bag intersections by \n"
+		"\t        post-processing the tree decomposition\n"
+		"\t -check will manually verify the TD (can be slow!)\n"
+		"\t --- Elimination Order Options ---\n"
+		"\t -lower_bounds : Runs two lower bound heuristics and prints results.\n"
+		"\t        Can be used in combination with all other EO options.\n"
+		"\t -s start_v : uses start_v as first vertex in ordering\n"
+		"\t -mind : generates an elim. ordering using min degree heuristic\n"
+		"\t -mmd: generates an elim. ordering using multiple min degree heuristic\n"
+		"\t -minf : generates an elim. ordering using min fill heuristic\n"
+		"\t -bmf: generates an elim. ordering using a batched min fill heuristic\n"
+		"\t -beta: generates an elim. ordering using the beta heuristic\n"
+		"\t -metmmd: generates an elim. ordering using METIS mmd heuristic\n"
+		"\t -metnnd: generates an elim. ordering using METS node ND heuristic\n"
+		"\t -mcsm : generates an elim. ordering using mcsm euristic\n"
+		"\t -mcs  : generates an elim. ordering using mcs\n"
+		"\t -lexm : generates an elim. ordering using lex-m bfs heuristic\n"
+		"\t -pktsort : generates the elim ordering corresponding to partial\n"
+		"\t            ktree generation\n"
+		"\t -amd: generates the elim. ordering using UFs approximate min\n"
+		"\t       degree heuristic (AMD)\n"
+		"\t -minmaxd: generates the elim. ordering using the minimum maximum\n"
+		"\t           degree heuristic.\n"
+		"\t -parmetis: generates an elim. ordering using ParMETIS\n"
+		"\t -ord <ordering_file> reads in an elimination ordering (1-based as in \n"
+		"\t      DIMACS file)\n"
+		"\t -sord <scotch ordering file> reads in an elimination ordering produced\n"
+		"\t                              by Scotch\n"
+		"\t --- Dynamic Programming Options ---\n"
+		"\t -nonniceDP will use the non-nice Dynamic Programming routines\n"
+		"\t -root <root_node> will set the TD's root node (default is 0)\n"
+		"\t                   (Only works for Gavril and BK trees)\n"
+		"\t -asp_root will use the Aspvall algorithm to find a root node\n"
+		"\t -child_root will use the All My Children algorithm to find a root node\n"
+		"\t -pc will use the child sets to help construct the parent\n\n"			
+		"\t -del_ch will delete a tree node's table once its parent is processed\n"
+		"\t         NOTE: you cannot reconstruct the solution if you do this!\n"
+		"\t -no_reconstruct will not reconstruct the solution\n"
+		"\t -split_bag will search for solutions by splitting the bag in half\n"
+		"\t      and then merging the two halves\n"
+		"\t -async_tbl will do the DP one child at a time rather than looping over\n"
+		"\t      all children at once\n"
+		"\t -dfs will generate a post-order walk using a DFS (BFS is default)\n"
+		"\t      DIMACS_file.mem_est\n"
+		"\t -max_width <w> will not attempt to run the DP if the decomposition\n"
+		"\t      has width larger than w.\n"
+		"\t --- Miscellaneous Options ---\n"
+		"\t -decompose_only will just generate the tree decomposition and will\n"
+		"\t        *not* run MWIS\n"
+		"\t -width will compute and print width of the specified decomposition and will *not* proceed\n"
+		"\t -hist will print out a histogram of bag sizes prior to running DP\n"
+		"\t -mem_est will estimate the memory usage at each treenode\n"
+		"\t -mod <model_file> : writes a GMPL MIP formulation of the problem\n"
+		"\t                     to model_file.\n"
+		"\t -mip : solves the problem by runing GLPK's glpsol solver\n"
+		"\t        via a system() call to glpsol -m model_file\n"
+		"\t -v : runs in verbose mode\n"
+		"\t -vv : runs in very verbose mode - lots of output about the ind. sets\n");
 }
 ;
 
@@ -146,17 +149,17 @@ bool hamming_compare(const int_bigint *x, const int_bigint *y)
 }
 
 /**
- * Takes in a sorted list of vertices taken from k's bag.  Fills the ind_sets
- * list with all independent sets from bag_subset and translates these into masks that
- * pick off entries in k's actual bag (so the masks are stretched in other words).
- */
+* Takes in a sorted list of vertices taken from k's bag.  Fills the ind_sets
+* list with all independent sets from bag_subset and translates these into masks that
+* pick off entries in k's actual bag (so the masks are stretched in other words).
+*/
 int list_ind_sets(TDTree *T, int k, list<int> *bag_subset,
-		list<TDSolution *> *ind_sets)
+	list<TDSolution *> *ind_sets)
 {
 	// check for idiotic argument
 	if (k < 0 || !(T->tree_nodes[k]))
 		fatal_error("%s: tried to compute table for impossible tree node\n",
-				__FUNCTION__);
+		__FUNCTION__);
 
 	int i, j;
 	TDSolution *new_set;
@@ -222,7 +225,7 @@ int list_ind_sets(TDTree *T, int k, list<int> *bag_subset,
 		}
 	}
 	T->tree_nodes[k]->num_subgraph_edges = T->tree_nodes[k]->num_subgraph_edges
-			/ 2;
+		/ 2;
 	// Sort the masks and put the densest first 
 	sort(nbr_mask_vec.begin(), nbr_mask_vec.end(), hamming_compare);
 
@@ -238,7 +241,7 @@ int list_ind_sets(TDTree *T, int k, list<int> *bag_subset,
 	two_w_word--;
 
 	bool has_bit;
-	
+
 	while (current_mask.words[two_w_word] < two_pow_w.words[two_w_word])
 	{
 		is_independent = true;
@@ -305,7 +308,7 @@ int list_ind_sets(TDTree *T, int k, list<int> *bag_subset,
 					// bit j is set in current_mask - that corresponds to bit pos_vec[j] in a full mask
 					new_set->mask->set_bit(pos_vec[j]);
 					new_set->value += T->G->get_vertex_weight(bag_subset_vec[j]);
-						//T->G->weight[bag_subset_vec[j]];
+					//T->G->weight[bag_subset_vec[j]];
 				}
 			}
 			// Add the new set to the list here -
@@ -323,14 +326,14 @@ int list_ind_sets(TDTree *T, int k, list<int> *bag_subset,
 }
 
 /**
- * Computes the independent sets at a non-leaf node using information from the children.
- * The idea is that any independent set in the parent is the union of a set that lives
- * only in the parent and a set that lives in parent \cap child.
- * Then looks "up" to the parent to find the
- * ind. set in this bag that has the largest weight with a given intersection
- * with the parent.  Letting M denote the mask of this intersection in the
- * parent's bag, weight_table[M]=w where w is the weight of this largest set.
- */
+* Computes the independent sets at a non-leaf node using information from the children.
+* The idea is that any independent set in the parent is the union of a set that lives
+* only in the parent and a set that lives in parent \cap child.
+* Then looks "up" to the parent to find the
+* ind. set in this bag that has the largest weight with a given intersection
+* with the parent.  Letting M denote the mask of this intersection in the
+* parent's bag, weight_table[M]=w where w is the weight of this largest set.
+*/
 int compute_nonnice_table_parent_child(TDTree *T, int k)
 {
 	// if k is a leaf, then just compute it the normal way
@@ -374,8 +377,8 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 	{
 		T->tree_nodes[*ii]->bag.sort();
 		vv = set_intersection(T->tree_nodes[k]->bag.begin(),
-				T->tree_nodes[k]->bag.end(), T->tree_nodes[*ii]->bag.begin(),
-				T->tree_nodes[*ii]->bag.end(), I.begin());
+			T->tree_nodes[k]->bag.end(), T->tree_nodes[*ii]->bag.begin(),
+			T->tree_nodes[*ii]->bag.end(), I.begin());
 		if (vv - I.begin() > max_intersection)
 		{
 			max_intersection = vv - I.begin();
@@ -385,13 +388,13 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 
 	// Compute parent - best_child
 	vv = set_difference(T->tree_nodes[k]->bag.begin(),
-			T->tree_nodes[k]->bag.end(),
-			T->tree_nodes[best_child]->bag.begin(),
-			T->tree_nodes[best_child]->bag.end(), D.begin());
+		T->tree_nodes[k]->bag.end(),
+		T->tree_nodes[best_child]->bag.begin(),
+		T->tree_nodes[best_child]->bag.end(), D.begin());
 	diff_size = vv - D.begin();
 	if (diff_size + max_intersection != w)
 		fatal_error("%s:  Incorrect bag size computation %d!=%d??\n",
-				__FUNCTION__, diff_size + max_intersection, w);
+		__FUNCTION__, diff_size + max_intersection, w);
 	list<int> bag_subset;
 	list<TDSolution *> ind_sets;
 	for (uu = D.begin(); uu != vv; ++uu)
@@ -419,7 +422,7 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 		for (j = 0; j < T->G->get_capacity(); j++)
 			cvec[i][j] = false;
 		for (ii = T->tree_nodes[children[i]]->bag.begin(); ii
-				!= T->tree_nodes[children[i]]->bag.end(); ++ii)
+			!= T->tree_nodes[children[i]]->bag.end(); ++ii)
 			cvec[i][*ii] = true;
 	}
 
@@ -444,13 +447,13 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 			for (i = 0; i < w; i++)
 			{
 				if (subset_pos[T->tree_nodes[k]->bag_vec[T->tree_nodes[k]->nbr_mask_vec->at(i)->k]]
-						&& (*ss)->mask->test_bit(T->tree_nodes[k]->nbr_mask_vec->at(i)->k))
-						{
+				&& (*ss)->mask->test_bit(T->tree_nodes[k]->nbr_mask_vec->at(i)->k))
+				{
 					// Do the loop below manually rather than calling the overloaded AND
 					for (j = 0; j < s->mask->S; j++)
 					{
 						if (s->mask->words[j] & T->tree_nodes[k]->nbr_mask_vec->at(i)->w->words[j])
-						//if (s->mask->words[j] & nbr_mask_vec[i]->w->words[j])
+							//if (s->mask->words[j] & nbr_mask_vec[i]->w->words[j])
 						{
 							// Some nbr is found in word j
 							is_independent = false;
@@ -475,7 +478,7 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 				{
 					if (s->mask->test_bit(j) || (*ss)->mask->test_bit(j))
 						new_value += T->G->get_vertex_weight(T->tree_nodes[k]->bag_vec[j]);
-						//T->G->weight[T->tree_nodes[k]->bag_vec[j]];
+					//T->G->weight[T->tree_nodes[k]->bag_vec[j]];
 				}
 				// Check for new max_obj
 				if (new_value > T->tree_nodes[k]->obj_val)
@@ -492,18 +495,18 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 						if (cvec[i][T->tree_nodes[k]->bag_vec[z]])
 						{
 							if (s->mask->test_bit(z)
-									|| (*ss)->mask->test_bit(z))
+								|| (*ss)->mask->test_bit(z))
 								// Bit z is set, and the corresponding vertex is also in the child
 								temp_sol.mask->set_bit(z);
 						}
 					}
 					hash_ptr = NULL;
 					HASH_FIND(hh, T->tree_nodes[children[i]]->hash_table, temp_sol.mask->words,
-							T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
+						T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
 					if (!hash_ptr)
 						fatal_error(
-								"%s: Did not find set in child!!! Cannot continue\n",
-								__FUNCTION__);
+						"%s: Did not find set in child!!! Cannot continue\n",
+						__FUNCTION__);
 					new_value += hash_ptr->value;
 					// Check for new max obj
 					if (new_value > T->tree_nodes[k]->obj_val)
@@ -525,7 +528,7 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 							temp_sol.mask->set_bit(T->tree_nodes[k]->parent_position->at(j));
 							//parent_location_vec[T->tree_nodes[k]->bag_vec[j]]);
 							parent_weight
-									+=  T->G->get_vertex_weight(T->tree_nodes[k]->bag_vec[j]);
+								+=  T->G->get_vertex_weight(T->tree_nodes[k]->bag_vec[j]);
 						}
 					}
 				}
@@ -544,14 +547,14 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 						*(added_set->orig_mask) = orig_mask;
 						added_set->value = temp_sol.value;
 						HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, added_set->mask->words,
-								T->num_mask_words*sizeof(BIGINT_WORD), added_set);
+							T->num_mask_words*sizeof(BIGINT_WORD), added_set);
 					}
 				}
 				else
 				{
 					// k is not the root - so do the usual
 					HASH_FIND(hh,T->tree_nodes[k]->hash_table, temp_sol.mask->words,
-							T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
+						T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
 					if (hash_ptr)
 					{
 						if (temp_sol.value - parent_weight > hash_ptr->value)
@@ -574,7 +577,7 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 						*(added_set->orig_mask) = orig_mask;
 						added_set->value = temp_sol.value - parent_weight;
 						HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, added_set->mask->words,
-								T->num_mask_words*sizeof(BIGINT_WORD), added_set);
+							T->num_mask_words*sizeof(BIGINT_WORD), added_set);
 					}
 				}
 				num_hash_ind_found++;
@@ -597,10 +600,10 @@ int compute_nonnice_table_parent_child(TDTree *T, int k)
 }
 
 /**
- * Computes the table for a leaf or non-leaf node in a non-nice TD. Uses only
- * the hash_table and only stores an entry for the unique intersections of node
- * k independent sets with the parent's.
- */
+* Computes the table for a leaf or non-leaf node in a non-nice TD. Uses only
+* the hash_table and only stores an entry for the unique intersections of node
+* k independent sets with the parent's.
+*/
 int compute_nonnice_table_standard(TDTree *T, int k)
 {
 	int i, j, w = (int) T->tree_nodes[k]->bag.size();
@@ -638,7 +641,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 				for (j = 0; j < current_mask.S; j++)
 				{
 					if ( (current_mask.words[j]
-							& T->tree_nodes[k]->nbr_mask_vec->at(i)->w->words[j]) )
+					& T->tree_nodes[k]->nbr_mask_vec->at(i)->w->words[j]) )
 					{
 						// Some nbr is found in word j so current_mask cannot represent an ind. set
 						has_bit = true;
@@ -651,7 +654,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 					// Set represented by current_mask is not independent
 					is_independent = false;
 					int rpos = 0;
-					
+
 #if 0
 					// Unfortunately this won't work since bigint doesn't know the + operator
 					// I should have used GMP from day one, esp. now that I'm using it for the memory
@@ -664,7 +667,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 					// SPEEDUP
 					while (!(current_mask.test_bit(rpos)))
 						rpos++;
-				
+
 					// Now advance current_mask by a potentially massive amount
 					// Would be faster here to figure out which word we are in and 
 					// do this w/o test_bit
@@ -717,12 +720,12 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 				// Get the intersection of this set with child i
 				*(temp_set.mask) &= *(T->tree_nodes[k]->child_intersection->at(i));
 				HASH_FIND(hh, T->tree_nodes[*ii]->hash_table, temp_set.mask->words,
-						T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
+					T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
 				if (!hash_ptr)
 				{
 					fatal_error(
-							"%s: Did not find set in child!!! Cannot continue\n",
-							__FUNCTION__);
+						"%s: Did not find set in child!!! Cannot continue\n",
+						__FUNCTION__);
 
 				}
 				new_value += hash_ptr->value;
@@ -746,7 +749,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 					if (T->tree_nodes[k]->parent_position->at(j) != -1)
 					{
 						temp_set.mask->set_bit(
-								T->tree_nodes[k]->parent_position->at(j));
+							T->tree_nodes[k]->parent_position->at(j));
 						parent_weight
 							+= T->G->get_vertex_weight(T->tree_nodes[k]->bag_vec[j]);
 					}
@@ -766,14 +769,14 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 					*(added_set->orig_mask) = current_mask;
 					added_set->value = temp_set.value;
 					HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, added_set->mask->words,
-							T->num_mask_words*sizeof(BIGINT_WORD), added_set);
+						T->num_mask_words*sizeof(BIGINT_WORD), added_set);
 				}
 			}
 			else
 			{
 				// k is not the root - so do the usual
 				HASH_FIND(hh,T->tree_nodes[k]->hash_table, temp_set.mask->words,
-						T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
+					T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
 				if (hash_ptr)
 				{
 					if (temp_set.value - parent_weight > hash_ptr->value)
@@ -793,7 +796,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 					*(added_set->orig_mask) = current_mask;
 					added_set->value = temp_set.value - parent_weight;
 					HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, added_set->mask->words,
-							T->num_mask_words*sizeof(BIGINT_WORD), added_set);
+						T->num_mask_words*sizeof(BIGINT_WORD), added_set);
 				}
 			}
 			// Advance to next candidate ind. set       
@@ -801,7 +804,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 		}
 	}
 	loop_end = clock();
-	
+
 	int table_size = HASH_COUNT(T->tree_nodes[k]->hash_table);
 	T->info->total_pc_table_entries += (unsigned long long) table_size;
 	T->info->aux_info[k] = num_ind_sets;
@@ -817,8 +820,8 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 int compute_nonnice_table_split_bag(TDTree *T, int k)
 {
 	int i, j, w = (int) T->tree_nodes[k]->bag.size(), parent =
-			T->tree_nodes[k]->adj.front(), num_nbrs =
-			(int) T->tree_nodes[k]->adj.size();
+		T->tree_nodes[k]->adj.front(), num_nbrs =
+		(int) T->tree_nodes[k]->adj.size();
 	int half_w = w / 2;
 	list<int>::iterator ii, jj, kk;
 	bigint_t current_mask(T->num_mask_words);
@@ -984,11 +987,11 @@ int compute_nonnice_table_split_bag(TDTree *T, int k)
 				}
 
 				HASH_FIND(hh, T->tree_nodes[children[i]]->hash_table, temp_set.mask->words,
-						T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
+					T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
 				if (!hash_ptr)
 					fatal_error(
-							"%s: Did not find set in child!!! Cannot continue\n",
-							__FUNCTION__);
+					"%s: Did not find set in child!!! Cannot continue\n",
+					__FUNCTION__);
 				new_value += hash_ptr->value;
 				// Check for new max obj
 				if (new_value > T->tree_nodes[k]->obj_val)
@@ -1030,14 +1033,14 @@ int compute_nonnice_table_split_bag(TDTree *T, int k)
 					*(added_set->orig_mask) = current_mask;
 					added_set->value = temp_set.value;
 					HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, added_set->mask->words,
-							T->num_mask_words*sizeof(BIGINT_WORD), added_set);
+						T->num_mask_words*sizeof(BIGINT_WORD), added_set);
 				}
 			}
 			else
 			{
 				// k is not the root - so do the usual
 				HASH_FIND(hh,T->tree_nodes[k]->hash_table, temp_set.mask->words,
-						T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
+					T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
 				if (hash_ptr)
 				{
 					if (temp_set.value - parent_weight > hash_ptr->value)
@@ -1057,7 +1060,7 @@ int compute_nonnice_table_split_bag(TDTree *T, int k)
 					*(added_set->orig_mask) = current_mask;
 					added_set->value = temp_set.value - parent_weight;
 					HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, added_set->mask->words,
-							T->num_mask_words*sizeof(BIGINT_WORD), added_set);
+						T->num_mask_words*sizeof(BIGINT_WORD), added_set);
 				}
 			}
 		}
@@ -1070,18 +1073,18 @@ int compute_nonnice_table_split_bag(TDTree *T, int k)
 	if (T->info->very_verbose)
 		// Print out some timing info for the DP
 		print_message(0,
-				"\n\tHALF: %f secs\n\tIND : %f secs\n\tDP  : %f secs\n",
-				(double) (half_stop - half_start) / CLOCKS_PER_SEC,
-				(double) ind_time / CLOCKS_PER_SEC,
-				(double) DP_time / CLOCKS_PER_SEC);
+		"\n\tHALF: %f secs\n\tIND : %f secs\n\tDP  : %f secs\n",
+		(double) (half_stop - half_start) / CLOCKS_PER_SEC,
+		(double) ind_time / CLOCKS_PER_SEC,
+		(double) DP_time / CLOCKS_PER_SEC);
 
 	// Need to delete first and second lists - iterator has to be const_ to do this!!
 	for (list<TDSolution *>::const_iterator dd = first_sets.begin(); dd
-			!= first_sets.end(); ++dd)
+		!= first_sets.end(); ++dd)
 		delete *dd;
 	first_sets.clear();
 	for (list<TDSolution *>::const_iterator dd = second_sets.begin(); dd
-			!= second_sets.end(); ++dd)
+		!= second_sets.end(); ++dd)
 		delete *dd;
 	second_sets.clear();
 
@@ -1099,10 +1102,10 @@ int compute_nonnice_table_split_bag(TDTree *T, int k)
 }
 
 /**
- * Function to add given mask into parent's hash table.
- */
+* Function to add given mask into parent's hash table.
+*/
 void add_to_parent_intersection_table(TDTree *T, int k, int w, bigint_t *mask,
-		int value)
+	int value)
 {
 	TDSolution temp_set(T->num_mask_words);
 	bigint_t current_mask(T->num_mask_words);
@@ -1125,7 +1128,7 @@ void add_to_parent_intersection_table(TDTree *T, int k, int w, bigint_t *mask,
 	temp_set.value = value;
 	// k is not the root - so do the usual
 	HASH_FIND(hh,T->tree_nodes[k]->hash_table, temp_set.mask->words,
-			T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
+		T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
 
 	if (hash_ptr)
 	{
@@ -1146,22 +1149,22 @@ void add_to_parent_intersection_table(TDTree *T, int k, int w, bigint_t *mask,
 		*(added_set->orig_mask) = current_mask;
 		added_set->value = temp_set.value;
 		HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, added_set->mask->words,
-				T->num_mask_words*sizeof(BIGINT_WORD), added_set);
+			T->num_mask_words*sizeof(BIGINT_WORD), added_set);
 	}
 }
 
 /**
- * Computes the table for a leaf or non-leaf node in a non-nice TD. 
- * Parent does not have to wait for all children to finish.
- * As soon as one child's table is computed, the parent can compute 
- * its table and free that child table.
- */
+* Computes the table for a leaf or non-leaf node in a non-nice TD. 
+* Parent does not have to wait for all children to finish.
+* As soon as one child's table is computed, the parent can compute 
+* its table and free that child table.
+*/
 int compute_nonnice_table_async(TDTree *T, int k)
 {
 	/**
-	 * TODO: In parallel implementation to dynamic programming intersection with the children should be found.
-	 * Therefore mask which represents child intersection should also be sent.
-	 */
+	* TODO: In parallel implementation to dynamic programming intersection with the children should be found.
+	* Therefore mask which represents child intersection should also be sent.
+	*/
 
 	bool is_leaf_node = false;
 	int table_size = 0;
@@ -1205,8 +1208,8 @@ int compute_nonnice_table_async(TDTree *T, int k)
 	int inter_weight = 0;
 
 	vv = set_intersection(T->tree_nodes[parent]->bag.begin(),
-			T->tree_nodes[parent]->bag.end(), T->tree_nodes[k]->bag.begin(),
-			T->tree_nodes[k]->bag.end(), intersection.begin());
+		T->tree_nodes[parent]->bag.end(), T->tree_nodes[k]->bag.begin(),
+		T->tree_nodes[k]->bag.end(), intersection.begin());
 
 	jj = T->tree_nodes[parent]->bag.begin();
 	j = 0;
@@ -1221,8 +1224,8 @@ int compute_nonnice_table_async(TDTree *T, int k)
 	}
 
 	/**
-	 * check whether parent has a table to store all independent sets.
-	 */
+	* check whether parent has a table to store all independent sets.
+	*/
 	if (T->tree_nodes[parent]->all_ind_sets.empty())
 	{
 		// We already have all the necessary information inside the TDTreeNode
@@ -1246,7 +1249,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 			for (i = 0; i < w; i++)
 			{
 				if (current_mask.test_bit(
-						T->tree_nodes[parent]->nbr_mask_vec->at(i)->k))
+					T->tree_nodes[parent]->nbr_mask_vec->at(i)->k))
 				{
 					// current_mask has the bit corresponding to nbr_mask_vec[i] set - so and with the appropriate vector for a hit
 					has_bit = false;
@@ -1254,7 +1257,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 					for (j = 0; j < current_mask.S; j++)
 					{
 						if (current_mask.words[j]
-								& T->tree_nodes[parent]->nbr_mask_vec->at(i)->w->words[j])
+						& T->tree_nodes[parent]->nbr_mask_vec->at(i)->w->words[j])
 						{
 							// Some nbr is found in word j so current_mask cannot represent an ind. set
 							has_bit = true;
@@ -1331,13 +1334,13 @@ int compute_nonnice_table_async(TDTree *T, int k)
 				new_value -= inter_weight;
 
 				HASH_FIND(hh,T->tree_nodes[k]->hash_table, tmp_set.words,
-						T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
+					T->num_mask_words*sizeof(BIGINT_WORD), hash_ptr);
 				if (hash_ptr)
 					new_value += hash_ptr->value;
 				else
 				{
 					fatal_error(
-							"can not find intersection for current mask, abort !!\n");
+						"can not find intersection for current mask, abort !!\n");
 					current_mask.print(__error_file__);
 				}
 
@@ -1347,12 +1350,12 @@ int compute_nonnice_table_async(TDTree *T, int k)
 					*cmask = current_mask;
 					T->tree_nodes[parent]->all_ind_sets.push_back(cmask);
 					T->tree_nodes[parent]->all_ind_set_values.push_back(
-							new_value);
+						new_value);
 				}
 				else
 				{
 					add_to_parent_intersection_table(T, parent, w,
-							&current_mask, new_value);
+						&current_mask, new_value);
 				}
 
 				// Done with child DP - advance to look for the next independent set in the parent's bag
@@ -1360,7 +1363,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 			}
 		}
 		loop_end = clock();
-		
+
 		T->info->aux_info[parent] = num_ind_sets;
 		// finish complete table creation and computation for k's parent.
 	}
@@ -1373,8 +1376,8 @@ int compute_nonnice_table_async(TDTree *T, int k)
 		list<int>::iterator i_iter;
 
 		for (bi_iter = T->tree_nodes[parent]->all_ind_sets.begin(), i_iter
-				= T->tree_nodes[parent]->all_ind_set_values.begin(); bi_iter
-				!= T->tree_nodes[parent]->all_ind_sets.end(); ++bi_iter, ++i_iter)
+			= T->tree_nodes[parent]->all_ind_set_values.begin(); bi_iter
+			!= T->tree_nodes[parent]->all_ind_sets.end(); ++bi_iter, ++i_iter)
 		{
 			//HASH_ITER(hh, T->tree_nodes[parent]->complete_table, current_set, tmp_sol)
 			//{
@@ -1394,7 +1397,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 					{
 						inter_weight
 							+=T->G->get_vertex_weight(T->tree_nodes[parent]->bag_vec[i]);
-								//+= T->G->weight[T->tree_nodes[parent]->bag_vec[i]];
+						//+= T->G->weight[T->tree_nodes[parent]->bag_vec[i]];
 					}
 				}
 			}
@@ -1408,7 +1411,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 			else
 			{
 				fatal_error(
-						"can not find intersection for current mask, abort !!\n");
+					"can not find intersection for current mask, abort !!\n");
 				current_mask.print(__error_file__);
 			}
 		}
@@ -1432,7 +1435,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 	// increase completed children count.
 	T->tree_nodes[parent]->increase_completed_children();
 	if (!(T->tree_nodes[parent]->get_completed_children()
-			< (int) T->tree_nodes[parent]->adj.size()))
+		< (int) T->tree_nodes[parent]->adj.size()))
 	{
 		// All the children have been processed so now go through the complete table
 		// and create the hash table for the parent node. Since the masks in the hash table
@@ -1444,8 +1447,8 @@ int compute_nonnice_table_async(TDTree *T, int k)
 		list<int>::iterator i_iter;
 
 		for (bi_iter = T->tree_nodes[parent]->all_ind_sets.begin(), i_iter
-				= T->tree_nodes[parent]->all_ind_set_values.begin(); bi_iter
-				!= T->tree_nodes[parent]->all_ind_sets.end(); ++bi_iter, ++i_iter)
+			= T->tree_nodes[parent]->all_ind_set_values.begin(); bi_iter
+			!= T->tree_nodes[parent]->all_ind_sets.end(); ++bi_iter, ++i_iter)
 		{
 			if (parent == T->root_node)
 			{
@@ -1458,7 +1461,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 					*(added_set->orig_mask) = *(*bi_iter);
 					added_set->value = *i_iter;
 					HASH_ADD_KEYPTR(hh, T->tree_nodes[parent]->hash_table, added_set->mask->words,
-							T->num_mask_words*sizeof(BIGINT_WORD), added_set);
+						T->num_mask_words*sizeof(BIGINT_WORD), added_set);
 				}
 				delete *bi_iter;
 				continue;
@@ -1504,9 +1507,9 @@ int compute_nonnice_table(TDTree *T, int k)
 // Functions specific to a NICE Tree Decomposition
 
 /**
- * Computes the ind. sets at a leaf node in a nice TD.  Does not look up to the
- * parent and worry about the intersection.
- */
+* Computes the ind. sets at a leaf node in a nice TD.  Does not look up to the
+* parent and worry about the intersection.
+*/
 int compute_ind_sets_nice(TDTree *T, int k)
 {
 	int i, j;
@@ -1531,7 +1534,7 @@ int compute_ind_sets_nice(TDTree *T, int k)
 	*(new_set->orig_mask) = (BIGINT_WORD) 0;
 	new_set->value = 0;
 	HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, new_set->mask->words,
-			T->num_mask_words*sizeof(BIGINT_WORD), new_set);
+		T->num_mask_words*sizeof(BIGINT_WORD), new_set);
 	T->info->total_pc_table_entries++;
 	T->info->total_table_entries++;
 	num_added++;
@@ -1617,7 +1620,7 @@ int compute_ind_sets_nice(TDTree *T, int k)
 			// There is no point searching the hash table for nice leaves since every set
 			// is added to the hash table
 			HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, new_set->mask->words,
-					T->num_mask_words*sizeof(BIGINT_WORD), new_set);
+				T->num_mask_words*sizeof(BIGINT_WORD), new_set);
 			T->info->total_pc_table_entries++;
 			T->info->total_table_entries++;
 			num_added++;
@@ -1632,18 +1635,18 @@ int compute_ind_sets_nice(TDTree *T, int k)
 	return num_added;
 }
 /**
- * Computes the table for an introduce node (node has 1 child whose bag is smaller by 1) in a nice tree decomposition.
- * Fatal error if the tree is not nice.
- */
+* Computes the table for an introduce node (node has 1 child whose bag is smaller by 1) in a nice tree decomposition.
+* Fatal error if the tree is not nice.
+*/
 int compute_introduce_table(TDTree *T, int k)
 {
 	if (!T->nice)
 		fatal_error(
-				"%s: only know how to compute table for introduce node in nice tree!\n",
-				__FUNCTION__);
+		"%s: only know how to compute table for introduce node in nice tree!\n",
+		__FUNCTION__);
 	if (T->tree_nodes[k]->adj.size() != 2)
 		fatal_error("Tree node %d does not appear to be an introduce node!\n",
-				k);
+		k);
 
 	int i, j, v = GD_UNDEFINED, v_pos;
 	int parent = GD_UNDEFINED, child = GD_UNDEFINED;
@@ -1661,15 +1664,15 @@ int compute_introduce_table(TDTree *T, int k)
 
 	if (T->tree_nodes[k]->bag.size() <= T->tree_nodes[child]->bag.size())
 		fatal_error(
-				"%s: Node %d has a smaller or same size bag than its child --> not an introduce node\n",
-				__FUNCTION__, k);
+		"%s: Node %d has a smaller or same size bag than its child --> not an introduce node\n",
+		__FUNCTION__, k);
 	// Find v
 	vv = set_difference(T->tree_nodes[k]->bag.begin(),
-			T->tree_nodes[k]->bag.end(), T->tree_nodes[child]->bag.begin(),
-			T->tree_nodes[child]->bag.end(), I.begin());
+		T->tree_nodes[k]->bag.end(), T->tree_nodes[child]->bag.begin(),
+		T->tree_nodes[child]->bag.end(), I.begin());
 	if (int(vv - I.begin()) != 1)
 		fatal_error("%s:  Child/parent differ by something other than 1!\n",
-				__FUNCTION__);
+		__FUNCTION__);
 	v = *(I.begin());
 	// Find v_pos, the position of the node that differentiates parent and child
 	// and create a mask that has a 1 in position k when bag[i]-v is an edge in the graph
@@ -1710,7 +1713,7 @@ int compute_introduce_table(TDTree *T, int k)
 		*(new_set->orig_mask) = *(new_set->mask);
 		new_set->value = tt->value;
 		HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, new_set->mask->words,
-				T->num_mask_words*sizeof(BIGINT_WORD), new_set);
+			T->num_mask_words*sizeof(BIGINT_WORD), new_set);
 		if (new_set->value > T->tree_nodes[k]->obj_val)
 			T->tree_nodes[k]->obj_val = new_set->value;
 		num_added++;
@@ -1736,11 +1739,11 @@ int compute_introduce_table(TDTree *T, int k)
 			// set the bit for v!
 			new_v_set->mask->set_bit(v_pos);
 			new_v_set->value = new_set->value + T->G->get_vertex_weight(v);
-				//T->G->weight[v];
+			//T->G->weight[v];
 			*(new_v_set->orig_mask) = *(new_v_set->mask);
 			// Add to the hash table
 			HASH_ADD_KEYPTR(hh, T->tree_nodes[k]->hash_table, new_v_set->mask->words,
-					T->num_mask_words*sizeof(BIGINT_WORD), new_v_set);
+				T->num_mask_words*sizeof(BIGINT_WORD), new_v_set);
 			num_added++;
 			if (new_v_set->value > T->tree_nodes[k]->obj_val)
 				T->tree_nodes[k]->obj_val = new_v_set->value;
@@ -1751,15 +1754,15 @@ int compute_introduce_table(TDTree *T, int k)
 }
 
 /**
- * Computes the table for a forget node (node has 1 child whose bag is larger by 1) in a nice tree decomposition.
- * Fatal error if the tree is not nice.
- */
+* Computes the table for a forget node (node has 1 child whose bag is larger by 1) in a nice tree decomposition.
+* Fatal error if the tree is not nice.
+*/
 int compute_forget_table(TDTree *T, int k)
 {
 	if (!T->nice)
 		fatal_error(
-				"%s: only know how to compute table for forget node in nice tree!\n",
-				__FUNCTION__);
+		"%s: only know how to compute table for forget node in nice tree!\n",
+		__FUNCTION__);
 
 	if (T->tree_nodes[k]->adj.size() != 2)
 	{
@@ -1784,24 +1787,24 @@ int compute_forget_table(TDTree *T, int k)
 		print_message(0, "Child tree node %d\n", child);
 		cerr << *(T->tree_nodes[child]);
 		fatal_error(
-				"Node %d has a larger or same size bag than its child --> not a forget node\n",
-				k);
+			"Node %d has a larger or same size bag than its child --> not a forget node\n",
+			k);
 	}
 
 	// Find v
 	vv = set_difference(T->tree_nodes[child]->bag.begin(),
-			T->tree_nodes[child]->bag.end(), T->tree_nodes[k]->bag.begin(),
-			T->tree_nodes[k]->bag.end(), I.begin());
+		T->tree_nodes[child]->bag.end(), T->tree_nodes[k]->bag.begin(),
+		T->tree_nodes[k]->bag.end(), I.begin());
 	if (int(vv - I.begin()) != 1)
 		fatal_error("%s:  Child/parent differ by something other than 1!\n",
-				__FUNCTION__);
+		__FUNCTION__);
 	v = *(I.begin());
 	// v is the differentiating node
 	// Find v_pos
 	int v_pos = GD_UNDEFINED;
 	i = 0;
 	for (ii = T->tree_nodes[child]->bag.begin(); ii
-			!= T->tree_nodes[child]->bag.end(); ++ii)
+		!= T->tree_nodes[child]->bag.end(); ++ii)
 	{
 		if ((*ii) == v)
 		{
@@ -1836,7 +1839,7 @@ int compute_forget_table(TDTree *T, int k)
 			// Now look for Scupv in the table of the child
 			hash_ptr = NULL;
 			HASH_FIND(hh,T->tree_nodes[child]->hash_table,Scupv.words,
-					T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
+				T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
 			int new_val = tt->value;
 			if (hash_ptr)
 			{
@@ -1852,7 +1855,7 @@ int compute_forget_table(TDTree *T, int k)
 			*(new_sol->orig_mask) = *(new_sol->mask);
 			T->info->total_table_entries++;
 			HASH_ADD_KEYPTR(hh,T->tree_nodes[k]->hash_table,new_sol->mask->words,
-					T->num_mask_words*sizeof(BIGINT_WORD), new_sol);
+				T->num_mask_words*sizeof(BIGINT_WORD), new_sol);
 			num_added++;
 			if (new_sol->value > T->tree_nodes[k]->obj_val)
 				T->tree_nodes[k]->obj_val = new_sol->value;
@@ -1863,15 +1866,15 @@ int compute_forget_table(TDTree *T, int k)
 }
 
 /**
- * Computes the table for a join node (node has 2 children with identical bags) in a nice tree decomposition.
- * Fatal error if the tree is not nice.
- */
+* Computes the table for a join node (node has 2 children with identical bags) in a nice tree decomposition.
+* Fatal error if the tree is not nice.
+*/
 int compute_join_table(TDTree *T, int k)
 {
 	if (!T->nice)
 		fatal_error(
-				"%s: only know how to compute table for join node in nice tree!\n",
-				__FUNCTION__);
+		"%s: only know how to compute table for join node in nice tree!\n",
+		__FUNCTION__);
 
 	if (T->tree_nodes[k]->adj.size() != 3)
 		fatal_error("Tree node %d does not appear to be a join node!\n", k);
@@ -1890,7 +1893,7 @@ int compute_join_table(TDTree *T, int k)
 	// Make sure bag sizes are all the same as a sanity check
 	int w = T->tree_nodes[k]->bag.size();
 	if ((int) T->tree_nodes[child1]->bag.size() != w
-			|| (int) T->tree_nodes[child2]->bag.size() != w)
+		|| (int) T->tree_nodes[child2]->bag.size() != w)
 		fatal_error("%s:  child bags not the same size as parents!\n");
 
 	// Go through child1 and look up in child2's hash table
@@ -1909,11 +1912,11 @@ int compute_join_table(TDTree *T, int k)
 		// Find tt in child2 - it has to live there
 		hash_ptr = NULL;
 		HASH_FIND(hh,T->tree_nodes[child2]->hash_table,tt->mask->words,
-				T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
+			T->num_mask_words*sizeof(BIGINT_WORD),hash_ptr);
 		if (!hash_ptr)
 			// This is a fatal error - should not happen
 			fatal_error("%s:  Didn't find set in child2=%d's table!!!!!\n",
-					__FUNCTION__, child2);
+			__FUNCTION__, child2);
 		new_sol = new TDSolution(T->num_mask_words);
 		*(new_sol->mask) = *(tt->mask);
 		*(new_sol->orig_mask) = *(new_sol->mask);
@@ -1925,12 +1928,12 @@ int compute_join_table(TDTree *T, int k)
 			{
 				// Bit j is set in i - so bag_vec[j] is in this set --> subtract the weight
 				new_sol->value -= T->G->get_vertex_weight(T->tree_nodes[k]->bag_vec[j]);
-					//weight[T->tree_nodes[k]->bag_vec[j]];
+				//weight[T->tree_nodes[k]->bag_vec[j]];
 			}
 		}
 		// Update k's hash table
 		HASH_ADD_KEYPTR(hh,T->tree_nodes[k]->hash_table,new_sol->mask->words,
-				T->num_mask_words*sizeof(BIGINT_WORD), new_sol);
+			T->num_mask_words*sizeof(BIGINT_WORD), new_sol);
 		T->info->total_table_entries++;
 		num_added++;
 		if (new_sol->value > T->tree_nodes[k]->obj_val)
@@ -1975,7 +1978,7 @@ int create_subgraph_stats(TDTree *T, vector<int_int> *stats)
 			}
 			else
 				parent_intersection=T->tree_nodes[i]->bag;
-			
+
 #if 1
 			// Compute the stats on the subgraph that is the intersection of this bag with his
 			// parent since that is what we need to store in the tables!
@@ -2004,10 +2007,10 @@ int compute_weighted_ind_set_table(TDTree *T, int k)
 		if (T->num_tree_nodes_processed == 0)
 			// print a header line for verbose output
 			print_message(0,
-					"id #left #bag #child DP_prep_time DP_run_time #table #sets max_obj #sg_edges memHW\n");
+			"id #left #bag #child DP_prep_time DP_run_time #table #sets max_obj #sg_edges memHW\n");
 		print_message(0, "%04d %04d %03d %d ", k,
-				T->num_tree_nodes - T->num_tree_nodes_processed,
-				T->tree_nodes[k]->bag.size(), T->tree_nodes[k]->adj.size() - 1);
+			T->num_tree_nodes - T->num_tree_nodes_processed,
+			T->tree_nodes[k]->bag.size(), T->tree_nodes[k]->adj.size() - 1);
 	}
 	// start the timer
 	T->info->start = clock();
@@ -2018,7 +2021,7 @@ int compute_weighted_ind_set_table(TDTree *T, int k)
 	// print out the "prep time"
 	if (T->info->verbose)
 		fprintf(stderr, "%1.5f ",
-				(double) (T->info->stop - T->info->start) / CLOCKS_PER_SEC);
+		(double) (T->info->stop - T->info->start) / CLOCKS_PER_SEC);
 
 	int table_size = GD_UNDEFINED;
 	int node_type = T->get_node_type(k);
@@ -2028,43 +2031,43 @@ int compute_weighted_ind_set_table(TDTree *T, int k)
 		table_size = compute_ind_sets_nice(T, k);
 		T->info->stop = clock();
 		T->info->leaf_time += (double) (T->info->stop - T->info->start)
-				/ CLOCKS_PER_SEC;
+			/ CLOCKS_PER_SEC;
 		break;
 	case TD_NONNICE_LEAF_NODE:
 		table_size = compute_nonnice_table(T, k);
 		T->info->stop = clock();
 		T->info->leaf_time += (double) (T->info->stop - T->info->start)
-				/ CLOCKS_PER_SEC;
+			/ CLOCKS_PER_SEC;
 		break;
 	case TD_NONLEAF_NODE:
 		// The choice of algorithm to use is contained inside T's DP_info struct
 		table_size = compute_nonnice_table(T, k);
 		T->info->stop = clock();
 		T->info->nonleaf_time += (double) (T->info->stop - T->info->start)
-				/ CLOCKS_PER_SEC;
+			/ CLOCKS_PER_SEC;
 		break;
 	case TD_INTRODUCE_NODE:
 		table_size = compute_introduce_table(T, k);
 		T->info->stop = clock();
 		T->info->introduce_time += (double) (T->info->stop - T->info->start)
-				/ CLOCKS_PER_SEC;
+			/ CLOCKS_PER_SEC;
 		break;
 	case TD_FORGET_NODE:
 		table_size = compute_forget_table(T, k);
 		T->info->stop = clock();
 		T->info->forget_time += (double) (T->info->stop - T->info->start)
-				/ CLOCKS_PER_SEC;
+			/ CLOCKS_PER_SEC;
 		break;
 	case TD_JOIN_NODE:
 		table_size = compute_join_table(T, k);
 		T->info->stop = clock();
 		T->info->join_time += (double) (T->info->stop - T->info->start)
-				/ CLOCKS_PER_SEC;
+			/ CLOCKS_PER_SEC;
 		break;
 	default:
 		fatal_error(
-				"Unknown tree node type %d encountered when computing table of tree node %d??\n",
-				node_type, k);
+			"Unknown tree node type %d encountered when computing table of tree node %d??\n",
+			node_type, k);
 		break;
 	}
 	T->num_tree_nodes_processed++;
@@ -2093,7 +2096,7 @@ int compute_weighted_ind_set_table(TDTree *T, int k)
 			(double) (T->info->stop - T->info->start) / CLOCKS_PER_SEC,table_size, x,
 			T->tree_nodes[k]->obj_val,
 
-				T->tree_nodes[k]->num_subgraph_edges, y);
+			T->tree_nodes[k]->num_subgraph_edges, y);
 
 	}
 
@@ -2112,11 +2115,11 @@ int compute_weighted_ind_set_table(TDTree *T, int k)
 }
 
 /**
- * Writes a GMPL model file to the file using information from the graph G
- * If solved, the solution is written to <DIMACS_file>.IND_SET.sol.
- */
+* Writes a GMPL model file to the file using information from the graph G
+* If solved, the solution is written to <DIMACS_file>.IND_SET.sol.
+*/
 void write_ind_set_model(const char *DIMACS_file, const char *model_file,
-		Graph::WeightedMutableGraph *G)
+	Graph::WeightedMutableGraph *G)
 {
 	int i, j;
 	char sol_file[200];
@@ -2144,13 +2147,13 @@ void write_ind_set_model(const char *DIMACS_file, const char *model_file,
 		"x[i]+x[j]<=1;\n\n"
 		"solve;\n\n", DIMACS_file);
 	fprintf(
-			out,
-			"printf \" \\nMaximum Independent Set: %%d\\n\", sum{i in Nodes} x[i]*w[i] > \"%s\";\n",
-			sol_file);
+		out,
+		"printf \" \\nMaximum Independent Set: %%d\\n\", sum{i in Nodes} x[i]*w[i] > \"%s\";\n",
+		sol_file);
 	fprintf(out, "for { i in Nodes }\n"
 		"{\n"
 		"   printf{0..0: x[i]!=0} \"%%d (%%3.1f)\\n\", i, w[i] >> \"%s\";\n",
-			sol_file);
+		sol_file);
 	fprintf(out, "}\n\n");
 
 	fprintf(out, "# Data Section\n\ndata;\n\n");
@@ -2192,7 +2195,7 @@ void write_ind_set_model(const char *DIMACS_file, const char *model_file,
 * and computes the contribution of the corresponding set to the provided optimal_vec.
 */
 void compute_contribution(TDTree *T, int k, bigint_t *mask,
-		vector<bool> *optimal_vec)
+	vector<bool> *optimal_vec)
 {
 	TDSolution *hash_ptr;
 	list<int>::iterator ii;
@@ -2213,21 +2216,21 @@ void compute_contribution(TDTree *T, int k, bigint_t *mask,
 		// Non-nice
 		// Find the mask in k's table - the mask is in the language of k's parent if non-nice
 		HASH_FIND(hh,T->tree_nodes[k]->hash_table, mask->words, T->num_mask_words*sizeof(BIGINT_WORD),
-				hash_ptr);
+			hash_ptr);
 		if (!hash_ptr)
 		{
 			// This is a fatal errorint
 			print_message(
-					0,
-					"%s:  Didn't find mask in table of tree node %d\n\tMissing mask: ",
-					__FUNCTION__, k);
+				0,
+				"%s:  Didn't find mask in table of tree node %d\n\tMissing mask: ",
+				__FUNCTION__, k);
 			mask->print(stderr);
 			list<int> missing_set;
 			int parent = T->tree_nodes[k]->adj.front();
 			vector<int> parent_vec(T->tree_nodes[parent]->bag.size(), -1);
 			i = 0;
 			for (ii = T->tree_nodes[parent]->bag.begin(); ii
-					!= T->tree_nodes[parent]->bag.end(); ++ii)
+				!= T->tree_nodes[parent]->bag.end(); ++ii)
 			{
 				parent_vec[i] = *ii;
 				i++;
@@ -2241,9 +2244,9 @@ void compute_contribution(TDTree *T, int k, bigint_t *mask,
 			Graph::GraphProperties properties;
 
 			if (properties.is_independent_set(
-					(Graph::WeightedMutableGraph *) (T->G), &missing_set, &val))
+				(Graph::WeightedMutableGraph *) (T->G), &missing_set, &val))
 				print_message(0, "Missing set is independent with weight %f\n",
-						val);
+				val);
 			else
 				print_message(0, "Missing set is NOT independent!!!\n");
 			fatal_error("Cannot continue.\n");
@@ -2275,7 +2278,7 @@ void compute_contribution(TDTree *T, int k, bigint_t *mask,
 * I set the child masks by doing a case-by-case consideration of the TDNode type (forget, introduce, join)
 */
 void record_children_solutions(TDTree *T, int k, bigint_t *mask,
-		vector<bigint_t *> *masks_to_process)
+	vector<bigint_t *> *masks_to_process)
 {
 	list<int>::iterator ii, jj;
 
@@ -2357,14 +2360,14 @@ void record_children_solutions(TDTree *T, int k, bigint_t *mask,
 			// The mask in k was derived either from the same set in the child or by setting bit v_pos
 			new_mask->set_bit(v_pos);
 			HASH_FIND(hh,T->tree_nodes[*ii]->hash_table, new_mask->words,T->num_mask_words*sizeof(BIGINT_WORD),
-					hash_ptr);
+				hash_ptr);
 			int val = -1;
 			if (hash_ptr)
 				val = hash_ptr->value;
 			// Now clear v_pos and look
 			new_mask->xor_bit(v_pos);
 			HASH_FIND(hh,T->tree_nodes[*ii]->hash_table, new_mask->words,T->num_mask_words*sizeof(BIGINT_WORD),
-					hash_ptr);
+				hash_ptr);
 			if (!hash_ptr)
 			{
 				// This is an error for WIS
@@ -2372,7 +2375,7 @@ void record_children_solutions(TDTree *T, int k, bigint_t *mask,
 				mask->print(stderr);
 				new_mask->print(stderr);
 				fatal_error("%s:  Didn't find mask with zeroized bit??\n",
-						__FUNCTION__);
+					__FUNCTION__);
 			}
 			if (hash_ptr->value > val)
 				masks_to_process->at(*ii) = new_mask;
@@ -2390,13 +2393,13 @@ void record_children_solutions(TDTree *T, int k, bigint_t *mask,
 		// T is not nice
 		// mask is in the language of k's parent - need to find the corresponding orig_mask in k!!
 		HASH_FIND(hh,T->tree_nodes[k]->hash_table, mask->words,T->num_mask_words*sizeof(BIGINT_WORD),
-				hash_ptr);
+			hash_ptr);
 		if (!hash_ptr)
 			fatal_error("%s:  couldn't find mask???\n", __FUNCTION__);
 
 		i = 0;
 		for (ii = T->tree_nodes[k]->bag.begin(); ii
-				!= T->tree_nodes[k]->bag.end(); ++ii)
+			!= T->tree_nodes[k]->bag.end(); ++ii)
 		{
 			// Use the orig_mask as that references nodes in k's bag
 			if (hash_ptr->orig_mask->test_bit(i))
@@ -2412,8 +2415,8 @@ void record_children_solutions(TDTree *T, int k, bigint_t *mask,
 		{
 			// Intersect the child bag with kset
 			vv = set_intersection(T->tree_nodes[*ii]->bag.begin(),
-					T->tree_nodes[*ii]->bag.end(), kset.begin(), kset.end(),
-					intersection.begin());
+				T->tree_nodes[*ii]->bag.end(), kset.begin(), kset.end(),
+				intersection.begin());
 
 			// Create the child mask for the intersection - since we want to look this mask up,
 			// it is expressed in the language of the parent bag (k in this case)
@@ -2432,7 +2435,7 @@ void record_children_solutions(TDTree *T, int k, bigint_t *mask,
 * back down the tree.  If sol_file is non-NULL, solution is written to sol_file
 */
 int reconstruct_solution(TDTree *T, list<int> *optimal_solution,
-		const char *sol_file)
+	const char *sol_file)
 {
 	// Get the best solution from the root
 	TDSolution *ss, *temp, *best_sol = NULL;
@@ -2491,7 +2494,7 @@ int reconstruct_solution(TDTree *T, list<int> *optimal_solution,
 		// Only do this if node walk[i] is a non-leaf
 		if (T->tree_nodes[walk[i]]->adj.size() > 1)
 			record_children_solutions(T, walk[i], masks_to_process[walk[i]],
-					&masks_to_process);
+			&masks_to_process);
 
 		// Now compute the contribution of the children whose masks we just added
 		list<int>::iterator ii = T->tree_nodes[walk[i]]->adj.begin();
@@ -2510,7 +2513,7 @@ int reconstruct_solution(TDTree *T, list<int> *optimal_solution,
 		{
 			optimal_solution->push_back(i);
 			optimal_obj_val += T->G->get_vertex_weight(i);
-				//weight[i];
+			//weight[i];
 		}
 	}
 
@@ -2527,8 +2530,8 @@ int reconstruct_solution(TDTree *T, list<int> *optimal_solution,
 	Graph::GraphProperties properties;
 	if (!properties.is_independent_set(T->G, optimal_solution))
 		fprintf(stderr, "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
-			"Claimed optimal solution is not an ind. set!\n"
-			"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n");
+		"Claimed optimal solution is not an ind. set!\n"
+		"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n");
 
 	Graph::Node *n1;
 	if (sol_file)
@@ -2540,11 +2543,11 @@ int reconstruct_solution(TDTree *T, list<int> *optimal_solution,
 			exit(-1);
 		}
 		fprintf(out, "# Optimal solution to %s has obj. function value %d\n",
-				T->graph_file, optimal_obj_val);
+			T->graph_file, optimal_obj_val);
 		fprintf(out,
-				"# Solution written in terms of original labels from input file\n");
+			"# Solution written in terms of original labels from input file\n");
 		for (list<int>::iterator ii = optimal_solution->begin(); ii
-				!= optimal_solution->end(); ++ii)
+			!= optimal_solution->end(); ++ii)
 		{
 			n1=T->G->get_node(*ii);
 			fprintf(out, "%d %d\n",n1->get_label(),T->G->get_vertex_weight(*ii));
@@ -2574,10 +2577,10 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 	creator.set_graph_type("DIMACS");
 
 	G = creator.create_weighted_mutable_graph();
-    if (!G)
-    {
-        return;
-    }
+	if (!G)
+	{
+		return;
+	}
 
 	// Add weights of 1 to all vertices if we didn't load any from the file
 	bool has_weights = false;
@@ -2607,7 +2610,7 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 	if (!properties.is_connected(G))
 	{
 		print_message(0,
-				"WIS only runs on connected graphs.  This graph has more than one component!\n");
+			"WIS only runs on connected graphs.  This graph has more than one component!\n");
 		list<Graph::WeightedMutableGraph *> C;
 
 		C = creator.create_all_components(G, true);
@@ -2622,16 +2625,16 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 			if ((*cc)->get_num_nodes() > 1 && (*cc)->get_num_edges() > 1)
 			{
 				sprintf(temp_file, "%s_%d_node_component_%d.temp",
-						info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
+					info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
 				sprintf(comp_file, "%s_%d_node_component_%d.comp",
-						info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
+					info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
 				writer->set_out_file_name(temp_file);
 				writer->write_graph(*cc);
 
 				normalize_DIMACS_file(temp_file, comp_file);
 				remove(temp_file);
 				fprintf(stderr, "Wrote component with %d nodes to file %s\n",
-						(*cc)->get_num_nodes(), comp_file);
+					(*cc)->get_num_nodes(), comp_file);
 				comp_number++;
 				if ((*cc)->get_num_nodes() > max_size)
 				{
@@ -2645,22 +2648,22 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 			else
 			{
 				fprintf(
-						stderr,
-						"Tiny component with %d nodes & %d edges not written\n",
-						(*cc)->get_num_nodes(), (*cc)->get_num_edges());
+					stderr,
+					"Tiny component with %d nodes & %d edges not written\n",
+					(*cc)->get_num_nodes(), (*cc)->get_num_edges());
 			}
 		}
 
-        
+
 		if (big_file)
 		{
-		  info->DIMACS_file = (char *) malloc(100);//3-21-2012 - before, we were overflowing the char*.
-		  sprintf(info->DIMACS_file, "%s", big_file);
-		  free(big_file);
-		  print_message(0,
-					"Will run WIS on largest component %s with %d nodes\n",
-					info->DIMACS_file, max_size);
-            delete G;
+			info->DIMACS_file = (char *) malloc(100);//3-21-2012 - before, we were overflowing the char*.
+			sprintf(info->DIMACS_file, "%s", big_file);
+			free(big_file);
+			print_message(0,
+				"Will run WIS on largest component %s with %d nodes\n",
+				info->DIMACS_file, max_size);
+			delete G;
 			create_WIS_graph(info, G);
 		}
 		else
@@ -2669,15 +2672,15 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 			exit(-1);
 		}
 
-        int s = C.size();
-        for (i = 0; i < s; i++)
-        {
-            delete C.front();
-            C.pop_front();
-        }
+		int s = C.size();
+		for (i = 0; i < s; i++)
+		{
+			delete C.front();
+			C.pop_front();
+		}
 	}
 
-    delete writer;
+	delete writer;
 
 }
 
@@ -2687,7 +2690,7 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 * contained in DP_info.
 */
 void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
-		TDTree **T)
+	TDTree **T)
 {
 	create_tree_decomposition(info, G, T, true);
 }
@@ -2697,29 +2700,29 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 * contained in DP_info.
 */
 void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
-			       TDTree **T, bool suppress_timing)
+	TDTree **T, bool suppress_timing)
 {
 	// Create a copy of G to do the triangulation and elim order
 	Graph::GraphEOUtil eoutil;
 
-    if (!G)
-    {
-        return;
-    }
+	if (!G)
+	{
+		return;
+	}
 
 	Graph::WeightedMutableGraph H = *G;
 
 	//Run (optional) lower bound heuristics and print information
 	if(info->lower_bounds)
-	  {
-	    int lb; 
-	    
-	    lb = eoutil.get_tw_lower_bound(G, GD_MAX_MIN_DEGREE_LB, 0); 
-	    printf("%s: MMD Lower Bound %d\n", info->DIMACS_file, lb);
-	    lb = eoutil.get_tw_lower_bound(G, GD_MCS_LB, 0); 
-	    printf("%s: MCS Lower Bound %d\n", info->DIMACS_file, lb);
-	    
-	  }
+	{
+		int lb; 
+
+		lb = eoutil.get_tw_lower_bound(G, GD_MAX_MIN_DEGREE_LB, 0); 
+		printf("%s: MMD Lower Bound %d\n", info->DIMACS_file, lb);
+		lb = eoutil.get_tw_lower_bound(G, GD_MCS_LB, 0); 
+		printf("%s: MCS Lower Bound %d\n", info->DIMACS_file, lb);
+
+	}
 
 	(*T) = new TDTree(&H);
 	// Set the name of T's graph file
@@ -2764,46 +2767,46 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 				// Create the ordering via a heuristic
 				// Create an ordering - if start_v not provided, find
 				// a good candidate
-                double start = clock();
-                if (!info->parmetis)
-                {
-                    if (info->start_v == GD_UNDEFINED)
-                        eoutil.find_elimination_ordering(&H, &ordering,
-                                                         info->elim_order_type, false);
-                    else
-                        eoutil.find_elimination_ordering(&H, &ordering,
-                                                         info->elim_order_type, info->start_v, false);
-                }
-                else
-                {
+				double start = clock();
+				if (!info->parmetis)
+				{
+					if (info->start_v == GD_UNDEFINED)
+						eoutil.find_elimination_ordering(&H, &ordering,
+						info->elim_order_type, false);
+					else
+						eoutil.find_elimination_ordering(&H, &ordering,
+						info->elim_order_type, info->start_v, false);
+				}
+				else
+				{
 #ifdef HAS_PARMETIS
-                    MPI_Comm comm;
-                    MPI_Comm_dup(MPI_COMM_WORLD, &comm);
-                    eoutil.parmetis_elimination_ordering(&H, ordering, info->elim_order_type, false, comm);
+					MPI_Comm comm;
+					MPI_Comm_dup(MPI_COMM_WORLD, &comm);
+					eoutil.parmetis_elimination_ordering(&H, ordering, info->elim_order_type, false, comm);
 #endif
-                }
+				}
 
-		if(!suppress_timing)
-                print_message(0, "%.2f:", (double) (clock() - start) / CLOCKS_PER_SEC);
+				if(!suppress_timing)
+					print_message(0, "%.2f:", (double) (clock() - start) / CLOCKS_PER_SEC);
 			}
 
-            // Write elimination ordering into a file
-            if (info->eorder)
-            {
-                int os = ordering.size();
-                FILE *ef = fopen(info->eorder, "w");
-                if (!ef)
-                {
-                    FERROR("can not open %s for writing\n", info->eorder);
-                    return;
-                }
+			// Write elimination ordering into a file
+			if (info->eorder)
+			{
+				int os = ordering.size();
+				FILE *ef = fopen(info->eorder, "w");
+				if (!ef)
+				{
+					FERROR("can not open %s for writing\n", info->eorder);
+					return;
+				}
 
-                for (int i = 0; i < os; i++)
-                {
-                    fprintf (ef, "%d\n", ordering[i] + 1);
-                }
-                fclose (ef);
-            }
+				for (int i = 0; i < os; i++)
+				{
+					fprintf (ef, "%d\n", ordering[i] + 1);
+				}
+				fclose (ef);
+			}
 		}
 
 		if (info->very_verbose)
@@ -2816,29 +2819,29 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 		// Triangulate the graph for methods requiring it.
 		clock_t tri_start = clock(), tri_stop;
 		if(info->superetree){
-		  //no need to triangulate; width set in construction.
-		  tri_stop = tri_start;	
+			//no need to triangulate; width set in construction.
+			tri_stop = tri_start;	
 		}
 		else
-		  {
+		{
 #if HAS_METIS
-		(*T)->width = eoutil.METIS_triangulate(&H, &ordering);
+			(*T)->width = eoutil.METIS_triangulate(&H, &ordering);
 #else
-		(*T)->width = eoutil.triangulate(&H, &ordering);
+			(*T)->width = eoutil.triangulate(&H, &ordering);
 #endif
-		tri_stop = clock();
-		
-		  }
+			tri_stop = clock();
+
+		}
 		if(!suppress_timing)
-		  print_message(0, "%.2f:", (double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
+			print_message(0, "%.2f:", (double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
 
 
 		// Now create the tree
 		info->start=clock();
 		if(info->superetree)
-		  {
-		    (*T)->construct_superetree(&ordering);
-		  }
+		{
+			(*T)->construct_superetree(&ordering);
+		}
 		if (info->gavril)
 		{
 			(*T)->construct_gavril(&ordering);
@@ -2858,21 +2861,21 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 
 		//moved information about triangulation and width below construction since width in superetree is unknown until here.
 		if (info->verbose)
-		  {
-		    print_message(0, "Triangulation took %f secs\n",
-				  (double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
-		    print_message(0, "Width=%d\n", (*T)->width);
-		  }
-		
+		{
+			print_message(0, "Triangulation took %f secs\n",
+				(double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
+			print_message(0, "Width=%d\n", (*T)->width);
+		}
+
 		if (info->width)
-		  {
-		    DEBUG("%s: Width=%d\n", info->DIMACS_file, (*T)->width);
-		    return;
-		  }
-		
-		
+		{
+			DEBUG("%s: Width=%d\n", info->DIMACS_file, (*T)->width);
+			return;
+		}
+
+
 		if(!suppress_timing)
-		  print_message(0, "%.2f:", (double) (info->stop - info->start) / CLOCKS_PER_SEC);
+			print_message(0, "%.2f:", (double) (info->stop - info->start) / CLOCKS_PER_SEC);
 
 		if (info->verbose)
 		{
@@ -2880,7 +2883,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 				(double) (info->stop - info->start) / CLOCKS_PER_SEC);
 		}
 	}
-	
+
 
 
 	if (!info->nice)
@@ -2901,13 +2904,13 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 	// Sort the bags
 	int num_tree_nodes=(int) (*T)->tree_nodes.size();
 	if(!info->superetree)//bags already sorted
-	  {
-	    for (i = 0; i < num_tree_nodes; i++)
-	      {
-		if ((*T)->tree_nodes[i])
-		  (*T)->tree_nodes[i]->bag.sort();
-	      }
-	  }
+	{
+		for (i = 0; i < num_tree_nodes; i++)
+		{
+			if ((*T)->tree_nodes[i])
+				(*T)->tree_nodes[i]->bag.sort();
+		}
+	}
 	// Reset (*T)'s graph is the original, non-triangulated graph!
 	(*T)->G = G;
 
@@ -3013,9 +3016,9 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 	// Width is 1 less than the largest bag! Then we need an extra word
 	// to handle a shift of BIGINT_WORD_SIZE!!
 	(*T)->num_mask_words = (int) ceil(
-			((double) (*T)->width + 2) / BIGINT_WORD_SIZE);
+		((double) (*T)->width + 2) / BIGINT_WORD_SIZE);
 	print_message(1, "width=%d; num_words=%d\n", (*T)->width,
-			(*T)->num_mask_words);
+		(*T)->num_mask_words);
 
 	// set T->num_mask_word in nodes, num_mask_words need to copy data such as nbr_mask_vec,
 	// child_intersection and parent position.
@@ -3057,7 +3060,7 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 		sprintf(td_type, "FL");
 
 	fprintf(stream, "%s %d %d %s ", info->DIMACS_file, T->G->get_num_nodes(),
-			T->G->get_num_edges(), td_type);
+		T->G->get_num_edges(), td_type);
 	if (info->parent_child)
 		fprintf(stream, "PC ");
 	else
@@ -3074,17 +3077,17 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 		fprintf(stream, "NFC ");
 
 	fprintf(stream, "%d %d %d %d ", T->width, T->refined_width,
-			T->num_tree_nodes, T->num_leafs);
+		T->num_tree_nodes, T->num_leafs);
 	fprintf(
-			stream,
-			"%3.2f %3.2f %3.2f %3.2f %3.2f",
-			info->leaf_time,
-			info->introduce_time + info->forget_time + info->join_time
-					+ info->nonleaf_time, info->introduce_time,
-			info->forget_time, info->join_time);
+		stream,
+		"%3.2f %3.2f %3.2f %3.2f %3.2f",
+		info->leaf_time,
+		info->introduce_time + info->forget_time + info->join_time
+		+ info->nonleaf_time, info->introduce_time,
+		info->forget_time, info->join_time);
 	fprintf(stream, " %lld %lld %lld %lld", info->orig_total_pc_table_entries,
-			info->orig_total_table_entries, info->total_pc_table_entries,
-			info->total_table_entries);
+		info->orig_total_table_entries, info->total_pc_table_entries,
+		info->total_table_entries);
 #if !(__CYGWIN__ || WIN32 || _WIN32)
 	fprintf(stream, " %d ", getHWmem());
 #else
@@ -3105,7 +3108,7 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 * intersects with the parent's bag.
 */
 int get_optimal_obj(TDTree *T, list<int> *root_intersection,
-		list<int> *root_difference, DP_info *info)
+	list<int> *root_difference, DP_info *info)
 {
 	TDSolution *hash_ptr, *temp_sol;
 	info->opt_obj = 0;
@@ -3124,10 +3127,10 @@ int get_optimal_obj(TDTree *T, list<int> *root_intersection,
 			for (int i = 0; i < root_size; i++)
 				if (hash_ptr->mask->test_bit(i))
 					root_intersection->push_back(
-							T->tree_nodes[T->root_node]->bag_vec[i]);
+					T->tree_nodes[T->root_node]->bag_vec[i]);
 				else
 					root_difference->push_back(
-							T->tree_nodes[T->root_node]->bag_vec[i]);
+					T->tree_nodes[T->root_node]->bag_vec[i]);
 			root_intersection->sort();
 			root_difference->sort();
 		}
@@ -3161,7 +3164,7 @@ double estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
 	vector<int_int> stats(T->num_tree_nodes);
 	create_subgraph_stats(T,&stats);
 	vector<int> inv_walk(T->num_tree_nodes);
-	
+
 	mpz_t sum, w_choose_k, rho_num, rho_denom, sum_num, sum_denom;
 	mpq_t q_sum, q_num, q_denom, q_term, grand_total;
 
@@ -3217,7 +3220,7 @@ double estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
 	mpz_clear(rho_denom);mpz_clear(sum_num);mpz_clear(sum_denom);
 	mpq_clear(q_sum);mpq_clear(q_num); mpq_clear(q_denom);mpq_clear(q_term);
 	mpq_clear(grand_total);
-	
+
 	fclose(out);
 
 	return final_ans;
@@ -3298,7 +3301,7 @@ double expected_num_ind_sets(TDTree *T, int k, bool parent_intersection)
 		mpq_canonicalize(q_term);
 		mpq_add(q_sum,q_sum,q_term);
 	}
-	
+
 	double ans=mpq_get_d(q_sum);
 
 	mpz_clear(sum); mpz_clear(w_choose_k);mpz_clear(rho_num);

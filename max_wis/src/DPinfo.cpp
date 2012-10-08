@@ -185,9 +185,9 @@ int DP_info::process_DP_info(int num_args, char **args)
 			this->has_graph = true;
 		}
 		if (strcmp(args[i],"-mem_est")==0)
-		{
 			this->mem_est=true;
-		}
+		if (strcmp(args[i],"-max_width")==0)
+			this->max_width=atoi(args[i+1]);
 	}
 	// Check options
 	if(this->fix_DIMACS)
