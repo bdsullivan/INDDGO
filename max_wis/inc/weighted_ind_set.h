@@ -53,6 +53,7 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info);
 int get_optimal_obj(TDTree *T, list<int> *root_intersection, list<int> *root_difference, 
 	DP_info *info);
 double estimate_memory_usage(TDTree *T, vector<int> *walk, const char *outfile);
+double estimate_memory_usage(TDTree *T, vector<int> *walk, bool parent_intersection)
 double expected_num_ind_sets(TDTree *T, int k, bool parent_intersection);
 
 #endif  /* __WIS_H__ */

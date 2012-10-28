@@ -153,9 +153,13 @@ int main(int argc, char **argv)
 			if(T->info->verbose)
 				print_message(0,"Computing memory estimate - width is %d\n",
 				T->width);
-			char mem_output[100];
-			sprintf(mem_output,"%s.mem_est",info.DIMACS_file);
-			T->info->mem_estimate=estimate_memory_usage(T, &walk, (const char *)mem_output);
+			//char mem_output[100];
+			//sprintf(mem_output,"%s.mem_est",info.DIMACS_file);
+			//double estimate_memory_usage(TDTree *T, vector<int> *walk, bool parent_intersection)
+			//T->info->mem_estimate=estimate_memory_usage(T, &walk, (const char *)mem_output);
+
+			// CSG - trying new function, 10/27/2012
+			T->info->mem_estimate=estimate_memory_usage(T, &walk, true);
 			if(T->info->verbose)
 				print_message(0,"Memory estimate complete\n");
 		}
@@ -301,19 +305,10 @@ int main(int argc, char **argv)
 
 	LOG_CLOSE();
 
-
-	//BDS 04/05 - always returning 0 to allow successful calls in make.
-	// return the opt obj val if we have it
-	int retval;
-	//if(T->info->opt_obj>0)
-	//		retval=T->info->opt_obj;
-	//else
-	retval= 0;
-
 	delete T;
 	delete G;
 
-	return retval;
+	return 0;
 }
 
 

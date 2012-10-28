@@ -3147,7 +3147,7 @@ int get_optimal_obj(TDTree *T, list<int> *root_intersection,
 * estimated number of independent sets to be found in all nodes in the tree.
 * Writes details to provided outfile
 */
-double estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
+double estimate_memory_usage(TDTree *T, vector<int> *walk, const char *outfile)
 {
 #if !HAS_GMP
 	fprintf(stderr,"HAS_GMP is set to 0\nCannot run %s!",__FUNCTION__);
@@ -3180,7 +3180,6 @@ double estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
 	{
 		i=walk->at(j);
 		fprintf(out,"%d %d %d ",i,stats[i].p1,stats[i].p2);
-		// Return to my former life and use GMP/MPIR to 
 		// calculate the estimate of # ind. sets
 		unsigned long ww=(unsigned long)stats[i].p1;
 		unsigned long ss=(unsigned long)stats[i].p2;
@@ -3224,6 +3223,34 @@ double estimate_memory_usage(TDTree *T, vector<int> *walk,const char *outfile)
 	fclose(out);
 
 	return final_ans;
+#endif
+}
+
+
+/**
+* Estimates the memory usage in a given tree decomposition by computing the actual
+* sum of the binomial coefficients using exact arithmetic and GMP. 
+* If parent_intersection flag is true,
+* then the estimate is for the # of ind. sets in the intersection of k's bag with his parent.
+* Otherwise only k's bag is considered. Returns the total # of expected ind. sets
+*/
+double estimate_memory_usage(TDTree *T, vector<int> *walk, bool parent_intersection)
+{
+#if !HAS_GMP
+	fprintf(stderr,"HAS_GMP is set to 0\nCannot run %s!",__FUNCTION__);
+	return 0;
+#else
+
+	double  grand_total=0;
+
+	int j,k;
+	for(j=0;j<T->num_tree_nodes;j++)
+	{
+		k=walk->at(j);
+		grand_total += expected_num_ind_sets(T, k, parent_intersection);
+	}
+
+	return grand_total;
 #endif
 }
 
@@ -3310,3 +3337,5 @@ double expected_num_ind_sets(TDTree *T, int k, bool parent_intersection)
 	return ans;
 #endif
 }
+
+
