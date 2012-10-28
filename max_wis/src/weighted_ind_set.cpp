@@ -3045,59 +3045,75 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 */
 void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 {
-	// Print out:
-	// filename G_n G_m td_type PC/NPC MN/NMN width refined_width # treenodes # leafs leaf_time
-	// nonleaf_time introtime forgettime jointime total_pc _entries total_entries MEM reconsruct_time avg_pc _proportion obj
+	if(info->verbose || info->vverbose)
+	{
+		// Print out:
+		// filename G_n G_m td_type PC/NPC MN/NMN width refined_width # treenodes # leafs leaf_time
+		// nonleaf_time introtime forgettime jointime total_pc _entries total_entries MEM reconsruct_time avg_pc _proportion obj
 
-	char td_type[3];
-	if (info->gavril)
-		sprintf(td_type, "GV");
-	if (info->BK)
-		sprintf(td_type, "BK");
-	if (info->nice)
-		sprintf(td_type, "NC");
-	if (info->read_tree)
-		sprintf(td_type, "FL");
+		// Print header line
+		fprintf(stream,"file n m td_type PC/NPC MN/NMN FC/NFC width ref_width num_tnodes num_leafs leaf_t "
+			"nonleaf_t intro_t forget_t join_t tot_pc_entries tot_entries mem_est "
+			"recon_t avg_pc_perc obj\n"
+			char td_type[3];
+		if (info->gavril)
+			sprintf(td_type, "GV");
+		if (info->BK)
+			sprintf(td_type, "BK");
+		if (info->nice)
+			sprintf(td_type, "NC");
+		if (info->read_tree)
+			sprintf(td_type, "FL");
 
-	fprintf(stream, "%s %d %d %s ", info->DIMACS_file, T->G->get_num_nodes(),
-		T->G->get_num_edges(), td_type);
-	if (info->parent_child)
-		fprintf(stream, "PC ");
-	else
-		fprintf(stream, "NPC ");
+		fprintf(stream, "%s %d %d %s ", info->DIMACS_file, T->G->get_num_nodes(),
+			T->G->get_num_edges(), td_type);
+		if (info->parent_child)
+			fprintf(stream, "PC ");
+		else
+			fprintf(stream, "NPC ");
 
-	if (info->make_nice)
-		fprintf(stream, "MN ");
-	else
-		fprintf(stream, "NMN ");
+		if (info->make_nice)
+			fprintf(stream, "MN ");
+		else
+			fprintf(stream, "NMN ");
 
-	if (info->free_children)
-		fprintf(stream, "FC ");
-	else
-		fprintf(stream, "NFC ");
+		if (info->free_children)
+			fprintf(stream, "FC ");
+		else
+			fprintf(stream, "NFC ");
 
-	fprintf(stream, "%d %d %d %d ", T->width, T->refined_width,
-		T->num_tree_nodes, T->num_leafs);
-	fprintf(
-		stream,
-		"%3.2f %3.2f %3.2f %3.2f %3.2f",
-		info->leaf_time,
-		info->introduce_time + info->forget_time + info->join_time
-		+ info->nonleaf_time, info->introduce_time,
-		info->forget_time, info->join_time);
-	fprintf(stream, " %lld %lld %lld %lld", info->orig_total_pc_table_entries,
-		info->orig_total_table_entries, info->total_pc_table_entries,
-		info->total_table_entries);
+		//fprintf(stream,"file n m td_type PC/NPC MN/NMN FC/NFC width ref_width num_tnodes num_leafs leaf_t "
+		//	           "nonleaf_t intro_t forget_t join_t tot_pc_entries tot_entries tot_ref_pc_entries "
+		//             " tot_ref_entries HWmem mem_est recon_t avg_pc_perc obj\n"
+		fprintf(stream, "%d %d %d %d ", T->width, T->refined_width,
+			T->num_tree_nodes, T->num_leafs);
+		fprintf(
+			stream,
+			"%3.2f %3.2f %3.2f %3.2f %3.2f",
+			info->leaf_time,
+			info->introduce_time + info->forget_time + info->join_time
+			+ info->nonleaf_time, info->introduce_time,
+			info->forget_time, info->join_time);
+		fprintf(stream, " %lld %lld %lld %lld", info->orig_total_pc_table_entries,
+			info->orig_total_table_entries, info->total_pc_table_entries,
+			info->total_table_entries);
 #if !(__CYGWIN__ || WIN32 || _WIN32)
-	fprintf(stream, " %d ", getHWmem());
+		fprintf(stream, " %d ", getHWmem());
 #else
-	fprintf(stream," -1 ");
+		fprintf(stream," -1 ");
 #endif
-	fprintf(stream,"%3.1f ", info->mem_estimate);
-	fprintf(stream, "%3.3f ", info->reconstruct_time);
-	fprintf(stream, "%0.3f ", info->avg_pc_proportion);
-	// obj is last entry
-	fprintf(stream, "%d\n", info->opt_obj);
+		fprintf(stream,"%3.1f ", info->mem_estimate);
+		fprintf(stream, "%3.3f ", info->reconstruct_time);
+		fprintf(stream, "%0.3f ", info->avg_pc_proportion);
+		// obj is last entry
+		fprintf(stream, "%d\n", info->opt_obj);
+	}
+	else
+	{
+		fprintf(stream,"file n m w obj\n");
+		fprintf(stream,"%s %d %d %d %d\n",info->DIMACS_file, T->G->get_num_nodes(),
+			T->G->get_num_edges(), T->width, info->opt_obj);
+	}
 
 }
 
