@@ -3045,7 +3045,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 */
 void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 {
-	if(info->verbose || info->vverbose)
+	if(info->verbose || info->very_verbose)
 	{
 		// Print out:
 		// filename G_n G_m td_type PC/NPC MN/NMN width refined_width # treenodes # leafs leaf_time
@@ -3054,8 +3054,8 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 		// Print header line
 		fprintf(stream,"file n m td_type PC/NPC MN/NMN FC/NFC width ref_width num_tnodes num_leafs leaf_t "
 			"nonleaf_t intro_t forget_t join_t tot_pc_entries tot_entries mem_est "
-			"recon_t avg_pc_perc obj\n"
-			char td_type[3];
+			"recon_t avg_pc_perc obj\n");
+		char td_type[3];
 		if (info->gavril)
 			sprintf(td_type, "GV");
 		if (info->BK)
