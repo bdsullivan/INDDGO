@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -46,11 +46,13 @@ public:
 		*scotch_ord_file, *tree_infile, *tree_outfile, *sol_file, *eorder;
 
 	bool lower_bounds, has_graph, read_ordering, read_scotch_ordering,
-		 write_mod, solve_mip, gviz, nice,
-	  superetree, gavril, BK, check, nonniceDP, read_tree, write_tree, write_ordered_tree,
+		write_mod, solve_mip, gviz, nice,
+		superetree, gavril, BK, check, nonniceDP, read_tree, write_tree, 
+		write_ordered_tree,
 		make_histogram, decompose_only, parent_child, make_nice,
 		very_verbose, free_children, verbose, no_reconstruct, split_bag,
-		asp_root, child_root, refine_td, DFS, async_tbl, mem_est, width, fix_DIMACS, parmetis, pbag;
+		asp_root, child_root, refine_td, DFS, async_tbl, mem_est, width, fix_DIMACS, 
+		parmetis, pbag;
 
 	int elim_order_type, root_node, start_v, max_width;
 	// CSG adding orig_ fields to handle stats for refined tree

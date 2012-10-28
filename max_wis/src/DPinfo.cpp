@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -28,12 +28,12 @@
 */
 int DP_info::process_DP_info(int num_args, char **args)
 {
-  int num_td_methods = 0;
+	int num_td_methods = 0;
 	if (num_args == 1 || (num_args == 2 && strcmp(args[1], "-h") == 0)
-			|| (num_args == 2 && strcmp(args[1], "--help") == 0) || (num_args
-										 == 2 && strcmp(args[1], "--h") == 0) || (num_args == 2 && strcmp(args[1], "-help")==0))
+		|| (num_args == 2 && strcmp(args[1], "--help") == 0) || (num_args
+		== 2 && strcmp(args[1], "--h") == 0) || (num_args == 2 && strcmp(args[1], "-help")==0))
 	{
-	  return -1;//calling function needs to call usage() function.
+		return -1;//calling function needs to call usage() function.
 	}
 
 	for (int i = 0; i < num_args; i++)
@@ -46,7 +46,7 @@ int DP_info::process_DP_info(int num_args, char **args)
 			this->fix_DIMACS=true;
 		// ELIM ORDER LOWER BOUNDS
 		if (strcmp(args[i], "-lower_bounds")==0)
-		        this->lower_bounds=true;
+			this->lower_bounds=true;
 		// ELIM ORDER TYPES
 		if (strcmp(args[i], "-lexm") == 0)
 			this->elim_order_type = GD_LEXM_BFS;
@@ -77,29 +77,29 @@ int DP_info::process_DP_info(int num_args, char **args)
 		if (strcmp(args[i], "-amd") == 0)
 			this->elim_order_type = GD_AMD;
 		if (strcmp(args[i], "-parmetis") == 0)
-		  this->parmetis = true;
+			this->parmetis = true;
 		if (strcmp(args[i], "-gavril") == 0)
-		  {
+		{
 			this->gavril = true;
 			num_td_methods++;
-		  }
+		}
 		if (strcmp(args[i], "-superetree") == 0)
-		  {
-		    this->superetree = true;
-		    num_td_methods++;
-		  }
+		{
+			this->superetree = true;
+			num_td_methods++;
+		}
 		if (strcmp(args[i], "-pbag") == 0)
 			this->pbag = true;
 		if (strcmp(args[i], "-bk") == 0)
-		  {
-		    this->BK = true;
-		    num_td_methods++;
-		  }
+		{
+			this->BK = true;
+			num_td_methods++;
+		}
 		if (strcmp(args[i], "-nice") == 0)
-		  {
+		{
 			this->nice = true;
 			num_td_methods++;
-		  }
+		}
 		if (strcmp(args[i], "-check") == 0)
 			this->check = true;
 		if (strcmp(args[i], "-nonniceDP") == 0)
@@ -156,9 +156,9 @@ int DP_info::process_DP_info(int num_args, char **args)
 			this->write_ordered_tree = true;
 		}
 		if (strcmp(args[i], "-eorder") == 0)
-		  this->eorder = args[i + 1];
+			this->eorder = args[i + 1];
 		if (strcmp(args[i], "-width") == 0)
-		  this->width = true;
+			this->width = true;
 		if (strcmp(args[i], "-hist") == 0)
 			this->make_histogram = true;
 		if (strcmp(args[i], "-pc") == 0)
@@ -213,28 +213,28 @@ int DP_info::process_DP_info(int num_args, char **args)
 	if (this->gviz)
 		if (this->gviz_file == NULL)
 			fatal_error("%s: graphviz option requires an output file name\n",
-					__FUNCTION__);
+			__FUNCTION__);
 
 	// Make sure file given if tree option set
 	if (this->write_tree || this->write_ordered_tree)
 		if (this->tree_outfile == NULL)
 			fatal_error(
-					"%s: -w option requires an output file name. -tpreord must be used with -w <filename>.\n",
-					__FUNCTION__);
+			"%s: -w option requires an output file name. -tpreord must be used with -w <filename>.\n",
+			__FUNCTION__);
 
 	// Make sure either nice gavril or bk or superetree was selected AND only one tree decomposition option
 	if (num_td_methods != 1 && !this->write_mod)
-	  //!this->nice && !this->gavril && !this->superetree && !this->BK && !this->write_mod && !this->read_tree && !this->pbag)
+		//!this->nice && !this->gavril && !this->superetree && !this->BK && !this->write_mod && !this->read_tree && !this->pbag)
 		fatal_error(
-				"Have to choose exactly one of -superetree, -nice, -gavril or -BK for the TD type or read tree from file\n");
+		"Have to choose exactly one of -superetree, -nice, -gavril or -BK for the TD type or read tree from file\n");
 
 
 	// Make sure we have at least one method of selecting the elimination ordering
 	if (this->elim_order_type == GD_UNDEFINED && !this->read_ordering
-			&& !this->read_scotch_ordering && !this->read_tree
-			&& !this->write_mod && !this->parmetis)
+		&& !this->read_scotch_ordering && !this->read_tree
+		&& !this->write_mod && !this->parmetis)
 		fatal_error(
-				"Must choose at least one of the elimination ordering routines\n");
+		"Must choose at least one of the elimination ordering routines\n");
 
 	// Only one rooting alg
 	if (this->asp_root == true && this->child_root == true)

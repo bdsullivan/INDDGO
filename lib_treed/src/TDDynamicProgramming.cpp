@@ -72,6 +72,7 @@ DP_info::DP_info()
 	this->leaf_time = this->introduce_time = this->forget_time
 			= this->join_time = this->nonleaf_time = this->reconstruct_time = 0;
 	this->mem_est=0;
+	this->max_width=999999;
 	this->lower_bounds=false;
 	// set obj val to 0
 	opt_obj = 0;
