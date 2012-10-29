@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -29,8 +29,8 @@
 #include <algorithm>
 
 /**
- * The constructor for the TDTree class.
- */
+* The constructor for the TDTree class.
+*/
 TDTree::TDTree(Graph::WeightedMutableGraph *H)
 {
 	this->G=H;
@@ -57,8 +57,8 @@ TDTree::TDTree(Graph::WeightedMutableGraph *H)
 }
 
 /**
- * Default constructor for TDTree.
- */
+* Default constructor for TDTree.
+*/
 TDTree::TDTree()
 {
 	this->graph_file=NULL;
@@ -74,8 +74,8 @@ TDTree::TDTree()
 }
 
 /**
- * Destructor for TDTree class.
- */
+* Destructor for TDTree class.
+*/
 TDTree::~TDTree()
 {
 	int i;
@@ -106,8 +106,8 @@ TDTree::~TDTree()
 }
 
 /** 
- * The copy constructor to do something like TDTree T=S;  This is a "deep copy".
- */
+* The copy constructor to do something like TDTree T=S;  This is a "deep copy".
+*/
 TDTree::TDTree(const TDTree& rhs)
 {
 
@@ -152,11 +152,11 @@ TDTree::TDTree(const TDTree& rhs)
 }
 
 /**
- * Assignment operator for TDTree.  Use is something like 
- * TDTree new_tree; 
- * new_tree=old_tree;
- * This will make new_tree into a deep_copy of old_tree.
- */
+* Assignment operator for TDTree.  Use is something like 
+* TDTree new_tree; 
+* new_tree=old_tree;
+* This will make new_tree into a deep_copy of old_tree.
+*/
 TDTree& TDTree::operator=(const TDTree& rhs)
 {
 	if (this != &rhs)
@@ -203,8 +203,8 @@ TDTree& TDTree::operator=(const TDTree& rhs)
 
 }
 /*
- * Overloading the << operator for TDTree.
- */
+* Overloading the << operator for TDTree.
+*/
 ostream &operator<<(ostream &output, const TDTree &T)
 {
 	int i;
@@ -223,11 +223,11 @@ ostream &operator<<(ostream &output, const TDTree &T)
 
 
 /**
- * Merges any parent(P) /child(C) TDTreeNode pair 
- * which have identical bags (P->bag has same members as C->bag) so that P now has 
- * the children of C added to its children list and C is removed from the decomposition.
- * Deletes nodes that are merged and leaves null pointers in tree_nodes array. 
- */
+* Merges any parent(P) /child(C) TDTreeNode pair 
+* which have identical bags (P->bag has same members as C->bag) so that P now has 
+* the children of C added to its children list and C is removed from the decomposition.
+* Deletes nodes that are merged and leaves null pointers in tree_nodes array. 
+*/
 void TDTree::remove_duplicate_bags()
 {
 	print_message(1, "In remove_duplicate_bags()\n");
@@ -256,10 +256,10 @@ void TDTree::remove_duplicate_bags()
 				{
 					print_message(1,"Child %d has same bag size\n", *cit);
 					vit = set_symmetric_difference(parent->bag.begin(), 
-                                                   parent->bag.end(), 
-                                                   child->bag.begin(), 
-                                                   child->bag.end(),
-                                                   diff.begin());
+						parent->bag.end(), 
+						child->bag.begin(), 
+						child->bag.end(),
+						diff.begin());
 					//actual equality
 					if((vit - diff.begin()) == 0)
 					{
@@ -301,11 +301,11 @@ void TDTree::remove_duplicate_bags()
 }
 
 /**
- * Working from the top down, merges any parent(P) /child(C) TDTreeNode pair 
- * where one is a subset of the other(P->bag \subset C->bag or P->bag \superset C->bag).
- * Note this also removes duplicate bags.
- * Deletes nodes that are merged and leaves null pointers in tree_nodes array. 
- */
+* Working from the top down, merges any parent(P) /child(C) TDTreeNode pair 
+* where one is a subset of the other(P->bag \subset C->bag or P->bag \superset C->bag).
+* Note this also removes duplicate bags.
+* Deletes nodes that are merged and leaves null pointers in tree_nodes array. 
+*/
 void TDTree::remove_subset_bags()
 {
 	print_message(1, "In remove_subset_bags()\n");
@@ -417,12 +417,12 @@ void TDTree::remove_subset_bags()
 
 
 /**
- * Checks to ensure the current TDTree is a valid rooted decomposition, 
- * then transforms it into a nice decomposition with the same width 
- * and num_tree_nodes + Sum_{nodes v with >=2 children} [2(deg(v)-1)] + 
- * Sum_{nodes v with a single child w} [|B(v)\B(w)| + |B(w)\B(v)|]  
- * tree nodes. The root remains the same.
- */
+* Checks to ensure the current TDTree is a valid rooted decomposition, 
+* then transforms it into a nice decomposition with the same width 
+* and num_tree_nodes + Sum_{nodes v with >=2 children} [2(deg(v)-1)] + 
+* Sum_{nodes v with a single child w} [|B(v)\B(w)| + |B(w)\B(v)|]  
+* tree nodes. The root remains the same.
+*/
 void TDTree::make_nice()
 {
 	//  Assumes the TD is valid, so don't check it here
@@ -456,10 +456,10 @@ void TDTree::make_nice()
 				// we add the size of the symm diff with the parent - 1
 				par_node = this->tree_nodes[*(curr_node->adj.begin())]; 
 				vit = set_symmetric_difference(curr_node->bag.begin(), 
-                                               curr_node->bag.end(), 
-                                               par_node->bag.begin(), 
-                                               par_node->bag.end(), 
-                                               v.begin()); 
+					curr_node->bag.end(), 
+					par_node->bag.begin(), 
+					par_node->bag.end(), 
+					v.begin()); 
 				new_num_nodes += (int)(vit - v.begin())-1 ; 
 				print_message(1, "Adding %d for node %d (chain)\n", (int)(vit-v.begin())-1, curr_node->id);
 			}
@@ -472,9 +472,9 @@ void TDTree::make_nice()
 					logans.p1++; 
 				new_num_nodes += (1<<(logans.p1+1)) -2 + (curr_node->adj.size()-1);
 				print_message(1, "Adding %d == %d  for node %d (join)\n", 
-                              2*(int)pow(2.0, (int)ceil(log((double)curr_node->adj.size()-1)/log(2.0))) -2 + (curr_node->adj.size()-1), 
-                              (1<<(logans.p1+1)) -2 + (curr_node->adj.size()-1),
-                              curr_node->id);
+					2*(int)pow(2.0, (int)ceil(log((double)curr_node->adj.size()-1)/log(2.0))) -2 + (curr_node->adj.size()-1), 
+					(1<<(logans.p1+1)) -2 + (curr_node->adj.size()-1),
+					curr_node->id);
 			}
 		}
 	}    // Done with accounting
@@ -539,15 +539,15 @@ void TDTree::make_nice()
 }
 
 /*
- * Replaces the node at P = tree_nodes[old_node] (which has one child C) by a chain of nodes, 
- * each of which has one child, 
- * differing from its parent only by 'forgetting' or 'introducing' a single vertex 
- * (following the rules of a nice decomposition). 
- * The original child becomes the bottom node of this new chain, which introduces
- * exactly |B(P)/B(C)| + |B(C)\B(P)| - 1 new nodes.
- * max_id should be the highest node id currently in the tree decomposition.
- * Returns the max id currently in use by a node after the chain has been added.
- */
+* Replaces the node at P = tree_nodes[old_node] (which has one child C) by a chain of nodes, 
+* each of which has one child, 
+* differing from its parent only by 'forgetting' or 'introducing' a single vertex 
+* (following the rules of a nice decomposition). 
+* The original child becomes the bottom node of this new chain, which introduces
+* exactly |B(P)/B(C)| + |B(C)\B(P)| - 1 new nodes.
+* max_id should be the highest node id currently in the tree decomposition.
+* Returns the max id currently in use by a node after the chain has been added.
+*/
 int TDTree::expand_symdiff(int old_node, int max_id)
 {
 	vector<int> pdiff(this->width);
@@ -558,18 +558,18 @@ int TDTree::expand_symdiff(int old_node, int max_id)
 	child = this->tree_nodes[*(++(parent->adj.begin()))];
 	//find the vertices in parent & not child
 	pit = set_difference(parent->bag.begin(), 
-                         parent->bag.end(), 
-                         child->bag.begin(), 
-                         child->bag.end(), 
-                         pdiff.begin()); 
+		parent->bag.end(), 
+		child->bag.begin(), 
+		child->bag.end(), 
+		pdiff.begin()); 
 	int numP = (int)(pit-pdiff.begin());
 
 	//find the vertices in child and not parent
 	cit = set_difference(child->bag.begin(), 
-                         child->bag.end(),
-                         parent->bag.begin(), 
-                         parent->bag.end(), 
-                         cdiff.begin()); 
+		child->bag.end(),
+		parent->bag.begin(), 
+		parent->bag.end(), 
+		cdiff.begin()); 
 	int numC = (int)(cit-cdiff.begin());
 
 	int num_added = 0;
@@ -636,13 +636,13 @@ int TDTree::expand_symdiff(int old_node, int max_id)
 
 
 /*
- * Replaces the node at tree_nodes[old_node] by a binary tree with deg(old_node) leaves, each of which
- * has one of old_node's children as its only child.
- * Currently this creates a binary tree that is as balanced as possible, but this can be modified in future
- * versions of the function. 
- * Returns the max id currently in use by a node after the join tree was created & introduced.
- * This should be max_id + 2*deg(old_node)-1.
- */
+* Replaces the node at tree_nodes[old_node] by a binary tree with deg(old_node) leaves, each of which
+* has one of old_node's children as its only child.
+* Currently this creates a binary tree that is as balanced as possible, but this can be modified in future
+* versions of the function. 
+* Returns the max id currently in use by a node after the join tree was created & introduced.
+* This should be max_id + 2*deg(old_node)-1.
+*/
 int TDTree::replace_by_join_tree(int old_node, int max_id)
 {
 	TDTreeNode *curr_node = this->tree_nodes[old_node];
@@ -791,20 +791,20 @@ int TDTree::replace_by_join_tree(int old_node, int max_id)
 
 
 /** Constructs a tree decomposition of this->G using
- * Bodlaender-Koster's algorithm 2 from Treewidth Computations I, Upper Bounds.   
- * The graph G is assumed to have 
- * a single connected component since tree decompositions
- * of disconnected components can be joined together in
- * an arbitrary way.
- */
+* Bodlaender-Koster's algorithm 2 from Treewidth Computations I, Upper Bounds.   
+* The graph G is assumed to have 
+* a single connected component since tree decompositions
+* of disconnected components can be joined together in
+* an arbitrary way.
+*/
 void TDTree::construct_BK(vector<int> *elim_order)
 {
 	// First make sure this->G has one connected component
 	if(this->G->get_num_components()!=1)
 	{
 		fatal_error("%s:  Tree decomposition routines operate only on connected graphs."
-                    "  This graph has %d connected components\n",__FUNCTION__,
-                    this->G->get_num_components());
+			"  This graph has %d connected components\n",__FUNCTION__,
+			this->G->get_num_components());
 	}
 
 	// We change the graph G, so we should use a copy. Note that this is potentially
@@ -858,7 +858,7 @@ void TDTree::construct_BK(vector<int> *elim_order)
 			if(v==elim_order->at(minpos))
 			{
 				fatal_error("%s:  Trying to create loop in TDTree (i=%d, v=%d, minpos=%d)\n",__FUNCTION__,
-                            i,v,elim_order->at(minpos));
+					i,v,elim_order->at(minpos));
 			}
 			// Now add the tree_edge between tree_node[v] and tree_node[minpos]
 			print_message(1,"Adding 1-based tree_edge %d-%d\n",v+1,elim_order->at(minpos)+1);
@@ -870,14 +870,14 @@ void TDTree::construct_BK(vector<int> *elim_order)
 		if(neighbors.size()>0)
 		{
 			print_message(1,"Eliminating vertex %d with %d fwd neighbors\n",
-                          v,num_fwd_neighbors);
+				v,num_fwd_neighbors);
 			H.eliminate_vertex(v,&neighbors,false);
 		}
 		else
 			print_message(1,"i=%d of %d:  Vertex %d has no neighbors in BK - continuing...\n",
-                          i,H.get_capacity(),v);
+			i,H.get_capacity(),v);
 	}    
-	
+
 	for(i=0;i<num_tree_nodes;i++)
 	{
 		if(this->tree_nodes[i])
@@ -886,25 +886,25 @@ void TDTree::construct_BK(vector<int> *elim_order)
 				this->num_leafs++;
 		}
 	}
-	
+
 	return;
 }
 
 
 /** Constructs a tree decomposition of this->G using
- * Gavril's algorithm.   The graph G is assumed to have 
- * a single connected component since tree decompositions
- * of disconnected components can be joined together in
- * an arbitrary way.
- */
+* Gavril's algorithm.   The graph G is assumed to have 
+* a single connected component since tree decompositions
+* of disconnected components can be joined together in
+* an arbitrary way.
+*/
 void TDTree::construct_gavril(vector<int> *elim_order)
 {  
 	// First make sure this->G has one connected component
 	if(this->G->get_num_components()!=1)
 	{
 		fatal_error("%s:  Tree decomposition routines operate only on connected graphs."
-                    "  This graph has %d connected components\n",__FUNCTION__,
-                    this->G->get_num_components());
+			"  This graph has %d connected components\n",__FUNCTION__,
+			this->G->get_num_components());
 	}
 
 	int i, k, m, v, minpos, num_fwd_neighbors;
@@ -932,17 +932,17 @@ void TDTree::construct_gavril(vector<int> *elim_order)
 	this->tree_nodes[k]->bag.push_front(elim_order->at(num_nodes-1));
 
 	int ctr=0;
-	
+
 	Graph::GraphEOUtil eoutil;
 
 	for(i=num_nodes-2; i >= 0 ; i--)
 	{
 		ctr++;
 		if(ctr%1000==0)
-        {
-            DEBUG("%d tree nodes done\n",ctr);
+		{
+			DEBUG("%d tree nodes done\n",ctr);
 			//fprintf(stderr,"%d tree nodes done\n",ctr);p
-        }
+		}
 
 		neighbors.clear();
 		v=elim_order->at(i);
@@ -950,9 +950,9 @@ void TDTree::construct_gavril(vector<int> *elim_order)
 		num_fwd_neighbors=eoutil.find_forward_neighbors(G, v,elim_order,i+1,&neighbors,&minpos);
 		if(num_fwd_neighbors==0)
 			fatal_error("%s:  No forward neighbors found for vertex %d\n"
-                        "This is currently a fatal error - perhaps the graph has\n"
-                        "more than one connected component that contains two or more\n"
-                        "vertices???\n",__FUNCTION__,v);
+			"This is currently a fatal error - perhaps the graph has\n"
+			"more than one connected component that contains two or more\n"
+			"vertices???\n",__FUNCTION__,v);
 
 		m=elim_order->at(minpos);        
 		neighbors.sort();
@@ -1003,26 +1003,25 @@ void TDTree::construct_gavril(vector<int> *elim_order)
 
 
 /** Constructs a tree decomposition of this->G from supernodal elimination tree.   
- * Uses cholmod, a part of SuiteSparse by Tim Davis. Exits with errors if not installed.
- * IMPORTANT: The graph does not need to be triangulated for this! Saves a huge amount of time and space, 
- * so please update calling routines to avoid triangulation when creating trees this way.
- * The graph G is assumed to have  a single connected component since tree decompositions
- * of disconnected components can be joined together in an arbitrary way.
- */
+* Uses cholmod, a part of SuiteSparse by Tim Davis. Exits with errors if not installed.
+* IMPORTANT: The graph does not need to be triangulated for this! Saves a huge amount of time and space, 
+* so please update calling routines to avoid triangulation when creating trees this way.
+* The graph G is assumed to have  a single connected component since tree decompositions
+* of disconnected components can be joined together in an arbitrary way.
+*/
 void TDTree::construct_superetree(vector<int> *elim_order)
 {  
-  if(!HAS_SUITESPARSE)
-	{
-		fatal_error("%s:  Superetree construction only available with SuiteSparse installed and configured in make.inc"
-			    , __FUNCTION__);
-	}
-  
-  // First make sure this->G has one connected component
+#if !HAS_SUITESPARSE
+	fatal_error("%s:  Superetree construction only available with SuiteSparse installed and configured in make.inc"
+		, __FUNCTION__);
+#else
+
+	// First make sure this->G has one connected component
 	if(this->G->get_num_components()!=1)
 	{
 		fatal_error("%s:  Tree decomposition routines operate only on connected graphs."
-                    "  This graph has %d connected components\n",__FUNCTION__,
-                    this->G->get_num_components());
+			"  This graph has %d connected components\n",__FUNCTION__,
+			this->G->get_num_components());
 	}
 
 	cholmod_common Common ;
@@ -1031,7 +1030,7 @@ void TDTree::construct_superetree(vector<int> *elim_order)
 
 	//input graph in suitesparse format.
 	Long n = (Long)G->get_num_nodes(); 
-	       
+
 	Graph::GraphUtil util; 
 	util.populate_CRS(G);
 	// Nodes are numbered 0,1,...,n-1
@@ -1039,74 +1038,74 @@ void TDTree::construct_superetree(vector<int> *elim_order)
 	vector<int> xadj = G->get_xadj(); 
 	vector<int> adjncy = G->get_adjncy();
 	util.free_CRS(G);
-	
+
 	Long *Ap =new Long[xadj.size()];
 	for(int i= 0; i < xadj.size(); i++){
-	    Ap[i] = xadj.at(i);
+		Ap[i] = xadj.at(i);
 	}
-	
+
 	Long *Ai =new Long[adjncy.size()];
 	for(int i= 0; i < adjncy.size(); i++){
-	  Ai[i] = adjncy.at(i);
+		Ai[i] = adjncy.at(i);
 	}
 
 	Long *perm =new Long[G->get_num_nodes()];
 	for(int i= 0; i < G->get_num_nodes(); i++){
-	  perm[i] = elim_order->at(i);
+		perm[i] = elim_order->at(i);
 	}
-	
+
 	cholmod_l_start (&Common) ;             // creates Common for CHOLMOD
 	//set up the methods for superwrap.
 	Common.nmethods = 1 ;
 	Common.method [0].ordering = CHOLMOD_GIVEN ;
 
-	
+
 	S = SuperWrap (n, Ap, Ai, perm, &Common) ;  // allocates and creates S
-		
+
 	//Populate the tree decomposition from S
 	this->width = S->maxsuper-1;
 	this->tree_nodes.resize(S->ns,NULL);	
 	for(int k = 0; k < S->ns; k++)
-	  { 
-	  // Create the k^th tree_node
-	  TDTreeNode *next_tree_node;
-	  next_tree_node=new TDTreeNode;
-	  next_tree_node->id=k;	
-	  this->tree_nodes[k]=next_tree_node;
-	  //set up the bag of the tree_node, sorted
-	  for(int l = S->Sp[k]; l < S->Sp[k+1]; l++)
-	    {
-	      this->tree_nodes[k]->bag.push_back(S->Si[l]);
-	    }
-	  this->tree_nodes[k]->bag.sort();
+	{ 
+		// Create the k^th tree_node
+		TDTreeNode *next_tree_node;
+		next_tree_node=new TDTreeNode;
+		next_tree_node->id=k;	
+		this->tree_nodes[k]=next_tree_node;
+		//set up the bag of the tree_node, sorted
+		for(int l = S->Sp[k]; l < S->Sp[k+1]; l++)
+		{
+			this->tree_nodes[k]->bag.push_back(S->Si[l]);
+		}
+		this->tree_nodes[k]->bag.sort();
 	}
-	
+
 
 	//add all the edges
 	for(int i = 0; i < S->ns; i++){
-	  j =  S->Sparent[i];
-	  if(j == -1){
-	    //this is the root, don't add a parent.
-	    //(this->tree_nodes[i])->adj.push_front(i);
-	  }
-	  else
-	    {
-	      (this->tree_nodes[i])->adj.push_front(j);
-	      (this->tree_nodes[j])->adj.push_back(i);
-	    }
+		j =  S->Sparent[i];
+		if(j == -1){
+			//this is the root, don't add a parent.
+			//(this->tree_nodes[i])->adj.push_front(i);
+		}
+		else
+		{
+			(this->tree_nodes[i])->adj.push_front(j);
+			(this->tree_nodes[j])->adj.push_back(i);
+		}
 	}
-	
+
 	this->num_tree_nodes=S->ns;
 	for(int i=0;i<this->num_tree_nodes;i++)
-	  {
-	    if(this->tree_nodes[i] && this->tree_nodes[i]->adj.size()==1)
-	      this->num_leafs++;
-	  }
-	
+	{
+		if(this->tree_nodes[i] && this->tree_nodes[i]->adj.size()==1)
+			this->num_leafs++;
+	}
+
 	SuperFree (&S, &Common) ;                   // frees S
 	cholmod_l_finish (&Common) ;                   // frees contents of Common
 	delete[] perm;
-
+#endif
 
 }
 
@@ -1114,9 +1113,9 @@ void TDTree::construct_superetree(vector<int> *elim_order)
 
 
 /**
- * Fills up the node_locations[] array so that node_locations[i] is a list of
- * the indices of the tree nodes whose bags contain connected node i.
- */
+* Fills up the node_locations[] array so that node_locations[i] is a list of
+* the indices of the tree nodes whose bags contain connected node i.
+*/
 void TDTree::record_node_locations()
 {
 	int i,k;
@@ -1140,9 +1139,9 @@ void TDTree::record_node_locations()
 }
 
 /**
- * Recursive function for depth first search for the path between two nodes in the tree.
- * The pred[] array should already be allocated and be of size tree_nodes.size().
- */
+* Recursive function for depth first search for the path between two nodes in the tree.
+* The pred[] array should already be allocated and be of size tree_nodes.size().
+*/
 void TDTree::find_path(int start, int end, int *pred)
 {
 	print_message(1, "Entering find_path %d %d\n", start, end);
@@ -1173,11 +1172,11 @@ void TDTree::find_path(int start, int end, int *pred)
 }
 
 /**
- * Function to find the path between two vertices in the tree.  If a path
- * is found, then the path list is populated with the path as
- * i, j, ..., m where i!=start and m!=end.  In other words, we only include the
- * "interior" of the path.  
- */
+* Function to find the path between two vertices in the tree.  If a path
+* is found, then the path list is populated with the path as
+* i, j, ..., m where i!=start and m!=end.  In other words, we only include the
+* "interior" of the path.  
+*/
 void TDTree::find_path(int start, int end, list<int> *path)
 {
 	// Create a pred[] array to trace the path
@@ -1210,7 +1209,7 @@ void TDTree::find_path(int start, int end, list<int> *path)
 		// Sanity check
 		if(k > size)
 			fatal_error("%s:  Found too many nodes in find_path from %d to %d\n",
-                        __FUNCTION__,start,end);
+			__FUNCTION__,start,end);
 	}
 
 	// clean up
@@ -1219,9 +1218,9 @@ void TDTree::find_path(int start, int end, list<int> *path)
 }
 
 /**
- * Determines whether or not the decomposition is valid by explicitly checking
- * the three conditions. Note that this is potentially very expensive!
- */
+* Determines whether or not the decomposition is valid by explicitly checking
+* the three conditions. Note that this is potentially very expensive!
+*/
 bool TDTree::verify()
 {
 	////////////////
@@ -1298,7 +1297,7 @@ bool TDTree::verify()
 		for(i1=nbr_list->begin();i1!=nbr_list->end();++i1)
 		{
 			print_message(1,"Checking for edge %d-%d (%d edges)\n",
-                          i,*i1,nbr_list->size());
+				i,*i1,nbr_list->size());
 			if(*i1>i)
 			{
 				// We are searching the bags for the edge i-*i1
@@ -1368,8 +1367,8 @@ bool TDTree::verify()
 					// Consider tree nodes i and j
 					// First, find the nodes in the intersection
 					print_message(1,"Finding intersection of bags %d(%d nodes) and %d(%d nodes)\n",
-                                  i,this->tree_nodes[i]->bag.size(),
-                                  j,this->tree_nodes[j]->bag.size());
+						i,this->tree_nodes[i]->bag.size(),
+						j,this->tree_nodes[j]->bag.size());
 
 					v=set_intersection(
 						this->tree_nodes[i]->bag.begin(),this->tree_nodes[i]->bag.end(),
@@ -1388,15 +1387,15 @@ bool TDTree::verify()
 						{
 							// Check tree node *i2
 							v2=set_intersection(I.begin(),v,
-                                                this->tree_nodes[*i2]->bag.begin(),
-                                                this->tree_nodes[*i2]->bag.end(),
-                                                J.begin());
+								this->tree_nodes[*i2]->bag.begin(),
+								this->tree_nodes[*i2]->bag.end(),
+								J.begin());
 							// We must have I==J - sufficient to check lengths
 							if((v2-J.begin()) != (v-I.begin()))
 							{
 								print_message(1,"Intersection set of size %d!=%d not found for tree node %d "
-                                              "on the path from %d to %d\n",(v2-J.begin()),(v-I.begin()),
-                                              *i2,i,j);
+									"on the path from %d to %d\n",(v2-J.begin()),(v-I.begin()),
+									*i2,i,j);
 								return false;
 							}
 						}
@@ -1416,20 +1415,20 @@ bool TDTree::verify()
 }
 
 /**
- * Wrapper to write DIMACS file without considering preordering.
- */
+* Wrapper to write DIMACS file without considering preordering.
+*/
 void TDTree::write_DIMACS_file(const char *DIMACS_file)
 {
-    this->write_DIMACS_file(DIMACS_file, false);
+	this->write_DIMACS_file(DIMACS_file, false);
 }
 
 /**
- * Writes the tree decomposition to the given file in
- * our interpretation of the DIMACS format for tree decomposition.
- * If preordered = true, finds a preorder walk and relabels tree nodes accordingly.
- * Assumes tree is rooted. Also writes edges as 'e p c' where p is the parent of c in 
- * the rooted tree.
- */
+* Writes the tree decomposition to the given file in
+* our interpretation of the DIMACS format for tree decomposition.
+* If preordered = true, finds a preorder walk and relabels tree nodes accordingly.
+* Assumes tree is rooted. Also writes edges as 'e p c' where p is the parent of c in 
+* the rooted tree.
+*/
 void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 {
 	FILE *out;
@@ -1459,28 +1458,28 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 		this->pre_order_walk(&walk);
 	else
 	{
-	    for(int i = 0; i < this->num_tree_nodes; ++i)
-            walk[i] = i;
+		for(int i = 0; i < this->num_tree_nodes; ++i)
+			walk[i] = i;
 	}
 
 	vector<int> perm(this->num_tree_nodes,GD_UNDEFINED);
 	for(int i = 0; i < this->num_tree_nodes; ++i)
-	    perm[walk[i]] = i;
+		perm[walk[i]] = i;
 
 
-	
+
 	// Print out the edges so that 'e p c' means p is the parent of c	
 	for(i=0;i<size;i++)
 	{   
 		if(this->tree_nodes[i] != NULL)
 		{
-		    L = this->tree_nodes[i]->adj.begin(); 
-		    ++L; //skip the parent
-		    for(L;L!=this->tree_nodes[i]->adj.end();++L)
+			L = this->tree_nodes[i]->adj.begin(); 
+			++L; //skip the parent
+			for(L;L!=this->tree_nodes[i]->adj.end();++L)
 			{
-			    j=*L;
-			    fprintf(out,"e %d %d\n",perm[i]+1,perm[j]+1);
-			    fflush(out);
+				j=*L;
+				fprintf(out,"e %d %d\n",perm[i]+1,perm[j]+1);
+				fflush(out);
 			}
 		}
 	}
@@ -1491,8 +1490,8 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 	{   
 		if(this->tree_nodes[i] != NULL)
 		{
-		    fprintf(out,"B %d %u ",perm[i]+1,(int)this->tree_nodes[i]->bag.size());
-			
+			fprintf(out,"B %d %u ",perm[i]+1,(int)this->tree_nodes[i]->bag.size());
+
 			L=this->tree_nodes[i]->bag.begin();
 			j=*L;
 			Graph::Node *n1;
@@ -1502,7 +1501,7 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 			{
 				n1=this->G->get_node(j);
 				j=n1->get_label();
-				
+
 			}
 			fprintf(out,"%d",j);
 			++L;
@@ -1516,7 +1515,7 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 				{
 					n1=this->G->get_node(j);
 					j=n1->get_label();
-					
+
 				}
 
 				fprintf(out," %d",j);
@@ -1536,9 +1535,9 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 }
 
 /**
- * Populates the TDTree data structures by reading the provided file.  Returns
- * the size of the largest bag minus one (aka the width).
- */
+* Populates the TDTree data structures by reading the provided file.  Returns
+* the size of the largest bag minus one (aka the width).
+*/
 int TDTree::read_DIMACS_file(const char *DIMACS_file)
 {
 	int width=-1;
@@ -1561,46 +1560,46 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 
 		if(retval!=1)
 			fatal_error("%s:  fscanf read %d char's (expected to read 1!)\n",__FUNCTION__,
-                        retval);
+			retval);
 
 		switch(line[0])
 		{
-            case 'p':
-                // This is the problem line.  
-                retval=fscanf(in,"%s %d %d",format,&n,&m);
-                if(strcmp(format,"treed")!=0 && strcmp(format,"TreeD")!=0 &&
-                   strcmp(format,"TREED")!=0 && strcmp(format,"Treed")!=0)
-                    fatal_error("%s:  Unknown problem type of %s in TreeD::read_DIMACS_file\n",
-                                __FUNCTION__);
+		case 'p':
+			// This is the problem line.  
+			retval=fscanf(in,"%s %d %d",format,&n,&m);
+			if(strcmp(format,"treed")!=0 && strcmp(format,"TreeD")!=0 &&
+				strcmp(format,"TREED")!=0 && strcmp(format,"Treed")!=0)
+				fatal_error("%s:  Unknown problem type of %s in TreeD::read_DIMACS_file\n",
+				__FUNCTION__);
 
 
-            case 'f':
-                break;
+		case 'f':
+			break;
 
-            case 'c':
-                break;
+		case 'c':
+			break;
 
-            case 'B':
-                // "Bag" line - of the form B id k n_1 n_2 ... n_k
-                // In other words, there are k nodes in the bag
-                retval=fscanf(in,"%d %d",&id,&num);
-                bag_labels.push_back(id);
-                break;
+		case 'B':
+			// "Bag" line - of the form B id k n_1 n_2 ... n_k
+			// In other words, there are k nodes in the bag
+			retval=fscanf(in,"%d %d",&id,&num);
+			bag_labels.push_back(id);
+			break;
 
-            case 'e':
-                // Edge line - of the form e start end
-                retval=fscanf(in,"%d %d",&start,&end);
-                if(retval!=2)
-                    fatal_error("%s:  DIMACS read error - didn't understand edge line\n",
-                                __FUNCTION__);
-                edge_labels.push_back(start);
-                edge_labels.push_back(end);
-                break;
+		case 'e':
+			// Edge line - of the form e start end
+			retval=fscanf(in,"%d %d",&start,&end);
+			if(retval!=2)
+				fatal_error("%s:  DIMACS read error - didn't understand edge line\n",
+				__FUNCTION__);
+			edge_labels.push_back(start);
+			edge_labels.push_back(end);
+			break;
 
-            default:
-                // We encountered some character that we don't understand
-                fatal_error("%s:  DIMACS read error - didn't understand character %c to start a line\n",
-                            __FUNCTION__,line[0]);
+		default:
+			// We encountered some character that we don't understand
+			fatal_error("%s:  DIMACS read error - didn't understand character %c to start a line\n",
+				__FUNCTION__,line[0]);
 		}// end switch
 
 		// Advance to next line if there is format at the end of it
@@ -1643,102 +1642,102 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 
 		if(retval!=1)
 			fatal_error("%s:  fscanf read %d char's (expected to read 1!)\n",__FUNCTION__,
-                        retval);
+			retval);
 
 		switch(line[0])
 		{
-            case 'p':
-                // This is the problem line.  
-                retval=fscanf(in,"%s %d %d",format,&n,&m);
-                if(strcmp(format,"treed")!=0 && strcmp(format,"TreeD")!=0 &&
-                   strcmp(format,"TREED")!=0 && strcmp(format,"Treed")!=0)
-                    fatal_error("%s:  Unknown problem type of %s in TreeD::read_DIMACS_file\n",
-                                __FUNCTION__);
+		case 'p':
+			// This is the problem line.  
+			retval=fscanf(in,"%s %d %d",format,&n,&m);
+			if(strcmp(format,"treed")!=0 && strcmp(format,"TreeD")!=0 &&
+				strcmp(format,"TREED")!=0 && strcmp(format,"Treed")!=0)
+				fatal_error("%s:  Unknown problem type of %s in TreeD::read_DIMACS_file\n",
+				__FUNCTION__);
 
-                print_message(1,"Reading tree decomposition with %d nodes in tree and %d edges\n",
-                              n, m);
+			print_message(1,"Reading tree decomposition with %d nodes in tree and %d edges\n",
+				n, m);
 
-                // Allocate n TDTreeNodes
-                if((int)this->tree_nodes.size()<n)
-                    this->tree_nodes.resize(n,NULL);
-                for(i=0;i<n;i++)
-                {
-                    TDTreeNode *next_tree_node;
-                    next_tree_node=new TDTreeNode;
-                    next_tree_node->id=i;
-                    this->tree_nodes[i]=next_tree_node;
-                }
-                this->num_tree_nodes=n;
-                print_message(1,"Allocated for tree to read in\n");
+			// Allocate n TDTreeNodes
+			if((int)this->tree_nodes.size()<n)
+				this->tree_nodes.resize(n,NULL);
+			for(i=0;i<n;i++)
+			{
+				TDTreeNode *next_tree_node;
+				next_tree_node=new TDTreeNode;
+				next_tree_node->id=i;
+				this->tree_nodes[i]=next_tree_node;
+			}
+			this->num_tree_nodes=n;
+			print_message(1,"Allocated for tree to read in\n");
 
-                break;
-            case 'f':
-                // This is the "file line" - the next entry is the name of the file
-                // containing the original graph for this decomposition
-                retval=fscanf(in,"%s",this->graph_file);
-                print_message(1,"Scanned in file name %s\n",this->graph_file);
-                //strcpy(this->graph_file,format);
-                if(retval==0)
-                    fatal_error("%s:  NULL filename found in TreeD::read_DIMACS_file??\n",
-                                __FUNCTION__);
-                print_message(100,"DIMACS: read graph_file=%s\n",this->graph_file);
+			break;
+		case 'f':
+			// This is the "file line" - the next entry is the name of the file
+			// containing the original graph for this decomposition
+			retval=fscanf(in,"%s",this->graph_file);
+			print_message(1,"Scanned in file name %s\n",this->graph_file);
+			//strcpy(this->graph_file,format);
+			if(retval==0)
+				fatal_error("%s:  NULL filename found in TreeD::read_DIMACS_file??\n",
+				__FUNCTION__);
+			print_message(100,"DIMACS: read graph_file=%s\n",this->graph_file);
 
-                break;
+			break;
 
-            case 'c':
-                // Comment line - skip and move on
-                break;
+		case 'c':
+			// Comment line - skip and move on
+			break;
 
-            case 'B':
-                // "Bag" line - of the form B id k n_1 n_2 ... n_k
-                // In other words, there are k nodes in the bag
-                retval=fscanf(in,"%d %d",&id,&num);
-                if(num>width)
-                    width=num;
-                // We read in id - stick this in position perm[id];
-                print_message(1,"Read in bag id %d - translated to %d\n",id,perm[id]);
-                id=perm[id];
+		case 'B':
+			// "Bag" line - of the form B id k n_1 n_2 ... n_k
+			// In other words, there are k nodes in the bag
+			retval=fscanf(in,"%d %d",&id,&num);
+			if(num>width)
+				width=num;
+			// We read in id - stick this in position perm[id];
+			print_message(1,"Read in bag id %d - translated to %d\n",id,perm[id]);
+			id=perm[id];
 
-                print_message(1,"Reading in bag for TreeNode %d (j=%d)\n\n",id,j);
+			print_message(1,"Reading in bag for TreeNode %d (j=%d)\n\n",id,j);
 
-                for(i=0;i<num;i++)
-                {
-                    fscanf(in,"%d",&k);
+			for(i=0;i<num;i++)
+			{
+				fscanf(in,"%d",&k);
 
-                    k--; // The file information is 1-based!
-                    if(k<0)
-                        fatal_error("%s:  Read in negative vertex number of %d?\n",__FUNCTION__,k);
-                    this->tree_nodes[id]->bag.push_back(k);
-                    this->tree_nodes[id]->bag_vec.push_back(k);
-                }
+				k--; // The file information is 1-based!
+				if(k<0)
+					fatal_error("%s:  Read in negative vertex number of %d?\n",__FUNCTION__,k);
+				this->tree_nodes[id]->bag.push_back(k);
+				this->tree_nodes[id]->bag_vec.push_back(k);
+			}
 
-                print_message(1,"Tree Node %d has %d vertice in its bag\n",j,
-                              this->tree_nodes[id]->bag.size());
+			print_message(1,"Tree Node %d has %d vertice in its bag\n",j,
+				this->tree_nodes[id]->bag.size());
 
-                j++;
-                break;
+			j++;
+			break;
 
-            case 'e':
-                // Edge line - of the form e start end
-                retval=fscanf(in,"%d %d",&start,&end);
-                if(retval!=2)
-                    fatal_error("%s:  DIMACS read error - didn't understand edge line\n",
-                                __FUNCTION__);
-                // We need to add this information to our adjacency lists
-                //start--;end--;
-                start=perm[start];
-                end=perm[end];
-                print_message(1,"Read in tree edge %d-%d\n",start,end);
-                this->tree_nodes[start]->adj.push_back(end);
-                this->tree_nodes[end]->adj.push_back(start);
-                // We thankfully don't have to worry about disconnected nodes since
-                // we have a tree by assumption
-                break;
+		case 'e':
+			// Edge line - of the form e start end
+			retval=fscanf(in,"%d %d",&start,&end);
+			if(retval!=2)
+				fatal_error("%s:  DIMACS read error - didn't understand edge line\n",
+				__FUNCTION__);
+			// We need to add this information to our adjacency lists
+			//start--;end--;
+			start=perm[start];
+			end=perm[end];
+			print_message(1,"Read in tree edge %d-%d\n",start,end);
+			this->tree_nodes[start]->adj.push_back(end);
+			this->tree_nodes[end]->adj.push_back(start);
+			// We thankfully don't have to worry about disconnected nodes since
+			// we have a tree by assumption
+			break;
 
-            default:
-                // We encountered some character that we don't understand
-                fatal_error("%s:  DIMACS read error - didn't understand character %c to start a line\n",
-                            __FUNCTION__,line[0]);
+		default:
+			// We encountered some character that we don't understand
+			fatal_error("%s:  DIMACS read error - didn't understand character %c to start a line\n",
+				__FUNCTION__,line[0]);
 		}// end switch
 
 		// Advance to next line if there is format at the end of it
@@ -1754,18 +1753,18 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 }
 
 /**
- * Function to write a graphviz representation (DOT language) of the tree decomposition to the specified file. 
- * The spline parameter allows the user to specify whether or not spline curves are used in edge layout. 
- * This is (strongly) not recommended for large graphs (> 100 vertices).
- * The final parameter takes one of the options GV_BAG_LABELS, GV_SCALE_BAGS, GV_TREE_ONLY
- * GV_BAG_LABELS lists the entire bag of vertices inside each node's label. 
- * GV_SCALE_BAGS scales the bags to indicate bag size, and labels them with the treenode ID. Note this may 
- * create dimacs files that neato cannot handle on very large graphs! 
- * GV_TREE_ONLY writes a file that just draws the underlying tree.
- * GV_COLORS creates a colored version of the decomposition showing the underlying tree with nodes colored
- * red if they have size k+1, blue if size k, and gradations of purple for smaller nodes, getting lighter as 
- * you get smaller.
- **/
+* Function to write a graphviz representation (DOT language) of the tree decomposition to the specified file. 
+* The spline parameter allows the user to specify whether or not spline curves are used in edge layout. 
+* This is (strongly) not recommended for large graphs (> 100 vertices).
+* The final parameter takes one of the options GV_BAG_LABELS, GV_SCALE_BAGS, GV_TREE_ONLY
+* GV_BAG_LABELS lists the entire bag of vertices inside each node's label. 
+* GV_SCALE_BAGS scales the bags to indicate bag size, and labels them with the treenode ID. Note this may 
+* create dimacs files that neato cannot handle on very large graphs! 
+* GV_TREE_ONLY writes a file that just draws the underlying tree.
+* GV_COLORS creates a colored version of the decomposition showing the underlying tree with nodes colored
+* red if they have size k+1, blue if size k, and gradations of purple for smaller nodes, getting lighter as 
+* you get smaller.
+**/
 void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 {
 	int i, j; 
@@ -1780,12 +1779,12 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 
 	fprintf(out, "Graph TD{\n"); 
 	/* You can choose one of the two options below if you want to eliminate node overlap 
-     * (the scale option makes a larger, more symmetric drawing than the false option). 
-     * The problem is that the scale factors for these graphs are enormous: output files are in the range of 3MB (png) for a 50 node tree, 
-     * and PDF rendering fails due to canvas size restrictions. 
-     * Current config allows node overlap, which also makes diagrams difficult to read. We should think on how to fix this.
-     */
-	
+	* (the scale option makes a larger, more symmetric drawing than the false option). 
+	* The problem is that the scale factors for these graphs are enormous: output files are in the range of 3MB (png) for a 50 node tree, 
+	* and PDF rendering fails due to canvas size restrictions. 
+	* Current config allows node overlap, which also makes diagrams difficult to read. We should think on how to fix this.
+	*/
+
 	if(style != GV_BAG_LABELS)
 		fprintf(out, "overlap=false;\n");
 	if(spline == true)
@@ -1829,7 +1828,7 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 			{
 				// you could set shape to circle or something else here.
 				fprintf(out,"%d [width=%f, shape=ellipse];\n",i+1, 
-                        (double)(this->tree_nodes[i]->bag.size())/sqrt((double)G->get_capacity()));
+					(double)(this->tree_nodes[i]->bag.size())/sqrt((double)G->get_capacity()));
 			}
 			else if(style == GV_TREE_ONLY)
 			{
@@ -1882,220 +1881,221 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 
 
 /*
-  This function writes a graphviz representation (DOT language) of the tree decomposition with node labels colored by the color_vector.
-  The color_vector is a vector<double> with a length equal to the number of nodes in the graph with range min_color-max_color.
-  The colormap used is defined in get_rgb_value which can be found in Util.cpp.
+This function writes a graphviz representation (DOT language) of the tree decomposition with node labels colored by the color_vector.
+The color_vector is a vector<double> with a length equal to the number of nodes in the graph with range min_color-max_color.
+The colormap used is defined in get_rgb_value which can be found in Util.cpp.
 
-  If min_color-max_color are not provided, then the first function will calculate them and call the second function.
-  Style should be one of GV_COLORS, GV_BAG_LABELS.
- */
+If min_color-max_color are not provided, then the first function will calculate them and call the second function.
+Style should be one of GV_COLORS, GV_BAG_LABELS.
+*/
 
 
-void TDTree::write_scored_graphviz_file(bool spline, const char *GVIZ_file, const vector<double>& color_vector, int style, const bool log_range)
+void TDTree::write_scored_graphviz_file(bool spline, const char *GVIZ_file, 
+	const vector<double>& color_vector, int style, const bool log_range)
 {
-    size_t length = color_vector.size();
-    
-    if (!length > 0)
-    {
-        FERROR("Empty color vector, Abort !!\n");
-        return;
-    }
+	size_t length = color_vector.size();
 
-    int max_color = color_vector[0];
-    int min_color = max_color;
+	if (length==0)
+	{
+		FERROR("Empty color vector, Abort !!\n");
+		return;
+	}
 
-    //loop to find range
-    for(size_t i=0;i<length;++i)
-    {
-        if(color_vector[i] > max_color)
-            max_color = color_vector[i];
-      
-        if(color_vector[i] < min_color)
-            min_color = color_vector[i];
-    }
+	int max_color = (int)(color_vector[0]);
+	int min_color = max_color;
 
-  this->write_scored_graphviz_file(spline, GVIZ_file, color_vector, max_color, min_color, log_range, style);
+	//loop to find range
+	for(size_t i=0;i<length;++i)
+	{
+		if((int)color_vector[i] > max_color)
+			max_color = (int)color_vector[i];
+
+		if(color_vector[i] < (int)min_color)
+			min_color = (int)color_vector[i];
+	}
+
+	//this->write_scored_graphviz_file(spline, GVIZ_file, color_vector, max_color, min_color, log_range, style);
+	// CSG - 10/29/2012 - last 2 arguments in wrong order?
+	this->write_scored_graphviz_file(spline, GVIZ_file, color_vector, max_color, min_color, style, log_range);
 
 }
 
-void TDTree::write_scored_graphviz_file(bool spline, const char *GVIZ_file, const vector<double>& color_vector, const double & max_color, const double & min_color, int style, const bool log_range)
+void TDTree::write_scored_graphviz_file(bool spline, const char *GVIZ_file, const vector<double>& color_vector, 
+	const double & max_color, const double & min_color, int style, const bool log_range)
 {
-    int i, j; 
-    FILE *out; 
-    Graph::WeightedMutableGraph *G = this->G;
-    list<int>::iterator L;
-    char rgb[8];
-    int k=0, rcolor; 
+	int i, j; 
+	FILE *out; 
+	Graph::WeightedMutableGraph *G = this->G;
+	list<int>::iterator L;
+	char rgb[8];
+	int k=0; 
 
-    if( (out = fopen(GVIZ_file, "w")) == NULL)
-        fatal_error("%s:  Error opening file %s for writing graphviz output\n",__FUNCTION__, GVIZ_file);
+	if( (out = fopen(GVIZ_file, "w")) == NULL)
+		fatal_error("%s:  Error opening file %s for writing graphviz output\n",__FUNCTION__, GVIZ_file);
 
-    fprintf(out, "Graph TD{\n"); 
-    /* You can choose one of the two options below if you want to eliminate node overlap 
-     * (the scale option makes a larger, more symmetric drawing than the false option). 
-     * The problem is that the scale factors for these graphs are enormous: output files are in the range of 3MB (png) for a 50 node tree, 
-     * and PDF rendering fails due to canvas size restrictions. 
-     * Current config allows node overlap, which also makes diagrams difficult to read. We should think on how to fix this.
-     */
-	    
-  //  fprintf(out, "overlap=true;\n");
-  if(spline==true)
-    fprintf(out, "splines=true;\n");
-  else
-    fprintf(out, "splines=false;\n");
-    print_message(1, "k : %d\n", k);
+	fprintf(out, "Graph TD{\n"); 
+	/* You can choose one of the two options below if you want to eliminate node overlap 
+	* (the scale option makes a larger, more symmetric drawing than the false option). 
+	* The problem is that the scale factors for these graphs are enormous: output files are in the range of 3MB (png) for a 50 node tree, 
+	* and PDF rendering fails due to canvas size restrictions. 
+	* Current config allows node overlap, which also makes diagrams difficult to read. We should think on how to fix this.
+	*/
 
-    double new_max;
-    double new_min;
+	//  fprintf(out, "overlap=true;\n");
+	if(spline==true)
+		fprintf(out, "splines=true;\n");
+	else
+		fprintf(out, "splines=false;\n");
+	print_message(1, "k : %d\n", k);
 
-    //scales and then takes log of color vector, for unevenly distributed color_vectors
-    if(log_range)
-    {
-        new_max = 10;
-        new_min = 1;
-    }
-    else
-    {
-        new_max = max_color;
-        new_min = min_color;
-    }
+	double new_max;
+	double new_min;
 
-    // Print out the bags
-    // Feb 24 2011 - changed back to tree_nodes.size() and check for NULL.
-    int size=this->tree_nodes.size();
-    Graph::Node *n1;
-  
-    for(i=0;i<size;i++)
-    {
-      if(style == GV_BAG_LABELS)
+	//scales and then takes log of color vector, for unevenly distributed color_vectors
+	if(log_range)
 	{
-	  double val;
-	  if(this->tree_nodes[i] != NULL){
-	    fprintf(out,"%d [label=<",i+1);
-	    print_message(10, "Bag %d:\n", i+1);
-	    
-	    //	cout<<i<<"\n";
-	    this->tree_nodes[i]->bag.sort();
-	    //cout<<i<<" two\n";
-	    int count = 0;
-	    for(L=this->tree_nodes[i]->bag.begin();
-		L!=this->tree_nodes[i]->bag.end();++L )
-	      {
-		count++;
-		//  cout<<i<<" "<<*L<<"\n";
-		// Get the actual node label if necessary (we have a pointer to G)
-		j=*L;
-		print_message(10, "Looking for %d\n", j);
-		n1=this->G->get_node(j);
-		j=n1->get_label();
-		//j=G->nodes[j].label;
-		print_message(10, "Found %d\n", j);
-		if(log_range)
-		  {
-		    val = (new_max-new_min)*(color_vector[j-1]-min_color)/(max_color-min_color) + new_min;
-		    //	cout<<new_max<<" "<<new_min<<" "<<color_vector[j-1]<<" "<<min_color<<" "<<max_color<<" "<<val<<" \n";
-		    val = log(val);
-		    
-		  }
-		else
-		  val = color_vector[j-1];
-
-		if(max_color==min_color)
-		  val = .5;
-		else
-		  {
-		    if(log_range)
-		      val = (val-log(new_min))/(log(new_max)-log(new_min));
-		    else
-		      val = (val-new_min)/(new_max-new_min);
-		    
-		  }
-		//get hex rgb value to print for font color
-		get_rgb_value(rgb,val);
-		
-		//Must use graphviz html output for labels
-		fprintf(out,"<FONT COLOR=\"%s\">",rgb);
-		fprintf(out,"%d ",j);
-		
-		//Need to insert line breaks every so often to prevent really long bags from occurring
-		if(count==25)	 
-		  {
-		    fprintf(out,"<BR/>");
-		    count = 0;
-		  }
-		fprintf(out,"</FONT>\n");
-		
-		
-		// NOTE!! The bags store the DIMACS labels (1,2,..,num_total_nodes) so if there
-		// are disconnected nodes, then the union of all the bags
-		// will NOT be equal to (1,2,...,num_total_nodes)
-	      }
-	    fprintf(out,">];\n");
-	  }      
-	}//end BAG_LABELS
-
-      else if(style == GV_COLORS)
+		new_max = 10;
+		new_min = 1;
+	}
+	else
 	{
-	  if(this->tree_nodes[i] != NULL)
-	    {
-	      double stat = get_statistics(this->tree_nodes[i]->bag_vec, color_vector, 1); //stat is hard coded right now.			  
-	      //	      cout << this->tree_nodes[i]->bag_vec[0] << " " << this->tree_nodes[i]->bag_vec[1] << "\n";
-	      //cout << stat << "\n";
-	      get_rgb_value(rgb, (stat-min_color)/(max_color-min_color));
-	      //cout << (stat-min_color)/(max_color-min_color) << "\n";
-
-	      fprintf(out,"%d [label=\"\",width=%f, shape=circle, style=\"filled\", fillcolor=\"%s\"];\n", i+1,
-		      (double)(5*this->tree_nodes[i]->bag.size())/this->width, rgb);	  
-	    } 
+		new_max = max_color;
+		new_min = min_color;
 	}
 
-      else
+	// Print out the bags
+	// Feb 24 2011 - changed back to tree_nodes.size() and check for NULL.
+	int size=this->tree_nodes.size();
+	Graph::Node *n1;
+
+	for(i=0;i<size;i++)
 	{
-	  fatal_error("%s : Style specified was not GV_BAG_LABELS or GV_COLOR"); 
+		if(style == GV_BAG_LABELS)
+		{
+			double val;
+			if(this->tree_nodes[i] != NULL){
+				fprintf(out,"%d [label=<",i+1);
+				print_message(10, "Bag %d:\n", i+1);
+
+				//	cout<<i<<"\n";
+				this->tree_nodes[i]->bag.sort();
+				//cout<<i<<" two\n";
+				int count = 0;
+				for(L=this->tree_nodes[i]->bag.begin();
+					L!=this->tree_nodes[i]->bag.end();++L )
+				{
+					count++;
+					//  cout<<i<<" "<<*L<<"\n";
+					// Get the actual node label if necessary (we have a pointer to G)
+					j=*L;
+					print_message(10, "Looking for %d\n", j);
+					n1=this->G->get_node(j);
+					j=n1->get_label();
+					//j=G->nodes[j].label;
+					print_message(10, "Found %d\n", j);
+					if(log_range)
+					{
+						val = (new_max-new_min)*(color_vector[j-1]-min_color)/(max_color-min_color) + new_min;
+						//	cout<<new_max<<" "<<new_min<<" "<<color_vector[j-1]<<" "<<min_color<<" "<<max_color<<" "<<val<<" \n";
+						val = log(val);
+
+					}
+					else
+						val = color_vector[j-1];
+
+					if(max_color==min_color)
+						val = .5;
+					else
+					{
+						if(log_range)
+							val = (val-log(new_min))/(log(new_max)-log(new_min));
+						else
+							val = (val-new_min)/(new_max-new_min);
+
+					}
+					//get hex rgb value to print for font color
+					get_rgb_value(rgb,val);
+
+					//Must use graphviz html output for labels
+					fprintf(out,"<FONT COLOR=\"%s\">",rgb);
+					fprintf(out,"%d ",j);
+
+					//Need to insert line breaks every so often to prevent really long bags from occurring
+					if(count==25)	 
+					{
+						fprintf(out,"<BR/>");
+						count = 0;
+					}
+					fprintf(out,"</FONT>\n");
+
+
+					// NOTE!! The bags store the DIMACS labels (1,2,..,num_total_nodes) so if there
+					// are disconnected nodes, then the union of all the bags
+					// will NOT be equal to (1,2,...,num_total_nodes)
+				}
+				fprintf(out,">];\n");
+			}      
+		}//end BAG_LABELS
+
+		else if(style == GV_COLORS)
+		{
+			if(this->tree_nodes[i] != NULL)
+			{
+				double stat = get_statistics(this->tree_nodes[i]->bag_vec, color_vector, 1); //stat is hard coded right now.			  
+				//	      cout << this->tree_nodes[i]->bag_vec[0] << " " << this->tree_nodes[i]->bag_vec[1] << "\n";
+				//cout << stat << "\n";
+				get_rgb_value(rgb, (stat-min_color)/(max_color-min_color));
+				//cout << (stat-min_color)/(max_color-min_color) << "\n";
+
+				fprintf(out,"%d [label=\"\",width=%f, shape=circle, style=\"filled\", fillcolor=\"%s\"];\n", i+1,
+					(double)(5*this->tree_nodes[i]->bag.size())/this->width, rgb);	  
+			} 
+		}
+
+		else
+		{
+			fatal_error("%s : Style specified was not GV_BAG_LABELS or GV_COLOR"); 
+		}
+
 	}
 
-    }
 
+	// Print out the edges
+	//Feb 24 2011 - updated to allow for NULL entries in tree_nodes array
+	for(i=0;i<size;i++)
+	{   
+		if(this->tree_nodes[i] != NULL)
+		{
+			for(L=this->tree_nodes[i]->adj.begin();L!=this->tree_nodes[i]->adj.end();++L)
+			{
+				j=*L;
+				if(i < j)
+					// Make this 1-based in true DIMACS spirit
+					fprintf(out,"%d -- %d;\n",i+1,j+1);
+			}
+		}
+	}
 
-    // Print out the edges
-    //Feb 24 2011 - updated to allow for NULL entries in tree_nodes array
-    for(i=0;i<size;i++)
-    {   
-        if(this->tree_nodes[i] != NULL)
-        {
-            for(L=this->tree_nodes[i]->adj.begin();L!=this->tree_nodes[i]->adj.end();++L)
-            {
-                j=*L;
-                if(i < j)
-                    // Make this 1-based in true DIMACS spirit
-                    fprintf(out,"%d -- %d;\n",i+1,j+1);
-            }
-        }
-    }
+	fprintf(out, "}\n");
 
-    fprintf(out, "}\n");
-
-    fflush(out);  
-    fclose(out); 
+	fflush(out);  
+	fclose(out); 
 }
-
-
-
 
 
 /*
- * Highlights the subtree of the tree decomposition which contains the vertex v. Writes a
- * gviz file to the specified output file. 
- * The final parameter takes one of the options GV_BAG_LABELS, GV_SCALE_BAGS, GV_TREE_ONLY
- * GV_BAG_LABELS lists the entire bag of vertices inside each node's label. 
- * GV_SCALE_BAGS scales the bags to indicate bag size, and labels them with the treenode ID. Note this may 
- * create dimacs files that neato cannot handle on very large graphs! 
- * GV_TREE_ONLY creates small circles for all nodes in the tree decomposition.
- */
+* Highlights the subtree of the tree decomposition which contains the vertex v. Writes a
+* gviz file to the specified output file. 
+* The final parameter takes one of the options GV_BAG_LABELS, GV_SCALE_BAGS, GV_TREE_ONLY
+* GV_BAG_LABELS lists the entire bag of vertices inside each node's label. 
+* GV_SCALE_BAGS scales the bags to indicate bag size, and labels them with the treenode ID. Note this may 
+* create dimacs files that neato cannot handle on very large graphs! 
+* GV_TREE_ONLY creates small circles for all nodes in the tree decomposition.
+*/
 
 void TDTree::highlight_subtree_gviz(int v, const char *GVIZ_file, int style)
 {
-  
+
 	int i, j; 
 	FILE *out; 
 	Graph::WeightedMutableGraph *G = this->G;
@@ -2163,10 +2163,10 @@ void TDTree::highlight_subtree_gviz(int v, const char *GVIZ_file, int style)
 			{
 				if(containsv[i])
 					fprintf(out,"%d [style=\"filled\", fillcolor=\"%s\", width=%f, shape=ellipse];\n",i+1, rgb,
-                            (double)(this->tree_nodes[i]->bag.size())/sqrt((double)G->get_capacity()));
+					(double)(this->tree_nodes[i]->bag.size())/sqrt((double)G->get_capacity()));
 				else
 					fprintf(out,"%d [width=%f, shape=ellipse];\n",i+1, 
-                            (double)(this->tree_nodes[i]->bag.size())/sqrt((double)G->get_capacity()));
+					(double)(this->tree_nodes[i]->bag.size())/sqrt((double)G->get_capacity()));
 			}
 			else if(style == GV_TREE_ONLY)
 			{
@@ -2205,41 +2205,41 @@ void TDTree::highlight_subtree_gviz(int v, const char *GVIZ_file, int style)
 }
 
 /*
-  This function writes a graphviz representation (DOT language) of the tree decomposition with node labels colored by the color_vector.
-  The color_vector is a vector<double> with a length equal to the number of nodes in the graph with range min_color-max_color.
-  The colormap used is defined in get_rgb_value which can be found in Util.cpp.
+This function writes a graphviz representation (DOT language) of the tree decomposition with node labels colored by the color_vector.
+The color_vector is a vector<double> with a length equal to the number of nodes in the graph with range min_color-max_color.
+The colormap used is defined in get_rgb_value which can be found in Util.cpp.
 
-  If min_color-max_color are not provided, then the first function will calculate them and call the second function.
+If min_color-max_color are not provided, then the first function will calculate them and call the second function.
 */
 
 void TDTree::highlight_subtree_scored_graphviz_file(int v, const char *GVIZ_file, const vector<double>& color_vector)
 {
-    size_t length = color_vector.size();
+	size_t length = color_vector.size();
 
-    int max_color = color_vector[0];
-    int min_color = max_color;
+	int max_color = (int)color_vector[0];
+	int min_color = (int)max_color;
 
-    //loop to find range
-    for(size_t i=0;i<length;++i)
-    {
-        if(color_vector[i] > max_color)
-            max_color = color_vector[i];
-      
-        if(color_vector[i] < min_color)
-            min_color = color_vector[i];
-    }
+	//loop to find range
+	for(size_t i=0;i<length;++i)
+	{
+		if((int)color_vector[i] > max_color)
+			max_color = (int)color_vector[i];
 
-    this->highlight_subtree_scored_graphviz_file(v, GVIZ_file, color_vector, max_color, min_color);
+		if((int)color_vector[i] < min_color)
+			min_color = (int)color_vector[i];
+	}
+
+	this->highlight_subtree_scored_graphviz_file(v, GVIZ_file, color_vector, max_color, min_color);
 }
 
 
 /*
- * Highlights the subtree of the tree decomposition which contains the vertex v. * Writes a gviz file to the specified output file. 
- * Bag display as the same as scored_graphviz with GV_BAG_LABELS. 
- */
+* Highlights the subtree of the tree decomposition which contains the vertex v. * Writes a gviz file to the specified output file. 
+* Bag display as the same as scored_graphviz with GV_BAG_LABELS. 
+*/
 void TDTree::highlight_subtree_scored_graphviz_file(int v, const char *GVIZ_file, const vector<double>& color_vector, const double max_color, const double min_color)
 {
-    //Blair - still need to add a check whether v is a valid node of G.
+	//Blair - still need to add a check whether v is a valid node of G.
 
 	int i, j; 
 	FILE *out; 
@@ -2249,7 +2249,7 @@ void TDTree::highlight_subtree_scored_graphviz_file(int v, const char *GVIZ_file
 	//for now we'll make the highlights a purple to make heat map labels readable
 	sprintf(node_rgb, "#f4bbff");
 	char rgb[8];
-	int k=0, rcolor; 
+	int k=0; 
 
 	//this should be a valid test for whether or not the 
 	//locations have been recorded. It does not guarantee they are 
@@ -2264,111 +2264,111 @@ void TDTree::highlight_subtree_scored_graphviz_file(int v, const char *GVIZ_file
 	//use v-1 because indices are 0-n-1, while dimacs node labels are 1-n
 	for(L = (this->node_locations[v-1]).begin(); L != (this->node_locations[v-1]).end(); ++L)
 	{
-        //printf("Node %d is in bag %d \n", v, *L);
-        containsv[*L] = true;
+		//printf("Node %d is in bag %d \n", v, *L);
+		containsv[*L] = true;
 	}
 
 	if( (out = fopen(GVIZ_file, "w")) == NULL)
 		fatal_error("%s:  Error opening file %s for writing graphviz output\n",__FUNCTION__, GVIZ_file);
 
 	fprintf(out, "Graph TD{\n"); 
-	
+
 	/* You can choose one of the two options below if you want to eliminate node overlap 
-	 * (the scale option makes a larger, more symmetric drawing than the false option). 
-	 * The problem is that the scale factors for these graphs are enormous: output files are in the range of 3MB (png) for a 50 node tree, 
-	 * and PDF rendering fails due to canvas size restrictions. 
-	 * Current config allows node overlap, which also makes diagrams difficult to read. We should think on how to fix this.
-	 */
-	
+	* (the scale option makes a larger, more symmetric drawing than the false option). 
+	* The problem is that the scale factors for these graphs are enormous: output files are in the range of 3MB (png) for a 50 node tree, 
+	* and PDF rendering fails due to canvas size restrictions. 
+	* Current config allows node overlap, which also makes diagrams difficult to read. We should think on how to fix this.
+	*/
+
 	fprintf(out, "overlap=true;\n");
 	if(0)//currently disabled - Blair Mar 21, 2012.
-        fprintf(out, "splines=true;\n");
+		fprintf(out, "splines=true;\n");
 	else
-        fprintf(out, "splines=false;\n");
-	
+		fprintf(out, "splines=false;\n");
+
 	print_message(1, "k : %d\n", k);
 
-    Graph::Node *n1;
-    double val;
-    for(i=0;i<size;i++)
-    {
-        // Sort the bags before outputting
+	Graph::Node *n1;
+	double val;
+	for(i=0;i<size;i++)
+	{
+		// Sort the bags before outputting
 
-        if(this->tree_nodes[i] != NULL){
+		if(this->tree_nodes[i] != NULL){
 
-            if(containsv[i])
-                fprintf(out,"%d [style=\"filled\", fillcolor=\"%s\", label=<",i+1, node_rgb);
-            else
-                fprintf(out,"%d [label=<",i+1);
-	
-            this->tree_nodes[i]->bag.sort();
-	
-            int count = 0;
-            for(L=this->tree_nodes[i]->bag.begin();
-                L!=this->tree_nodes[i]->bag.end();++L )
-            {
-                count++;
-	
-                // Get the actual node label if necessary (we have a pointer to G)
-                j=*L;
-                print_message(10, "Looking for %d\n", j);
-                n1=this->G->get_node(j);
-                j=n1->get_label();
-                //j=G->nodes[j].label;
-                print_message(10, "Found %d\n", j);
-		  
-	 
-                if(max_color==min_color)
-                    val = .5;
-                else
-                    val = (color_vector[j-1]-min_color)/(max_color-min_color);
-		  
-	 
-                //get hex rgb value to print for font color
-                get_rgb_value(rgb,val);
-	       
-                //Must use graphviz html output for labels
-                fprintf(out,"<FONT COLOR=\"%s\">",rgb);
-                fprintf(out,"%d ",j);
+			if(containsv[i])
+				fprintf(out,"%d [style=\"filled\", fillcolor=\"%s\", label=<",i+1, node_rgb);
+			else
+				fprintf(out,"%d [label=<",i+1);
 
-                //Need to insert line breaks every so often to prevent really long bags from occurring
-                if(count==25)	 
-                {
-                    fprintf(out,"<BR/>");
-                    count = 0;
-                }
-                fprintf(out,"</FONT>\n");
-	    
-	      
-                // NOTE!! The bags store the DIMACS labels (1,2,..,num_total_nodes) so if there
-                // are disconnected nodes, then the union of all the bags
-                // will NOT be equal to (1,2,...,num_total_nodes)
-            }
-            fprintf(out,">];\n");
-        }
-    }
+			this->tree_nodes[i]->bag.sort();
 
-  
-    // Print out the edges
-    //Feb 24 2011 - updated to allow for NULL entries in tree_nodes array
-    for(i=0;i<size;i++)
-    {   
-        if(this->tree_nodes[i] != NULL)
-        {
-            for(L=this->tree_nodes[i]->adj.begin();L!=this->tree_nodes[i]->adj.end();++L)
-            {
-                j=*L;
-                if(i < j)
-                    // Make this 1-based in true DIMACS spirit
-                    fprintf(out,"%d -- %d;\n",i+1,j+1);
-            }
-        }
-    }
+			int count = 0;
+			for(L=this->tree_nodes[i]->bag.begin();
+				L!=this->tree_nodes[i]->bag.end();++L )
+			{
+				count++;
 
-    fprintf(out, "}\n");
+				// Get the actual node label if necessary (we have a pointer to G)
+				j=*L;
+				print_message(10, "Looking for %d\n", j);
+				n1=this->G->get_node(j);
+				j=n1->get_label();
+				//j=G->nodes[j].label;
+				print_message(10, "Found %d\n", j);
 
-    fflush(out);  
-    fclose(out); 
+
+				if(max_color==min_color)
+					val = .5;
+				else
+					val = (color_vector[j-1]-min_color)/(max_color-min_color);
+
+
+				//get hex rgb value to print for font color
+				get_rgb_value(rgb,val);
+
+				//Must use graphviz html output for labels
+				fprintf(out,"<FONT COLOR=\"%s\">",rgb);
+				fprintf(out,"%d ",j);
+
+				//Need to insert line breaks every so often to prevent really long bags from occurring
+				if(count==25)	 
+				{
+					fprintf(out,"<BR/>");
+					count = 0;
+				}
+				fprintf(out,"</FONT>\n");
+
+
+				// NOTE!! The bags store the DIMACS labels (1,2,..,num_total_nodes) so if there
+				// are disconnected nodes, then the union of all the bags
+				// will NOT be equal to (1,2,...,num_total_nodes)
+			}
+			fprintf(out,">];\n");
+		}
+	}
+
+
+	// Print out the edges
+	//Feb 24 2011 - updated to allow for NULL entries in tree_nodes array
+	for(i=0;i<size;i++)
+	{   
+		if(this->tree_nodes[i] != NULL)
+		{
+			for(L=this->tree_nodes[i]->adj.begin();L!=this->tree_nodes[i]->adj.end();++L)
+			{
+				j=*L;
+				if(i < j)
+					// Make this 1-based in true DIMACS spirit
+					fprintf(out,"%d -- %d;\n",i+1,j+1);
+			}
+		}
+	}
+
+	fprintf(out, "}\n");
+
+	fflush(out);  
+	fclose(out); 
 
 
 }
@@ -2379,11 +2379,11 @@ void TDTree::highlight_subtree_scored_graphviz_file(int v, const char *GVIZ_file
 
 
 /**
- * Returns the width of the decomposition, defined to be one less than the size
- * of the largest bag. If the value of TDTree::width is nonzero, then this value is
- * returned to avoid recomputing.  Otherwise, loop over the bags and set the value 
- * of width
- */
+* Returns the width of the decomposition, defined to be one less than the size
+* of the largest bag. If the value of TDTree::width is nonzero, then this value is
+* returned to avoid recomputing.  Otherwise, loop over the bags and set the value 
+* of width
+*/
 int TDTree::compute_width()
 {
 	if(this->width>0)
@@ -2406,9 +2406,9 @@ int TDTree::compute_width()
 
 
 /**
- * Removes the edge u-v from the tree. Returns false if the edge was not in the
- * tree already, true otherwise.
- */
+* Removes the edge u-v from the tree. Returns false if the edge was not in the
+* tree already, true otherwise.
+*/
 bool TDTree::remove_tree_edge(int u, int v)
 {
 	int s1, s2;
@@ -2418,7 +2418,7 @@ bool TDTree::remove_tree_edge(int u, int v)
 	if(s1==s2)
 	{
 		print_message(0,"%s:  Tree edge u-v not found? (v not in u's adj list)\n",
-                      __FUNCTION__);
+			__FUNCTION__);
 		return false;
 	}
 
@@ -2428,7 +2428,7 @@ bool TDTree::remove_tree_edge(int u, int v)
 	if(s1==s2)
 	{
 		print_message(0,"%s:  Tree edge u-v not found? (u not in v's adj list)\n",
-                      __FUNCTION__);
+			__FUNCTION__);
 		return false;
 	}
 
@@ -2437,8 +2437,8 @@ bool TDTree::remove_tree_edge(int u, int v)
 }
 
 /**
- * Adds the tree edge u-v.  Returns false if u-v is already in the tree.
- */
+* Adds the tree edge u-v.  Returns false if u-v is already in the tree.
+*/
 bool TDTree::add_tree_edge(int u, int v)
 {
 	list<int>::iterator ii;
@@ -2448,7 +2448,7 @@ bool TDTree::add_tree_edge(int u, int v)
 		if(*ii==v)
 		{
 			print_message(0,"%s:  Tree edge u-v already exists (v in u's adj list)\n",
-                          __FUNCTION__);
+				__FUNCTION__);
 			return false;
 		}
 	}
@@ -2458,7 +2458,7 @@ bool TDTree::add_tree_edge(int u, int v)
 		if(*ii==u)
 		{
 			print_message(0,"%s:  Tree edge u-v already exists (u in v's adj list)\n",
-                          __FUNCTION__);
+				__FUNCTION__);
 			return false;
 		}
 	}
@@ -2471,27 +2471,27 @@ bool TDTree::add_tree_edge(int u, int v)
 }
 
 /** Constructs a nice tree decomposition of this->G using
- * a modified version of Kloks' algorithm.  The graph G is assumed to have 
- * a single connected component since tree decompositions
- * of disconnected components can be joined together in
- * an arbitrary way. Furthermore, G is assumed to be triangulated, 
- * and the given elimination ordering perfect for G (zero-fill). 
- * The algorithm simultaneously constructs a k-tree H which contains G. 
- * The maximum clique in G must have size at most k+1.
- * The boolean indicates whether to push new node creation farther 
- * down the tree when possible in the one-child case.  The tree is rooted
- * with root node 0 and we adopt the convention that a tree node's parent
- * is the first node in the adjacency list, followed by the children.
- * Since this is a nice TD, we have at most 2 children.
- */
+* a modified version of Kloks' algorithm.  The graph G is assumed to have 
+* a single connected component since tree decompositions
+* of disconnected components can be joined together in
+* an arbitrary way. Furthermore, G is assumed to be triangulated, 
+* and the given elimination ordering perfect for G (zero-fill). 
+* The algorithm simultaneously constructs a k-tree H which contains G. 
+* The maximum clique in G must have size at most k+1.
+* The boolean indicates whether to push new node creation farther 
+* down the tree when possible in the one-child case.  The tree is rooted
+* with root node 0 and we adopt the convention that a tree node's parent
+* is the first node in the adjacency list, followed by the children.
+* Since this is a nice TD, we have at most 2 children.
+*/
 void TDTree::construct_knice(vector<int> *elim_order, int k, bool descend_one)
 {  
 	// First make sure this->G has one connected component
 	if(this->G->get_num_components()!=1)
 	{
 		fatal_error("%s:  Tree decomposition routines operate only on connected graphs."
-                    "  This graph has %d connected components\n",__FUNCTION__,
-                    this->G->get_num_components());
+			"  This graph has %d connected components\n",__FUNCTION__,
+			this->G->get_num_components());
 	}
 
 	int i, j; // counters
@@ -2820,10 +2820,10 @@ void TDTree::construct_knice(vector<int> *elim_order, int k, bool descend_one)
 }
 
 /**
- * Manually verifies if the decomposition is nice.  Returns true and sets nice=true 
- * if the decomposition is ``nice'' and false otherwise.
- * Modified Feb 24, 2011 to fix problems not detecting anomalies and allow for "gaps" in tree_nodes vector.
- */
+* Manually verifies if the decomposition is nice.  Returns true and sets nice=true 
+* if the decomposition is ``nice'' and false otherwise.
+* Modified Feb 24, 2011 to fix problems not detecting anomalies and allow for "gaps" in tree_nodes vector.
+*/
 bool TDTree::is_nice()
 {
 	// First make sure it is valid!
@@ -2893,7 +2893,7 @@ bool TDTree::is_nice()
 					// The bags should be sorted!
 
 					if(!includes(curr->bag.begin(),curr->bag.end(),
-                                 child1->bag.begin(),child1->bag.end()))
+						child1->bag.begin(),child1->bag.end()))
 					{
 						print_message(0,"Parent larger:  Do not appear to have proper bag containment!\n");
 						print(0,curr->bag);
@@ -2906,7 +2906,7 @@ bool TDTree::is_nice()
 				else if(curr->bag.size() == child1->bag.size() -1)
 				{
 					if(!includes(child1->bag.begin(),child1->bag.end(),
-                                 curr->bag.begin(),curr->bag.end()))
+						curr->bag.begin(),curr->bag.end()))
 					{
 						print_message(0,"Child larger:  Do not appear to have proper bag containment!\n");
 						print(0,curr->bag);
@@ -2933,13 +2933,13 @@ bool TDTree::is_nice()
 }
 
 /**
- * Finds & sets a root node to minimize the maximum number of tables
- * required to be stored at any given time (assuming no reconstruction is required).
- * Reference: "Memory Requirements for Table Computations" by Aspvall et al.
- * algorithm needs to be one of the following: 
- * TD_ROOT_ASPVALL - original tabreq() function assumes child tables are deleted sequentially due to DFS
- * TD_ROOT_ALLCHILDREN - tries to account for all child tables needing to exist simultaneously to create parent.
- */
+* Finds & sets a root node to minimize the maximum number of tables
+* required to be stored at any given time (assuming no reconstruction is required).
+* Reference: "Memory Requirements for Table Computations" by Aspvall et al.
+* algorithm needs to be one of the following: 
+* TD_ROOT_ASPVALL - original tabreq() function assumes child tables are deleted sequentially due to DFS
+* TD_ROOT_ALLCHILDREN - tries to account for all child tables needing to exist simultaneously to create parent.
+*/
 int TDTree::root_mintables(int algorithm)
 {
 
@@ -3002,7 +3002,7 @@ int TDTree::root_mintables(int algorithm)
 
 		//remove w from v's adjacency list
 		T.tree_nodes[v]->adj.remove(w);
-		
+
 		//remove w from the tree
 		//free(T.tree_nodes[w]);
 		delete T.tree_nodes[w];
@@ -3013,14 +3013,14 @@ int TDTree::root_mintables(int algorithm)
 		//Update the table requirement values of v. 
 		switch(algorithm)
 		{
-            case TD_ROOT_ASPVALL: 
-                tab_req[v].p2 = max(min(i, tab_req[v].p1), tab_req[v].p2); 
-                tab_req[v].p1 = max(i, tab_req[v].p1); 
-                break; 
-            case TD_ROOT_ALLCHILDREN: 
-                tab_req[v].p2 = max(tab_req[v].p1 + i, tab_req[v].p2); 
-                tab_req[v].p1++; 
-                break; 
+		case TD_ROOT_ASPVALL: 
+			tab_req[v].p2 = max(min(i, tab_req[v].p1), tab_req[v].p2); 
+			tab_req[v].p1 = max(i, tab_req[v].p1); 
+			break; 
+		case TD_ROOT_ALLCHILDREN: 
+			tab_req[v].p2 = max(tab_req[v].p1 + i, tab_req[v].p2); 
+			tab_req[v].p1++; 
+			break; 
 		}    
 
 		//if v has only one neighbor left, we push it onto a stack & decrease num nodes in T.
@@ -3028,14 +3028,14 @@ int TDTree::root_mintables(int algorithm)
 		{
 			switch(algorithm)
 			{
-                case TD_ROOT_ASPVALL: 
-                    j = max(tab_req[v].p1, 1+tab_req[v].p2); 
-                    j = max(j, 2);
-                    break; 
-                case TD_ROOT_ALLCHILDREN: 
-                    j = tab_req[v].p1 + tab_req[v].p2;
-                    j = max(j, 2);
-                    break; 
+			case TD_ROOT_ASPVALL: 
+				j = max(tab_req[v].p1, 1+tab_req[v].p2); 
+				j = max(j, 2);
+				break; 
+			case TD_ROOT_ALLCHILDREN: 
+				j = tab_req[v].p1 + tab_req[v].p2;
+				j = max(j, 2);
+				break; 
 			}    
 
 			//cout << "Trying to add to stack " << j << "\n";
@@ -3054,55 +3054,55 @@ int TDTree::root_mintables(int algorithm)
 			//		    cout << "root " << j << " has tab_req = " << max(tab_req[j].p1, 1+tab_req[j].p2);/* << " which should be at most " << ( mylog2((4*(T.num_tree_nodes + 1)) / 3) ).p1 << endl;*/
 			switch(algorithm)
 			{
-                case TD_ROOT_ASPVALL: 
-                    this->root(j);
-                    break;
-                case TD_ROOT_ALLCHILDREN: 
-                    list<int> myS;
-                    list<int>::iterator ii;
-                    int t;
+			case TD_ROOT_ASPVALL: 
+				this->root(j);
+				break;
+			case TD_ROOT_ALLCHILDREN: 
+				list<int> myS;
+				list<int>::iterator ii;
+				int t;
 
-                    this->rooted=true;
-                    this->root_node=j;
+				this->rooted=true;
+				this->root_node=j;
 
-                    //sort the other neighbors in decreasing order based on tab_req
-                    score_sort(&((this->tree_nodes[j])->adj), &scores);
+				//sort the other neighbors in decreasing order based on tab_req
+				score_sort(&((this->tree_nodes[j])->adj), &scores);
 
-                    // Set the root's parent to itself (leave the other existing neighbors intact)
-                    this->tree_nodes[j]->adj.push_front(j);
+				// Set the root's parent to itself (leave the other existing neighbors intact)
+				this->tree_nodes[j]->adj.push_front(j);
 
-                    myS.push_front(j);
-                    while(!myS.empty())
-                    {
-                        t=myS.front();
-                        //			cout << "processing node " << t << endl;
-                        // Reorder the adj. lists of all t's children, setting t to be the new parent
-                        ii=this->tree_nodes[t]->adj.begin();
-                        // Advance past the parent
-                        ++ii;
+				myS.push_front(j);
+				while(!myS.empty())
+				{
+					t=myS.front();
+					//			cout << "processing node " << t << endl;
+					// Reorder the adj. lists of all t's children, setting t to be the new parent
+					ii=this->tree_nodes[t]->adj.begin();
+					// Advance past the parent
+					++ii;
 
-                        while(ii!=this->tree_nodes[t]->adj.end())
-                        {
-                            //sort the neighbors in decreasing order based on tab_req
-                            score_sort(&(this->tree_nodes[*ii]->adj), &scores);
+					while(ii!=this->tree_nodes[t]->adj.end())
+					{
+						//sort the neighbors in decreasing order based on tab_req
+						score_sort(&(this->tree_nodes[*ii]->adj), &scores);
 
-                            if(*(this->tree_nodes[*ii]->adj.begin())!=t)
-                            {
-                                // Remove t from the list of adjacent nodes and put it at the front
-                                // since t is the parent
-                                int orig_size=(int)this->tree_nodes[*ii]->adj.size();
-                                this->tree_nodes[*ii]->adj.remove(t);
-                                if((int)this->tree_nodes[*ii]->adj.size()!=orig_size -1)
-                                    print_message(0, "Didn't find alleged parent in existing neighbors??\n");
-                                this->tree_nodes[*ii]->adj.push_front(t);
-                            }
+						if(*(this->tree_nodes[*ii]->adj.begin())!=t)
+						{
+							// Remove t from the list of adjacent nodes and put it at the front
+							// since t is the parent
+							int orig_size=(int)this->tree_nodes[*ii]->adj.size();
+							this->tree_nodes[*ii]->adj.remove(t);
+							if((int)this->tree_nodes[*ii]->adj.size()!=orig_size -1)
+								print_message(0, "Didn't find alleged parent in existing neighbors??\n");
+							this->tree_nodes[*ii]->adj.push_front(t);
+						}
 
-                            // Add *ii to the end of the list
-                            myS.push_back(*ii);
-                            ++ii; 
-                        }
-                        myS.pop_front();
-                    }			    
+						// Add *ii to the end of the list
+						myS.push_back(*ii);
+						++ii; 
+					}
+					myS.pop_front();
+				}			    
 			}//end of switch statement
 			return j;
 		}
@@ -3115,9 +3115,9 @@ int TDTree::root_mintables(int algorithm)
 
 
 /**
- * Roots the tree at node k and reorders all adjacency lists in the tree so that
- * parent is first followed by children.  The root's parent is itself.
- */
+* Roots the tree at node k and reorders all adjacency lists in the tree so that
+* parent is first followed by children.  The root's parent is itself.
+*/
 void TDTree::root(int k)
 {
 	list<int> S;
@@ -3166,12 +3166,12 @@ void TDTree::root(int k)
 }
 
 /**
- * Computes a post order walk of the tree so that if we process the elements in the 
- * order given by the walk[], then we know that we will never encounter a descendant
- * of a previously processed node.
- * Important: This is a walk that results from a DFS starting at the root, as required for Aspvall.
- * This is a Breadth First Search.
- */
+* Computes a post order walk of the tree so that if we process the elements in the 
+* order given by the walk[], then we know that we will never encounter a descendant
+* of a previously processed node.
+* Important: This is a walk that results from a DFS starting at the root, as required for Aspvall.
+* This is a Breadth First Search.
+*/
 void TDTree::post_order_walk(vector<int> *walk)
 {
 	if((int)walk->capacity()< this->num_tree_nodes)
@@ -3258,10 +3258,10 @@ void TDTree::post_order_walk_DFS(vector<int> *walk)
 
 
 /**
- * Computes a pre order walk of the tree so that if we process the elements in the 
- * order given by the walk[], then we know that we will never encounter an ancestor
- * of a previously processed node.
- */
+* Computes a pre order walk of the tree so that if we process the elements in the 
+* order given by the walk[], then we know that we will never encounter an ancestor
+* of a previously processed node.
+*/
 void TDTree::pre_order_walk(vector<int> *walk)
 {
 	if((int)walk->capacity()< this->num_tree_nodes)
@@ -3312,9 +3312,9 @@ void TDTree::pre_order_walk(vector<int> *walk)
 
 
 /**
- * Returns the type of node if the decomposition is nice. Possible return values are
- * TD_LEAF_NODE, TD_INTRODUCE_NODE, TD_FORGET_NODE, TD_JOIN_NODE, TD_NONLEAF_NODE.
- */
+* Returns the type of node if the decomposition is nice. Possible return values are
+* TD_LEAF_NODE, TD_INTRODUCE_NODE, TD_FORGET_NODE, TD_JOIN_NODE, TD_NONLEAF_NODE.
+*/
 int TDTree::get_node_type(int k)
 {
 	if(this->tree_nodes[k]->adj.size()==1 && this->nice==true)
@@ -3344,12 +3344,12 @@ int TDTree::get_node_type(int k)
 
 
 /**
- * Computes the table of node tnode in the tree, using the user-supplied
- * table_function.  This is a function that takes in a TDTree and an integer k
- * and then computes a problem-specific table for this node.  This function should
- * return the size of the table for this node. Has a third parameter that allows
- * some options on the computation.
- */
+* Computes the table of node tnode in the tree, using the user-supplied
+* table_function.  This is a function that takes in a TDTree and an integer k
+* and then computes a problem-specific table for this node.  This function should
+* return the size of the table for this node. Has a third parameter that allows
+* some options on the computation.
+*/
 int TDTree::compute_table(int(*table_function)(TDTree *T, int k),int tnode)
 {
 	return table_function(this,tnode);
@@ -3358,11 +3358,11 @@ int TDTree::compute_table(int(*table_function)(TDTree *T, int k),int tnode)
 
 
 /**
- * Fills the TDTree S with the subtree induced by the provided indices. Currently
- * does not verify that the resulting TDTree is, in fact, a tree.  All edge information
- * between the tree nodes is translated to use the new labels.  The only neighbors included
- * are those in the indices list!
- */
+* Fills the TDTree S with the subtree induced by the provided indices. Currently
+* does not verify that the resulting TDTree is, in fact, a tree.  All edge information
+* between the tree nodes is translated to use the new labels.  The only neighbors included
+* are those in the indices list!
+*/
 bool TDTree::create_subtree(list<int> *indices, TDTree *S)
 {
 	int i;
@@ -3430,11 +3430,11 @@ void TDTree::clear()
 }
 
 /*
- * For rooted tree decompositions only (fatal error if called on unrooted).
- * Populates the vector B (which will be sized to equal the number of bags in the TD)
- * with B[i] = the number of vertices in bag i which are also in the bags of at least 2 children of i. 
- * If i is a leaf, B[i] is the size of the bag (aka the width).
- */
+* For rooted tree decompositions only (fatal error if called on unrooted).
+* Populates the vector B (which will be sized to equal the number of bags in the TD)
+* with B[i] = the number of vertices in bag i which are also in the bags of at least 2 children of i. 
+* If i is a leaf, B[i] is the size of the bag (aka the width).
+*/
 int TDTree::find_child_boundaries(vector<int> *B)
 {
 
@@ -3558,9 +3558,9 @@ void TDTree::fill_bag_vecs()
 }
 
 /*
- * Goes through the tree and removes all nodes from the list T from the bags
- * of all tree nodes 
- */
+* Goes through the tree and removes all nodes from the list T from the bags
+* of all tree nodes 
+*/
 void TDTree::refine_tree(list<int> *T)
 {
 	vector<int> I(this->width+1,-1);
@@ -3571,7 +3571,7 @@ void TDTree::refine_tree(list<int> *T)
 		// Fill I with all vertices in i's bag that are not in T - we have to keep these
 		// around as they might be in the opt. solution
 		vv=set_difference(this->tree_nodes[i]->bag.begin(),this->tree_nodes[i]->bag.end(),
-                          T->begin(),T->end(),I.begin());
+			T->begin(),T->end(),I.begin());
 		this->tree_nodes[i]->bag.clear();
 		this->tree_nodes[i]->bag_vec.clear();
 		for(uu=I.begin();uu!=vv;++uu)
@@ -3593,10 +3593,10 @@ void TDTree::refine_tree(list<int> *T)
 }
 
 /*
- * Fills the intersection_sizes[] array with the size of the intersection of each
- * node in the tree with its parent.  Assigns size of 0 to root node.
- * Assumes that intersection_sizes[] array is big enough to hold everything.
- */
+* Fills the intersection_sizes[] array with the size of the intersection of each
+* node in the tree with its parent.  Assigns size of 0 to root node.
+* Assumes that intersection_sizes[] array is big enough to hold everything.
+*/
 void TDTree::compute_parent_child_intersections(vector<int> *intersection_sizes)
 {
 	int i;
@@ -3618,10 +3618,10 @@ void TDTree::compute_parent_child_intersections(vector<int> *intersection_sizes)
 			else
 			{
 				uu=set_intersection(this->tree_nodes[current_node]->bag.begin(),
-                                    this->tree_nodes[current_node]->bag.end(),
-                                    this->tree_nodes[parent_node]->bag.begin(),
-                                    this->tree_nodes[parent_node]->bag.end(),
-                                    I.begin());
+					this->tree_nodes[current_node]->bag.end(),
+					this->tree_nodes[parent_node]->bag.begin(),
+					this->tree_nodes[parent_node]->bag.end(),
+					I.begin());
 				intersection_sizes->at(current_node)=uu-I.begin();
 			}
 		}
@@ -3630,9 +3630,9 @@ void TDTree::compute_parent_child_intersections(vector<int> *intersection_sizes)
 
 
 /**
- * Fills vertices list with all vertices contained in the bag of tree node
- * v or any node beneath v in the tree.
- */
+* Fills vertices list with all vertices contained in the bag of tree node
+* v or any node beneath v in the tree.
+*/
 void TDTree::compute_subtree(int v, list<int> *subtree)
 {
 	int j;
@@ -3689,12 +3689,12 @@ void TDTree::compute_subtree_vertices(int v, list<int> *vertex_list)
 }
 
 /**
- * Goes through tree from leaves up, removing vertices from unnecessary "higher" bags
- * once they and all their neighbors have been encountered. This should help trim bag
- * sizes on decompositions arising from triangulation where vertices are needed for the 
- * TD to be valid for the chordal graph, but not the original. After sweep, algorithm 
- * removes all duplicate and subset bags.
- */
+* Goes through tree from leaves up, removing vertices from unnecessary "higher" bags
+* once they and all their neighbors have been encountered. This should help trim bag
+* sizes on decompositions arising from triangulation where vertices are needed for the 
+* TD to be valid for the chordal graph, but not the original. After sweep, algorithm 
+* removes all duplicate and subset bags.
+*/
 void TDTree::refine()
 {
 	//first, remove duplicates and subsets

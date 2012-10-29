@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -28,8 +28,8 @@
 DP_info::DP_info()
 {
 	this->DIMACS_file = this->model_file = this->ord_file = this->gviz_file
-	  = this->scotch_ord_file = this->tree_infile = this->tree_outfile
-	  = this->sol_file = this->eorder = NULL;
+		= this->scotch_ord_file = this->tree_infile = this->tree_outfile
+		= this->sol_file = this->eorder = NULL;
 	this->pbag = false;
 	this->parmetis = false;
 	this->fix_DIMACS=false;
@@ -70,10 +70,12 @@ DP_info::DP_info()
 	this->width = false;
 	// set timers to 0
 	this->leaf_time = this->introduce_time = this->forget_time
-			= this->join_time = this->nonleaf_time = this->reconstruct_time = 0;
+		= this->join_time = this->nonleaf_time = this->reconstruct_time = 0;
+	this->mem_estimate=0;
 	this->mem_est=0;
-	this->max_width=999999;
+	this->max_width=GD_INFINITY;
 	this->lower_bounds=false;
+	this->noheader=false;
 	// set obj val to 0
 	opt_obj = 0;
 	aux_info = NULL;
@@ -153,7 +155,7 @@ int DP_construct_adj_matrix(TDTree *T, int k)
 		ii = nbr_list->begin();
 		jj = nbr_list->end();
 		int max_nbr = nbr_list->back();
-		
+
 		while (uu != vv && ii != jj)
 		{
 			// Break if an additional entry in the intersection is impossible
@@ -171,7 +173,7 @@ int DP_construct_adj_matrix(TDTree *T, int k)
 					if (!hash_ptr)
 						fatal_error("%s:  WTF\n", __FUNCTION__);
 					T->tree_nodes[k]->nbr_mask_vec->at(i)->w->or_bit(
-							hash_ptr->value);
+						hash_ptr->value);
 					T->tree_nodes[k]->num_subgraph_edges++;
 					uu++;
 					ii++;
@@ -251,17 +253,17 @@ int DP_create_children_intersections(TDTree *T, int k)
 	list<int>::iterator ii, jj;
 	int num_children = T->tree_nodes[k]->adj.size() - 1;
 	T->tree_nodes[k]->child_intersection
-			= new vector<bigint_t *> (num_children);
+		= new vector<bigint_t *> (num_children);
 
 	ii = T->tree_nodes[k]->adj.begin();
 	++ii;
 	for (; ii != T->tree_nodes[k]->adj.end(); ++ii)
 	{
 		T->tree_nodes[k]->child_intersection->at(i) = new bigint_t(
-				T->num_mask_words);
+			T->num_mask_words);
 		vv = set_intersection(T->tree_nodes[k]->bag.begin(),
-				T->tree_nodes[k]->bag.end(), T->tree_nodes[*ii]->bag.begin(),
-				T->tree_nodes[*ii]->bag.end(), intersection.begin());
+			T->tree_nodes[k]->bag.end(), T->tree_nodes[*ii]->bag.begin(),
+			T->tree_nodes[*ii]->bag.end(), intersection.begin());
 		// Now go through the intersection and k's bag simultaneously to populate the positions
 		jj = T->tree_nodes[k]->bag.begin();
 		j = 0;
@@ -293,7 +295,7 @@ int DP_create_parent_positions(TDTree *T, int k)
 	}
 
 	int i = 0, j, m, w = (int) T->tree_nodes[k]->bag.size(), parent =
-			T->tree_nodes[k]->adj.front();
+		T->tree_nodes[k]->adj.front();
 	vector<int> intersection(w);
 	vector<int>::iterator uu, vv;
 	list<int>::iterator ii, jj;
@@ -303,8 +305,8 @@ int DP_create_parent_positions(TDTree *T, int k)
 		T->tree_nodes[k]->parent_position->at(i) = -1;
 
 	vv = set_intersection(T->tree_nodes[k]->bag.begin(),
-			T->tree_nodes[k]->bag.end(), T->tree_nodes[parent]->bag.begin(),
-			T->tree_nodes[parent]->bag.end(), intersection.begin());
+		T->tree_nodes[k]->bag.end(), T->tree_nodes[parent]->bag.begin(),
+		T->tree_nodes[parent]->bag.end(), intersection.begin());
 	// Now go through the intersection and k's bag simultaneously to populate the positions
 	ii = T->tree_nodes[k]->bag.begin();
 	jj = T->tree_nodes[parent]->bag.begin();
@@ -351,7 +353,7 @@ int DP_create_vertex_weights(TDTree *T, int k)
 	for (i = 0; i < w; i++)
 	{
 		T->tree_nodes[k]->vertex_weights->at(i)
-				= weights[T->tree_nodes[k]->bag_vec[i]];
+			= weights[T->tree_nodes[k]->bag_vec[i]];
 	}
 
 	return 1;

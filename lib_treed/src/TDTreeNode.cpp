@@ -1,29 +1,29 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
 #include "GraphDecomposition.h"
 #include "TreeDecomposition.h"
 /**
- * The constructor for the TDTreeNode class.
- */
+* The constructor for the TDTreeNode class.
+*/
 TDTreeNode::TDTreeNode()
 {
 	this->id = GD_UNDEFINED;
@@ -44,8 +44,8 @@ TDTreeNode::TDTreeNode()
 }
 
 /**
- * Destructor for TDTreeNode class.
- */
+* Destructor for TDTreeNode class.
+*/
 TDTreeNode::~TDTreeNode()
 {
 	// Delete the hash_table if it exists
@@ -61,7 +61,7 @@ TDTreeNode::~TDTreeNode()
 		this->hash_table = NULL;
 	}
 #endif
-    
+
 	if (this->nbr_mask_vec)
 	{
 		delete this->nbr_mask_vec;
@@ -72,8 +72,8 @@ TDTreeNode::~TDTreeNode()
 }
 
 /**
- * Assignment operator for TDTreeNode.
- */
+* Assignment operator for TDTreeNode.
+*/
 TDTreeNode& TDTreeNode::operator=(const TDTreeNode& rhs)
 {
 	//if (!(&rhs) && this != &rhs)
@@ -100,7 +100,7 @@ TDTreeNode& TDTreeNode::operator=(const TDTreeNode& rhs)
 		this->root = rhs.root;
 
 		this->hash_table = rhs.hash_table;
-      	// copy nbr_mask_vec
+		// copy nbr_mask_vec
 		this->nbr_mask_vec = NULL;
 		if (rhs.nbr_mask_vec)
 		{
@@ -111,7 +111,7 @@ TDTreeNode& TDTreeNode::operator=(const TDTreeNode& rhs)
 				for (i = 0; i < w; ++i)
 				{
 					this->nbr_mask_vec->at(i) = new int_bigint(
-							rhs.num_mask_words);
+						rhs.num_mask_words);
 					this->nbr_mask_vec->at(i) = rhs.nbr_mask_vec->at(i);
 					this->nbr_mask_vec->at(i)->k = rhs.nbr_mask_vec->at(i)->k;
 				}
@@ -126,14 +126,14 @@ TDTreeNode& TDTreeNode::operator=(const TDTreeNode& rhs)
 			if (num_children > 0)
 			{
 				this->child_intersection
-						= new vector<bigint_t *> (num_children);
+					= new vector<bigint_t *> (num_children);
 
 				for (i = 0; i < num_children; i++)
 				{
 					this->child_intersection->at(i) = new bigint_t(
-							rhs.num_mask_words);
+						rhs.num_mask_words);
 					this->child_intersection->at(i)
-							= rhs.child_intersection->at(i);
+						= rhs.child_intersection->at(i);
 				}
 			}
 		}
@@ -158,8 +158,8 @@ TDTreeNode& TDTreeNode::operator=(const TDTreeNode& rhs)
 }
 
 /**
- * Copy constructor for TDTreeNode.
- */
+* Copy constructor for TDTreeNode.
+*/
 TDTreeNode::TDTreeNode(const TDTreeNode& rhs)
 {
 	list<int>::const_iterator ii;
@@ -185,8 +185,8 @@ TDTreeNode::TDTreeNode(const TDTreeNode& rhs)
 	this->num_mask_words = rhs.num_mask_words;
 	this->root = rhs.root;
 
-    this->hash_table = rhs.hash_table;
-    
+	this->hash_table = rhs.hash_table;
+
 	// copy nbr_mask_vec
 	this->nbr_mask_vec = NULL;
 	if (rhs.nbr_mask_vec)
@@ -216,7 +216,7 @@ TDTreeNode::TDTreeNode(const TDTreeNode& rhs)
 			for (i = 0; i < num_children; i++)
 			{
 				this->child_intersection->at(i) = new bigint_t(
-						rhs.num_mask_words);
+					rhs.num_mask_words);
 				this->child_intersection->at(i) = rhs.child_intersection->at(i);
 			}
 		}
@@ -240,8 +240,8 @@ TDTreeNode::TDTreeNode(const TDTreeNode& rhs)
 }
 
 /**
- * Overloading the << operator for the TDTreeNode class.
- */
+* Overloading the << operator for the TDTreeNode class.
+*/
 ostream &operator<<(ostream &output, const TDTreeNode &T)
 {
 	list<int>::const_iterator ii;
@@ -313,16 +313,16 @@ int TDTreeNode::get_num_mask_words() const
 }
 
 /**
- * Sets a node's root status according to the input flag.
- */
+* Sets a node's root status according to the input flag.
+*/
 void TDTreeNode::set_root(bool flag)
 {
 	this->root = flag;
 }
 
 /**
- * Returns true if a node's root flag is true, false otherwise.
- */
+* Returns true if a node's root flag is true, false otherwise.
+*/
 bool TDTreeNode::is_root()
 {
 	return this->root;

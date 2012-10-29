@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -213,10 +213,10 @@ public:
 		//using uint_128_t
 #else
 		while(k<=this->S &&
-				((this->words[k]>>64) == ULLONG_MAX) &&
-				((this->words[k]&ULLONG_MAX) == ULLONG_MAX)
-		)
-		k++;
+			((this->words[k]>>64) == ULLONG_MAX) &&
+			((this->words[k]&ULLONG_MAX) == ULLONG_MAX)
+			)
+			k++;
 #endif
 		// Words 0,1,...,k-1 are 0xff...ff - set them to zero and increment word k by 1
 		for (int i = 0; i <= k - 1; i++)
@@ -385,7 +385,7 @@ public:
 		if (p1 > BIGINT_WORD_SIZE * this->S || p2 > BIGINT_WORD_SIZE * this->S)
 		{
 			fprintf(stderr, "%s:  too big a number! p1=%d, p2=%d; S=%d\n",
-					__FUNCTION__, p1, p2, this->S);
+				__FUNCTION__, p1, p2, this->S);
 			exit(-1);
 		}
 		this->zeroize();
@@ -513,7 +513,7 @@ public:
 			for (int i = BIGINT_WORD_SIZE - 1; i >= p; i--)
 				mask |= ((BIGINT_ONE) << i);
 			this->words[0] = ((this->words[0] & mask) << 1) | (this->words[0]
-					& (((BIGINT_ONE) << p) - 1));
+			& (((BIGINT_ONE) << p) - 1));
 			return;
 		}
 

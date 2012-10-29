@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -53,7 +53,7 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info);
 int get_optimal_obj(TDTree *T, list<int> *root_intersection, list<int> *root_difference, 
 	DP_info *info);
 double estimate_memory_usage(TDTree *T, vector<int> *walk, const char *outfile);
-double estimate_memory_usage(TDTree *T, vector<int> *walk, bool parent_intersection)
+double estimate_memory_usage(TDTree *T, vector<int> *walk, bool parent_intersection);
 double expected_num_ind_sets(TDTree *T, int k, bool parent_intersection);
 
 #endif  /* __WIS_H__ */

@@ -40,76 +40,81 @@ void usage(const char *s)
 		"\t        are labeled with a preordering (1 is root, i > j means i is \n"
 		"\t        farther from root than j\n"
 		"\t -eorder <eo_file> writes elimination ordering into specified file.\n"
-		"\t -sol <sol_file> will write the weighted independent set solution to the\n:"
-		"\t        given file.  If not given, then solution is written \n"
-		"\t        to <DIMACS_file>.WIS.sol\n"
+		"\t -sol <sol_file> : will write the weighted independent set solution to\n"
+		"\t                   the given file.  If not given, then solution is\n"
+		"\t                   written to <DIMACS_file>.WIS.sol\n"
 		"\t --- Decomposition Construction Options ---\n" 
 		"\t -superetree : constructs a non-nice TD using CHOLMOD and supernodal\n"
-		"etrees (fast; no triangulation)\n"
+		"\t               etrees (fast; no triangulation)\n"
 		"\t -gavril : constructs a non-nice TD using Gavril's algorithm\n"
 		"\t -bk : constructs a non-nice TD using BK algorithm\n"
 		"\t -pbag : parallel bag generation, non-nice TD using Gavril's algorithm\n"
 		"\t -nice : constructs a nice TD\n"
-		"\t -make_nice will take a non-nice tree and niceify it by adding new\n"
-		"\t        tree nodes\n"
-		"\t -refine_td will try to reduce the sizes of the bag intersections by \n"
-		"\t        post-processing the tree decomposition\n"
-		"\t -check will manually verify the TD (can be slow!)\n"
+		"\t -make_nice : will take a non-nice tree and niceify it by adding new\n"
+		"\t              tree nodes\n"
+		"\t -refine_td : will try to reduce the sizes of the bag intersections by \n"
+		"\t              post-processing the tree decomposition\n"
+		"\t -check : will manually verify the TD (can be slow!)\n"
 		"\t --- Elimination Order Options ---\n"
 		"\t -lower_bounds : Runs two lower bound heuristics and prints results.\n"
-		"\t        Can be used in combination with all other EO options.\n"
+		"\t                 Can be used in combination with other EO options.\n"
 		"\t -s start_v : uses start_v as first vertex in ordering\n"
 		"\t -mind : generates an elim. ordering using min degree heuristic\n"
-		"\t -mmd: generates an elim. ordering using multiple min degree heuristic\n"
+		"\t -mmd : generates an elim. ordering using multiple min degree heuristic\n"
 		"\t -minf : generates an elim. ordering using min fill heuristic\n"
-		"\t -bmf: generates an elim. ordering using a batched min fill heuristic\n"
-		"\t -beta: generates an elim. ordering using the beta heuristic\n"
-		"\t -metmmd: generates an elim. ordering using METIS mmd heuristic\n"
-		"\t -metnnd: generates an elim. ordering using METS node ND heuristic\n"
+		"\t -bmf : generates an elim. ordering using a batched min fill heuristic\n"
+		"\t -beta : generates an elim. ordering using the beta heuristic\n"
+		"\t -metmmd : generates an elim. ordering using METIS mmd heuristic\n"
+		"\t -metnnd : generates an elim. ordering using METS node ND heuristic\n"
 		"\t -mcsm : generates an elim. ordering using mcsm euristic\n"
 		"\t -mcs  : generates an elim. ordering using mcs\n"
 		"\t -lexm : generates an elim. ordering using lex-m bfs heuristic\n"
 		"\t -pktsort : generates the elim ordering corresponding to partial\n"
 		"\t            ktree generation\n"
-		"\t -amd: generates the elim. ordering using UFs approximate min\n"
+		"\t -amd : generates the elim. ordering using UFs approximate min\n"
 		"\t       degree heuristic (AMD)\n"
-		"\t -minmaxd: generates the elim. ordering using the minimum maximum\n"
+		"\t -minmaxd : generates the elim. ordering using the minimum maximum\n"
 		"\t           degree heuristic.\n"
-		"\t -parmetis: generates an elim. ordering using ParMETIS\n"
-		"\t -ord <ordering_file> reads in an elimination ordering (1-based as in \n"
-		"\t      DIMACS file)\n"
-		"\t -sord <scotch ordering file> reads in an elimination ordering produced\n"
-		"\t                              by Scotch\n"
+		"\t -parmetis : generates an elim. ordering using ParMETIS\n"
+		"\t -ord <ordering_file> : reads in an elimination ordering (1-based as\n"
+		"\t                        in DIMACS file)\n"
+		"\t -sord <scotch ordering file> : reads in an elimination ordering\n"
+		"\t                                produced by Scotch\n"
 		"\t --- Dynamic Programming Options ---\n"
-		"\t -nonniceDP will use the non-nice Dynamic Programming routines\n"
-		"\t -root <root_node> will set the TD's root node (default is 0)\n"
-		"\t                   (Only works for Gavril and BK trees)\n"
-		"\t -asp_root will use the Aspvall algorithm to find a root node\n"
-		"\t -child_root will use the All My Children algorithm to find a root node\n"
-		"\t -pc will use the child sets to help construct the parent\n\n"			
-		"\t -del_ch will delete a tree node's table once its parent is processed\n"
-		"\t         NOTE: you cannot reconstruct the solution if you do this!\n"
-		"\t -no_reconstruct will not reconstruct the solution\n"
-		"\t -split_bag will search for solutions by splitting the bag in half\n"
-		"\t      and then merging the two halves\n"
-		"\t -async_tbl will do the DP one child at a time rather than looping over\n"
-		"\t      all children at once\n"
-		"\t -dfs will generate a post-order walk using a DFS (BFS is default)\n"
-		"\t      DIMACS_file.mem_est\n"
-		"\t -max_width <w> will not attempt to run the DP if the decomposition\n"
-		"\t      has width larger than w.\n"
+		"\t -nonniceDP : will use the non-nice Dynamic Programming routines\n"
+		"\t -root <root_node> : will set the TD's root node (default is 0)\n"
+		"\t                     (Only works for Gavril and BK trees)\n"
+		"\t -asp_root : will use the Aspvall algorithm to find a root node\n"
+		"\t -child_root : will use All My Children algorithm to find root node\n"
+		"\t -pc : will use the child sets to help construct the parent\n\n"			
+		"\t -del_ch : will delete a tree node's table once its parent is processed\n"
+		"\t           NOTE: you cannot reconstruct the solution if you do this!\n"
+		"\t -no_reconstruct : will not reconstruct the solution\n"
+		"\t -split_bag : will search for solutions by splitting the bag in half\n"
+		"\t              and then merging the two halves\n"
+		"\t -async_tbl : will do the DP one child at a time rather than looping\n"
+		"\t              over all children at once\n"
+		"\t -dfs : will generate a post-order walk using a DFS (BFS is default)\n"
+		"\t        DIMACS_file.mem_est\n"
+		"\t -max_width <w> : will not attempt to run the DP if the decomposition\n"
+		"\t                  has width larger than w.\n"
 		"\t --- Miscellaneous Options ---\n"
-		"\t -decompose_only will just generate the tree decomposition and will\n"
-		"\t        *not* run MWIS\n"
-		"\t -width will compute and print width of the specified decomposition and will *not* proceed\n"
-		"\t -hist will print out a histogram of bag sizes prior to running DP\n"
-		"\t -mem_est will estimate the memory usage at each treenode\n"
+		"\t -decompose_only : will just generate the tree decomposition and will\n"
+		"\t                  *not* run MWIS\n"
+		"\t -width : will compute and print width of the specified decomposition\n"
+		"\t          and will *not* proceed\n"
+		"\t -hist : will print out a histogram of bag sizes prior to running DP\n"
+		"\t -mem_est : will estimate the memory usage at each treenode\n"
 		"\t -mod <model_file> : writes a GMPL MIP formulation of the problem\n"
 		"\t                     to model_file.\n"
 		"\t -mip : solves the problem by runing GLPK's glpsol solver\n"
 		"\t        via a system() call to glpsol -m model_file\n"
 		"\t -v : runs in verbose mode\n"
-		"\t -vv : runs in very verbose mode - lots of output about the ind. sets\n");
+		"\t -vv : runs in very verbose mode - lots of output about the ind. sets\n"
+		"\t -noheader : will not print header for output data to stdout\n"
+		);
+		
+
 }
 ;
 
@@ -3050,11 +3055,12 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 	{
 		// Print out:
 		// filename G_n G_m td_type PC/NPC MN/NMN width refined_width # treenodes # leafs leaf_time
-		// nonleaf_time introtime forgettime jointime total_pc _entries total_entries MEM reconsruct_time avg_pc _proportion obj
+		// nonleaf_time introtime forgettime jointime total_pc_entries total_entries MEM reconsruct_time avg_pc _proportion obj
 
 		// Print header line
-		fprintf(stream,"file n m td_type PC/NPC MN/NMN FC/NFC width ref_width num_tnodes num_leafs leaf_t "
-			"nonleaf_t intro_t forget_t join_t tot_pc_entries tot_entries mem_est "
+		if(!info->noheader)
+			fprintf(stream,"file n m td_type PC/NPC MN/NMN FC/NFC width ref_width num_tnodes num_leafs leaf_t "
+			"nonleaf_t intro_t forget_t join_t tot_pc_entries tot_entries tot_ref_pc_entries tot_ref_entries mem_est "
 			"recon_t avg_pc_perc obj\n");
 		char td_type[3];
 		if (info->gavril)
@@ -3083,9 +3089,6 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 		else
 			fprintf(stream, "NFC ");
 
-		//fprintf(stream,"file n m td_type PC/NPC MN/NMN FC/NFC width ref_width num_tnodes num_leafs leaf_t "
-		//	           "nonleaf_t intro_t forget_t join_t tot_pc_entries tot_entries tot_ref_pc_entries "
-		//             " tot_ref_entries HWmem mem_est recon_t avg_pc_perc obj\n"
 		fprintf(stream, "%d %d %d %d ", T->width, T->refined_width,
 			T->num_tree_nodes, T->num_leafs);
 		fprintf(
@@ -3111,9 +3114,22 @@ void print_WIS_results(FILE *stream, TDTree *T, DP_info *info)
 	}
 	else
 	{
-		fprintf(stream,"file n m w obj\n");
-		fprintf(stream,"%s %d %d %d %d\n",info->DIMACS_file, T->G->get_num_nodes(),
+
+		if(!info->noheader)
+		{
+			fprintf(stream,"file n m w obj");
+			if(info->mem_estimate>0)
+				fprintf(stream," num_pc_entries num_entries est_entries\n");
+			else
+				fprintf(stream,"\n");
+		}
+		fprintf(stream,"%s %d %d %d %d",info->DIMACS_file, T->G->get_num_nodes(),
 			T->G->get_num_edges(), T->width, info->opt_obj);
+		if(info->mem_estimate>0)
+			fprintf(stream," %lld %lld %lld\n",info->orig_total_pc_table_entries, 
+			info->orig_total_table_entries, (unsigned long long)info->mem_estimate);
+		else
+			fprintf(stream,"\n");
 	}
 
 }
@@ -3240,34 +3256,6 @@ double estimate_memory_usage(TDTree *T, vector<int> *walk, const char *outfile)
 	fclose(out);
 
 	return final_ans;
-#endif
-}
-
-
-/**
-* Estimates the memory usage in a given tree decomposition by computing the actual
-* sum of the binomial coefficients using exact arithmetic and GMP. 
-* If parent_intersection flag is true,
-* then the estimate is for the # of ind. sets in the intersection of k's bag with his parent.
-* Otherwise only k's bag is considered. Returns the total # of expected ind. sets
-*/
-double estimate_memory_usage(TDTree *T, vector<int> *walk, bool parent_intersection)
-{
-#if !HAS_GMP
-	fprintf(stderr,"HAS_GMP is set to 0\nCannot run %s!",__FUNCTION__);
-	return 0;
-#else
-
-	double  grand_total=0;
-
-	int j,k;
-	for(j=0;j<T->num_tree_nodes;j++)
-	{
-		k=walk->at(j);
-		grand_total += expected_num_ind_sets(T, k, parent_intersection);
-	}
-
-	return grand_total;
 #endif
 }
 

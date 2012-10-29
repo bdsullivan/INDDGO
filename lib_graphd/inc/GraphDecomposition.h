@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -23,15 +23,15 @@
 #define GRAPHDECOMPOSITION_H_
 
 #if WIN32 || _WIN32
- // Minor hack to deal with apparent inconsistency in VS versions regarding
- // WIN32 and _WIN32?? WIN32 is used in metis.h...
- #define WIN32 1
- #define _WIN32 1
- // Define these here if using Windows
- // Otherwise, they are set in the makefile
- #define HAS_METIS   1
- #define HAS_SUITESPARSE     1
- //#define HAS_ARPACK 1
+// Minor hack to deal with apparent inconsistency in VS versions regarding
+// WIN32 and _WIN32?? WIN32 is used in metis.h...
+#define WIN32 1
+#define _WIN32 1
+// Define these here if using Windows
+// Otherwise, they are set in the makefile
+#define HAS_METIS   0
+#define HAS_SUITESPARSE     0
+//#define HAS_ARPACK 1
 #endif
 
 

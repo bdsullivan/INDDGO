@@ -69,7 +69,7 @@ extern struct timezone tzval;
 
 #ifdef __LOG_ENABLE__
 
-#if _MSC_VER
+#if (WIN32 || _WIN32)
 
 #define DEBUG(format, ...) if(__log_level__ < 2){fprintf(__log_file__, "[%lf]  [debug] "format, (LOGTIME), ## __VA_ARGS__);fflush(__log_file__);}
 #define INFO(format, ...)  if(__log_level__ < 3){fprintf(__log_file__, "[%lf]  [info]  "format, (LOGTIME), ## __VA_ARGS__);fflush(__log_file__);}
@@ -91,7 +91,7 @@ extern struct timezone tzval;
 #define DEBUG(format, ...)
 #define INFO(format, ...) 
 #define WARN(format, ...) 
-#define FERROR(format, ...)
+#define FERROR(format, ...) 
 #define CRIT(format, ...)
 #define GEN(format, ...)
 #endif /* __LOG_ENABLE__ */

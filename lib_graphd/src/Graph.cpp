@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -77,7 +77,7 @@ namespace Graph
 		this->num_edges = numEdges;
 	}
 
-    void Graph::set_num_nodes(int numNodes)
+	void Graph::set_num_nodes(int numNodes)
 	{
 		this->num_nodes = numNodes;
 	}
@@ -147,8 +147,8 @@ namespace Graph
 		capacity = n;
 		num_connected_components = 1;
 		num_edges = 0;
-        for (int i = 0; i < n; i++)
-            nodes[i].set_label(i+1);
+		for (int i = 0; i < n; i++)
+			nodes[i].set_label(i+1);
 	}
 
 	void Graph::set_num_components(int num_components)
@@ -210,35 +210,35 @@ namespace Graph
 
 	}
 
-    void Graph::complement()
-    {
-        Node *n;
+	void Graph::complement()
+	{
+		Node *n;
 
-        list<int> elements;
-        list<int> newnbrs;
-        list<int> nbrs;
-        list<int>::iterator it;
-        int edge = 0;
+		list<int> elements;
+		list<int> newnbrs;
+		list<int> nbrs;
+		list<int>::iterator it;
+		int edge = 0;
 
-        for (int i = 0; i < this->capacity; i++)
-            elements.push_back(i);
+		for (int i = 0; i < this->capacity; i++)
+			elements.push_back(i);
 
-        for (int i = 0; i < this->capacity; i++)
-        {
-            n = this->get_node(i);
-            nbrs = n->get_nbrs();
-            newnbrs = elements;
-            nbrs.sort();
-            
-            newnbrs.remove(i);
-            for (it = nbrs.begin(); it != nbrs.end(); ++it)
-                newnbrs.remove(*it);
+		for (int i = 0; i < this->capacity; i++)
+		{
+			n = this->get_node(i);
+			nbrs = n->get_nbrs();
+			newnbrs = elements;
+			nbrs.sort();
 
-            this->degree[i] = newnbrs.size();
-            edge += this->degree[i];
-            n->set_nbr(newnbrs);
-        }
+			newnbrs.remove(i);
+			for (it = nbrs.begin(); it != nbrs.end(); ++it)
+				newnbrs.remove(*it);
 
-        this->set_num_edges(edge/2);
-    }
+			this->degree[i] = newnbrs.size();
+			edge += this->degree[i];
+			n->set_nbr(newnbrs);
+		}
+
+		this->set_num_edges(edge/2);
+	}
 }

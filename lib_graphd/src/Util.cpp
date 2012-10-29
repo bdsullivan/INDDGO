@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -41,7 +41,7 @@ int getHWmem(){ //Note: this value is in KB!
 	{
 		int result = -1;
 		char line[128];
-        
+
 		while (fgets(line, 128, file) != NULL){
 			if (strncmp(line, "VmHWM:", 6) == 0)
 			{
@@ -58,7 +58,7 @@ int getMemInfo(const char *x, int n)
 {
 	FILE* file = fopen("/proc/self/status", "r");
 	if(file == NULL)
-    {
+	{
 		fprintf(stderr, "Error opening processor status file!\n");
 		return -1;
 	}
@@ -67,7 +67,7 @@ int getMemInfo(const char *x, int n)
 		int result = -1;
 		char line[128];
 		while (fgets(line, 128, file) != NULL)
-        {
+		{
 			if (strncmp(line, x, n) == 0)
 			{
 				result = parseLine(line);
@@ -85,75 +85,75 @@ int getMemInfo(const char *x, int n)
 //return value is true
 bool read_color_file(const char input_file[], double & max_color, double & min_color, vector<double> & color_vector)
 {
-  ifstream k_core_input;
-  k_core_input.open(input_file);
-     
+	ifstream k_core_input;
+	k_core_input.open(input_file);
 
-  if(!k_core_input.is_open())
-    {
-      std::cerr<<"Error opening color file \n"<<input_file;
-      exit(EXIT_FAILURE);
-    }
-  bool max_flag, min_flag;
-  max_flag = false;
-  min_flag = false;
-  max_color=0;
-  min_color=0;
-  bool pound_flag = false;	
 
-  while(k_core_input.good())
-    {  
-      string line;
-      getline(k_core_input,line);
-		
-      if(line.substr(0,1)=="#")
+	if(!k_core_input.is_open())
 	{
-	  pound_flag = true;
-	  if(strcmp(line.substr(1,3).c_str(),"max")==0)
-	    {
-	      size_t pos1 = line.find(" ");
-	      size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
-	      //cout<<"p1max: "<<pos1<<" p2max: "<<pos2<<"\n";
-
-	      max_color = atof(line.substr(pos1+1,pos2+1).c_str());
-	      max_flag  = true;
-	    }
-		
-	  if(strcmp(line.substr(1,3).c_str(),"min")==0)
-	    {
-	      size_t pos1 = line.find(" ");
-	      size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
-	      //cout<<"p1: "<<pos1<<" p2: "<<pos2<<"\n";
-		    
-	      min_color = atof(line.substr(pos1+1,pos2+1).c_str());
-	      min_flag  = true;
-	    }
+		std::cerr<<"Error opening color file \n"<<input_file;
+		exit(EXIT_FAILURE);
 	}
-      else if(pound_flag)
-	{
-	  pound_flag = false;
-	  size_t pos1 = 0;
-	  size_t pos2 = 0;
-	  size_t end  = line.find_last_not_of("\t\f\v\n\r ");
-	  //	int count = 0;
-	  while(pos1<end)
-	    {
-	      //count++;
-	      pos2 = line.find_first_of("\t\f\v\n\r ",pos1+1);
-		    
-	      color_vector.push_back(atof(line.substr(pos1,pos2).c_str()));
-		    
-	      pos1 = pos2;
-	      //cout<<count<<"pos: "<<pos1<<" "<<pos2<<"\n";
-	    }
+	bool max_flag, min_flag;
+	max_flag = false;
+	min_flag = false;
+	max_color=0;
+	min_color=0;
+	bool pound_flag = false;	
+
+	while(k_core_input.good())
+	{  
+		string line;
+		getline(k_core_input,line);
+
+		if(line.substr(0,1)=="#")
+		{
+			pound_flag = true;
+			if(strcmp(line.substr(1,3).c_str(),"max")==0)
+			{
+				size_t pos1 = line.find(" ");
+				size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
+				//cout<<"p1max: "<<pos1<<" p2max: "<<pos2<<"\n";
+
+				max_color = atof(line.substr(pos1+1,pos2+1).c_str());
+				max_flag  = true;
+			}
+
+			if(strcmp(line.substr(1,3).c_str(),"min")==0)
+			{
+				size_t pos1 = line.find(" ");
+				size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
+				//cout<<"p1: "<<pos1<<" p2: "<<pos2<<"\n";
+
+				min_color = atof(line.substr(pos1+1,pos2+1).c_str());
+				min_flag  = true;
+			}
+		}
+		else if(pound_flag)
+		{
+			pound_flag = false;
+			size_t pos1 = 0;
+			size_t pos2 = 0;
+			size_t end  = line.find_last_not_of("\t\f\v\n\r ");
+			//	int count = 0;
+			while(pos1<end)
+			{
+				//count++;
+				pos2 = line.find_first_of("\t\f\v\n\r ",pos1+1);
+
+				color_vector.push_back(atof(line.substr(pos1,pos2).c_str()));
+
+				pos1 = pos2;
+				//cout<<count<<"pos: "<<pos1<<" "<<pos2<<"\n";
+			}
+		}
+		else
+			pound_flag = false;
 	}
-      else
-	pound_flag = false;
-    }
 
-  k_core_input.close();
+	k_core_input.close();
 
-  return(min_flag && max_flag);
+	return(min_flag && max_flag);
 }
 
 //Input a vector of node indices, a vector of node scores (values associated with each node), and a flag
@@ -164,91 +164,91 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
 
 double get_statistics(const vector<int> & nodes, const vector<double> & scores, const int FLAG)
 {
-  double statistic = 0.0;
+	double statistic = 0.0;
 
-  if(FLAG==1)
-    {
-      //compute average
-
-      const int size = nodes.size();
-
-      for(int i=0;i<size;++i)
-	  statistic += scores[nodes[i]];
-      
-      statistic = statistic/double(size);
-    }
-  else if(FLAG==2)
-    {
-      //compute standard deviation
-
-      const int size = nodes.size();
-      double sum=0;
-      double square_sum=0;
-      
-      for(int i=0;i<size;++i)
+	if(FLAG==1)
 	{
-	  sum += nodes[i];
-	  square_sum += pow((nodes[i]),2);
-	}
-      
-      statistic = square_sum/double(size) - pow((sum/double(size)),2);
-      statistic = sqrt(statistic);
-    }
-  else if(FLAG==3)
-    {
-      //compute median
-      //To be done
-      
-    }
+		//compute average
 
-  return statistic;
+		const int size = nodes.size();
+
+		for(int i=0;i<size;++i)
+			statistic += scores[nodes[i]];
+
+		statistic = statistic/double(size);
+	}
+	else if(FLAG==2)
+	{
+		//compute standard deviation
+
+		const int size = nodes.size();
+		double sum=0;
+		double square_sum=0;
+
+		for(int i=0;i<size;++i)
+		{
+			sum += nodes[i];
+			square_sum += pow((double)(nodes[i]),2);
+		}
+
+		statistic = square_sum/double(size) - pow((sum/double(size)),2);
+		statistic = sqrt(statistic);
+	}
+	else if(FLAG==3)
+	{
+		//compute median
+		//To be done
+
+	}
+
+	return statistic;
 
 }
 
 //Input a value between 0-1, get out an rgb heatmap value
 void get_rgb_value(char rgb[], double val)
 {
-  int red, green, blue;
-  double temp_color_value;
+	int red, green, blue;
+	double temp_color_value;
 
-  //Red
-  temp_color_value = 0;
-  if(val > 0.875)
-    temp_color_value = -4.0*val + 4.5;
-  else if(val > .625)
-    temp_color_value = 1.0;
-  else if(val > .375)
-    temp_color_value = 4.0*val - 1.5;
+	//Red
+	temp_color_value = 0;
+	if(val > 0.875)
+		temp_color_value = -4.0*val + 4.5;
+	else if(val > .625)
+		temp_color_value = 1.0;
+	else if(val > .375)
+		temp_color_value = 4.0*val - 1.5;
 
-  red = 255*temp_color_value;
+	red = (int)(255*temp_color_value);
 
-  //green
-  temp_color_value = 0;
-  if(val > 0.875)
-    temp_color_value = 0;
-  else if(val > .625)
-    temp_color_value = -4.0*val + 3.5;
-  else if(val > .375)
-    temp_color_value = 1.0;
-  else if(val>.125)
-    temp_color_value = 4.0*val - 0.5;
+	//green
+	temp_color_value = 0;
+	if(val > 0.875)
+		temp_color_value = 0;
+	else if(val > .625)
+		temp_color_value = -4.0*val + 3.5;
+	else if(val > .375)
+		temp_color_value = 1.0;
+	else if(val>.125)
+		temp_color_value = 4.0*val - 0.5;
 
-  green = 255*temp_color_value;
+	green = (int)(255*temp_color_value);
 
-  //blue
-  temp_color_value = 0;
-  if(val > 0.625)
-    temp_color_value = 0;
-  else if(val > .375)
-    temp_color_value = -4.0*val + 2.5;
-  else if(val > .125)
-    temp_color_value = 1.0;
-  else if(val>=0.0)
-    temp_color_value = 4.0*val + .5;
-  
-  blue = 255*temp_color_value;
+	//blue
+	temp_color_value = 0;
+	if(val > 0.625)
+		temp_color_value = 0;
+	else if(val > .375)
+		temp_color_value = -4.0*val + 2.5;
+	else if(val > .125)
+		temp_color_value = 1.0;
+	else if(val>=0.0)
+		temp_color_value = 4.0*val + .5;
 
-  sprintf(rgb,"#%02x%02x%02x",red,green,blue);
+	blue = (int)(255*temp_color_value);
+
+	sprintf(rgb,"#%02x%02x%02x",red,green,blue);
 }
 
 

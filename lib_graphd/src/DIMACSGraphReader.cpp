@@ -1,21 +1,21 @@
 /*
-  This file is part of INDDGO.
+This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+Copyright (C) 2012, Oak Ridge National Laboratory 
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+This product includes software produced by UT-Battelle, LLC under Contract No. 
+DE-AC05-00OR22725 with the Department of Energy. 
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the New BSD 3-clause software license (LICENSE). 
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+LICENSE for more details.
+
+For more information please contact the INDDGO developers at: 
+inddgo-info@googlegroups.com
 
 */
 
@@ -63,9 +63,10 @@ namespace Graph
 				break;
 
 			if (retval != 1)
+			{
 				FERROR("%s:  fscanf read %d char's (expected to read 1!)\n",
 				__FUNCTION__, retval);
-
+			}
 			switch (line[0])
 			{
 			case 'p':
@@ -119,17 +120,21 @@ namespace Graph
 
 				// Simple error checking - make sure we know n and m already!
 				if (n == 0 || m == 0)
+				{
 					FERROR("%s:  DIMACS read error - node line found before problem line!\n",
 					__FUNCTION__);
+				}
 				if (retval != 2)
+				{
 					FERROR( "%s:  DIMACS read error - didn't understand node line\n",
 					__FUNCTION__);
-
+				}
 				// Check id
 				if (id < 1 || id > n)
+				{
 					FERROR("%s:  DIMACS read error - node id (%d) must be between 1 and n= %d\n",
 					__FUNCTION__, id, n);
-
+				}
 				// Store value - first allocate the value array if NULL
 				//if((int)this->weight.size()!=n)
 				//    this->weight.resize(n);
@@ -148,18 +153,23 @@ namespace Graph
 
 				// Simple error checking - make sure we know n and m already!
 				if (n == 0 || m == 0)
+				{
 					FERROR(
 					"%s:  DIMACS read error - edge line found before problem line!\n",
 					__FUNCTION__);
-
+				}
 				if (retval != 2)
+				{
 					FERROR( "%s:  DIMACS read error - didn't understand edge line\n",
 					__FUNCTION__);
+				}
 				// Check start and end values
 				if (i < 1 || i > n || j < 1 || j > n)
+				{
 					FERROR( "%s:  DIMACS read error - edge (u,v) (%d-%d) must have"
 					" both u and v between 1 and n=%d, inclusive\n",
 					__FUNCTION__, i, j, n);
+				}
 
 				// So when we read in an edge (a,b) in the DIMACS file
 				// we need to add G.label_index[b] to nodes[G.label_index[a]]

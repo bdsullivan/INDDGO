@@ -188,6 +188,8 @@ int DP_info::process_DP_info(int num_args, char **args)
 			this->mem_est=true;
 		if (strcmp(args[i],"-max_width")==0)
 			this->max_width=atoi(args[i+1]);
+		if (strcmp(args[i],"-noheader")==0)
+			this->noheader=true;
 	}
 	// Check options
 	if(this->fix_DIMACS)
@@ -224,7 +226,6 @@ int DP_info::process_DP_info(int num_args, char **args)
 
 	// Make sure either nice gavril or bk or superetree was selected AND only one tree decomposition option
 	if (num_td_methods != 1 && !this->write_mod)
-		//!this->nice && !this->gavril && !this->superetree && !this->BK && !this->write_mod && !this->read_tree && !this->pbag)
 		fatal_error(
 		"Have to choose exactly one of -superetree, -nice, -gavril or -BK for the TD type or read tree from file\n");
 

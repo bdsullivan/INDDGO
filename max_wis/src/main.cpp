@@ -153,13 +153,9 @@ int main(int argc, char **argv)
 			if(T->info->verbose)
 				print_message(0,"Computing memory estimate - width is %d\n",
 				T->width);
-			//char mem_output[100];
-			//sprintf(mem_output,"%s.mem_est",info.DIMACS_file);
-			//double estimate_memory_usage(TDTree *T, vector<int> *walk, bool parent_intersection)
-			//T->info->mem_estimate=estimate_memory_usage(T, &walk, (const char *)mem_output);
-
-			// CSG - trying new function, 10/27/2012
-			T->info->mem_estimate=estimate_memory_usage(T, &walk, true);
+			char mem_output[100];
+			sprintf(mem_output,"%s.mem_est",info.DIMACS_file);
+			T->info->mem_estimate=estimate_memory_usage(T, &walk, (const char *)mem_output);
 			if(T->info->verbose)
 				print_message(0,"Memory estimate complete\n");
 		}
@@ -172,7 +168,7 @@ int main(int argc, char **argv)
 			delete T;
 			return 1;
 		}
-		
+
 
 		// Do the DP using the provided options - this loop is where all the time is!!!
 		// Note that T->num_tree_nodes is safe here since the walk
@@ -180,8 +176,6 @@ int main(int argc, char **argv)
 		double dstart = clock();
 		for (i = 0; i < T->num_tree_nodes; i++)
 			T->compute_table(compute_weighted_ind_set_table, walk[i]);
-		//print_message(0, "%.2f\n", (clock() - dstart) / CLOCKS_PER_SEC);
-		//printf("%s: Treewidth %d\n", info.DIMACS_file, T->width);
 
 		// Store and reset info's table stats 
 		info.orig_total_pc_table_entries = info.total_pc_table_entries;

@@ -52,7 +52,7 @@ public:
 		make_histogram, decompose_only, parent_child, make_nice,
 		very_verbose, free_children, verbose, no_reconstruct, split_bag,
 		asp_root, child_root, refine_td, DFS, async_tbl, mem_est, width, fix_DIMACS, 
-		parmetis, pbag;
+		parmetis, pbag, noheader;
 
 	int elim_order_type, root_node, start_v, max_width;
 	// CSG adding orig_ fields to handle stats for refined tree
