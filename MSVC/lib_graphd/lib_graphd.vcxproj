@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\lib_graphd\src\AdjMatrixGraphReader.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\AdjMatrixGraphWriter.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\Debug.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\DIMACSGraphReader.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\DIMACSGraphWriter.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\Graph.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphCreator.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphCreatorFile.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphDisplay.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphEOUtil.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphProperties.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphReader.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphReaderWriterFactory.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphUtil.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphVizGraphWriter.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphWriter.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\Log.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\MetisGraphReader.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\MetisGraphWriter.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\MutableGraph.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\Node.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\RndNumGen.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\Util.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\WeightedGraph.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\WeightedMutableGraph.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BFE092BE-DF45-44F1-B013-A98820441A40}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>metis502</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../uthash-1.9.5/src/;../../lib_graphd/inc/;../../lib_treed/inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../..uthash-1.9.5/src/;../../lib_graphd/inc/;../../lib_treed/inc/;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
