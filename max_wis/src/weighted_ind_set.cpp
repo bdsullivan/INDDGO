@@ -2976,7 +2976,8 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 		// Create a non-labeled Graphviz output
 		sprintf(dimacs_tree_file, "%s.dimacs", info->gviz_file);
 		(*T)->write_DIMACS_file(dimacs_tree_file);
-		(*T)->write_graphviz_file(true, info->gviz_file, GV_BAG_LABELS);
+		//(*T)->write_graphviz_file(true, info->gviz_file, GV_BAG_LABELS);
+		(*T)->write_graphviz_file(true, info->gviz_file, GV_COLORS);
 	}
 
 	// Verify the tree if this option was passed in
