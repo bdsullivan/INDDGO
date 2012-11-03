@@ -23,14 +23,16 @@ source tree.
 
 The default binaries created by INSTALL include executables to:
 * generate partial k-trees (./bin/gen_pkt)
-* compute elimination orderings, tree decompositions, and maximum weighted independent sets (./bin/serial_wis and/or ./bin/parallel_wis)
+* compute elimination orderings, tree decompositions, and maximum weighted independent sets 
+	(./bin/serial_wis and/or ./bin/parallel_wis)
 * provide various visualization output (./bin/td_viz)
 
 Currently, all tree decomposition functionality is accessible through the 
 weighted independent set executables - flags are provided to disable the 
 problem-specific dynamic programming portion of the code (e.g. -decompose_only).
 
-All binaries respect the -h flag for printing a comprehensive usage message detailing required input and all options. Note that not all options are supported yet in the parallel_wis executable.
+All binaries respect the -h flag for printing a comprehensive usage message detailing required 
+input and all options. Note that not all options are supported yet in the parallel_wis executable.
 
 When running parallel versions of INDDGO, you must set the following
 environment variables:
@@ -45,8 +47,8 @@ All components will be written to separate .comp files, and the one used
 will be identified through a message to standard out. 
 
 ##Examples of common use cases
-Two sample input graph files, as well as an example tree decomposition
-file and elimination order file can be found in the sample_graphs directory.
+ Two sample input graph files, as well as an example tree decomposition
+ file and elimination order file can be found in the sample_graphs directory.
  All examples use these files. The optimal MWIS value for each is in the 
  comments at the top of the DIMACS file. Additional information on both input and 
  output formatting for the weighted independent set binaries is in max_wis/README.
@@ -60,36 +62,36 @@ file and elimination order file can be found in the sample_graphs directory.
 ###Find Tree Decomposition
  Generate a tree decomposition (serial) and save elimination ordering
  and decomposition to file for future use.
-* ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -decompose_only -w sample_graphs/1dc.64.tree -eorder sample_graphs/1dc.64.mind.eorder
+ * ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -decompose_only -w sample_graphs/1dc.64.tree -eorder sample_graphs/1dc.64.mind.eorder
 
 ###Run MWIS (serial, find set)
  Computes max weighted independent set and saves vertices to solution file 
  named <inputfile>.WIS.sol
-* ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind 
+ * ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind 
 
 ####Run MWIS (serial, find objective) 
  Computes objective (set weight) only, but reduces memory use drastically. 
-* ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -no_reconstruct -del_ch
+ * ./bin/serial_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -no_reconstruct -del_ch
 
 ###Run MWIS (all parallel) 
  Complete run from graph to final solution. Requires PARMETIS.
-* export MAD_NUM_THREADS=4
-* export OMP_NUM_THREADS=4
-* export PTD_NUM_THREADS=4 
-* mpirun -n 4 ./bin/parallel_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -pbag -parmetis
+ * export MAD_NUM_THREADS=4
+ * export OMP_NUM_THREADS=4
+ * export PTD_NUM_THREADS=4 
+ * mpirun -n 4 ./bin/parallel_wis -f sample_graphs/1dc.64.dimacs -gavril -mind -pbag -parmetis
 
 ###Run MWIS (only DP parallel) 
  Reads EO from file, serial tree decomposition, parallel (MADNESS) DP.  
-* export MAD_NUM_THREADS=4
-* export OMP_NUM_THREADS=4
-* export PTD_NUM_THREADS=4 
-* mpirun -n 4 ./bin/parallel_wis -ord sample_graphs/1dc.64.mind.eorder -f sample_graphs/1dc.64.dimacs -gavril 
+ * export MAD_NUM_THREADS=4
+ * export OMP_NUM_THREADS=4
+ * export PTD_NUM_THREADS=4 
+ * mpirun -n 4 ./bin/parallel_wis -ord sample_graphs/1dc.64.mind.eorder -f sample_graphs/1dc.64.dimacs -gavril 
 
 ###Generate visualization
  Create a basic DOT file of the tree decomposition for use with graphviz where
  bags are labelled with the vertices they contain 
  (sample graphviz command: neato -Tpdf -o tree.pdf tree.dot). 
-* ./bin/td_viz -f ./sample_graphs/1dc.64.dimacs -t ./sample_graphs/1dc.64.tree -e 
+ * ./bin/td_viz -f ./sample_graphs/1dc.64.dimacs -t ./sample_graphs/1dc.64.tree -e 
 
 More information on the output formats for the weighted independent set executables is in the README in max_wis.
 
@@ -98,4 +100,8 @@ More information on the output formats for the weighted independent set executab
 To get help with or discuss INDDGO, join the mailing list at inddgo-info@googlegroups.com
 
 ##Licensing
-The INDDGO software suite is generally covered by the BSD 3-clause license found in LICENSE. The madness runtime snapshot is included under the terms found in madness/LICENSE. The SuperWrap functionality for interfacing with CHOLMOD from SuiteSparse is included under the terms found in lib_treed/SuperWrap_LICENSE. 
+The INDDGO software suite is generally covered by the BSD 3-clause license found in LICENSE. The madness 
+runtime snapshot is included under the terms found in madness/LICENSE. The SuperWrap functionality for 
+interfacing with CHOLMOD from SuiteSparse is included under the terms found in lib_treed/SuperWrap_LICENSE. 
+
+

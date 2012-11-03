@@ -8,7 +8,7 @@
 # This should be a full path to the root directory for INDDGO.
 # (i.e. the parent of lib_graphd, libtree_d, madness, wis, etc.)
 #
-SRC_DIR = /home/MSIAD/cgroer/git/INDDGO
+SRC_DIR = 
 
 #----------------------------------------------------------------
 # REQUIRED USER-SUPPLIED OPTIONS
@@ -23,14 +23,14 @@ SRC_DIR = /home/MSIAD/cgroer/git/INDDGO
 # This then defines the variable _GK_ERROR_C_ which
 # cures a compile error when building with gcc and g++ 
 # under cygwin 
-CYGWIN = 1
+CYGWIN = 0
 
 HAS_ARPACK	= 0
-HAS_SUITESPARSE = 1
+HAS_SUITESPARSE = 0
 HAS_PARMETIS	= 0
-HAS_METIS	= 1
+HAS_METIS	= 0
 HAS_IGRAPH	= 0
-HAS_GMP		= 1
+HAS_GMP		= 0
 HAS_GTEST	= 0
 # Set whether serial or parallel version is desired for WIS.
 IS_PARALLEL	= 0
@@ -39,7 +39,6 @@ HAS_MADNESS	= 0
 
 #use this to turn logging on/off
 LOG_ENABLED = 0
-
 
 #----------------------------------------------------------------
 #  OPTIONAL USER-SUPPLIED DIRECTORY VARIABLES
@@ -50,7 +49,7 @@ ARPACK =
 
 # Directory containing SuiteSparse source code - not the directory where it
 # is installed 
-SUITESPARSE = /home/MSIAD/cgroer/SuiteSparse
+SUITESPARSE = #FILL IN
 
 #NOTE: the build directory is usually platform dependent.
 PARMETIS_SRC_DIR =
@@ -58,19 +57,14 @@ PARMETIS_LIB_DIR =
 #NOTE: the METIS_SRC_DIR should be the directory containing programs/ and GKLib/ dirs
 #NOTE: when building Metis, we have seen cases where setting IDXTYPEWIDTH=64 in
 #metis.h on a 64-bit system fails, so we recommend leaving IDXTYPEWIDTH=32
-#10/7 - the above is not true - the METIS variables should prob. be defined
-# in terms of a METIS_INSTALL_DIR? Do we actually need the METIS_SRC_DIR anywhere?
-#METIS_SRC_DIR  = /home/MSIAD/cgroer/metis-5.0.2
-METIS_SRC_DIR = /home/link/metis-5.0.2/
-METIS_LIB_DIR = /home/link/metis-5.0.2/lib
-#/usr/local/lib
+METIS_SRC_DIR  = #FILL IN
+METIS_LIB_DIR = #FILL IN
 
 
 IGRAPH = 
 IGRAPH_INSTALL_DIR = $(IGRAPH)/deploy
 
-GMP    = /home/link/GMP
-#/usr/local
+GMP    = 
 
 GTEST_DIR=
 
@@ -89,13 +83,13 @@ CFLAGS = -O3
 CPPFLAGS = 
 LDFLAGS = 
 
-ifeq ($(LOG_ENABLED), 1)
-CFLAGS := $(CFLAGS) -D__LOG_ENABLE__ 
-endif
-
 ifeq ($(CYGWIN), 1)
 CFLAGS:= $(CFLAGS) -D_GK_ERROR_C_
 CPPFLAGS:= $(CPPFLAGS) -D_GK_ERROR_C_
+endif
+
+ifeq ($(LOG_ENABLED), 1)
+CFLAGS := $(CFLAGS) -D__LOG_ENABLE__ 
 endif
 
 ifeq ($(HAS_MADNESS),1)

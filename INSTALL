@@ -21,7 +21,7 @@ Configuration:
 
   Note that trailing spaces in your variable declarations may cause 
   Make to fail in seemingly random ways (directories and 0/1 values are 
-  particularly susceptable).
+  particularly susceptible).
 
   We provide a copy of the MADNESS runtime library, however other
   dependencies must be installed manually.
@@ -37,6 +37,11 @@ make
   Resulting binaries will be places in SRC_DIR/bin.  INDDGO also provides
   various non-default binaries that may be built for testing purposes.
   These will be placed in the appropriate sub-package's /bin directory.
+
+  The max_wis/bin directory contains the serial_wis binary which is the 
+  most well-tested. It can be used to solve WIS instances and also do
+  general purpose tree decomposition-related tasks. See the README
+  in the max_wis directory for more details.
 
   Tested with the GNU compilers (g++, gcc, version >= 4.4.3) and OpenMPI. 
   No support is provided for non-GCC compilers.

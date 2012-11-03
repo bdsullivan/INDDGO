@@ -23,12 +23,12 @@ SRC_DIR =
 # This then defines the variable _GK_ERROR_C_ which
 # cures a compile error when building with gcc and g++ 
 # under cygwin 
-CYGWIN = 1
+CYGWIN = 0
 
 HAS_ARPACK	= 0
-HAS_SUITESPARSE = 1
+HAS_SUITESPARSE = 0
 HAS_PARMETIS	= 0
-HAS_METIS	= 1
+HAS_METIS	= 0
 HAS_IGRAPH	= 0
 HAS_GMP		= 0
 HAS_GTEST	= 0
