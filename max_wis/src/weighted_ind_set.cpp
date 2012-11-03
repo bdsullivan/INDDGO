@@ -31,7 +31,7 @@ void usage(const char *s)
 	fprintf(
 		stderr,
 		"\t --- Input/Output Options ---\n"
-		"\t -f DIMACS_file : loads in the file with symmetric adj lists\n"
+		"\t -f <DIMACS_file> : loads in the file with symmetric adj lists\n"
 		"\t -t <tree_infile> will read in the tree from a file\n"
 		"\t -w <tree_outfile> will write the tree to a file\n"
 		"\t -gviz <gviz_file>: writes a graphviz version of the tree decomposition\n"
@@ -43,6 +43,8 @@ void usage(const char *s)
 		"\t -sol <sol_file> : will write the weighted independent set solution to\n"
 		"\t                   the given file.  If not given, then solution is\n"
 		"\t                   written to <DIMACS_file>.WIS.sol\n"
+		"\t -fix_DIMACS <DIMACS_file> will attempt to repair an existing file\n"
+		"\t         and write DIMACS_file.fixed\n"	
 		"\t --- Decomposition Construction Options ---\n" 
 		"\t -superetree : constructs a non-nice TD using CHOLMOD and supernodal\n"
 		"\t               etrees (fast; no triangulation)\n"

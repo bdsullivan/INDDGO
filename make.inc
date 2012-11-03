@@ -8,7 +8,7 @@
 # This should be a full path to the root directory for INDDGO.
 # (i.e. the parent of lib_graphd, libtree_d, madness, wis, etc.)
 #
-SRC_DIR = /home/cgroer/INDDGO
+SRC_DIR = /home/MSIAD/cgroer/git/INDDGO
 
 #----------------------------------------------------------------
 # REQUIRED USER-SUPPLIED OPTIONS
@@ -50,7 +50,7 @@ ARPACK =
 
 # Directory containing SuiteSparse source code - not the directory where it
 # is installed 
-SUITESPARSE = /home/cgroer/SuiteSparse
+SUITESPARSE = /home/MSIAD/cgroer/SuiteSparse
 
 #NOTE: the build directory is usually platform dependent.
 PARMETIS_SRC_DIR =
@@ -58,14 +58,19 @@ PARMETIS_LIB_DIR =
 #NOTE: the METIS_SRC_DIR should be the directory containing programs/ and GKLib/ dirs
 #NOTE: when building Metis, we have seen cases where setting IDXTYPEWIDTH=64 in
 #metis.h on a 64-bit system fails, so we recommend leaving IDXTYPEWIDTH=32
-METIS_SRC_DIR  = /home/cgroer/metis-5.0.2
-METIS_LIB_DIR = /usr/local/lib
+#10/7 - the above is not true - the METIS variables should prob. be defined
+# in terms of a METIS_INSTALL_DIR? Do we actually need the METIS_SRC_DIR anywhere?
+#METIS_SRC_DIR  = /home/MSIAD/cgroer/metis-5.0.2
+METIS_SRC_DIR = /home/link/metis-5.0.2/
+METIS_LIB_DIR = /home/link/metis-5.0.2/lib
+#/usr/local/lib
 
 
 IGRAPH = 
 IGRAPH_INSTALL_DIR = $(IGRAPH)/deploy
 
-GMP    = /usr/local
+GMP    = /home/link/GMP
+#/usr/local
 
 GTEST_DIR=
 

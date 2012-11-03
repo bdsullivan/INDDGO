@@ -21,6 +21,7 @@ are assumed to be labelled 1, 2, ... n and start,end must be in [1,n]. Each edge
 specified once (i.e. 'e start end' and 'e end start' do not need to both appear). Further, duplicate
 edges and self loops are ignored (graphs are assumed to be simple). We offer a utility to "standardize" 
 graphs which have non-sequential vertex labels, etc as part of serial_wis - use the 
+-fix_DIMACS command-line option to serial_wis
 
 Example of a 10-cycle in DIMACS format: 
 --c10.dimacs--
@@ -63,13 +64,14 @@ B 5 3 6 7 8
 
 ===Interpreting Output (Serial Only) ===
 
-A single line of output to stdout provides the objective value along with timing and other statistics about the run:
+A header and a single line of output to stdout provides the objective value along with timing and 
+other statistics about the run:
 
-filename G_n G_m td_type PC/NPC MN/NMN width refined_width #treenodes #leafs leaf_time nonleaf_time introtime forgettime jointime total_pc _entries total_entries MEM reconsruct_time avg_pc_proportion objective
+file n m w obj
+/home/MSIAD/cgroer/git/INDDGO/sample_graphs/pkt.200.70.75_0.dimacs 200 8636 70 79
 
-PC/NPC indicates whether or not parent-child intersection tables were used to store partial solutions (-pc option to exe)
-MN/NMN indicates whether or not the tree was "made nice" with -make_nice 
-refined_width should be the same as width unless you've run the -refine_td flag, in which case it could be smaller
+n is the number of nodes, m is the number of edges, w is the width, obj is the maximum weight
+independent set. Additional output can be obtained by running with the -v option.
 
 If reconstruction of the set was done, the results can be found in <inputfile>.WIS.sol
 

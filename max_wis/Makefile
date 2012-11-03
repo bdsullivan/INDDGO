@@ -57,7 +57,7 @@ all: $(ALL)
 
 # Binaries
 
-$(WEIGHTED_IND_SET_EXE): $(SHAREDOBJ) 
+$(WEIGHTED_IND_SET_EXE): $(SHAREDOBJ) $(WEIGHTED_IND_SET_SRC)
 	$(CXX) $(CFLAGS) $(WEIGHTED_IND_SET_SRC) $(SHAREDOBJ) $(INC_DIR)  $(LIBS) $(LDFLAGS) -o $(WEIGHTED_IND_SET_EXE)
 
 $(MAD_WIS_EXE): $(SHAREDOBJ) $(MAD_WIS_SRC)
@@ -76,17 +76,19 @@ clean:
 	-rm -rf $(EXES)
 
 # make test will run a simple test using basic binary
-test: weighted_ind_set
-	$(WEIGHTED_IND_SET_EXE) -gavril  -mind -f $(TEST_GRAPH)  -v
+test: $(WEIGHTED_IND_SET_EXE)
+	$(WEIGHTED_IND_SET_EXE) -gavril  -mind -f $(TEST_GRAPH)
 
 # make check will run WIS on TEST_GRAPH using all kinds of options and will make
 # sure we get the same answer
-check: weighted_ind_set
+check: $(WEIGHTED_IND_SET_EXE)
+	@echo running $(WEIGHTED_IND_SET_EXE) on same file with multiple options
+	@echo 
 	$(WEIGHTED_IND_SET_EXE) -gavril  -mind -f $(TEST_GRAPH) > gav_mind.out
 	$(WEIGHTED_IND_SET_EXE) -gavril  -mind -f $(TEST_GRAPH) -make_nice > gav_mind_make_nice.out
 	$(WEIGHTED_IND_SET_EXE) -gavril  -mind -f $(TEST_GRAPH) -pc > gav_mind_pc.out
 	$(WEIGHTED_IND_SET_EXE) -gavril  -mind -f $(TEST_GRAPH) -make_nice -pc > gav_mind_make_nice_pc.out
-	$(WEIGHTED_IND_SET_EXE) -gavril -mind -f $(TEST_GRAPH) -nice -pc > nice_mind.out
-	$(WEIGHTED_IND_SET_EXE) -gavril  -mind -f $(TEST_GRAPH) -make_nice -pc > gav_mind_make_nice_pc.out
-	$(WEIGHTED_IND_SET_EXE) -gavril -mind -f $(TEST_GRAPH) -nice -pc -nonniceDP > nice_mind_nonniceDP.out
+	$(WEIGHTED_IND_SET_EXE) -mind -f $(TEST_GRAPH) -nice -pc > nice_mind.out
+	@echo 
+	@echo gav_mind.out, gav_mind_make_nice.out, gav_mind_pc.out, gav_mind_make_nice_pc.out, nice_mind.out should be identical
 
