@@ -34,27 +34,27 @@ test: testgraph testtree
 #
 
 graph:
-	test -d $(SRC_DIR)
+	test -d $(GRAPH)
 	@($(CD) "$(GRAPH)/src";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
 tree: deps
-	test -d $(SRC_DIR)
+	test -d $(TREE)
 	@($(CD) "$(TREE)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
 ptree: 
 ifeq ($(HAS_MADNESS), 1)
-	test -d $(SRC_DIR)
+	test -d $(PTREE)
 	@($(CD) "$(PTREE)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 endif
 
 valtree:
-	test -d $(SRC_DIR)
+	test -d $(TREE)
 	@($(CD) "$(TREE)";\
 	$(MAKE) td_valgrind ;\
 	$(CD) ..;)
@@ -64,7 +64,7 @@ valtree:
 #  Targets for weighted independent set
 #
 wis: libs deps
-	test -d $(SRC_DIR)
+	test -d $(WIS)
 	@($(CD) "$(WIS)";\
 	$(MAKE) ;\
 	$(CD) ..;)
@@ -75,7 +75,7 @@ wis: libs deps
 #
 
 viz: graph tree 
-	test -d $(SRC_DIR)
+	test -d $(VIZ)
 	@($(CD) "$(VIZ)";\
 	$(MAKE) ;\
 	$(CD) ..;)
@@ -84,7 +84,7 @@ viz: graph tree
 #  Targets for utilities
 #
 util: graph 
-	test -d $(SRC_DIR)
+	test -d $(UTIL)
 	@($(CD) "$(UTIL)";\
 	$(MAKE) ;\
 	$(CD) ..;)
@@ -97,7 +97,7 @@ util: graph
 
 $(MADLIB):
 ifeq ($(HAS_MADNESS), 1)
-	test -d $(SRC_DIR)
+	test -d $(MADNESS)
 	@($(CD) "$(MADNESS)";\
 	$(AUTOGEN);\
 	$(CONFIGURE) --prefix=$(MADNESS_INSTALL_DIR);\
@@ -112,7 +112,7 @@ endif
 
 testgraph:
 ifeq ($(HAS_GTEST), 1)
-	test -d $(SRC_DIR)
+	test -d $(GRAPH)/test
 	@($(CD) "$(GRAPH)/test";\
 	$(MAKE) ;\
 	$(RUN_TEST) ;\
@@ -123,7 +123,7 @@ endif
 
 testtree:
 ifeq ($(HAS_GTEST), 1)
-	test -d $(SRC_DIR)
+	test -d $(TREE)/test
 	@($(CD) "$(TREE)/test";\
 	$(MAKE) ;\
 	$(RUN_TEST) ;\
