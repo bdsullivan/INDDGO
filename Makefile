@@ -34,23 +34,27 @@ test: testgraph testtree
 #
 
 graph:
+	test -d $(SRC_DIR)
 	@($(CD) "$(GRAPH)/src";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
 tree: deps
+	test -d $(SRC_DIR)
 	@($(CD) "$(TREE)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 
 ptree: 
 ifeq ($(HAS_MADNESS), 1)
+	test -d $(SRC_DIR)
 	@($(CD) "$(PTREE)";\
 	$(MAKE) ;\
 	$(CD) ..;)
 endif
 
 valtree:
+	test -d $(SRC_DIR)
 	@($(CD) "$(TREE)";\
 	$(MAKE) td_valgrind ;\
 	$(CD) ..;)
@@ -60,6 +64,7 @@ valtree:
 #  Targets for weighted independent set
 #
 wis: libs deps
+	test -d $(SRC_DIR)
 	@($(CD) "$(WIS)";\
 	$(MAKE) ;\
 	$(CD) ..;)
@@ -70,6 +75,7 @@ wis: libs deps
 #
 
 viz: graph tree 
+	test -d $(SRC_DIR)
 	@($(CD) "$(VIZ)";\
 	$(MAKE) ;\
 	$(CD) ..;)
@@ -78,6 +84,7 @@ viz: graph tree
 #  Targets for utilities
 #
 util: graph 
+	test -d $(SRC_DIR)
 	@($(CD) "$(UTIL)";\
 	$(MAKE) ;\
 	$(CD) ..;)
@@ -90,6 +97,7 @@ util: graph
 
 $(MADLIB):
 ifeq ($(HAS_MADNESS), 1)
+	test -d $(SRC_DIR)
 	@($(CD) "$(MADNESS)";\
 	$(AUTOGEN);\
 	$(CONFIGURE) --prefix=$(MADNESS_INSTALL_DIR);\
@@ -104,6 +112,7 @@ endif
 
 testgraph:
 ifeq ($(HAS_GTEST), 1)
+	test -d $(SRC_DIR)
 	@($(CD) "$(GRAPH)/test";\
 	$(MAKE) ;\
 	$(RUN_TEST) ;\
@@ -114,6 +123,7 @@ endif
 
 testtree:
 ifeq ($(HAS_GTEST), 1)
+	test -d $(SRC_DIR)
 	@($(CD) "$(TREE)/test";\
 	$(MAKE) ;\
 	$(RUN_TEST) ;\
@@ -129,6 +139,7 @@ endif
 
 # Default cleanup for INDDGO-distributed source and libraries only.
 clean:
+	test -d $(SRC_DIR)
 	@( \
 	for f in $(GRAPH)/src $(GRAPH)/test $(PTREE) $(TREE) $(WIS) $(VIZ) $(UTIL); \
 	do \
@@ -143,32 +154,38 @@ cleandeps: cleanmad
 
 # Targets for cleaning INDDGO-distributed subdirectories
 cleanmad:
+	test -d $(SRC_DIR)
 	@($(CD) "$(MADNESS)";\
 	$(MAKE) distclean;\
 	$(CD) ..;)
 	rm -f $(MADLIB)
 
 cleangraph: 
+	test -d $(SRC_DIR)
 	@($(CD) "$(GRAPH)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
 cleantree:
+	test -d $(SRC_DIR)
 	@($(CD) "$(TREE)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
 cleanwis: 
+	test -d $(SRC_DIR)
 	@($(CD) "$(WIS)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
 cleanviz: 
+	test -d $(SRC_DIR)
 	@($(CD) "$(VIZ)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
 cleanutil: 
+	test -d $(SRC_DIR)
 	@($(CD) "$(UTIL)";\
 	  $(MAKE) clean;\
 	  $(CD) ..;)
