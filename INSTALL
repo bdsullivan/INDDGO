@@ -56,4 +56,58 @@ Mac users:
   the MADNESS runtime, similar problems may occur (we have not done extensive 
   testing). One possible solution is to compile for Snow Leopard (10.6), 
   which can be done by setting an environment variable. 
-  
+
+Here are details on how to obtain Metis and SuiteSparse, compile them, and
+instruct INDDGO to use these additional capabilities. The links are current
+as of 20121104:
+
+The top level directory for this example is /home/cgroer.
+It will contain INDDGO, Metis, and SuiteSparse.
+
+> cd /home/cgroer
+> mkdir INDDGO 
+> git clone https://github.com/bdsullivan/INDDGO.git
+> wget http://glaros.dtc.umn.edu/gkhome/fetch/sw/metis/metis-5.0.2.tar.gz
+> tar xzvf metis-5.0.2.tar.gz
+> cd metis-5.0.2
+> make config
+> make
+> OPTIONAL: make install
+> cd ..
+> wget http://www.cise.ufl.edu/research/sparse/SuiteSparse/SuiteSparse-4.0.2.tar.gz
+> tar xzvf SuiteSparse-4.0.2.tar.gz
+> cd SuiteSparse
+> make
+> OPTIONAL: make install
+> cd ..
+> cd INDDGO
+
+< Edit make.inc, example edit below >
+
+SRC_DIR = /home/cgroer/INDDGO
+...
+HAS_SUITESPARSE = 1
+...
+HAS_METIS	= 1
+...
+SUITESPARSE = /home/cgroer/SuiteSparse
+...
+METIS_SRC_DIR  = /home/cgroer/metis-5.0.2 
+METIS_LIB_DIR = /home/cgroer/metis-5.0.2/build/Linux-x86_64/libmetis
+
+< Done editing make.inc. Now ready to build INDDGO>
+
+> make
+> cd bin
+
+< This should be it.  Do a quick test >
+
+> ./serial_wis.exe -f ../sample_graphs/1dc.64.dimacs -metmmd -gavril
+file n m w obj
+../sample_graphs/1dc.64.dimacs 64 543 35 10
+> ./serial_wis -f ../sample_graphs/1dc.64.dimacs -amd -gavril
+file n m w obj
+../sample_graphs/1dc.64.dimacs 64 543 32 10
+
+
+
