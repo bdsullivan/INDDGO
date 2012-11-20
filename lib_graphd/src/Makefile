@@ -50,7 +50,7 @@ locallib: $(INDDGO_LIB_DIR)/$(LIBNAME)
 	cp $(INDDGO_LIB_DIR)/$(LIBNAME) ../lib/$(LIBNAME)
 
 $(GVIZ): gviz.cpp
-	$(CXX) -I../inc $(CFLAGS) $< -o $@ $(INCLUDES) $(LIBS) $(LDFLAGS) -lgraphd
+	$(CXX) -I../inc $(CFLAGS) $< -o $@ $(INCLUDES) -lgraphd $(LIBS) $(LDFLAGS)
 
 clean:
 	rm -f *.o \#* PI* ${EXECUTABLES} core *~ $(OBJ) $(OUT) $(INDDGO_LIB_DIR)/$(LIBNAME) ../lib/$(LIBNAME) $(GVIZ)

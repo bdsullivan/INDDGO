@@ -40,6 +40,11 @@
 #define TD_ROOT_ASPVALL     1
 #define TD_ROOT_ALLCHILDREN 2
 
+// Algorithms for generation
+#define TD_SUPERETREE 1
+#define TD_GAVRIL     2
+#define TD_BK         3
+#define TD_NICE       4
 
 // Types of graphviz output that are available for tree decompositions
 #define GV_BAG_LABELS  0

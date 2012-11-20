@@ -33,6 +33,7 @@ namespace Graph
 	public:
 		GraphUtil();
 		virtual ~GraphUtil();
+		
 		void recompute_degrees(MutableGraph *mg);
 		// Returns the index of one of the vertices with maximal degree
 		int get_random_high_degree_vertex(MutableGraph *mg) const;
@@ -80,6 +81,11 @@ namespace Graph
 		int* bfs_dist(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 	};
 
+	void create_largestcomponent_graph(char* graph_file, WeightedMutableGraph *&G);
+	void form_eo(bool read_order, bool scotch, char* ord_file, int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering);
+	void form_eo(bool read_order, bool scotch, char* ord_file, MutableGraph *G,   vector<int> *ordering);
+	void form_eo(int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering);
+	void form_eo(int elim_order_type, MutableGraph *G, vector<int> *ordering);
 }
 
 #endif /* GRAPHUTIL_H_ */

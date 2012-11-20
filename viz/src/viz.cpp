@@ -40,10 +40,7 @@ TD_info::TD_info()
   this->write_ordered_tree = false;
 
   /*TD construction options*/
-  this->nice = false;
-  this->superetree = false;
-  this->gavril = false;
-  this->BK = false;
+  this->td_alg = GD_UNDEFINED;
   this->make_nice = false;
   
   /*EO options*/
@@ -119,13 +116,13 @@ void TD_info::process_TD_info(int num_args, char **args,
 		if (strcmp(args[i], "-amd") == 0)
 			this->elim_order_type = GD_AMD;
 		if(strcmp(args[i], "-superetree") == 0)
-		  this->superetree = true;
+		  this->td_alg = TD_SUPERETREE; 
 		if (strcmp(args[i], "-gavril") == 0)
-		  this->gavril = true;
+		  this->td_alg = TD_GAVRIL;
 		if (strcmp(args[i], "-bk") == 0)
-			this->BK = true;
+			this->td_alg = TD_BK;
 		if (strcmp(args[i], "-nice") == 0)
-			this->nice = true;
+			this->td_alg = TD_NICE;
 		if (strcmp(args[i], "-ord") == 0)
 		{
 			this->read_ordering = true;
@@ -183,7 +180,7 @@ void TD_info::process_TD_info(int num_args, char **args,
 		
 	}
 	// Check options
-	if (this->nice && this->make_nice)
+	if (this->td_alg == TD_NICE && this->make_nice)
 		fatal_error("A nice tree doesn't need to be made nice!\n");
 
 	// Make sure we have a graph
@@ -221,7 +218,7 @@ void TD_info::process_TD_info(int num_args, char **args,
 
 
 	// Make sure either nice gavril or bk was selected
-	if (!this->nice && !this->gavril && !this->BK && !this->superetree && !this->read_tree)
+	if (this->td_alg == GD_UNDEFINED && !this->read_tree)
 		fatal_error(
 				"Have to choose either -superetree, -nice, -gavril, -BK for the TD type or read tree from file\n");
 
@@ -288,65 +285,26 @@ void usage(const char *s)
 
 
 /**
-* Populates the provided Graph structure with the necessary information to do TD and visualizations.
-* If needed, stores the largest connected components in DIMACS format at graph_file.giantcomp (and populates Graph from this).
-*/
-void create_TDviz_graph(char* graph_file, Graph::WeightedMutableGraph *&G)
-{
-	Graph::GraphCreatorFile creator;
-	creator.set_file_name(graph_file);
-	creator.set_graph_type("DIMACS");
-	G = creator.create_weighted_mutable_graph();
-	Graph::GraphProperties properties;
-
-    if (!G)
-      throw(Graph::GraphException("Failed to read graph from specified file.\n"));
-        
-    if (!properties.is_connected(G))
-      {
-	char* bigcompfile = (char*) malloc(100);
-	sprintf(bigcompfile, "%s.giantcomp", graph_file);	
-	G->write_largest_component("DIMACS", "temp_max_comp.dimacs");
-	normalize_DIMACS_file("temp_max_comp.dimacs", bigcompfile );
-	delete G;
-	remove("temp_max_comp.dimacs");
-	creator.set_file_name(bigcompfile);
-	G = creator.create_weighted_mutable_graph();
-	free(bigcompfile);
-      }
-
-}
-
-/**
 * Creates a tree decomposition for the provided tree and the DP options
 * contained in DP_info.
 */
-void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G,
-		TDTree **T)
+void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G, TDTree **T)
 {
   Graph::GraphEOUtil eoutil;
-  
   if (!G)
-    {
-      return;
-    }
- 
+    throw(Graph::GraphException("Null graph passed to create_tree_decomposition\n"));
+  
   // Create a copy of G to do the triangulation and elim order 
   Graph::WeightedMutableGraph H = *G;
   (*T) = new TDTree(&H);
   // Set the name of T's graph file
   sprintf((*T)->graph_file, "%s", info->DIMACS_file);
+
+  int i;
   
   // create a vector for the elimination ordering
   vector<int> ordering(H.get_num_nodes(), GD_UNDEFINED);
-  int i;
   
-  // Set the info pointer so we have access to the options
-  //(*T)->info = info;
-  
-  //	creating an instance of eoutils class
-  
-  // Now read in the tree file if we have one
   if (info->read_tree)
     {
       // Read in the decomposition from a file
@@ -356,87 +314,46 @@ void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G,
     }
   else
     {
-      // Figure out how to create the tree
-      if (info->read_ordering)
-	{
-	  read_ordering_file(info->ord_file, &ordering);
-	  print_message(0, "Read in ordering\n");
-	  print(1, ordering);
-	}
+      
+      if(info->read_scotch_ordering)
+	Graph::form_eo(info->read_ordering, info->read_scotch_ordering, info->scotch_ord_file, &H, &ordering);
       else
-	{
-	  if (info->read_scotch_ordering)
-	    {
-	      read_SCOTCH_ordering_file(info->scotch_ord_file, &ordering);
-	      print_message(0, "Read in SCOTCH ordering\n");
-	      print(1, ordering);
-	    }
-	  else
-	    {
-	      // Create the ordering via a heuristic
-	      // Create an ordering - if start_v not provided, find a good candidate
-	      if (info->start_v == GD_UNDEFINED)
-		eoutil.find_elimination_ordering(&H, &ordering,
-						 info->elim_order_type, false);
-	      //					H.find_elimination_ordering(&ordering,
-	      //							info->elim_order_type, false);
-	      else
-		eoutil.find_elimination_ordering(&H, &ordering,
-						 info->elim_order_type, info->start_v, false);
-	      //					H.find_elimination_ordering(&ordering,
-	      //							info->elim_order_type, info->start_v, false);
-	    }
-	}
-      
-		 
-      // Triangulate the graph
-      clock_t tri_start = clock(), tri_stop;
-      if(info->superetree){
-	//no need to triangulate
-	tri_stop = tri_start;	
-      }
-      else
-	{
-#if HAS_METIS
-	  (*T)->width = eoutil.METIS_triangulate(&H, &ordering);
-#else
-	  (*T)->width = eoutil.triangulate(&H, &ordering);
-#endif
-	  tri_stop = clock();
-	}
-      
-      // Now create the tree
-      info->start=clock();
-      if(info->superetree){
-	(*T)->construct_superetree(&ordering);
-      }
-      if (info->gavril)
-	{
-	  (*T)->construct_gavril(&ordering);
-	}
-      
-      if (info->BK)
-	{
-	  (*T)->construct_BK(&ordering);
-	}
-      
-      if (info->nice)
-	{
-	  print_message(1, "nice\n");
-	  (*T)->construct_knice(&ordering, (*T)->width, false);
-	}
-      info->stop=clock();
-      if (0)
-	{
-	  print_message(0, "Tree construction took %f secs\n",
-			(double) (info->stop - info->start) / CLOCKS_PER_SEC);
-	}
+	Graph::form_eo(info->read_ordering, info->read_scotch_ordering, info->ord_file, info->elim_order_type, info->start_v, &H, &ordering);
+    
     }
-
+      
+  
+  // Triangulate the graph
+  clock_t tri_start = clock(), tri_stop;
+  if(info->td_alg == TD_SUPERETREE)
+    {
+      //no need to triangulate
+      tri_stop = tri_start;	
+    }
+  else
+    {
+#if HAS_METIS
+      (*T)->width = eoutil.METIS_triangulate(&H, &ordering);
+#else
+      (*T)->width = eoutil.triangulate(&H, &ordering);
+#endif
+      tri_stop = clock();
+    }
+  
+  
+  // Now create the tree
+  info->start=clock();
+  form_td(info->td_alg, T, &ordering);
+  info->stop=clock();
+  if (0)
+    {
+      print_message(0, "Tree construction took %f secs\n",
+		    (double) (info->stop - info->start) / CLOCKS_PER_SEC);
+    }
   
   // Sort the bags
   int num_tree_nodes=(int) (*T)->tree_nodes.size();
-  if(!info->superetree)//bags already sorted
+  if(info->td_alg != TD_SUPERETREE)//bags already sorted
     {
       for (i = 0; i < num_tree_nodes; i++)
 	{
@@ -477,4 +394,26 @@ void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G,
 }
 
 
-
+/*
+ * Helper function for computing a tree decomposition. Valid algorithms include TD_SUPERETREE, TD_GAVRIL, TD_BK, TD_NICE.
+ */
+void form_td(int td_alg, TDTree**T, vector<int>* ordering)
+{
+  switch(td_alg)
+    {
+    case TD_SUPERETREE: 
+      (*T)->construct_superetree(ordering);
+      break;
+    case TD_GAVRIL: 
+      (*T)->construct_gavril(ordering);
+      break;
+    case TD_BK: 
+      (*T)->construct_BK(ordering);
+      break; 
+    case TD_NICE: 
+      (*T)->construct_knice(ordering, (*T)->width, false);
+      break;
+    default: 
+      throw(Graph::GraphException("Unrecognized td construction algorithm.\n"));
+    }
+}
