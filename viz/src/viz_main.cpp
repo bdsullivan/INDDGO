@@ -62,7 +62,7 @@ int main(int argc, char **argv)
       print_message(0, "Options processed\n");
 
       // Create the graph for WIS
-      create_TDviz_graph(&info, G);
+      create_TDviz_graph(info.DIMACS_file, G);
 
       print_message(0, "Graph structure populated\n");
 

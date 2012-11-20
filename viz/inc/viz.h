@@ -28,6 +28,7 @@
 #include "gmp.h"
 #endif
 
+
 // Data structure to keep track of options for TD-based Dynamic Programming
 class TD_info
 {
@@ -51,7 +52,7 @@ public:
 };
 
 void usage(const char *s);
-void create_TDviz_graph(TD_info *info, Graph::WeightedMutableGraph *&G);
+void create_TDviz_graph(char* graph_file, Graph::WeightedMutableGraph *&G);
 void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G, TDTree **T);
 
 #endif  /* __VIZ_H__ */

@@ -23,35 +23,43 @@
 #include "TreeDecomposition.h"
 #include "viz.h" 
 #include "DIMACSGraphWriter.h"
+#include "GraphException.h"
 
 /** 
 * Constructor for TD_info. Sets all options to false and strings to NULL.
 */
 TD_info::TD_info()
 {
-  this->DIMACS_file = this->ord_file =
-    this->score_infile 
-    = this->scotch_ord_file = this->tree_infile = this->tree_outfile = NULL;
+  /*IO options*/
+  this->DIMACS_file = this->tree_infile = this->tree_outfile = NULL;
   this->gviz_outfile  = (char *)"tree.dot";
   this->has_graph = false;
-  this->read_ordering = false;
-  this->read_scotch_ordering = false;
-    this->nice = false;
-    this->superetree = false;
-  this->gavril = false;
-  this->BK = false;
   this->read_tree = false;
   this->write_tree = false;
-  this->make_histogram = false;
-  this->make_nice = false;
+  this->make_histogram = false;  
   this->write_ordered_tree = false;
+
+  /*TD construction options*/
+  this->nice = false;
+  this->superetree = false;
+  this->gavril = false;
+  this->BK = false;
+  this->make_nice = false;
+  
+  /*EO options*/
+  this->read_ordering = false;
+  this->read_scotch_ordering = false;
+  this->ord_file = this->scotch_ord_file = NULL; 
   this->start_v = GD_UNDEFINED;
   this->elim_order_type = GD_UNDEFINED;
-  this->use_scores = false; //Aaron - by default, this is turned off.
+  
+  /*visualization options*/
+  this->use_scores = false; 
+  this->score_infile = NULL; 
   this->viz_style = GV_TREE_ONLY; //default black & white tree.
   this->subtree = false; 
   this->highlight_node = GD_UNDEFINED;
-  this->log_range = false; //Blair, this is turned off by default
+  this->log_range = false; 
 };
 
 /**
@@ -281,105 +289,32 @@ void usage(const char *s)
 
 /**
 * Populates the provided Graph structure with the necessary information to do TD and visualizations.
+* If needed, stores the largest connected components in DIMACS format at graph_file.giantcomp (and populates Graph from this).
 */
-void create_TDviz_graph(TD_info *info, Graph::WeightedMutableGraph *&G)
+void create_TDviz_graph(char* graph_file, Graph::WeightedMutableGraph *&G)
 {
-	int i;
-
 	Graph::GraphCreatorFile creator;
-	creator.set_file_name(info->DIMACS_file);
+	creator.set_file_name(graph_file);
 	creator.set_graph_type("DIMACS");
 	G = creator.create_weighted_mutable_graph();
+	Graph::GraphProperties properties;
 
     if (!G)
-    {
-        return;
-    }
-
-    Graph::GraphProperties properties;
-    Graph::GraphEOUtil eoutil;
-    Graph::GraphWriter *writer;
-    Graph::GraphReaderWriterFactory factory;
-    
-    writer = factory.create_writer("DIMACS");
-    // Put the input graph in canonical form for the tests
-    properties.make_canonical(G);
-
-// Make sure there is only 1 component in the graph!
-	if (!properties.is_connected(G))
-	{
-		print_message(0,
-				"Visualizations run only on connected graphs.  This graph has more than one component!\n");
-		list<Graph::WeightedMutableGraph *> C;
-
-		C = creator.create_all_components(G, true);
-		print_message(0, "Found %d components\n", C.size());
-		list<Graph::WeightedMutableGraph *>::iterator cc;
-		int comp_number = 0;
-		char temp_file[100], comp_file[100];
-		int max_size = -1;
-		char *big_file = NULL;
-		for (cc = C.begin(); cc != C.end(); ++cc)
-		{
-			if ((*cc)->get_num_nodes() > 1 && (*cc)->get_num_edges() > 1)
-			{
-				sprintf(temp_file, "%s_%d_node_component_%d.temp",
-						info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
-				sprintf(comp_file, "%s_%d_node_component_%d.comp",
-						info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
-				writer->set_out_file_name(temp_file);
-				writer->write_graph(*cc);
-
-				normalize_DIMACS_file(temp_file, comp_file);
-				remove(temp_file);
-				fprintf(stderr, "Wrote component with %d nodes to file %s\n",
-						(*cc)->get_num_nodes(), comp_file);
-				comp_number++;
-				if ((*cc)->get_num_nodes() > max_size)
-				{
-					if (!big_file)
-						big_file = (char *) malloc(100);
-
-					max_size = (*cc)->get_num_nodes();
-					sprintf(big_file, "%s", comp_file);
-				}
-			}
-			else
-			{
-				fprintf(
-						stderr,
-						"Tiny component with %d nodes & %d edges not written\n",
-						(*cc)->get_num_nodes(), (*cc)->get_num_edges());
-			}
-		}
-
+      throw(Graph::GraphException("Failed to read graph from specified file.\n"));
         
-		if (big_file)
-		  {
-		    info->DIMACS_file = (char *) malloc(100);//Blair - Mar 20, 2012
-		    sprintf(info->DIMACS_file, "%s", big_file);
-		    free(big_file);
-		    print_message(0,
-				  "Will run WIS on largest component %s with %d nodes\n",
-				  info->DIMACS_file, max_size);
-		    delete G;
-		    create_TDviz_graph(info, G);
-		  }
-		else
-		  {
-		    print_message(0, "No big file found. Exiting\n");
-		    exit(-1);
-		  }
+    if (!properties.is_connected(G))
+      {
+	char* bigcompfile = (char*) malloc(100);
+	sprintf(bigcompfile, "%s.giantcomp", graph_file);	
+	G->write_largest_component("DIMACS", "temp_max_comp.dimacs");
+	normalize_DIMACS_file("temp_max_comp.dimacs", bigcompfile );
+	delete G;
+	remove("temp_max_comp.dimacs");
+	creator.set_file_name(bigcompfile);
+	G = creator.create_weighted_mutable_graph();
+	free(bigcompfile);
+      }
 
-        int s = C.size();
-        for (i = 0; i < s; i++)
-        {
-            delete C.front();
-            C.pop_front();
-        }
-	}
-
-    delete writer;
 }
 
 /**

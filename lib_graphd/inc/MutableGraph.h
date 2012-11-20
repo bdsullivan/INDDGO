@@ -58,7 +58,8 @@ public:
     void set_adjncy(vector<int> adjncy);
     void set_xadj(vector<int> xadj);
     vector<int> get_adj_vec() const;
-	vector<int> *get_adj_vec_ptr();
+    vector<int> *get_adj_vec_ptr();
+
 
     friend class GraphUtil;
     friend class GraphProperties;

@@ -37,8 +37,8 @@ public:
 	WeightedMutableGraph();
 	WeightedMutableGraph(int n);
 	virtual ~WeightedMutableGraph();
-
 	WeightedMutableGraph& operator=(const WeightedMutableGraph& wmg);
+	void write_largest_component(std::string filetype, std::string filename);
 
 	friend class GraphUtil;
 	friend class GraphProperties;

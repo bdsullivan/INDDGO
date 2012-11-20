@@ -20,6 +20,10 @@ inddgo-info@googlegroups.com
 */
 
 #include "WeightedMutableGraph.h"
+#include "GraphProperties.h" 
+#include "GraphReaderWriterFactory.h"
+#include "GraphCreatorFile.h"
+#include <string.h>
 
 namespace Graph
 {
@@ -67,5 +71,56 @@ namespace Graph
 		return *this;
 	}
 
+  /* This should really live in MutableGraph, but all the GraphCreator code is currently for WMGs only. 
+   * Finds all connected components and saves one with largest number of nodes to the specified filename. 
+   * If you desire normalized DIMACS files, you must run that after the component file is created.
+   */
+  void WeightedMutableGraph::write_largest_component(std::string filetype, std::string filename)
+  {
+    GraphProperties properties;
+    GraphWriter *writer;
+    GraphReaderWriterFactory factory;
+    GraphCreatorFile creator;
+
+    writer = factory.create_writer(filetype);
+    writer->set_out_file_name(filename);
+
+    // Put the input graph in canonical form for the tests
+    properties.make_canonical(this);
+    
+    list<WeightedMutableGraph *> C;
+    C = creator.create_all_components(this, true);
+    print_message(10, "Found %d components\n", C.size());
+    list<WeightedMutableGraph *>::iterator cc;
+    list<WeightedMutableGraph *>::iterator maxcomp;
+    int max_size = -1;
+    
+    for (cc = C.begin(); cc != C.end(); ++cc)
+      {
+	if ((*cc)->get_num_nodes() > 1 && (*cc)->get_num_edges() > 1)
+	  {
+	    if ((*cc)->get_num_nodes() > max_size)
+	      {
+		/*mark this as potential largest component*/
+		maxcomp=cc;
+		max_size = (*cc)->get_num_nodes();
+	      }
+	  }
+      }
+      
+    writer->write_graph(*maxcomp);
+    
+    /*cleanup*/
+    int s = C.size();
+    for (int i = 0; i < s; i++)
+      {
+	delete C.front();
+	C.pop_front();
+      }
+    delete writer;
+
+  }
+
 
 }
+
