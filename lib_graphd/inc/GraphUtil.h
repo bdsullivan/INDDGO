@@ -79,6 +79,7 @@ namespace Graph
 		bool* bfs(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 		bool* bfs_old(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 		int* bfs_dist(MutableGraph *mg, int start, bool *allowed, int *num_reached);
+
 	};
 
 	void create_largestcomponent_graph(char* graph_file, WeightedMutableGraph *&G);

@@ -2037,10 +2037,10 @@ void TDTree::write_scored_graphviz_file(bool spline, const char *GVIZ_file, cons
 		}//end BAG_LABELS
 
 		else if(style == GV_COLORS)
-		{
+		  {
 			if(this->tree_nodes[i] != NULL)
-			{
-				double stat = get_statistics(this->tree_nodes[i]->bag_vec, color_vector, 1); //stat is hard coded right now.			  
+			  {
+				double stat = get_statistics(this->tree_nodes[i]->bag_vec, color_vector, GD_STAT_MEAN); //stat is hard coded right now.			  
 				//	      cout << this->tree_nodes[i]->bag_vec[0] << " " << this->tree_nodes[i]->bag_vec[1] << "\n";
 				//cout << stat << "\n";
 				get_rgb_value(rgb, (stat-min_color)/(max_color-min_color));

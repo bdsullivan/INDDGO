@@ -1426,7 +1426,7 @@ namespace Graph
 		GraphUtil util;
 		util.populate_CRS(mg);
 		vector<int> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
-		int nvtxs = mg->num_nodes;
+		int nvtxs = mg->get_num_nodes();
 		int numflag = 0;
 
 		//int options[10];
@@ -1458,7 +1458,6 @@ namespace Graph
 		METIS_NodeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), NULL, options,
 			&(ordering->at(0)), &(metis_order[0]));
 		util.free_CRS(mg);
-		return 1;
 #endif
 	}
 

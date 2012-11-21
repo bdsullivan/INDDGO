@@ -158,9 +158,7 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
 
 //Input a vector of node indices, a vector of node scores (values associated with each node), and a flag
 //that indicates the statistic you desire to be calculated
-//FLAG=1 -> Calculate mean of nodes
-//FLAG=2 -> Calculate standard deviation of nodes
-//FLAG=3 -> Calculate median of nodes
+//FLAG should be one of GD_XXX defined in Util.h
 
 double get_statistics(const vector<int> & nodes, const vector<double> & scores, const int FLAG)
 {
