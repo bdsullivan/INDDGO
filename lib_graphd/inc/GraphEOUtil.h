@@ -30,7 +30,6 @@ using namespace std;
 
 namespace Graph
 {
-
 	class GraphEOUtil
 	{
 	private:
@@ -93,7 +92,7 @@ namespace Graph
 		// Private lower bound alg's
 		int get_max_min_degree_lower_bound(MutableGraph *mg);
 		int get_mcs_lower_bound(MutableGraph *mg, int start_v);
-
+	
 	public:
 		GraphEOUtil();
 		virtual ~GraphEOUtil();
@@ -139,6 +138,10 @@ namespace Graph
 
 	};
 
+	void form_eo(bool read_order, bool scotch, char* ord_file, int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering);
+	void form_eo(bool read_order, bool scotch, char* ord_file, MutableGraph *G,   vector<int> *ordering);
+	void form_eo(int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering);
+	void form_eo(int elim_order_type, MutableGraph *G, vector<int> *ordering);
 }
 
 #endif /* GRAPHEOUTIL_H_ */

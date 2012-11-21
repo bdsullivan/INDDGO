@@ -2031,6 +2031,47 @@ namespace Graph
 		DEBUG("ordering is written into %s\n", eoname);
 		DEBUG("%f,%f\n", parmet_time, p_amd_time);
 	}
-
 #endif // HAS_PARMETIS
+
 }
+
+/**
+ * Helper functions for creating elimination orderings. Allow reading from file (normal or SCOTCH), or generating internally (with or without start vertex)
+ */
+void Graph::form_eo(bool read_order, bool scotch, char* ord_file, int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering)
+{
+    GraphEOUtil eoutil;
+    if(read_order)
+      {
+  	if(scotch)
+  	  read_SCOTCH_ordering_file(ord_file, ordering);      
+  	else
+  	  read_ordering_file(ord_file, ordering);      
+      }
+    else
+      {
+  	if (start_v == GD_UNDEFINED || start_v < 0)
+	  eoutil.find_elimination_ordering(G, ordering, elim_order_type, false);
+  	else
+	  eoutil.find_elimination_ordering(G, ordering, elim_order_type, start_v, false);
+      }
+  }
+  
+void Graph::form_eo(bool read_order, bool scotch, char* ord_file, MutableGraph *G,   vector<int> *ordering)
+  {
+    form_eo(read_order, scotch, ord_file, 0, 0, G, ordering);
+  }
+  
+void Graph::form_eo(int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering)
+  {
+    form_eo(false, false, NULL, elim_order_type, start_v, G, ordering);
+  }
+  
+void Graph::form_eo(int elim_order_type, MutableGraph *G, vector<int> *ordering)
+  {
+    form_eo(false, false, NULL, elim_order_type, GD_UNDEFINED, G, ordering);
+  }
+
+
+
+

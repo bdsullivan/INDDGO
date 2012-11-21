@@ -82,10 +82,7 @@ namespace Graph
 	};
 
 	void create_largestcomponent_graph(char* graph_file, WeightedMutableGraph *&G);
-	void form_eo(bool read_order, bool scotch, char* ord_file, int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering);
-	void form_eo(bool read_order, bool scotch, char* ord_file, MutableGraph *G,   vector<int> *ordering);
-	void form_eo(int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering);
-	void form_eo(int elim_order_type, MutableGraph *G, vector<int> *ordering);
+	
 }
 
 #endif /* GRAPHUTIL_H_ */

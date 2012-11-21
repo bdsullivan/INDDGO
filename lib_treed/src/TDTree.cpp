@@ -19,10 +19,9 @@ inddgo-info@googlegroups.com
 
 */
 
-#include "WeightedMutableGraph.h"
-#include "Debug.h"
-#include "TreeDecomposition.h"
 #include "GraphDecomposition.h"
+#include "TreeDecomposition.h"
+#include "Debug.h"
 #include "Util.h"
 #include "RndNumGen.h"
 #include <math.h>
@@ -3780,3 +3779,18 @@ void TDTree::refine()
 
 	this->remove_subset_bags(); 
 }
+
+/*
+ * Sorts all bags in the tree decomposition
+ */
+void TDTree::sort_bags()
+{
+  int num_tree_nodes=(int) this->tree_nodes.size();
+  for (int i = 0; i < num_tree_nodes; i++)
+    {
+      if (this->tree_nodes[i])
+	this->tree_nodes[i]->bag.sort();
+    }
+}
+
+

@@ -144,6 +144,9 @@ public:
 	void remove_duplicate_bags();
 	void remove_subset_bags();
 	void refine();
+	
+	// Sorts all the members of the bags of T.
+	void sort_bags();
 
 	// Constructs a tree decomposition using Bodlaender-Koster's "Algorithm 2"
 	// with the provided elimination order
@@ -304,9 +307,6 @@ protected:
 	// Remove and add edges from the tree
 	bool remove_tree_edge(int u, int v);
 	bool add_tree_edge(int u, int v);
-
-
-
 
 };
 

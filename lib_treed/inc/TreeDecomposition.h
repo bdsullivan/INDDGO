@@ -59,6 +59,7 @@
 #include "uthash.h"
 #include "bigint.h"
 #include <time.h>
+#include "GraphDecomposition.h"
 #include "TDSolution.h"
 #include "TDTreeNode.h"
 #include "TDTree.h"
@@ -71,7 +72,9 @@ extern "C"{
 }
 #endif
 
-
+void form_td(int td_alg, TDTree**T, vector<int>* ordering);
+void td_size_histogram(TDTree *T, FILE *stream);
+void create_tree_decomposition(Graph::WeightedMutableGraph *G, TDTree **T, bool read_tree, char *tree_infile, bool read_ordering, bool scotch, char *ord_file, int elim_order_type, int start_v, int td_alg, bool make_nice, bool timings);
 
 #endif
 

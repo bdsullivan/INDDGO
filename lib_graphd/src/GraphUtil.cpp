@@ -758,7 +758,7 @@ namespace Graph
 using namespace std;
  /**
    * Populates the provided Graph structure with the necessary information to do TD, visualizations, analysis.
-   * Assumes graph_file is in DIMACS format.
+   * Assumes graph_file is in DIMACS format. 
    * If needed, stores the largest connected components in DIMACS format at graph_file.giantcomp (and populates Graph from this).
    */
 void Graph::create_largestcomponent_graph(char* graph_file, WeightedMutableGraph *&G)
@@ -787,43 +787,3 @@ void Graph::create_largestcomponent_graph(char* graph_file, WeightedMutableGraph
       }
   }
   
-  /**
-   * Helper functions for creating elimination orderings. Allow reading from file (normal or SCOTCH), or generating internally (with or without start vertex)
-   */
-void Graph::form_eo(bool read_order, bool scotch, char* ord_file, int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering)
-  {
-    GraphEOUtil eoutil;
-    if(read_order)
-      {
-  	if(scotch)
-  	  read_SCOTCH_ordering_file(ord_file, ordering);      
-  	else
-  	  read_ordering_file(ord_file, ordering);      
-      }
-    else
-      {
-  	if (start_v == GD_UNDEFINED || start_v < 0)
-	  eoutil.find_elimination_ordering(G, ordering, elim_order_type, false);
-  	else
-	  eoutil.find_elimination_ordering(G, ordering, elim_order_type, start_v, false);
-      }
-  }
-  
-void Graph::form_eo(bool read_order, bool scotch, char* ord_file, MutableGraph *G,   vector<int> *ordering)
-  {
-    form_eo(read_order, scotch, ord_file, 0, 0, G, ordering);
-  }
-  
-void Graph::form_eo(int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering)
-  {
-    form_eo(false, false, NULL, elim_order_type, start_v, G, ordering);
-  }
-  
-void Graph::form_eo(int elim_order_type, MutableGraph *G, vector<int> *ordering)
-  {
-    form_eo(false, false, NULL, elim_order_type, GD_UNDEFINED, G, ordering);
-  }
-
-
-
-

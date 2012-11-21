@@ -51,10 +51,5 @@ public:
 };
 
 void usage(const char *s);
-void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G, TDTree **T);
-
-/*These are generic and don't really belong in viz.*/
-
-void form_td(int td_alg, TDTree**T, vector<int>* ordering);
 
 #endif  /* __VIZ_H__ */
