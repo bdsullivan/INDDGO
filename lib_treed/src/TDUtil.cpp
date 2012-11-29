@@ -155,21 +155,23 @@ void create_tree_decomposition(Graph::WeightedMutableGraph *G, TDTree **T, bool 
  * Calculates a statistic for each bag in the tree decomposition and stores
  * to the stats vector so that stats[i] = statistic(bag assoc w/ node i)
  * stat_flag should be one of GD_XXX defined in Util.h
+ * Note this will fail if T's bag vectors have not been filled (e.g. with fill_bag_vecs()).
  */
 void bag_statistics(TDTree *T, const vector<double> &scores, vector<double> *stats, int stat_flag)
 {
   int size = T->tree_nodes.size();
   TDTreeNode *curr;
-  stats->resize(size);
+  int curr_node = 0;
+  stats->resize(T->num_tree_nodes);
   for(int i; i < size; i++)
     {
       curr = T->tree_nodes[i];
       if(curr != NULL)
 	{
-	  (*stats)[i] = get_statistics(curr->bag_vec, scores, stat_flag);
-      }
-      else 
-	(*stats)[i] = GD_UNDEFINED;
+	  (*stats)[curr_node] = get_statistics(curr->bag_vec, scores, stat_flag);
+	  curr_node++;
+	}
+      //no else clause; we don't record stats for 'missing' nodes.
     }
 
   

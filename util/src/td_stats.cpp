@@ -19,9 +19,6 @@
 
 */
 
-//Nov 21 2012: Discovered problem with metis-node-nd. Gives an error of "Input error. Incorrect ufactor." (subsequent core dump). 
-//This is not an issue specific to td_stats. Also replicated with td_viz and serial_wis. CRITICAL FIX.
-
 #include "GraphDecomposition.h"
 #include "TreeDecomposition.h"
 #include <fstream>
@@ -43,12 +40,12 @@ int main(int argc, char **argv)
    * 
    */
   vector<double> *kcore_score = new vector<double>();
-  vector<double> *degree_score;
+  vector<double> *degree_score = new vector<double>();
   int tdt[] = {TD_SUPERETREE, TD_GAVRIL, TD_BK, TD_NICE}; 
   int et[] = {GD_AMD, GD_METIS_NODE_ND, GD_METIS_MMD};
-  vector<double>* st[] = {kcore_score, degree_score};
   vector<int> td_types(tdt, tdt+sizeof(tdt)/sizeof(tdt[0]));
   vector<int> elim_types(et, et+sizeof(et)/sizeof(et[0]));
+  vector<double>* st[] = {kcore_score, degree_score};
   vector<vector<double> *> scores(st, st+sizeof(st)/sizeof(st[0]));
 
   /*necessary variables for storage*/
@@ -79,39 +76,44 @@ int main(int argc, char **argv)
   
   try
     {
-      fprintf(stdout, "create G.\n");
-      fflush(stdout);
-
       /*populate the graph*/
       Graph::create_largestcomponent_graph(graph_file, G);      
      
-      fprintf(stdout, "Find scores.\n");
-      fflush(stdout);
       /*populate appropriate score vectors*/
       bool range = read_color_file(kcore_file,kcore_max,kcore_min,*kcore_score);
       Graph::GraphUtil gutil; 
       gutil.recompute_degrees(G);
       vector<int> idegree_score = G->get_degree();
-      degree_score  = new vector<double>(idegree_score.begin(), idegree_score.end());
+      (*degree_score).resize(idegree_score.size());
+      for(int i = 0; i < idegree_score.size(); i++)
+	(*degree_score)[i] = idegree_score[i];
 
+      
       /*loop over tree decomposition algorithms*/
       for(t = 0; t < td_types.size(); t++)
 	{
 	  /*loop over elimination order heuristics*/
 	  for(e = 0; e < elim_types.size(); e++)
 	    {
-	      fprintf(stdout, "create T.\n");
-	      fflush(stdout);
 	      /*form the tree decomposition*/
 	      create_tree_decomposition(G, &T, false, NULL, false, 
 					false, NULL, elim_types[e], 
 					GD_UNDEFINED, td_types[t], 
 					false, true);
-	      
+	      //fill the bag vectors
+	      T->fill_bag_vecs();
+	      cout << "T has " << T->num_tree_nodes << " tree nodes\n";
+
 	      /*loop over scores*/
 	      for(s = 0; s < scores.size(); s++)
 		{
-
+		  vector<double> mystats;
+		  cout << "Score " << s << ":\n"; 
+		  bag_statistics(T, *(scores[s]), &mystats, GD_STAT_MEAN);
+		  for(int i = 0; i < mystats.size(); i++)
+		    cout << mystats[i] << " "; 
+		  cout << "\n";
+		  
 		}
 	      
 	      /*delete the tree decomposition*/

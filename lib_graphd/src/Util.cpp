@@ -194,9 +194,9 @@ double get_statistics(const vector<int> & nodes, const vector<double> & scores, 
 	}
 	else if(FLAG==3)
 	{
+	  fatal_error("Median statistic not yet implemented.");
 		//compute median
 		//To be done
-
 	}
 
 	return statistic;
