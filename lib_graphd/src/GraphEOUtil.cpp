@@ -1444,6 +1444,7 @@ namespace Graph
 		//as default for ONMETIS before and (2) satisfy the checkParams function
 		//in 5.0.2. They do NOT currently exactly replicate old behaviour.
 		int options[METIS_NOPTIONS];
+		METIS_SetDefaultOptions(options);
 		options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_NODE; 
 		options[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM; 
 		options[METIS_OPTION_IPTYPE] = METIS_IPTYPE_NODE; 
