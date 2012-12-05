@@ -198,7 +198,16 @@ double get_statistics(const vector<int> & nodes, const vector<double> & scores, 
 		//compute median
 		//To be done
 	}
+	else if(FLAG == 4)
+	  {
+	    //Count number of non-negative scored vertices in bag.
+	    const int size = nodes.size();
+	    
+	    for(int i=0;i<size;++i)
+	      if(!(scores[nodes[i]] < 0))
+		statistic++;
 
+	  }
 	return statistic;
 
 }

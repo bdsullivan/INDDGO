@@ -108,12 +108,21 @@ int main(int argc, char **argv)
 	      for(s = 0; s < scores.size(); s++)
 		{
 		  vector<double> mystats;
-		  cout << "Score " << s << ":\n"; 
+		  cout << "Mean " << s << ":\n"; 
 		  bag_statistics(T, *(scores[s]), &mystats, GD_STAT_MEAN);
 		  for(int i = 0; i < mystats.size(); i++)
 		    cout << mystats[i] << " "; 
 		  cout << "\n";
 		  
+		  if(s == 0)
+		    {
+		      cout << "Count " << s << ":\n"; 
+		      bag_statistics(T, *(scores[s]), &mystats, GD_STAT_COUNT);
+		      for(int i = 0; i < mystats.size(); i++)
+			cout << mystats[i] << " "; 
+		      cout << "\n";
+		    }
+
 		}
 	      
 	      /*delete the tree decomposition*/
