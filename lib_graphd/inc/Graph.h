@@ -82,7 +82,6 @@ namespace Graph
 		friend class GraphDisplay;
 		friend class GraphEOUtil;
 		friend class GraphCreator;
-
 	};
 
 }

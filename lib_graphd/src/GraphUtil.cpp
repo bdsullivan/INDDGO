@@ -682,14 +682,16 @@ namespace Graph
 		return k;
 	}
 
+
 	//runs a BFS from start using only vertices with allowed[v] = true.
 	//Returns an array of integers giving distance from the source (0 for source).
 	//Unreachable vertices have value GD_INFINITY.
 	//num_reached is the number of vertices which are reachable. mg does not include
 	//disallowed vertices, and does include the start.
+  //Returns the maximum distance (vertex eccentricity of start) in ecc.
 
 	int *GraphUtil::bfs_dist(MutableGraph *mg, int start, bool *allowed,
-		int *num_reached)
+				 int *num_reached, int *ecc)
 	{
 
 		// We need the graph to be symmetric, as we're going to walk through a neighbor list
@@ -749,12 +751,47 @@ namespace Graph
 			}
 		}
 
+		*ecc = curr_level-1;
 		*num_reached = num_found;
 		// We emptied the stack.
 		return dists;
 	}
-}
+  
+  	int *GraphUtil::bfs_dist(MutableGraph *mg, int start, bool *allowed,
+		int *num_reached)
+	{
+	  int ecc;
+	  return bfs_dist(mg, start, allowed, num_reached, &ecc);
+	}
 
+  
+        //Find the eccentricity of each vertex and store it in ecc, which is resized appropriately within this function.
+        void GraphUtil::find_ecc(MutableGraph *mg, vector<int> *ecc)
+	{
+	  ecc->resize(mg->capacity);
+
+	  //all nodes are allowed
+	  bool allowed[mg->capacity]; 
+	  for(int i = 0; i < mg->capacity; i++)
+	    allowed[i] = true;
+	  int num_reached;
+	  int e;
+	  int * dists;
+	  for (int i = 0; i < mg->capacity; i++)
+	    {
+	      //for valid nodes
+	      if (mg->nodes[i].label != -1)
+		{
+		  dists = this->bfs_dist(mg, (mg->nodes[i]).get_label()-1, allowed, &num_reached, &e);
+		  (*ecc)[i] =e;
+		}
+	      
+	    }
+	  return;
+	}
+
+
+}
 using namespace std;
  /**
    * Populates the provided Graph structure with the necessary information to do TD, visualizations, analysis.

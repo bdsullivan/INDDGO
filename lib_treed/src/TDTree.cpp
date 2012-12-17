@@ -3794,3 +3794,50 @@ void TDTree::sort_bags()
 }
 
 
+
+/*
+ * Forms a MutableGraph holding the underlying tree of the given tree decomposition. 
+ * Nodes in TDTree will be stored as {1,2, ... num_tree_nodes} in G so that 
+ * the label of nodes[i] < the label of nodes[j] whenever i < j. 
+ */
+Graph::MutableGraph *TDTree::export_tree()
+{
+  int n = this->num_tree_nodes;
+  int i,j,k;
+  Graph::MutableGraph *mg = new Graph::MutableGraph(n);
+  //set up the Graph allocations and default variables.    
+  mg->initialize_params(true, true, 1);
+  
+  //figure out how to go back and forth from tree node vector to graph nodes 
+  //If there are no gaps in the tree_nodes array, this just maps i <-> i.
+  int curr = 0;
+  int size = (this->tree_nodes).size();
+  int *graph_labels = new int[size];
+  memset(graph_labels, GD_UNDEFINED, size*sizeof(int));
+  for(k=0; k < size; k++)
+    {
+      graph_labels[k] = curr;
+      curr++;
+    }
+  list<int>::iterator L;
+  
+  for(i=0;i<size;i++)
+    {   
+      if(this->tree_nodes[i] != NULL)
+	{
+	  L = this->tree_nodes[i]->adj.begin(); 
+	    for(L;L!=this->tree_nodes[i]->adj.end();++L)
+	      {
+		j=*L;
+		if(j > i)
+		  mg->add_edge(graph_labels[i], graph_labels[j]);
+		  mg->add_edge(graph_labels[j], graph_labels[i]);
+	      }
+	}
+    }
+
+  Graph::GraphUtil util; 
+  util.recompute_degrees(mg); 
+  
+  return mg;
+}

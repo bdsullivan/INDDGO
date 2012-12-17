@@ -52,14 +52,12 @@ int main(int argc, char **argv)
   char *kcore_file = argv[2]; 
   char *graph_file = argv[1];
 
-  if(kcore_file == NULL || graph_file == NULL)
-    throw(Graph::GraphException("Call with two arguments: graph_file kcore_file\n"));
   int t, e, i, s;
   Graph::WeightedMutableGraph *G;
   TDTree *T;
   double kcore_max, kcore_min; 
   int degree_max, degree_min;
-  
+     
   /*initialize log files if needed*/
   int pid;
 #if WIN32 || _WIN32
@@ -76,6 +74,9 @@ int main(int argc, char **argv)
   
   try
     {
+      if(kcore_file == NULL || graph_file == NULL)
+	throw(Graph::GraphException("Call with two arguments: graph_file kcore_file\n"));
+      
       /*populate the graph*/
       Graph::create_largestcomponent_graph(graph_file, G);      
      
@@ -104,25 +105,37 @@ int main(int argc, char **argv)
 	      T->fill_bag_vecs();
 	      cout << "T has " << T->num_tree_nodes << " tree nodes\n";
 
+	      //calculate the eccentricities
+	      Graph::MutableGraph *GT = T->export_tree();
+	      vector<int> ecc;
+	      gutil.find_ecc(GT, &ecc);
+	      cout << "Eccentricities " << ":\n"; 
+	      for(int i = 0; i < ecc.size(); i++)
+		cout << ecc[i] << " "; 
+	      cout << "\n";
+	      
+	      vector<double> mystats;
+	      cout << "Count " << ":\n"; 
+	      bag_statistics(T, *(scores[0]), &mystats, GD_STAT_COUNT);
+	      for(int i = 0; i < mystats.size(); i++)
+		cout << mystats[i] << " "; 
+	      cout << "\n";
+	
 	      /*loop over scores*/
 	      for(s = 0; s < scores.size(); s++)
 		{
-		  vector<double> mystats;
 		  cout << "Mean " << s << ":\n"; 
 		  bag_statistics(T, *(scores[s]), &mystats, GD_STAT_MEAN);
 		  for(int i = 0; i < mystats.size(); i++)
 		    cout << mystats[i] << " "; 
 		  cout << "\n";
-		  
-		  if(s == 0)
-		    {
-		      cout << "Count " << s << ":\n"; 
-		      bag_statistics(T, *(scores[s]), &mystats, GD_STAT_COUNT);
-		      for(int i = 0; i < mystats.size(); i++)
-			cout << mystats[i] << " "; 
-		      cout << "\n";
-		    }
 
+		  cout << "Std Dev " << s << ":\n"; 
+		  bag_statistics(T, *(scores[s]), &mystats, GD_STAT_STD);
+		  for(int i = 0; i < mystats.size(); i++)
+		    cout << mystats[i] << " "; 
+		  cout << "\n";
+		  
 		}
 	      
 	      /*delete the tree decomposition*/

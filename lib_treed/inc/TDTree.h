@@ -161,6 +161,9 @@ public:
 
 	// Verifies that the decomposition is nice
 	bool is_nice();
+	
+	//Export the tree structure to a MutableGraph.
+	Graph::MutableGraph *export_tree();
 
 	// Writes the decomposition to a file in (an extended) DIMACS format
 	void write_DIMACS_file(const char *DIMACS_file);

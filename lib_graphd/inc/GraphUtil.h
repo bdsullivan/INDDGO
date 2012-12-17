@@ -79,6 +79,11 @@ namespace Graph
 		bool* bfs(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 		bool* bfs_old(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 		int* bfs_dist(MutableGraph *mg, int start, bool *allowed, int *num_reached);
+		int* bfs_dist(MutableGraph *mg, int start, bool *allowed, int *num_reached, int *ecc);
+		
+		//Find the eccentricity of each vertex and store it in ecc.
+		void find_ecc(MutableGraph *mg, vector<int> *ecc);
+
 
 	};
 

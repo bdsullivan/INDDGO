@@ -477,4 +477,40 @@ namespace Graph
 
 		return;
 	}
+
+  /*
+   * Calculates number of connected components, checks whether the graph is simple/canonical.
+   * Also checks and sets num_components. 
+   *
+   */
+  void MutableGraph::initialize_params()
+  {
+    fatal_error("Initialize params not yet implemented\n");
+    
+    //Graph::GraphProperties properties;
+    //properties.make_canonical(G);
+    //if (!properties.is_connected(G))
+    //	list<Graph::WeightedMutableGraph *> C;
+    //	C = creator.create_all_components(G, true);
+    //  print_message(0, "Found %d components\n", C.size());
+    
+    return;
+  } 
+
+  /*
+   * For advanced users - allows you to set number of connected components, and whether the graph is simple/canonical
+   * Will not verify that the values passed in are accurate. 
+   */
+  void MutableGraph::initialize_params(bool simple, bool canonical, int num_comp)
+  {
+
+    this->simple = simple; 
+    this->canonical = canonical; 
+    this->num_connected_components = num_comp; 
+    this->next_label = this->num_nodes + 1;
+
+    return;
+  }
+ 
+
 }
