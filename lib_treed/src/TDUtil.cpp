@@ -176,3 +176,27 @@ void bag_statistics(TDTree *T, const vector<double> &scores, vector<double> *sta
 
   
 }
+
+/*
+ * Calculates the "length" of each bag (maximum shortest path distance in the 
+ * original graph between pairs of vertices in that bag).
+ * Note this will fail if T's bag vectors have not been filled (e.g. with fill_bag_vecs()).
+ */
+void bag_lengths(TDTree *T, vector<int> *lengths)
+{
+  int size = T->tree_nodes.size();
+  TDTreeNode *curr;
+  Graph::GraphUtil util;
+  int curr_node = 0;
+  lengths->resize(T->num_tree_nodes);
+  for(int i; i < size; i++)
+    {
+      curr = T->tree_nodes[i];
+      if(curr != NULL)
+	{
+	  (*lengths)[curr_node] = util.subset_max_dist(T->G, curr->bag_vec);
+	  curr_node++;
+	}
+      //no else clause; we don't record stats for 'missing' nodes.
+    }
+}

@@ -84,6 +84,9 @@ namespace Graph
 		//Find the eccentricity of each vertex and store it in ecc.
 		void find_ecc(MutableGraph *mg, vector<int> *ecc);
 
+		//Calculate the maximum distance between nodes within a subset of vertices
+		//given as a list
+		int subset_max_dist(MutableGraph *mg, vector<int> subset);
 
 	};
 

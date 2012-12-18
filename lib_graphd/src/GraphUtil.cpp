@@ -787,8 +787,36 @@ namespace Graph
 		}
 	      
 	    }
+	  delete[] dists;
 	  return;
 	}
+
+  //Calculate the maximum distance between nodes within a subset of vertices
+  //given as a list
+  int GraphUtil::subset_max_dist(MutableGraph *mg,  vector<int> subset)
+  {
+    int max = 0;
+
+    //all nodes are allowed
+    bool allowed[mg->capacity]; 
+    for(int i = 0; i < mg->capacity; i++)
+      allowed[i] = true;
+    int num_reached;
+    vector<int>::iterator it, it2;
+    int * dists;
+    for (it = subset.begin(); it != subset.end(); ++it)
+      {
+	dists = this->bfs_dist(mg, *it, allowed, &num_reached);
+	for (it2 = subset.begin(); it2 != subset.end(); ++it2)
+	  {
+	    if(max < dists[*it2])
+	      max = dists[*it2];
+	  }
+	delete[] dists;      
+      }
+    
+    return max;
+  }
 
 
 }

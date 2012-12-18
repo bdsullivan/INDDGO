@@ -77,6 +77,6 @@ void td_size_histogram(TDTree *T, FILE *stream);
 void create_tree_decomposition(Graph::WeightedMutableGraph *G, TDTree **T, bool read_tree, char *tree_infile, bool read_ordering, bool scotch, char *ord_file, int elim_order_type, int start_v, int td_alg, bool make_nice, bool timings);
 void bag_statistics(TDTree *T, const vector<double> &scores, vector<double> *stats, int stat_flag);
 void find_eccentricities(TDTree &T, vector<int>* ec);
-
+void bag_lengths(TDTree *T, vector<int> *lengths);
 #endif
 

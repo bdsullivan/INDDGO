@@ -156,6 +156,8 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
 	return(min_flag && max_flag);
 }
 
+
+
 //Input a vector of node indices, a vector of node scores (values associated with each node), and a flag
 //that indicates the statistic you desire to be calculated
 //FLAG should be one of GD_XXX defined in Util.h
@@ -163,51 +165,58 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
 double get_statistics(const vector<int> & nodes, const vector<double> & scores, const int FLAG)
 {
 	double statistic = 0.0;
+	const int size = nodes.size();
 
-	if(FLAG==1)
+	if(FLAG==GD_STAT_MEAN)
 	{
 		//compute average
-
-		const int size = nodes.size();
-
-		for(int i=0;i<size;++i)
-			statistic += scores[nodes[i]];
-
-		statistic = statistic/double(size);
+	  for(int i=0;i<size;++i)
+	    statistic += scores[nodes[i]];
+	  
+	  statistic = statistic/double(size);
 	}
-	else if(FLAG==2)
+	else if(FLAG==GD_STAT_STD)
 	{
 		//compute standard deviation
-
-		const int size = nodes.size();
-		double sum=0;
-		double square_sum=0;
-
-		for(int i=0;i<size;++i)
-		{
-			sum += nodes[i];
-			square_sum += pow((double)(nodes[i]),2);
-		}
-
-		statistic = square_sum/double(size) - pow((sum/double(size)),2);
-		statistic = sqrt(statistic);
+	  double sum=0;
+	  double square_sum=0;
+	  
+	  for(int i=0;i<size;++i)
+	    {
+	      sum += nodes[i];
+	      square_sum += pow((double)(nodes[i]),2);
+	    }
+	  
+	  statistic = square_sum/double(size) - pow((sum/double(size)),2);
+	  statistic = sqrt(statistic);
 	}
-	else if(FLAG==3)
+	else if(FLAG==GD_STAT_MED)
 	{
-	  fatal_error("Median statistic not yet implemented.");
-		//compute median
-		//To be done
+	  //compute median - currently using builtin vector sort
+	  vector<double> sorted = scores;
+	  sort(sorted.begin(), sorted.end());
+
+	  int middle = size/2; 
+	  if(size%2 == 0)
+	    {
+	      statistic = sorted[middle]; 
+	    }
+	  else
+	    {
+	      statistic = (sorted[middle] + sorted[middle+1])/2; 
+	    }
 	}
-	else if(FLAG == 4)
+	else if(FLAG == GD_STAT_COUNT)
 	  {
 	    //Count number of non-negative scored vertices in bag.
-	    const int size = nodes.size();
-	    
 	    for(int i=0;i<size;++i)
 	      if(!(scores[nodes[i]] < 0))
 		statistic++;
-
+	    
 	  }
+	else{
+	  fatal_error("Statistic must be one of GD_STAT_XXX from Util.h\n");
+	}
 	return statistic;
 
 }
