@@ -377,7 +377,9 @@ namespace Graph
 		 *This block is to allow compatibility with 64-bit metis where idx_t is not an int, and replaces the original code below it.
 		 */
 		int sizexa = mg->get_num_nodes() + 1;
-		int sizead = 2*(mg->get_num_edges());
+		int sizead = mg->xadj[nvtxs]; //2*(mg->get_num_edges());
+		maxsub = 4*sizead; 
+
 		xadj = new idx_t[sizexa];
 		adjncy = new idx_t[sizead];
 		for(i = 0; i < sizexa;i++)
@@ -426,10 +428,6 @@ namespace Graph
 		//print_message(0, "smbfct found %d nonzeros\n", maxlnz);
 		//print_message(0, "Clearing graph\n");
 
-		util.free_CRS(mg);
-		delete xadj; 
-		delete adjncy;
-
 		for (i = 0; i < nvtxs; i++)
 		{
 			xlnz[i]--;
@@ -461,6 +459,10 @@ namespace Graph
 				width = k;
 
 		}
+
+		util.free_CRS(mg);
+		delete xadj; 
+		delete adjncy;
 
 		free(perm);
 		free(xlnz);
