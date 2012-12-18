@@ -1501,7 +1501,7 @@ namespace Graph
 		options[METIS_OPTION_CCORDER] = 0; 
 		options[METIS_OPTION_NITER] = 10;
 
-				/*
+		/*
 		 * for 64-bit compatibility with METIS
 		 * Concern: in triangulation, we increment all vertex numbers by 1 in 
 		 * xadj and adjncy; this wasn't being done in this function. Are we getting correct results in both?
@@ -1519,11 +1519,13 @@ namespace Graph
 		  {
 		    adjncy[i] = (mg->adjncy)[i];//++;
 		  } 
-
-
+		vector<idx_t> my_order(mg->get_num_nodes(), GD_UNDEFINED);
 		METIS_NodeND(&nvtxs, xadj, adjncy, NULL, options,
-			&(ordering->at(0)), &(metis_order[0]));
+			     &(my_order[0]), &(metis_order[0]));
 		util.free_CRS(mg);
+		for (i = 0; i < mg->get_num_nodes(); i++)
+		  ordering->at(i) = (int) my_order[i];
+		
 		return 1;
 #endif
 	}
