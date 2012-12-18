@@ -364,22 +364,39 @@ namespace Graph
 		// Not reached but MSVC complains
 		return 0;
 #else
-		int i, j, k, nvtxs, maxlnz, maxsub;
-		int *xadj, *adjncy;
-		int *perm, *xlnz, *xnzsub, *nzsub, *iperm;
+		int i, j, k, nvtxs; 
+		idx_t maxlnz, maxsub;
+		idx_t *xadj, *adjncy;//need to be idx_t for METIS, but int* for use elsewhere in Graph; this is a problem on 64-bit.
+		idx_t *perm, *xlnz, *xnzsub, *nzsub, *iperm;
 		nvtxs = mg->num_nodes;
 		//print_message(0,"nvtxs=num_nodes=%d\n",nvtxs);
 		GraphUtil util;
 		util.populate_CRS(mg);
-		xadj = &(mg->xadj[0]);
-		adjncy = &(mg->adjncy[0]);
-		maxsub = 4 * xadj[nvtxs];
-		k = xadj[nvtxs];
-		for (i = 0; i < k; i++)
-			adjncy[i]++;
 
-		for (i = 0; i < nvtxs + 1; i++)
-			xadj[i]++;
+		/**
+		 *This block is to allow compatibility with 64-bit metis where idx_t is not an int, and replaces the original code below it.
+		 */
+		int sizexa = mg->get_num_nodes() + 1;
+		int sizead = 2*(mg->get_num_edges());
+		xadj = new idx_t[sizexa];
+		adjncy = new idx_t[sizead];
+		for(i = 0; i < sizexa;i++)
+		  {
+		    xadj[i] = (mg->xadj)[i]++;
+		  }
+		for(i = 0; i < sizead; i++)
+		  {
+		    adjncy[i] = (mg->adjncy)[i]++;
+		  } 
+		// xadj = &(mg->xadj[0]);
+		// adjncy = &(mg->adjncy[0]);
+		// maxsub = 4 * xadj[nvtxs];
+		// k = xadj[nvtxs];
+		// for (i = 0; i < k; i++)
+		// 	adjncy[i]++;
+
+		// for (i = 0; i < nvtxs + 1; i++)
+		// 	xadj[i]++;
 
 		perm = imalloc(nvtxs + 1, (char *) "ComputeFillIn: perm");
 		xlnz = imalloc(nvtxs + 1, (char *) "ComputeFillIn: xlnz");
@@ -408,6 +425,11 @@ namespace Graph
 		}
 		//print_message(0, "smbfct found %d nonzeros\n", maxlnz);
 		//print_message(0, "Clearing graph\n");
+
+		util.free_CRS(mg);
+		delete xadj; 
+		delete adjncy;
+
 		for (i = 0; i < nvtxs; i++)
 		{
 			xlnz[i]--;
@@ -439,6 +461,7 @@ namespace Graph
 				width = k;
 
 		}
+
 		free(perm);
 		free(xlnz);
 		free(xnzsub);
@@ -1395,8 +1418,26 @@ namespace Graph
 		for (i = 0; i < graph.nvtxs; i++)
 			graph.label[i] = i;
 
-		graph.adjncy = &(mg->adjncy[0]);
-		graph.xadj = &(mg->xadj[0]);
+		/*
+		 * for 64-bit compatibility with METIS
+		 * Concern: in triangulation, we increment all vertex numbers by 1 in 
+		 * xadj and adjncy; this wasn't being done in this function. Are we getting correct results in both?
+		 */
+		int sizexa = mg->get_num_nodes() + 1;
+		int sizead = 2*(mg->get_num_edges());
+		idx_t *xadj = new idx_t[sizexa];
+		idx_t *adjncy = new idx_t[sizead];
+		for(i = 0; i < sizexa;i++)
+		  {
+		    xadj[i] = (mg->xadj)[i];//++;
+		  }
+		for(i = 0; i < sizead; i++)
+		  {
+		    adjncy[i] = (mg->adjncy)[i];//++;
+		  } 
+
+		graph.adjncy = adjncy;//&(mg->adjncy[0]);
+		graph.xadj = xadj;//&(mg->xadj[0]);
 		//workspace mem alloc uses graph->ncon, which we were not setting before
 		graph.ncon = 1;
 
@@ -1406,7 +1447,7 @@ namespace Graph
 		/* allocate workspace memory */
 		AllocateWorkSpace(ctrl, &graph);
 
-		vector<int> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
+		vector<idx_t> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
 		MMDOrder(ctrl, &graph, &(metis_order[0]), graph.nvtxs);
 		util.free_CRS(mg);
 		for (i = 0; i < mg->get_num_nodes(); i++)
@@ -1415,6 +1456,9 @@ namespace Graph
 		return 1;
 #endif
 	}
+
+
+
 	int GraphEOUtil::find_metis_node_nd_ordering(MutableGraph *mg,
 		vector<int> *ordering)
 	{
@@ -1425,8 +1469,8 @@ namespace Graph
 #else
 		GraphUtil util;
 		util.populate_CRS(mg);
-		vector<int> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
-		int nvtxs = mg->get_num_nodes();
+		vector<idx_t> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
+		idx_t nvtxs = (idx_t)mg->num_nodes;
 		int numflag = 0;
 
 		//int options[10];
@@ -1443,7 +1487,7 @@ namespace Graph
 		//04/04 These options were chosen to (1) try and match what was being set 
 		//as default for ONMETIS before and (2) satisfy the checkParams function
 		//in 5.0.2. They do NOT currently exactly replicate old behaviour.
-		int options[METIS_NOPTIONS];
+		idx_t options[METIS_NOPTIONS];
 		METIS_SetDefaultOptions(options);
 		options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_NODE; 
 		options[METIS_OPTION_CTYPE] = METIS_CTYPE_SHEM; 
@@ -1456,9 +1500,35 @@ namespace Graph
 		options[METIS_OPTION_SEED] = -1; 
 		options[METIS_OPTION_CCORDER] = 0; 
 		options[METIS_OPTION_NITER] = 10;
-		METIS_NodeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), NULL, options,
-			&(ordering->at(0)), &(metis_order[0]));
+
+		/*
+		 * for 64-bit compatibility with METIS
+		 * Concern: in triangulation, we increment all vertex numbers by 1 in 
+		 * xadj and adjncy; this wasn't being done in this function. Are we getting correct results in both?
+		 */
+		int i;
+		int sizexa = mg->get_num_nodes() + 1;
+		int sizead = 2*(mg->get_num_edges());
+		idx_t *xadj = new idx_t[sizexa];
+		idx_t *adjncy = new idx_t[sizead];
+		for(i = 0; i < sizexa;i++)
+		  {
+		    xadj[i] = (mg->xadj)[i];//++;
+		  }
+		for(i = 0; i < sizead; i++)
+		  {
+		    adjncy[i] = (mg->adjncy)[i];//++;
+		  } 
+		vector<idx_t> my_order(mg->get_num_nodes(), GD_UNDEFINED);
+		METIS_NodeND(&nvtxs, xadj, adjncy, NULL, options,
+			     &(my_order[0]), &(metis_order[0]));
 		util.free_CRS(mg);
+
+		for (i = 0; i < mg->get_num_nodes(); i++)
+		  ordering->at(i) = (int) my_order[i];
+		
+		return 1;
+
 #endif
 	}
 
