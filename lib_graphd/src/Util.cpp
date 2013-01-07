@@ -21,6 +21,7 @@ inddgo-info@googlegroups.com
 
 #include "GraphDecomposition.h"
 #include <fstream>
+#include <limits>
 
 /*BDS - added to get memory highwater mark*/
 int parseLine(char* line){
@@ -177,17 +178,19 @@ double get_statistics(const vector<int> & nodes, const vector<double> & scores, 
 	}
 	else if(FLAG==GD_STAT_STD)
 	{
-		//compute standard deviation
-	  double sum=0;
+	  //compute standard deviation
+	  double mean=0;
+	  for(int i=0;i<size;++i)
+	    mean += scores[nodes[i]];
+	  mean = mean/double(size);
+
 	  double square_sum=0;
-	  
 	  for(int i=0;i<size;++i)
 	    {
-	      sum += nodes[i];
-	      square_sum += pow((double)(scores[nodes[i]]),2);
+	      square_sum += pow((double)(scores[nodes[i]] - mean),2);
 	    }
+	  statistic = square_sum/double(size);
 	  
-	  statistic = square_sum/double(size) - pow((sum/double(size)),2);
 	  statistic = sqrt(statistic);
 	}
 	else if(FLAG==GD_STAT_MED)
