@@ -133,13 +133,14 @@ int main(int argc, char **argv)
 	      //Non-score-specific statistics - width, length, eccentricity
 
 	      /* Width - uses degree scores for non-negativity check*/
+	      /* We define width = |B| - 1 to coincide with treewidth*/
 	      bag_statistics(T, *(scores[0]), &mystats, GD_STAT_COUNT);
 	      treewidth = 0;
 	      for(int i = 0; i < mystats.size(); i++)
 		{
-		  if(mystats[i] > treewidth)
-		    treewidth = (int)(mystats[i]);
-		  stats[i].push_back(mystats[i]);
+		  if(mystats[i]-1 > treewidth)
+		    treewidth = (int)(mystats[i])-1;
+		  stats[i].push_back(mystats[i]-1);
 		}
 
 	      /*Length*/
