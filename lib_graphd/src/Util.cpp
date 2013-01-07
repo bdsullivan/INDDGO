@@ -184,7 +184,7 @@ double get_statistics(const vector<int> & nodes, const vector<double> & scores, 
 	  for(int i=0;i<size;++i)
 	    {
 	      sum += nodes[i];
-	      square_sum += pow((double)(nodes[i]),2);
+	      square_sum += pow((double)(scores[nodes[i]]),2);
 	    }
 	  
 	  statistic = square_sum/double(size) - pow((sum/double(size)),2);
@@ -193,17 +193,22 @@ double get_statistics(const vector<int> & nodes, const vector<double> & scores, 
 	else if(FLAG==GD_STAT_MED)
 	{
 	  //compute median - currently using builtin vector sort
-	  vector<double> sorted = scores;
+	  //Need to select sub-vector associated with nodes given in function call
+	  vector<double> sorted(size);
+	  for(int i = 0; i < size; ++i)
+	    sorted[i] = scores[nodes[i]];
+	  
 	  sort(sorted.begin(), sorted.end());
 
 	  int middle = size/2; 
-	  if(size%2 == 0)
+	  if(size%2 == 1)
 	    {
 	      statistic = sorted[middle]; 
 	    }
 	  else
 	    {
-	      statistic = (sorted[middle] + sorted[middle+1])/2; 
+	      //Adjust downwards since we index from 0, not 1
+	      statistic = (sorted[middle] + sorted[middle-1])/2; 
 	    }
 	}
 	else if(FLAG == GD_STAT_COUNT)
