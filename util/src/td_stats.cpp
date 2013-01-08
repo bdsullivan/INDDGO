@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 
   vector<int> td_types(tdt, tdt+sizeof(tdt)/sizeof(tdt[0]));
   vector<int> elim_types(et, et+sizeof(et)/sizeof(et[0]));
-  vector<double>* st[] = {kcore_score, degree_score};
+  vector<double>* st[] = {degree_score, kcore_score};
   vector<vector<double> *> scores(st, st+sizeof(st)/sizeof(st[0]));
 
   /*File names; this needs some checking to catch NULLS/miscalls*/
