@@ -100,44 +100,45 @@ void create_tree_decomposition(Graph::WeightedMutableGraph *G, TDTree **T, bool 
       (*T)->width = (*T)->read_DIMACS_file(tree_infile);
       // Assume not nice - could check this in read_DIMACS_file actually...
       (*T)->nice = false;
+      print_message(0,"Read tree.\n");
     }
   else
     {
 	Graph::form_eo(read_ordering, scotch, ord_file, elim_order_type, start_v, &H, &ordering);
-    }      
-  
-  // Triangulate the graph
-  clock_t tri_start = clock(), tri_stop;
-  if(td_alg == TD_SUPERETREE)
-    {
-      //no need to triangulate
-      tri_stop = tri_start;	
-    }
-  else
-    {
+	
+	// Triangulate the graph
+	clock_t tri_start = clock(), tri_stop;
+	if(td_alg == TD_SUPERETREE)
+	  {
+	    //no need to triangulate
+	    tri_stop = tri_start;	
+	  }
+	else
+	  {
 #if HAS_METIS
-      (*T)->width = eoutil.METIS_triangulate(&H, &ordering);
+	    (*T)->width = eoutil.METIS_triangulate(&H, &ordering);
 #else
-      (*T)->width = eoutil.triangulate(&H, &ordering);
+	    (*T)->width = eoutil.triangulate(&H, &ordering);
 #endif
-      tri_stop = clock();
-    }
-  if(timings)
-    {
-      print_message(0, "Triangulation took %f secs\n",
-		    (double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
-    }
+	    tri_stop = clock();
+	  }
+	if(timings)
+	  {
+	    print_message(0, "Triangulation took %f secs\n",
+			  (double) (tri_stop - tri_start) / CLOCKS_PER_SEC);
+	  }
+	
+	// Now create the tree
+	clock_t td_start = clock(), td_stop;
+	form_td(td_alg, T, &ordering);
+	td_stop=clock();
+	if (timings)
+	  {
+	    print_message(0, "Tree construction took %f secs\n",
+			  (double) (td_stop - td_start) / CLOCKS_PER_SEC);
+	  }  
+    }//end of creation from ordering
 
-  // Now create the tree
-  clock_t td_start = clock(), td_stop;
-  form_td(td_alg, T, &ordering);
-  td_stop=clock();
-  if (timings)
-    {
-      print_message(0, "Tree construction took %f secs\n",
-		    (double) (td_stop - td_start) / CLOCKS_PER_SEC);
-    }
-  
   // Sort the bags
   if(td_alg != TD_SUPERETREE)//bags already sorted
       (*T)->sort_bags();
