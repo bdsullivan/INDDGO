@@ -1430,6 +1430,9 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file)
 */
 void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 {
+  if(this->rooted == false)
+    fatal_error("s: Only writes rooted trees.\n", __FUNCTION__);
+
 	FILE *out;
 	if( (out=fopen(DIMACS_file,"w"))==NULL)
 		fatal_error("%s:  Couldn't open %s for writing\n",__FUNCTION__,DIMACS_file);
@@ -1442,9 +1445,10 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 	int size=(int)this->tree_nodes.size();
 	for(i=0;i<size;i++)
 	{
-		if(this->tree_nodes[i] != NULL)
-			m+=this->tree_nodes[i]->adj.size();
+	  if(this->tree_nodes[i] != NULL)
+	    m+=this->tree_nodes[i]->adj.size();
 	}
+	m = m-1; //counted root's "edge" to self once
 	m=m/2;// We double counted all the edges!
 
 	// Print out the "problem" information
@@ -1457,15 +1461,14 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 		this->pre_order_walk(&walk);
 	else
 	{
-		for(int i = 0; i < this->num_tree_nodes; ++i)
-			walk[i] = i;
+	  for(int i = 0; i < this->num_tree_nodes; ++i)
+	    walk[i] = i;
 	}
 
 	vector<int> perm(this->num_tree_nodes,GD_UNDEFINED);
 	for(int i = 0; i < this->num_tree_nodes; ++i)
 		perm[walk[i]] = i;
-
-
+	
 
 	// Print out the edges so that 'e p c' means p is the parent of c	
 	for(i=0;i<size;i++)
@@ -1474,7 +1477,7 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 		{
 			L = this->tree_nodes[i]->adj.begin(); 
 			++L; //skip the parent
-			for(L;L!=this->tree_nodes[i]->adj.end();++L)
+			for(L;L!=this->tree_nodes[i]->adj.end();L++)
 			{
 				j=*L;
 				fprintf(out,"e %d %d\n",perm[i]+1,perm[j]+1);
@@ -3123,7 +3126,6 @@ void TDTree::root(int k)
 	list<int>::iterator ii;
 	int t;
 
-
 	this->rooted=true;
 	this->root_node=k;
 	// Set the root's parent to itself (leave the other existing neighbors intact)
@@ -3135,22 +3137,32 @@ void TDTree::root(int k)
 		t=S.front();
 		// Reorder the adj. lists of all t's children, setting t to be the new parent
 		ii=this->tree_nodes[t]->adj.begin();
-		// Advance past the parent
-		++ii;
+		
+		//If this node was an old root, we need to remove it from its own list
+		if(*ii == t && *ii != k)
+		  {
+		    print_message(0, "found old root %d\n", *ii);
+		    (this->tree_nodes[*ii]->adj).pop_front();
+		    ii = this->tree_nodes[t]->adj.begin();
+		  }
+		else{
+		  // Advance past the parent
+		  ++ii;
+		}
 
 		while(ii!=this->tree_nodes[t]->adj.end())
 		{
 			if(*(this->tree_nodes[*ii]->adj.begin())!=t)
 			{
-				// Could do size check here to make sure we find t
-				// Remove t from the list of adjacent nodes and put it at the front
-				// since t is the parent
-				int orig_size=(int)this->tree_nodes[*ii]->adj.size();
-				this->tree_nodes[*ii]->adj.remove(t);
-				if((int)this->tree_nodes[*ii]->adj.size()!=orig_size -1)
-					print_message(0, "Didn't find alleged parent in existing neighbors??\n");
-
-				this->tree_nodes[*ii]->adj.push_front(t);
+		   
+			  // Do size check here to make sure we find t
+			  // Remove t from the list of adjacent nodes and put it at the front
+			  // since t is the parent
+			  int orig_size=(int)this->tree_nodes[*ii]->adj.size();
+			  this->tree_nodes[*ii]->adj.remove(t);
+			  if((int)this->tree_nodes[*ii]->adj.size()!=orig_size -1)
+			    print_message(0, "Didn't find alleged parent in existing neighbors??\n");
+			  this->tree_nodes[*ii]->adj.push_front(t);
 			}
 			// Add *ii to the end of the list
 			S.push_back(*ii);

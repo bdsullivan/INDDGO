@@ -45,7 +45,7 @@ int main(int argc, char **argv)
   vector<double> *degree_score = new vector<double>();
   int tdt[] = {TD_SUPERETREE, TD_GAVRIL, TD_BK, TD_NICE}; 
   int et[] = {GD_AMD, GD_METIS_NODE_ND, GD_METIS_MMD};
-  const char* tdtype[] = {"Super-E-Tree", "Gavril", "Bodlaender-Koster", "Nice"};
+  const char* tdtype[] = {"Super-E-Tree", "Gavril"}; /*,"Bodlaender-Koster", "Nice"};*/ //Edited to speed up computations
   const char* elimtype[] = {"AMD", "MetisNodeND", "MetisMultMinD"};
 
   vector<int> td_types(tdt, tdt+sizeof(tdt)/sizeof(tdt[0]));

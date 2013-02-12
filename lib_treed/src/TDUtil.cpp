@@ -44,6 +44,8 @@ void form_td(int td_alg, TDTree**T, vector<int>* ordering)
     default: 
       throw(Graph::GraphException("Unrecognized td construction algorithm.\n"));
     }
+  /*root this at 0 to make sure writing works correctly. Can always re-root later*/
+  (*T)->root(0);
 }
 
 void td_size_histogram(TDTree *T, FILE *stream)
@@ -100,6 +102,8 @@ void create_tree_decomposition(Graph::WeightedMutableGraph *G, TDTree **T, bool 
       (*T)->width = (*T)->read_DIMACS_file(tree_infile);
       // Assume not nice - could check this in read_DIMACS_file actually...
       (*T)->nice = false;
+      /*root this at 0 to make sure writing works correctly. Can always re-root later*/
+      (*T)->root(0);
       print_message(0,"Read tree.\n");
     }
   else
