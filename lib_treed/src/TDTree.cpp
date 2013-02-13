@@ -1448,6 +1448,7 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 	  if(this->tree_nodes[i] != NULL)
 	    m+=this->tree_nodes[i]->adj.size();
 	}
+	print_message(1, "Adj lists contain %d entries\n", m);
 	m = m-1; //counted root's "edge" to self once
 	m=m/2;// We double counted all the edges!
 
@@ -1471,20 +1472,25 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 	
 
 	// Print out the edges so that 'e p c' means p is the parent of c	
+	m = 0;//debugging edge count
 	for(i=0;i<size;i++)
 	{   
-		if(this->tree_nodes[i] != NULL)
+	  if(this->tree_nodes[i] != NULL)
+	    {
+	      L = this->tree_nodes[i]->adj.begin(); 
+	      print_message(1, "skipping %d %d\n", i, *L);
+	      L++; //skip the parent
+	      while(L!=this->tree_nodes[i]->adj.end())
 		{
-			L = this->tree_nodes[i]->adj.begin(); 
-			++L; //skip the parent
-			for(L;L!=this->tree_nodes[i]->adj.end();L++)
-			{
-				j=*L;
-				fprintf(out,"e %d %d\n",perm[i]+1,perm[j]+1);
-				fflush(out);
-			}
+		  j=*L;
+		  fprintf(out,"e %d %d\n",perm[i]+1,perm[j]+1);
+		  m++;
+		  fflush(out);
+		  L++;
 		}
+	    }
 	}
+	print_message(1, "printed %d edges to file\n", m);
 
 
 	// Print out the bags
@@ -1634,6 +1640,7 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 
 	rewind(in);
 
+	int edge_count = 0;
 	j=0;
 	// Use j to count the tree nodes read in
 	while(!feof(in))
@@ -1729,6 +1736,7 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 			//start--;end--;
 			start=perm[start];
 			end=perm[end];
+			edge_count++;
 			print_message(1,"Read in tree edge %d-%d\n",start,end);
 			this->tree_nodes[start]->adj.push_back(end);
 			this->tree_nodes[end]->adj.push_back(start);
@@ -1746,6 +1754,7 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 		while (!feof(in) && (retval=getc(in)) != '\n') ;  
 	}// end while
 
+	print_message(0, "Read %d edges\n", edge_count);
 	fclose(in);
 
 	// return the width
@@ -2428,7 +2437,7 @@ bool TDTree::remove_tree_edge(int u, int v)
 	this->tree_nodes[v]->adj.remove(u);
 	s2=this->tree_nodes[v]->adj.size();
 	if(s1==s2)
-	{
+	  {
 		print_message(0,"%s:  Tree edge u-v not found? (u not in v's adj list)\n",
 			__FUNCTION__);
 		return false;
@@ -3125,6 +3134,16 @@ void TDTree::root(int k)
 	list<int> S;
 	list<int>::iterator ii;
 	int t;
+	int size=(int)this->tree_nodes.size();
+	
+	// //for debugging
+	// int i, m = 0;
+	// for(i=0;i<size;i++)
+	//   {
+	//   if(this->tree_nodes[i] != NULL)
+	//     m+=this->tree_nodes[i]->adj.size();
+	// }
+	// print_message(1, "%d Adj lists contain %d entries\n", size, m);
 
 	this->rooted=true;
 	this->root_node=k;
@@ -3136,37 +3155,36 @@ void TDTree::root(int k)
 	{
 		t=S.front();
 		// Reorder the adj. lists of all t's children, setting t to be the new parent
-		ii=this->tree_nodes[t]->adj.begin();
+		ii=this->tree_nodes[t]->adj.begin();		
+		// Advance past the parent, which has been fixed for anything in S
+		ii++;
 		
-		//If this node was an old root, we need to remove it from its own list
-		if(*ii == t && *ii != k)
-		  {
-		    print_message(0, "found old root %d\n", *ii);
-		    (this->tree_nodes[*ii]->adj).pop_front();
-		    ii = this->tree_nodes[t]->adj.begin();
-		  }
-		else{
-		  // Advance past the parent
-		  ++ii;
-		}
-
 		while(ii!=this->tree_nodes[t]->adj.end())
 		{
-			if(*(this->tree_nodes[*ii]->adj.begin())!=t)
-			{
-		   
-			  // Do size check here to make sure we find t
-			  // Remove t from the list of adjacent nodes and put it at the front
-			  // since t is the parent
-			  int orig_size=(int)this->tree_nodes[*ii]->adj.size();
-			  this->tree_nodes[*ii]->adj.remove(t);
-			  if((int)this->tree_nodes[*ii]->adj.size()!=orig_size -1)
-			    print_message(0, "Didn't find alleged parent in existing neighbors??\n");
-			  this->tree_nodes[*ii]->adj.push_front(t);
-			}
-			// Add *ii to the end of the list
-			S.push_back(*ii);
-			++ii; // CSG, June 10 - this was missing?
+		  
+		  //If this node was an old root, we need to remove it from its own list
+		  if(*ii == this->tree_nodes[*ii]->adj.front() && *ii != k)
+		    {
+		      print_message(0, "found old root %d\n", *ii);
+		      int x = *ii;
+		      (this->tree_nodes[x]->adj).pop_front();
+		      ii = this->tree_nodes[x]->adj.begin();
+		    }
+		  
+		  if(*(this->tree_nodes[*ii]->adj.begin())!=t)
+		    {
+		      // Do size check here to make sure we find t
+		      // Remove t from the list of adjacent nodes and put it at the front
+		      // since t is the parent
+		      int orig_size=(int)this->tree_nodes[*ii]->adj.size();
+		      this->tree_nodes[*ii]->adj.remove(t);
+		      if((int)this->tree_nodes[*ii]->adj.size()!=orig_size -1)
+			print_message(0, "Didn't find alleged parent in existing neighbors??\n");
+		      this->tree_nodes[*ii]->adj.push_front(t);
+		    }
+		  // Add *ii to the end of the list
+		  S.push_back(*ii);
+		  ++ii; // CSG, June 10 - this was missing?
 		}
 		S.pop_front();
 	}

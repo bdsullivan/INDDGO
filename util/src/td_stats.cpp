@@ -129,6 +129,16 @@ int main(int argc, char **argv)
 	      T->fill_bag_vecs();
 	      cout << "T has " << T->num_tree_nodes << " tree nodes\n";
 	      
+	      /*
+	       * Write the tree decomposition to file, if required.
+	       */
+	      if(tree_file_base != NULL)
+		{
+		  sstm << tree_file_base << td_id; 
+		  T->write_DIMACS_file((sstm.str()).c_str());
+		  sstm.str("");//clears the stream
+		}
+	      
 
 	      //Non-score-specific statistics - width, length, eccentricity
 
@@ -227,15 +237,6 @@ int main(int argc, char **argv)
 	       */
 	      out.close();
 
-	      /*
-	       * Write the tree decomposition to file, if required.
-	       */
-	      if(tree_file_base != NULL)
-		{
-		  sstm << tree_file_base << td_id; 
-		  T->write_DIMACS_file((sstm.str()).c_str());
-		  sstm.str("");//clears the stream
-		}
 
 	      /*delete the tree decomposition*/
 	      delete T;
