@@ -91,8 +91,8 @@ int main(int argc, char **argv)
   
   try
     {
-      if(kcore_file == NULL || graph_file == NULL)
-	throw(Graph::GraphException("Call with two arguments: graph_file kcore_file\n"));
+      if(kcore_file == NULL || graph_file == NULL || out_file_base == NULL || tree_file_base == NULL )
+	throw(Graph::GraphException("Call with four arguments: graph_file kcore_file outfile_base treefile_base\n"));
      
       /*populate the graph*/
       Graph::create_largestcomponent_graph(graph_file, G);      
