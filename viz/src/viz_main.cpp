@@ -96,7 +96,6 @@ int main(int argc, char **argv)
 	      T->highlight_subtree_scored_graphviz_file(info.highlight_node, info.gviz_outfile, color_vector, max_color, min_color);
 	    else
 	      {
-
 		if(info.viz_style == GV_BAG_LABELS || info.viz_style==GV_COLORS)
 		  {
 		    if(info.log_range)
@@ -106,7 +105,7 @@ int main(int argc, char **argv)
 		  }
 		else
 		  {
-		    T->write_graphviz_file(false, info.gviz_outfile, GV_TREE_ONLY);
+		    T->write_graphviz_file(false, info.gviz_outfile, info.viz_style);
 		  }
 	      }
 	  }

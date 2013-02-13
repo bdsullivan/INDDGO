@@ -172,7 +172,10 @@ void TD_info::process_TD_info(int num_args, char **args,
 		if (strcmp(args[i], "-shaded") == 0)
 		  this->viz_style = GV_COLORS;
 		if (strcmp(args[i], "-scaled") == 0)
-		  this->viz_style = GV_SCALE_BAGS;
+		  {
+		    if(this->viz_style != GV_COLORS)//implies scaled, resetting removes scoring colors.
+		      this->viz_style = GV_SCALE_BAGS;
+		  }
 		if (strcmp(args[i], "-labels") == 0)
 		  this->viz_style = GV_BAG_LABELS;
 		
