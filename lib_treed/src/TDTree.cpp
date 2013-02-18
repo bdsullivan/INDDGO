@@ -1839,7 +1839,7 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 			{
 				// you could set shape to circle or something else here.
 				fprintf(out,"%d [width=%f, shape=ellipse];\n",i+1, 
-					(double)(this->tree_nodes[i]->bag.size())/sqrt((double)G->get_capacity()));
+					(double)(TD_BAG_SCALE*this->tree_nodes[i]->bag.size())/this->width);
 			}
 			else if(style == GV_TREE_ONLY)
 			{
@@ -2059,7 +2059,7 @@ void TDTree::write_scored_graphviz_file(bool spline, const char *GVIZ_file, cons
 				//cout << (stat-min_color)/(max_color-min_color) << "\n";
 
 				fprintf(out,"%d [label=\"\",width=%f, shape=circle, style=\"filled\", fillcolor=\"%s\"];\n", i+1,
-					(double)(5*this->tree_nodes[i]->bag.size())/this->width, rgb);	  
+					(double)(TD_BAG_SCALE*this->tree_nodes[i]->bag.size())/this->width, rgb);	  
 			} 
 		}
 

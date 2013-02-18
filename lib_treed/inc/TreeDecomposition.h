@@ -52,6 +52,9 @@
 #define GV_TREE_ONLY   2
 #define GV_COLORS      3
 
+// Visualization related constants
+#define TD_BAG_SCALE   1.5  //Multiplier used for bag radius in visualization. 
+
 // Include the header files specific to tree decompositions
 // Include this first - custom implementation of some big integer math for 
 // bit masking, etc.
