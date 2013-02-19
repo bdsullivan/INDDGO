@@ -21,13 +21,8 @@
 
 #include "GraphDecomposition.h"
 #include "TreeDecomposition.h"
-#include "Log.h"
-#include "GraphException.h"
 #include <fstream>
-#include <string>
 #include <unistd.h>
-
-#include "WeightedMutableGraph.h"
 #include "viz.h"
 
 int main(int argc, char **argv)
@@ -53,36 +48,44 @@ int main(int argc, char **argv)
   
   try
     {
-      // Process command line options
-      //Aaron - add the processing of any options here - should include a -color flag which requires an input file name
-      //as well as any options you want in terms of the type of graphviz output you want to be able to create - you'll 
-      //probably consider putting things like -avg_scaled or -label_colors or the like to determine the output. 
+      // Process command line options      
       info.process_TD_info(argc, argv, usage);
-
       print_message(0, "Options processed\n");
 
       // Create the graph for WIS
-      create_TDviz_graph(info.DIMACS_file, G);
-
+      Graph::create_largestcomponent_graph(info.DIMACS_file, G);
       print_message(0, "Graph structure populated\n");
 
       // Create the tree decomposition using the options
-      create_tree_decomposition(&info, G, &T);
+      if(info.read_scotch_ordering)
+      	create_tree_decomposition(G, &T, info.read_tree, info.tree_infile, info.read_ordering, info.read_scotch_ordering, 
+      				  info.scotch_ord_file, info.elim_order_type, info.start_v, info.td_alg, info.make_nice, 
+      				  true);      
+      else
+      	create_tree_decomposition(G, &T, info.read_tree, info.tree_infile, info.read_ordering, info.read_scotch_ordering, 
+      				  info.ord_file, info.elim_order_type, info.start_v, info.td_alg, info.make_nice, 
+      				  true);      
+
+      // Write out the tree if desired
+      if (info.write_tree)
+	T->write_DIMACS_file(info.tree_outfile);
+      
+      // Print out a histogram if desired
+      if (info.make_histogram)
+	td_size_histogram(T, stdout);  
 
       print_message(0, "Tree Decomposition created\n");
 
       //fill the bag vectors
       T->fill_bag_vecs();
 
-      //Aaron - here you'll want to make a call to a function that reads and populates your color/score vector.
-      //I would place such a function in viz.cpp/viz.h. You'll want to pass in the info struct so it can get out 
-      //the color_file name. 
-      if(info.use_scores){
-	vector<double> color_vector;
-	double max_color=0;
-	double min_color=0;
-	cout<<info.score_infile<<"\n";
-	bool range = read_color_file(info.score_infile,max_color,min_color,color_vector);
+      if(info.use_scores)
+	{
+	  vector<double> color_vector;
+	  double max_color=0;
+	  double min_color=0;
+	  cout<<info.score_infile << "\n";
+	  bool range = read_color_file(info.score_infile,max_color,min_color,color_vector);
 
 	if(range)
 	  {
@@ -93,7 +96,6 @@ int main(int argc, char **argv)
 	      T->highlight_subtree_scored_graphviz_file(info.highlight_node, info.gviz_outfile, color_vector, max_color, min_color);
 	    else
 	      {
-
 		if(info.viz_style == GV_BAG_LABELS || info.viz_style==GV_COLORS)
 		  {
 		    if(info.log_range)
@@ -103,7 +105,7 @@ int main(int argc, char **argv)
 		  }
 		else
 		  {
-		    T->write_graphviz_file(false, info.gviz_outfile, GV_TREE_ONLY);
+		    T->write_graphviz_file(false, info.gviz_outfile, info.viz_style);
 		  }
 	      }
 	  }

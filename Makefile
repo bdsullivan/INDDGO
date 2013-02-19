@@ -83,7 +83,7 @@ viz: graph tree
 #----------------------------------------------------------------
 #  Targets for utilities
 #
-util: graph 
+util: graph tree
 	test -d $(UTIL)
 	@($(CD) "$(UTIL)";\
 	$(MAKE) ;\

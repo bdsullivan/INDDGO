@@ -13,7 +13,7 @@ TD_LIB_NAME = libtreed.a
 TD_PROF_LIB = ./lib/libproftd.a
 TD_VALGRIND_LIB = ./lib/libvaltd.a
 
-SRCS=  ./src/TDTree.cpp ./src/TDTreeNode.cpp ./src/TDSolution.cpp ./src/TDDynamicProgramming.cpp ./src/TDMadTreeNode.cpp 
+SRCS=  ./src/TDTree.cpp ./src/TDTreeNode.cpp ./src/TDSolution.cpp ./src/TDDynamicProgramming.cpp ./src/TDMadTreeNode.cpp ./src/TDUtil.cpp
 OBJS=$(SRCS:.cpp=.o)
 
 ifeq ($(HAS_SUITESPARSE),1)

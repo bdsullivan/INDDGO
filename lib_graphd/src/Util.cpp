@@ -21,6 +21,7 @@ inddgo-info@googlegroups.com
 
 #include "GraphDecomposition.h"
 #include <fstream>
+#include <limits>
 
 /*BDS - added to get memory highwater mark*/
 int parseLine(char* line){
@@ -156,51 +157,74 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
 	return(min_flag && max_flag);
 }
 
+
+
 //Input a vector of node indices, a vector of node scores (values associated with each node), and a flag
 //that indicates the statistic you desire to be calculated
-//FLAG=1 -> Calculate mean of nodes
-//FLAG=2 -> Calculate standard deviation of nodes
-//FLAG=3 -> Calculate median of nodes
+//FLAG should be one of GD_XXX defined in Util.h
 
 double get_statistics(const vector<int> & nodes, const vector<double> & scores, const int FLAG)
 {
 	double statistic = 0.0;
+	const int size = nodes.size();
 
-	if(FLAG==1)
+	if(FLAG==GD_STAT_MEAN)
 	{
 		//compute average
-
-		const int size = nodes.size();
-
-		for(int i=0;i<size;++i)
-			statistic += scores[nodes[i]];
-
-		statistic = statistic/double(size);
+	  for(int i=0;i<size;++i)
+	    statistic += scores[nodes[i]];
+	  
+	  statistic = statistic/double(size);
 	}
-	else if(FLAG==2)
+	else if(FLAG==GD_STAT_STD)
 	{
-		//compute standard deviation
+	  //compute standard deviation
+	  double mean=0;
+	  for(int i=0;i<size;++i)
+	    mean += scores[nodes[i]];
+	  mean = mean/double(size);
 
-		const int size = nodes.size();
-		double sum=0;
-		double square_sum=0;
-
-		for(int i=0;i<size;++i)
-		{
-			sum += nodes[i];
-			square_sum += pow((double)(nodes[i]),2);
-		}
-
-		statistic = square_sum/double(size) - pow((sum/double(size)),2);
-		statistic = sqrt(statistic);
+	  double square_sum=0;
+	  for(int i=0;i<size;++i)
+	    {
+	      square_sum += pow((double)(scores[nodes[i]] - mean),2);
+	    }
+	  statistic = square_sum/double(size);
+	  
+	  statistic = sqrt(statistic);
 	}
-	else if(FLAG==3)
+	else if(FLAG==GD_STAT_MED)
 	{
-		//compute median
-		//To be done
+	  //compute median - currently using builtin vector sort
+	  //Need to select sub-vector associated with nodes given in function call
+	  vector<double> sorted(size);
+	  for(int i = 0; i < size; ++i)
+	    sorted[i] = scores[nodes[i]];
+	  
+	  sort(sorted.begin(), sorted.end());
 
+	  int middle = size/2; 
+	  if(size%2 == 1)
+	    {
+	      statistic = sorted[middle]; 
+	    }
+	  else
+	    {
+	      //Adjust downwards since we index from 0, not 1
+	      statistic = (sorted[middle] + sorted[middle-1])/2; 
+	    }
 	}
-
+	else if(FLAG == GD_STAT_COUNT)
+	  {
+	    //Count number of non-negative scored vertices in bag.
+	    for(int i=0;i<size;++i)
+	      if(!(scores[nodes[i]] < 0))
+		statistic++;
+	    
+	  }
+	else{
+	  fatal_error("Statistic must be one of GD_STAT_XXX from Util.h\n");
+	}
 	return statistic;
 
 }

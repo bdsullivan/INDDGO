@@ -59,14 +59,14 @@ public:
     void set_xadj(vector<int> xadj);
     vector<int> get_adj_vec() const;
     vector<int> *get_adj_vec_ptr();
-
+    void initialize_params(); 
+    void initialize_params(bool simple, bool canonical, int num_comp); 
 
     friend class GraphUtil;
     friend class GraphProperties;
     friend class GraphDisplay;
     friend class GraphEOUtil;
     friend class GraphCreator;
-
 };
 
 }

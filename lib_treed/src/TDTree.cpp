@@ -19,10 +19,9 @@ inddgo-info@googlegroups.com
 
 */
 
-#include "WeightedMutableGraph.h"
-#include "Debug.h"
-#include "TreeDecomposition.h"
 #include "GraphDecomposition.h"
+#include "TreeDecomposition.h"
+#include "Debug.h"
 #include "Util.h"
 #include "RndNumGen.h"
 #include <math.h>
@@ -1431,6 +1430,9 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file)
 */
 void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 {
+  if(this->rooted == false)
+    fatal_error("s: Only writes rooted trees.\n", __FUNCTION__);
+
 	FILE *out;
 	if( (out=fopen(DIMACS_file,"w"))==NULL)
 		fatal_error("%s:  Couldn't open %s for writing\n",__FUNCTION__,DIMACS_file);
@@ -1443,9 +1445,11 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 	int size=(int)this->tree_nodes.size();
 	for(i=0;i<size;i++)
 	{
-		if(this->tree_nodes[i] != NULL)
-			m+=this->tree_nodes[i]->adj.size();
+	  if(this->tree_nodes[i] != NULL)
+	    m+=this->tree_nodes[i]->adj.size();
 	}
+	print_message(1, "Adj lists contain %d entries\n", m);
+	m = m-1; //counted root's "edge" to self once
 	m=m/2;// We double counted all the edges!
 
 	// Print out the "problem" information
@@ -1458,31 +1462,35 @@ void TDTree::write_DIMACS_file(const char *DIMACS_file, bool preordered)
 		this->pre_order_walk(&walk);
 	else
 	{
-		for(int i = 0; i < this->num_tree_nodes; ++i)
-			walk[i] = i;
+	  for(int i = 0; i < this->num_tree_nodes; ++i)
+	    walk[i] = i;
 	}
 
 	vector<int> perm(this->num_tree_nodes,GD_UNDEFINED);
 	for(int i = 0; i < this->num_tree_nodes; ++i)
 		perm[walk[i]] = i;
-
-
+	
 
 	// Print out the edges so that 'e p c' means p is the parent of c	
+	m = 0;//debugging edge count
 	for(i=0;i<size;i++)
 	{   
-		if(this->tree_nodes[i] != NULL)
+	  if(this->tree_nodes[i] != NULL)
+	    {
+	      L = this->tree_nodes[i]->adj.begin(); 
+	      print_message(1, "skipping %d %d\n", i, *L);
+	      L++; //skip the parent
+	      while(L!=this->tree_nodes[i]->adj.end())
 		{
-			L = this->tree_nodes[i]->adj.begin(); 
-			++L; //skip the parent
-			for(L;L!=this->tree_nodes[i]->adj.end();++L)
-			{
-				j=*L;
-				fprintf(out,"e %d %d\n",perm[i]+1,perm[j]+1);
-				fflush(out);
-			}
+		  j=*L;
+		  fprintf(out,"e %d %d\n",perm[i]+1,perm[j]+1);
+		  m++;
+		  fflush(out);
+		  L++;
 		}
+	    }
 	}
+	print_message(1, "printed %d edges to file\n", m);
 
 
 	// Print out the bags
@@ -1632,6 +1640,7 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 
 	rewind(in);
 
+	int edge_count = 0;
 	j=0;
 	// Use j to count the tree nodes read in
 	while(!feof(in))
@@ -1727,6 +1736,7 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 			//start--;end--;
 			start=perm[start];
 			end=perm[end];
+			edge_count++;
 			print_message(1,"Read in tree edge %d-%d\n",start,end);
 			this->tree_nodes[start]->adj.push_back(end);
 			this->tree_nodes[end]->adj.push_back(start);
@@ -1744,6 +1754,7 @@ int TDTree::read_DIMACS_file(const char *DIMACS_file)
 		while (!feof(in) && (retval=getc(in)) != '\n') ;  
 	}// end while
 
+	print_message(0, "Read %d edges\n", edge_count);
 	fclose(in);
 
 	// return the width
@@ -1828,7 +1839,7 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 			{
 				// you could set shape to circle or something else here.
 				fprintf(out,"%d [width=%f, shape=ellipse];\n",i+1, 
-					(double)(this->tree_nodes[i]->bag.size())/sqrt((double)G->get_capacity()));
+					(double)(TD_BAG_SCALE*this->tree_nodes[i]->bag.size())/this->width);
 			}
 			else if(style == GV_TREE_ONLY)
 			{
@@ -2038,17 +2049,17 @@ void TDTree::write_scored_graphviz_file(bool spline, const char *GVIZ_file, cons
 		}//end BAG_LABELS
 
 		else if(style == GV_COLORS)
-		{
+		  {
 			if(this->tree_nodes[i] != NULL)
-			{
-				double stat = get_statistics(this->tree_nodes[i]->bag_vec, color_vector, 1); //stat is hard coded right now.			  
+			  {
+				double stat = get_statistics(this->tree_nodes[i]->bag_vec, color_vector, GD_STAT_MEAN); //stat is hard coded right now.			  
 				//	      cout << this->tree_nodes[i]->bag_vec[0] << " " << this->tree_nodes[i]->bag_vec[1] << "\n";
 				//cout << stat << "\n";
 				get_rgb_value(rgb, (stat-min_color)/(max_color-min_color));
 				//cout << (stat-min_color)/(max_color-min_color) << "\n";
 
 				fprintf(out,"%d [label=\"\",width=%f, shape=circle, style=\"filled\", fillcolor=\"%s\"];\n", i+1,
-					(double)(5*this->tree_nodes[i]->bag.size())/this->width, rgb);	  
+					(double)(TD_BAG_SCALE*this->tree_nodes[i]->bag.size())/this->width, rgb);	  
 			} 
 		}
 
@@ -2426,7 +2437,7 @@ bool TDTree::remove_tree_edge(int u, int v)
 	this->tree_nodes[v]->adj.remove(u);
 	s2=this->tree_nodes[v]->adj.size();
 	if(s1==s2)
-	{
+	  {
 		print_message(0,"%s:  Tree edge u-v not found? (u not in v's adj list)\n",
 			__FUNCTION__);
 		return false;
@@ -3123,7 +3134,16 @@ void TDTree::root(int k)
 	list<int> S;
 	list<int>::iterator ii;
 	int t;
-
+	int size=(int)this->tree_nodes.size();
+	
+	// //for debugging
+	// int i, m = 0;
+	// for(i=0;i<size;i++)
+	//   {
+	//   if(this->tree_nodes[i] != NULL)
+	//     m+=this->tree_nodes[i]->adj.size();
+	// }
+	// print_message(1, "%d Adj lists contain %d entries\n", size, m);
 
 	this->rooted=true;
 	this->root_node=k;
@@ -3135,27 +3155,36 @@ void TDTree::root(int k)
 	{
 		t=S.front();
 		// Reorder the adj. lists of all t's children, setting t to be the new parent
-		ii=this->tree_nodes[t]->adj.begin();
-		// Advance past the parent
-		++ii;
-
+		ii=this->tree_nodes[t]->adj.begin();		
+		// Advance past the parent, which has been fixed for anything in S
+		ii++;
+		
 		while(ii!=this->tree_nodes[t]->adj.end())
 		{
-			if(*(this->tree_nodes[*ii]->adj.begin())!=t)
-			{
-				// Could do size check here to make sure we find t
-				// Remove t from the list of adjacent nodes and put it at the front
-				// since t is the parent
-				int orig_size=(int)this->tree_nodes[*ii]->adj.size();
-				this->tree_nodes[*ii]->adj.remove(t);
-				if((int)this->tree_nodes[*ii]->adj.size()!=orig_size -1)
-					print_message(0, "Didn't find alleged parent in existing neighbors??\n");
-
-				this->tree_nodes[*ii]->adj.push_front(t);
-			}
-			// Add *ii to the end of the list
-			S.push_back(*ii);
-			++ii; // CSG, June 10 - this was missing?
+		  
+		  //If this node was an old root, we need to remove it from its own list
+		  if(*ii == this->tree_nodes[*ii]->adj.front() && *ii != k)
+		    {
+		      print_message(0, "found old root %d\n", *ii);
+		      int x = *ii;
+		      (this->tree_nodes[x]->adj).pop_front();
+		      ii = this->tree_nodes[x]->adj.begin();
+		    }
+		  
+		  if(*(this->tree_nodes[*ii]->adj.begin())!=t)
+		    {
+		      // Do size check here to make sure we find t
+		      // Remove t from the list of adjacent nodes and put it at the front
+		      // since t is the parent
+		      int orig_size=(int)this->tree_nodes[*ii]->adj.size();
+		      this->tree_nodes[*ii]->adj.remove(t);
+		      if((int)this->tree_nodes[*ii]->adj.size()!=orig_size -1)
+			print_message(0, "Didn't find alleged parent in existing neighbors??\n");
+		      this->tree_nodes[*ii]->adj.push_front(t);
+		    }
+		  // Add *ii to the end of the list
+		  S.push_back(*ii);
+		  ++ii; // CSG, June 10 - this was missing?
 		}
 		S.pop_front();
 	}
@@ -3779,4 +3808,66 @@ void TDTree::refine()
 	}//end of processing post-order walk
 
 	this->remove_subset_bags(); 
+}
+
+/*
+ * Sorts all bags in the tree decomposition
+ */
+void TDTree::sort_bags()
+{
+  int num_tree_nodes=(int) this->tree_nodes.size();
+  for (int i = 0; i < num_tree_nodes; i++)
+    {
+      if (this->tree_nodes[i])
+	this->tree_nodes[i]->bag.sort();
+    }
+}
+
+
+
+/*
+ * Forms a MutableGraph holding the underlying tree of the given tree decomposition. 
+ * Nodes in TDTree will be stored as {1,2, ... num_tree_nodes} in G so that 
+ * the label of nodes[i] < the label of nodes[j] whenever i < j. 
+ */
+Graph::MutableGraph *TDTree::export_tree()
+{
+  int n = this->num_tree_nodes;
+  int i,j,k;
+  Graph::MutableGraph *mg = new Graph::MutableGraph(n);
+  //set up the Graph allocations and default variables.    
+  mg->initialize_params(true, true, 1);
+  
+  //figure out how to go back and forth from tree node vector to graph nodes 
+  //If there are no gaps in the tree_nodes array, this just maps i <-> i.
+  int curr = 0;
+  int size = (this->tree_nodes).size();
+  int *graph_labels = new int[size];
+  memset(graph_labels, GD_UNDEFINED, size*sizeof(int));
+  for(k=0; k < size; k++)
+    {
+      graph_labels[k] = curr;
+      curr++;
+    }
+  list<int>::iterator L;
+  
+  for(i=0;i<size;i++)
+    {   
+      if(this->tree_nodes[i] != NULL)
+	{
+	  L = this->tree_nodes[i]->adj.begin(); 
+	    for(L;L!=this->tree_nodes[i]->adj.end();++L)
+	      {
+		j=*L;
+		if(j > i)
+		  mg->add_edge(graph_labels[i], graph_labels[j]);
+		  mg->add_edge(graph_labels[j], graph_labels[i]);
+	      }
+	}
+    }
+
+  Graph::GraphUtil util; 
+  util.recompute_degrees(mg); 
+  
+  return mg;
 }

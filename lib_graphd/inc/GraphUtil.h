@@ -33,6 +33,7 @@ namespace Graph
 	public:
 		GraphUtil();
 		virtual ~GraphUtil();
+		
 		void recompute_degrees(MutableGraph *mg);
 		// Returns the index of one of the vertices with maximal degree
 		int get_random_high_degree_vertex(MutableGraph *mg) const;
@@ -78,8 +79,19 @@ namespace Graph
 		bool* bfs(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 		bool* bfs_old(MutableGraph *mg, int start, bool *allowed, int *num_reached);
 		int* bfs_dist(MutableGraph *mg, int start, bool *allowed, int *num_reached);
+		int* bfs_dist(MutableGraph *mg, int start, bool *allowed, int *num_reached, int *ecc);
+		
+		//Find the eccentricity of each vertex and store it in ecc.
+		void find_ecc(MutableGraph *mg, vector<int> *ecc);
+
+		//Calculate the maximum distance between nodes within a subset of vertices
+		//given as a list
+		int subset_max_dist(MutableGraph *mg, vector<int> subset);
+
 	};
 
+	void create_largestcomponent_graph(char* graph_file, WeightedMutableGraph *&G);
+	
 }
 
 #endif /* GRAPHUTIL_H_ */

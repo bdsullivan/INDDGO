@@ -123,6 +123,7 @@ static const char EO_NAMES[][30] = {"MinDegree", "MCS", "MCS-M", "LEX-M", "LEX-P
 #include "MutableGraph.h"  
 #include "WeightedGraph.h"
 #include "DIMACSGraphReader.h"  
+#include "DIMACSGraphWriter.h"  
 #include "GraphDisplay.h"        
 #include "GraphInterface.h"   
 #include "GraphUtil.h"                 

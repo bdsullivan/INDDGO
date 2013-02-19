@@ -41,18 +41,15 @@ public:
 	  *scotch_ord_file, *tree_infile, *tree_outfile, *score_infile; 
 
 	bool has_graph, read_ordering, read_scotch_ordering,
-	  nice, gavril, BK, superetree,
 	  read_tree, write_tree, write_ordered_tree,
 	  make_histogram, make_nice, use_scores, subtree, log_range;
 
 	clock_t start, stop;
-	int elim_order_type, start_v, viz_style, highlight_node;
+	int td_alg, elim_order_type, start_v, viz_style, highlight_node;
 
 	void process_TD_info(int num_args, char **args, void (*usage)(const char *str));
 };
 
 void usage(const char *s);
-void create_TDviz_graph(char* graph_file, Graph::WeightedMutableGraph *&G);
-void create_tree_decomposition(TD_info *info, Graph::WeightedMutableGraph *G, TDTree **T);
 
 #endif  /* __VIZ_H__ */
