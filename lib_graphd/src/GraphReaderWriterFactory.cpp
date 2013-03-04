@@ -21,12 +21,13 @@ inddgo-info@googlegroups.com
 
 #include "GraphReaderWriterFactory.h"
 #include "DIMACSGraphReader.h"
+#include "DIMACSGraphWriter.h"
 #include "AdjMatrixGraphReader.h"
 #include "AdjMatrixGraphWriter.h"
-#include "DIMACSGraphWriter.h"
 #include "MetisGraphWriter.h"
 #include "MetisGraphReader.h"
 #include "GraphVizGraphWriter.h"
+#include "EdgelistGraphReader.h"
 #include "GraphException.h"
 
 namespace Graph
@@ -51,6 +52,10 @@ namespace Graph
 		else if (name == "METIS" || name == "Metis" || name == "metis")
 		{
 			r = new MetisGraphReader();
+		}
+		else if (name == "Edge" || name == "EDGE" || name == "edge")
+		{
+			r = new EdgelistGraphReader();
 		}
 		else
 		{
