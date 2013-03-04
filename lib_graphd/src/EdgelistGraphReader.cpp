@@ -74,8 +74,8 @@ namespace Graph
 		while(!feof(in)) {
 
 			retp = fgets(line, 100, in);
-            //fprintf(stderr, "Got line: %s\n",line);
 
+            // not sure why this doesn't trigger correctly in the while condition....
             if (feof(in))
                 break;
 
@@ -86,8 +86,7 @@ namespace Graph
             // Edge line - start end
             retval = sscanf(line, "%d %d", &i, &j);
 
-				//DEBUG("Read edge %d-%d\n", i, j);
-
+            // TODO: add smome detection of comments, blank lines, etc
             if (retval != 2)
             {
                 FERROR( "%s:  Edgelist read error - didn't understand edge line\n",
@@ -98,8 +97,8 @@ namespace Graph
             if (i < 0 || i > n-1 || j < 0 || j > n-1)
             {
                 FERROR( "%s:  Edgelist read error - edge (u,v) (%d-%d) must have"
-                " both u and v between 1 and n=%d, inclusive\n",
-                __FUNCTION__, i, j, n);
+                " both u and v between 0 and n=%d, inclusive\n",
+                __FUNCTION__, i, j, n-1);
             }
             //fprintf(stderr, "i=%d j=%d\n", i, j);
 
@@ -112,6 +111,7 @@ namespace Graph
             this->nodes[j].set_label(j+1);
             // Add to i's adjlist
 
+            // make sure we don't add self loops to a nertex more than once
             if(i != j){
                 this->nodes[j].add_nbr(i);
                 this->degree[j]++; // 1->0
