@@ -12,7 +12,11 @@ STATS_SRCS =  ./src/td_stats.cpp
 STATS_OBJ =  $(STATS_SRCS:.cpp=.o)
 STATS_EXE = $(INDDGO_BIN)/td_stats
 
-all: $(PKT_EXE) $(STATS_EXE)
+OTHER_SRCS = ./src/edge2dimacs.cpp
+OTHER_OBJ = $(OTHER_SRCS:.cpp=.o)
+OTHER_EXE = $(INDDGO_BIN)/edge2dimacs
+
+all: $(PKT_EXE) $(STATS_EXE) $(OTHER_EXE)
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
@@ -21,6 +25,9 @@ $(PKT_EXE): $(PKT_OBJ)
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 $(STATS_EXE): $(STATS_OBJ) 
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
+
+$(OTHER_EXE): $(OTHER_OBJ) 
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 clean: 
