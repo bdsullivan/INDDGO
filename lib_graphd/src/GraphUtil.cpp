@@ -33,16 +33,16 @@ namespace Graph
 	{
 
 	}
-  
- 
-  
-  /**
-   * Recomputes the entries in the degree[] array using the size of
-   * the adjacency lists. Updates the number of edges in the graph.
-   */
-  void GraphUtil::recompute_degrees(MutableGraph *wmg)
-  {
-    wmg->num_edges = 0;
+
+
+
+	/**
+	* Recomputes the entries in the degree[] array using the size of
+	* the adjacency lists. Updates the number of edges in the graph.
+	*/
+	void GraphUtil::recompute_degrees(MutableGraph *wmg)
+	{
+		wmg->num_edges = 0;
 		int i;
 		//set the degrees to 0 - should wmg be -1 if the nodes label is -1?
 		// CSG - all these loops used to start at i=1?
@@ -688,10 +688,10 @@ namespace Graph
 	//Unreachable vertices have value GD_INFINITY.
 	//num_reached is the number of vertices which are reachable. mg does not include
 	//disallowed vertices, and does include the start.
-  //Returns the maximum distance (vertex eccentricity of start) in ecc.
+	//Returns the maximum distance (vertex eccentricity of start) in ecc.
 
 	int *GraphUtil::bfs_dist(MutableGraph *mg, int start, bool *allowed,
-				 int *num_reached, int *ecc)
+		int *num_reached, int *ecc)
 	{
 
 		// We need the graph to be symmetric, as we're going to walk through a neighbor list
@@ -756,99 +756,106 @@ namespace Graph
 		// We emptied the stack.
 		return dists;
 	}
-  
-  	int *GraphUtil::bfs_dist(MutableGraph *mg, int start, bool *allowed,
+
+	int *GraphUtil::bfs_dist(MutableGraph *mg, int start, bool *allowed,
 		int *num_reached)
 	{
-	  int ecc;
-	  return bfs_dist(mg, start, allowed, num_reached, &ecc);
+		int ecc;
+		return bfs_dist(mg, start, allowed, num_reached, &ecc);
 	}
 
-  
-        //Find the eccentricity of each vertex and store it in ecc, which is resized appropriately within this function.
-        void GraphUtil::find_ecc(MutableGraph *mg, vector<int> *ecc)
+
+	//Find the eccentricity of each vertex and store it in ecc, which is resized appropriately within this function.
+	void GraphUtil::find_ecc(MutableGraph *mg, vector<int> *ecc)
 	{
-	  ecc->resize(mg->capacity);
+		ecc->resize(mg->capacity);
 
-	  //all nodes are allowed
-	  bool allowed[mg->capacity]; 
-	  for(int i = 0; i < mg->capacity; i++)
-	    allowed[i] = true;
-	  int num_reached;
-	  int e;
-	  int * dists;
-	  for (int i = 0; i < mg->capacity; i++)
-	    {
-	      //for valid nodes
-	      if (mg->nodes[i].label != -1)
+		//all nodes are allowed
+		// CSG fixing this
+		//bool allowed[mg->capacity]; 
+		bool *allowed;
+		allowed=new bool[mg->capacity];
+		for(int i = 0; i < mg->capacity; i++)
+			allowed[i] = true;
+		int num_reached;
+		int e;
+		int * dists;
+		for (int i = 0; i < mg->capacity; i++)
 		{
-		  dists = this->bfs_dist(mg, (mg->nodes[i]).get_label()-1, allowed, &num_reached, &e);
-		  (*ecc)[i] =e;
+			//for valid nodes
+			if (mg->nodes[i].label != -1)
+			{
+				dists = this->bfs_dist(mg, (mg->nodes[i]).get_label()-1, allowed, &num_reached, &e);
+				(*ecc)[i] =e;
+			}
+
 		}
-	      
-	    }
-	  delete[] dists;
-	  return;
+		delete[] dists;
+		delete [] allowed;
+		return;
 	}
 
-  //Calculate the maximum distance between nodes within a subset of vertices
-  //given as a list
-  int GraphUtil::subset_max_dist(MutableGraph *mg,  vector<int> subset)
-  {
-    int max = 0;
+	//Calculate the maximum distance between nodes within a subset of vertices
+	//given as a list
+	int GraphUtil::subset_max_dist(MutableGraph *mg,  vector<int> subset)
+	{
+		int max = 0;
 
-    //all nodes are allowed
-    bool allowed[mg->capacity]; 
-    for(int i = 0; i < mg->capacity; i++)
-      allowed[i] = true;
-    int num_reached;
-    vector<int>::iterator it, it2;
-    int * dists;
-    for (it = subset.begin(); it != subset.end(); ++it)
-      {
-	dists = this->bfs_dist(mg, *it, allowed, &num_reached);
-	for (it2 = subset.begin(); it2 != subset.end(); ++it2)
-	  {
-	    if(max < dists[*it2])
-	      max = dists[*it2];
-	  }
-	delete[] dists;      
-      }
-    
-    return max;
-  }
+		//all nodes are allowed
+		//bool allowed[mg->capacity]; 
+
+		bool *allowed;
+		allowed=new bool[mg->capacity];
+		for(int i = 0; i < mg->capacity; i++)
+			allowed[i] = true;
+		int num_reached;
+		vector<int>::iterator it, it2;
+		int * dists;
+		for (it = subset.begin(); it != subset.end(); ++it)
+		{
+			dists = this->bfs_dist(mg, *it, allowed, &num_reached);
+			for (it2 = subset.begin(); it2 != subset.end(); ++it2)
+			{
+				if(max < dists[*it2])
+					max = dists[*it2];
+			}
+			delete[] dists;      
+		}
+		delete [] allowed;
+		return max;
+	}
 
 
 }
 using namespace std;
- /**
-   * Populates the provided Graph structure with the necessary information to do TD, visualizations, analysis.
-   * Assumes graph_file is in DIMACS format. 
-   * If needed, stores the largest connected components in DIMACS format at graph_file.giantcomp (and populates Graph from this).
-   */
+/**
+* Populates the provided Graph structure with the necessary information to do TD, visualizations, analysis.
+* Assumes graph_file is in DIMACS format. 
+* If needed, stores the largest connected components in DIMACS format at graph_file.giantcomp (and populates Graph from this).
+*/
 void Graph::create_largestcomponent_graph(char* graph_file, WeightedMutableGraph *&G)
-  {
-    GraphCreatorFile creator;
-    creator.set_file_name(graph_file);
-    creator.set_graph_type("DIMACS");
-    G = creator.create_weighted_mutable_graph();
-    GraphProperties properties;
-    
-    if (!G)
-      throw(GraphException("Failed to read graph from specified file.\n"));
-    
-    if (!properties.is_connected(G))
-      {
-  	char* bigcompfile = (char*) malloc(100);
-  	sprintf(bigcompfile, "%s.giantcomp", graph_file);	
-  	G->write_largest_component("DIMACS", "temp_max_comp.dimacs");
-  	normalize_DIMACS_file("temp_max_comp.dimacs", bigcompfile );
-  	delete G;
-  	remove("temp_max_comp.dimacs");
-  	creator.set_file_name(bigcompfile);
-  	G = creator.create_weighted_mutable_graph();
-  	G->set_input_file(bigcompfile);
-  	free(bigcompfile);
-      }
-  }
-  
+{
+	GraphCreatorFile creator;
+	creator.set_file_name(graph_file);
+	creator.set_graph_type("DIMACS");
+	G = creator.create_weighted_mutable_graph();
+	GraphProperties properties;
+
+	if (!G)
+		throw(GraphException("Failed to read graph from specified file.\n"));
+
+	if (!properties.is_connected(G))
+	{
+		char* bigcompfile = (char*) malloc(100);
+		sprintf(bigcompfile, "%s.giantcomp", graph_file);	
+		G->write_largest_component("DIMACS", "temp_max_comp.dimacs");
+		normalize_DIMACS_file("temp_max_comp.dimacs", bigcompfile );
+		delete G;
+		remove("temp_max_comp.dimacs");
+		creator.set_file_name(bigcompfile);
+		G = creator.create_weighted_mutable_graph();
+		G->set_input_file(bigcompfile);
+		free(bigcompfile);
+	}
+}
+

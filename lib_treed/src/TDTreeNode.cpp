@@ -21,6 +21,7 @@ inddgo-info@googlegroups.com
 
 #include "GraphDecomposition.h"
 #include "TreeDecomposition.h"
+
 /**
 * The constructor for the TDTreeNode class.
 */
@@ -304,6 +305,7 @@ void TDTreeNode::set_num_mask_words(int i)
 {
 	this->num_mask_words = i;
 }
+
 /**
 * Returns the number of words in the tree node's mask.
 */

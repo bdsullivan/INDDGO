@@ -50,9 +50,11 @@ inddgo-info@googlegroups.com
 
 #define BIGINT_ONE (BIGINT_WORD)1
 
-// Represents a BIGINT_WORD_SIZE*S-bit integer as S BIGINT_WORD_SIZE-bit words
-// word[x-1]word[x-2]...word[3]word[2]word[1]word[0]
-// Should be independent of a machine's endian-ness.
+/**
+* The bigint_t represents a BIGINT_WORD_SIZE*S-bit integer as S BIGINT_WORD_SIZE-bit words
+* word[x-1]word[x-2]...word[3]word[2]word[1]word[0].  The representation
+* should be independent of a machine's endian-ness.
+*/
 class bigint_t
 {
 public:
@@ -619,6 +621,9 @@ public:
 #endif /* __MADNESS__ */
 };
 
+/**
+* A simple data structure to represent an int and a bigint_t that is occasionally useful.
+*/
 class int_bigint
 {
 public:

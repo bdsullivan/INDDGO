@@ -1483,7 +1483,9 @@ int compute_nonnice_table_async(TDTree *T, int k)
 	return table_size;
 }
 
-/** Wrapper for the various nonnice table functions.
+/** 
+* Wrapper for the various nonnice table functions. The computation varies depending
+* on the options to the dynamic programming.
 */
 int compute_nonnice_table(TDTree *T, int k)
 {
@@ -1514,7 +1516,7 @@ int compute_nonnice_table(TDTree *T, int k)
 // Functions specific to a NICE Tree Decomposition
 
 /**
-* Computes the ind. sets at a leaf node in a nice TD.  Does not look up to the
+* Computes the independent sets at a leaf node in a nice TD.  Does not look up to the
 * parent and worry about the intersection.
 */
 int compute_ind_sets_nice(TDTree *T, int k)
@@ -1641,8 +1643,10 @@ int compute_ind_sets_nice(TDTree *T, int k)
 	// Return the size of the table
 	return num_added;
 }
+
 /**
-* Computes the table for an introduce node (node has 1 child whose bag is smaller by 1) in a nice tree decomposition.
+* Computes the table for an introduce node (node has 1 child whose bag is smaller by 1)
+* in a nice tree decomposition.
 * Fatal error if the tree is not nice.
 */
 int compute_introduce_table(TDTree *T, int k)
@@ -1761,8 +1765,8 @@ int compute_introduce_table(TDTree *T, int k)
 }
 
 /**
-* Computes the table for a forget node (node has 1 child whose bag is larger by 1) in a nice tree decomposition.
-* Fatal error if the tree is not nice.
+* Computes the table for a forget node (node has 1 child whose bag is larger by 1) in a 
+* nice tree decomposition.  Fatal error if the tree is not nice.
 */
 int compute_forget_table(TDTree *T, int k)
 {
@@ -2005,7 +2009,7 @@ int create_subgraph_stats(TDTree *T, vector<int_int> *stats)
 
 /**
 * A user-defined table_function that computes a table for
-* the weighted ind. set dynamic programming.
+* the weighted independent set dynamic programming.
 */
 int compute_weighted_ind_set_table(TDTree *T, int k)
 {
