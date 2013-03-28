@@ -1591,6 +1591,9 @@ namespace Graph
 	int GraphEOUtil::find_amd_ordering(MutableGraph *mg, vector<int> *ordering)
 	{
 #if !HAS_SUITESPARSE
+		fatal_error("%s:  AMD only available with SuiteSparse installed and configured in make.inc"
+		, __FUNCTION__);
+		// Not reached but MSVC complains
 		return 0;
 #else
 		GraphUtil util;
