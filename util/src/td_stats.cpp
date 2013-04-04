@@ -26,6 +26,15 @@
 #include <sstream> 
 
 /*
+ * Usage message for td_stats function.
+ */
+void usage()
+{
+  cerr << "/* required arguments:\n* -g graph_file (dimacs)\n* -s  kcore_file (scorefile format)\n* optional arguments:\n* -o output_file_basename (otherwise it writes to stdout)\n* -t tree_outfile_basename (otherwise no tree is written)\n* -l : This computes lower bounds on the treewidth \n* -L : Lower bounds ONLY. Turns off the computation of all upper bounds, bag distributions, etc\n*/\n";
+}
+
+
+/*
  * This file generates one or more tree decompositions and 
  * calculates a variety of statistics (width, bag size distribution, 
  * average bag score), as well as optional treewidth lower bounds. 
@@ -35,34 +44,76 @@
  */
 int main(int argc, char **argv)
 {
-  /*current required arguments (in this order, no flags):
-   * graph_file (dimacs)
-   * kcore_file (scorefile format)
-   * output_file_basename
-   * tree_outfile_basename
+  /* required arguments:
+   * -g graph_file (dimacs)
+   * -s  kcore_file (scorefile format)
+   * -o output_file_basename
+   * -t tree_outfile_basename
+   * optional arguments:
+   * -l : This computes lower bounds on the treewidth 
+   * -L : Lower bounds ONLY. Turns off the computation of all upper bounds, bag distributions, etc
    */
+
   vector<double> *kcore_score = new vector<double>();
   vector<double> *degree_score = new vector<double>();
   int tdt[] = {TD_SUPERETREE, TD_GAVRIL}; //, TD_BK, TD_NICE}; 
   int et[] = {GD_AMD, GD_METIS_NODE_ND, GD_METIS_MMD};
+  int lbt[] = {GD_MAX_MIN_DEGREE_LB, GD_MCS_LB};
   const char* tdtype[] = {"Super-E-Tree", "Gavril"}; /*,"Bodlaender-Koster", "Nice"};*/ //Edited to speed up computations
   const char* elimtype[] = {"AMD", "MetisNodeND", "MetisMultMinD"};
-
+  bool lower_bounds = false; 
+  bool upper_bounds = true;
+  
   vector<int> td_types(tdt, tdt+sizeof(tdt)/sizeof(tdt[0]));
   vector<int> elim_types(et, et+sizeof(et)/sizeof(et[0]));
   vector<double>* st[] = {degree_score, kcore_score};
   vector<vector<double> *> scores(st, st+sizeof(st)/sizeof(st[0]));
-
-  /*File names; this needs some checking to catch NULLS/miscalls*/
-  char *graph_file = argv[1];
-  char *kcore_file = argv[2]; 
-  /*we'll print to stdout otherwise*/
+  
+  char *graph_file = NULL;
+  char *kcore_file = NULL;
   char *out_file_base = NULL;
-  if(argc > 3)
-    out_file_base = argv[3];
   char *tree_file_base = NULL; 
-  if(argc > 4)
-    tree_file_base = argv[4];
+
+  //process arguments
+  int c;
+  while ((c = getopt (argc, argv, "hlLg:s:o:t:")) != -1)
+    switch (c)
+      {
+      case 'h':
+        usage();
+        return 0;
+      case 'L':
+        upper_bounds = false;
+      case 'l':
+	lower_bounds = true;
+        break;      
+      case 'g':
+        graph_file = optarg;
+        break;
+      case 's':
+        kcore_file = optarg;
+        break;
+      case 'o':
+        out_file_base = optarg;
+        break;
+      case 't':
+        tree_file_base = optarg;
+        break;
+      case '?':
+        if (optopt == 'g' || optopt == 's' || optopt == 'o' || optopt == 't')
+          fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+        else if (isprint (optopt))
+          fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+        else
+          fprintf (stderr,
+                   "Unknown option character `\\x%x'.\n",
+                   optopt);
+        return 1;
+      default:
+        abort ();
+      }
+  for (int index = optind; index < argc; index++)
+    printf ("Non-option argument %s\n", argv[index]);
   
   int t, e, i, s;
   Graph::WeightedMutableGraph *G;
@@ -88,19 +139,68 @@ int main(int argc, char **argv)
   sprintf(efname, "stats-%d.log",pid);
   //0: debug, 5: critical
   LOG_INIT(lfname, efname, 0);
-  
+    
   try
     {
-      if(kcore_file == NULL || graph_file == NULL || out_file_base == NULL || tree_file_base == NULL )
-	throw(Graph::GraphException("Call with four arguments: graph_file kcore_file outfile_base treefile_base\n"));
-     
+
+      if(graph_file == NULL) 
+	throw(Graph::GraphException("Failed to specify input graph file (-g). Aborting.\n"));
+           
       /*populate the graph*/
       Graph::create_largestcomponent_graph(graph_file, G);      
-     
-      /*populate appropriate score vectors*/
-      bool range = read_color_file(kcore_file,kcore_max,kcore_min,*kcore_score);
       Graph::GraphUtil gutil; 
       gutil.recompute_degrees(G);
+      
+      if(lower_bounds)
+	{
+	  /*
+	   * Open output file for writing results
+	   */
+	  if(out_file_base == NULL)
+	    outStream.rdbuf(std::cout.rdbuf());
+	  else 
+	    {
+	      sstm << out_file_base << "LB"; 
+	      out.open((sstm.str()).c_str(), fstream::out);
+	      if(out.fail())
+		fatal_error("%s:  Error opening file %s for writing graphviz output\n", __FUNCTION__, (sstm.str()).c_str());
+	      outStream.rdbuf(out.rdbuf());
+	      sstm.str("");//clears the stream
+	    }
+	  
+	  outStream << "# " << graph_file << endl;
+	  outStream << "# Lower bounds: min_max_degree and mcs\n";
+	  
+	  Graph::GraphEOUtil eoutil; 
+	  /*
+	   * Print the lower bounds
+	   */
+	  for(int i = 0; i < sizeof(lbt)/sizeof(lbt[0]); i++)
+	    {
+	      //currently defaulting start_v to 0. Should probably improve this.
+	      outStream << eoutil.get_tw_lower_bound(G, lbt[i], 0 ) << "\t";
+	    }
+	  outStream << endl;
+	  
+	  /*
+	   * Close the output file.
+	   */
+	  out.close();
+	  
+	}
+      
+      if(!upper_bounds)
+	{
+	  delete G;
+	  LOG_CLOSE();
+	  return 1;
+	}
+
+      if(kcore_file == NULL || tree_file_base == NULL )
+	throw(Graph::GraphException("TD stats requested, but no score file (-s) specified. Aborting.\n"));
+      
+      /*populate appropriate score vectors*/
+      bool range = read_color_file(kcore_file,kcore_max,kcore_min,*kcore_score);
       vector<int> idegree_score = G->get_degree();
       (*degree_score).resize(idegree_score.size());
       for(int i = 0; i < idegree_score.size(); i++)
@@ -186,7 +286,7 @@ int main(int argc, char **argv)
 		  for(int i = 0; i < mystats.size(); i++)
 		    stats[i].push_back(mystats[i]);
 		}
-	      
+	      	
 	      /*
 	       * Open output file for writing results
 	       */
@@ -201,7 +301,7 @@ int main(int argc, char **argv)
 		  outStream.rdbuf(out.rdbuf());
 		  sstm.str("");//clears the stream
 		}
-	      
+      
 	      /*
 	       * Print the file header
 	       */
@@ -239,9 +339,6 @@ int main(int argc, char **argv)
 		  sstm.str("");//clears the stream
 		}
 
-
-
-
 	      /*delete the tree decomposition*/
 	      delete T;
 	      
@@ -259,6 +356,8 @@ int main(int argc, char **argv)
       	LOG_CLOSE();
       return -1;
     }     
+    
+
 }
 
 
