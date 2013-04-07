@@ -115,7 +115,7 @@ void usage(const char *s)
 		"\t -vv : runs in very verbose mode - lots of output about the ind. sets\n"
 		"\t -noheader : will not print header for output data to stdout\n"
 		);
-		
+
 
 }
 ;
