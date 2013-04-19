@@ -1,23 +1,23 @@
 /*
-This file is part of INDDGO.
+   This file is part of INDDGO.
 
-Copyright (C) 2012, Oak Ridge National Laboratory 
+   Copyright (C) 2012, Oak Ridge National Laboratory
 
-This product includes software produced by UT-Battelle, LLC under Contract No. 
-DE-AC05-00OR22725 with the Department of Energy. 
+   This product includes software produced by UT-Battelle, LLC under Contract No.
+   DE-AC05-00OR22725 with the Department of Energy.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the New BSD 3-clause software license (LICENSE). 
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the New BSD 3-clause software license (LICENSE).
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-LICENSE for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   LICENSE for more details.
 
-For more information please contact the INDDGO developers at: 
-inddgo-info@googlegroups.com
+   For more information please contact the INDDGO developers at:
+   inddgo-info@googlegroups.com
 
-*/
+ */
 
 #ifndef GRAPHDECOMPOSITION_H_
 #define GRAPHDECOMPOSITION_H_
@@ -25,15 +25,14 @@ inddgo-info@googlegroups.com
 #if WIN32 || _WIN32
 // Minor hack to deal with apparent inconsistency in VS versions regarding
 // WIN32 and _WIN32?? WIN32 is used in metis.h...
-#define WIN32 1
-#define _WIN32 1
+  #define WIN32 1
+  #define _WIN32 1
 // Define these here if using Windows
 // Otherwise, they are set in the makefile
-#define HAS_METIS   0
-#define HAS_SUITESPARSE     0
+  #define HAS_METIS   0
+  #define HAS_SUITESPARSE     0
 //#define HAS_ARPACK 1
 #endif
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,31 +48,30 @@ inddgo-info@googlegroups.com
 #include <algorithm>
 #include <set>
 #include <map>
-#include<limits.h>
+#include <limits.h>
 
 using namespace std;
 
 #if HAS_METIS
-extern "C"{
+extern "C" {
 #include <metis.h>
 #include <metislib.h>
-#include <metisbin.h>//appropriate header for smbfactor in metis programs
+#include <metisbin.h> //appropriate header for smbfactor in metis programs
 }
 
 #endif
 
 #if HAS_SUITESPARSE
-extern "C"{
+extern "C" {
 #include <amd.h>
 }
 #endif
-
 
 // Some user-defined constants, always prefaced with GD_
 // to avoid conflicts w/ other code, etc.
 #define    GD_SUCCESS   0
 #define    GD_FAILURE   -1
-#define    GD_INFINITY  (1<<30)
+#define    GD_INFINITY  (1 << 30)
 #define    GD_MAX(a,b)    (((a) > (b)) ? (a) : (b))
 #define    GD_MIN(a,b)    (((a) < (b)) ? (a) : (b))
 #define    GD_UNDEFINED    -1
@@ -102,8 +100,9 @@ extern "C"{
 #define     GD_MINMAX_DEGREE        14
 
 //array of names for the elimination ordering routines defined above
-static const char EO_NAMES[][30] = {"MinDegree", "MCS", "MCS-M", "LEX-M", "LEX-P", "MinFill", "PKT_sort", "Batch-MinFill", "MetisMMD", "MetisNodeND", "DEPRECATED" /*"MetisEdgeND"*/, "BetaOrdering", "AMDOrdering", "MultipleMinDegree", "MinMaxDegree", "Unknown"};
-
+static const char EO_NAMES[][30] = {
+    "MinDegree", "MCS", "MCS-M", "LEX-M", "LEX-P", "MinFill", "PKT_sort", "Batch-MinFill", "MetisMMD", "MetisNodeND", "DEPRECATED" /*"MetisEdgeND"*/, "BetaOrdering", "AMDOrdering", "MultipleMinDegree", "MinMaxDegree", "Unknown"
+};
 
 // Update the # of heuristics as new ones are added
 #define     GD_NUM_ELIM_HEURISTICS  15
@@ -115,30 +114,29 @@ static const char EO_NAMES[][30] = {"MinDegree", "MCS", "MCS-M", "LEX-M", "LEX-P
 // Specialized graph types
 #define     GD_KTREE           1
 
-
 // Include header files
 #include "GraphDecomposition.h"
-#include "Graph.h"            
-#include "GraphReaderWriterFactory.h"  
-#include "MutableGraph.h"  
+#include "Graph.h"
+#include "GraphReaderWriterFactory.h"
+#include "MutableGraph.h"
 #include "WeightedGraph.h"
-#include "DIMACSGraphReader.h"  
-#include "DIMACSGraphWriter.h"  
-#include "GraphDisplay.h"        
-#include "GraphInterface.h"   
-#include "GraphUtil.h"                 
-#include "Node.h"          
+#include "DIMACSGraphReader.h"
+#include "DIMACSGraphWriter.h"
+#include "GraphDisplay.h"
+#include "GraphInterface.h"
+#include "GraphUtil.h"
+#include "Node.h"
 #include "WeightedMutableGraph.h"
-#include "GraphCreatorFile.h"   
-#include "GraphEOUtil.h"         
-#include "GraphProperties.h"  
-#include "GraphWriter.h"               
+#include "GraphCreatorFile.h"
+#include "GraphEOUtil.h"
+#include "GraphProperties.h"
+#include "GraphWriter.h"
 #include "RndNumGen.h"
-#include "GraphCreator.h"       
-#include "GraphException.h"      
+#include "GraphCreator.h"
+#include "GraphException.h"
 #include "GraphReader.h"
 
-#include "Log.h"                       
+#include "Log.h"
 #include "Util.h"
 #include "RndNumGen.h"
 #include "Debug.h"
