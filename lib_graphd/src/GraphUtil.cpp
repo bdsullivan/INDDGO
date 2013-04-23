@@ -127,7 +127,7 @@ namespace Graph {
         int i, j;
         j = 0;
         for(i = 0; i < mg->capacity; i++){
-            if((mg->nodes[i].label != -1) && ( (int) (mg->nodes[i].nbrs.size())) <= min_deg) ){
+            if((mg->nodes[i].label != -1) && (( (int) (mg->nodes[i].nbrs.size())) <= min_deg) ){
                 min_deg = mg->nodes[i].nbrs.size();
                 low_degree_vs[j] = i;
                 print_message(1, "Low[%d]=%d(deg=%d)\n", j, i, min_deg);
