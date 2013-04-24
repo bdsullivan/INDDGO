@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     Graph::NewGraphReader ngr;
 
     fprintf(stderr,"g before: 0x%x\n", g);
-    g = ngr.read_graph(argv[1], "Edge");
+    g = ngr.read_graph(argv[1], "MeTiS");
     fprintf(stderr,"g after: 0x%x\n", g);
 
     // if we don't get rid of duplicate edges, bad things happen
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     fprintf(stderr, "edges read in: %d nodes read in: %d\n", g->get_num_edges(), g->get_num_nodes());
 
     //reader->read_graph(g, argv[1]);
-    gcf = new Graph::GraphCreatorFile(argv[1], "Edge");
+    gcf = new Graph::GraphCreatorFile(argv[1], "METIS");
    
     writer = rwf.create_writer("DIMACS", "t");
 

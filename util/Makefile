@@ -12,11 +12,15 @@ STATS_SRCS =  ./src/td_stats.cpp
 STATS_OBJ =  $(STATS_SRCS:.cpp=.o)
 STATS_EXE = $(INDDGO_BIN)/td_stats
 
-OTHER_SRCS = ./src/edge2dimacs.cpp
-OTHER_OBJ = $(OTHER_SRCS:.cpp=.o)
-OTHER_EXE = $(INDDGO_BIN)/edge2dimacs
+E2D_SRCS = ./src/edge2dimacs.cpp
+E2D_OBJ = $(E2D_SRCS:.cpp=.o)
+E2D_EXE = $(INDDGO_BIN)/edge2dimacs
 
-all: $(PKT_EXE) $(STATS_EXE) $(OTHER_EXE)
+M2D_SRCS = ./src/metis2dimacs.cpp
+M2D_OBJ = $(M2D_SRCS:.cpp=.o)
+M2D_EXE = $(INDDGO_BIN)/metis2dimacs
+
+all: $(PKT_EXE) $(STATS_EXE) $(E2D_EXE) $(M2D_EXE)
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
@@ -27,8 +31,11 @@ $(PKT_EXE): $(PKT_OBJ)
 $(STATS_EXE): $(STATS_OBJ) 
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(OTHER_EXE): $(OTHER_OBJ) 
+$(E2D_EXE): $(E2D_OBJ)  ../lib/libgraphd.a
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
+
+$(M2D_EXE): $(M2D_OBJ)  ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 clean: 
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(STATS_OBJ) $(STATS_EXE) $(OTHER_OBJ) $(OTHER_EXE)
+	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(STATS_OBJ) $(STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ)
