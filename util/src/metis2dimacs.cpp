@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     Graph::NewGraphReader ngr;
 
     fprintf(stderr,"g before: 0x%x\n", g);
-    g = ngr.read_graph(argv[1], "MeTiS");
+    g = ngr.read_graph<Graph::WeightedMutableGraph>(argv[1], "MeTiS");
     fprintf(stderr,"g after: 0x%x\n", g);
 
     // if we don't get rid of duplicate edges, bad things happen

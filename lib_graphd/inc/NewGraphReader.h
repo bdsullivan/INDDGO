@@ -23,7 +23,21 @@
 #define NEWGRAPHREADER_H_
 
 #include "Node.h"
+#include "Graph.h"
 #include "MutableGraph.h"
+#include "WeightedMutableGraph.h"
+#include "Log.h"
+#include "Debug.h"
+#include <stdio.h>
+#include <strings.h>
+#include <stdlib.h>
+#include <iostream>
+#include <algorithm>
+#include <iterator>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <vector>
 
 namespace Graph {
     class NewGraphReader {
@@ -32,15 +46,17 @@ namespace Graph {
         NewGraphReader();
         virtual ~NewGraphReader();
 
-        MutableGraph *read_graph(const char *filename, char *type);
+        template <class gtype> gtype *read_graph(const char *filename, char *type);
     private:
-        MutableGraph *read_edgelist(const char *filename);
-        MutableGraph *read_dimacs(const char *filename);
-        MutableGraph *read_adjmatrix(const char *filename);
-        MutableGraph *read_metis(const char *filename);
+        template <class gtype> gtype *read_edgelist(const char *filename);
+        template <class gtype> gtype *read_dimacs(const char *filename);
+        template <class gtype> gtype *read_adjmatrix(const char *filename);
+        template <class gtype> gtype *read_metis(const char *filename);
         void split(const string& s, char sep, vector<int>& v);  // used in metisgraph reader
         
     };
+
 }
+
 
 #endif /* GRAPHREADER_H_ */
