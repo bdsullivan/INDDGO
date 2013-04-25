@@ -339,35 +339,19 @@ namespace Graph {
         return g;
     } // read_adjmatrix
 
-    void NewGraphReader::split(const string& s, string sep, vector<int>& v){
+    void NewGraphReader::split(const string& s, char sep, vector<int>& v){
         string::size_type i = 0;
-        string::size_type j = s.find(c);
-        stringstream ss;
-        int k;
-        fprintf(stderr, "in split, s is '%s'\n", s.c_str());
-        while(j != string::npos){
-            //v.push_back(s.substr(i, j - i));
-            k = 0;
-            ss.clear();
-            ss << s.substr(i, j - i);
-            ss >> k;
-            v.push_back(k);
-            i = ++j;
-            j = s.find(c, j);
-            if(j == string::npos){
-                k = 0;
-                //v.push_back(s.substr(i, s.length( )));
-                ss.clear();
-                ss << s.substr(i, s.length());
-                ss >> k;
-                if(k > 0){
-                    v.push_back(k);
-                }
+        stringstream ss(s);
+        int k=-1;
+        string temp;
+        while(std::getline(ss, temp, sep)){
+            stringstream convert(temp);
+            convert >> k;
+            if(k != -1){
+                v.push_back(k);
             }
+            k=-1;
         }
-        cout << "v is: ";
-        copy(v.begin(), v.end(), ostream_iterator<int>(cout, " "));
-        cout << "\n";
     } // split
 
     MutableGraph *NewGraphReader::read_metis(const char *filename){
@@ -384,11 +368,8 @@ namespace Graph {
             elem.clear();
             do {
                 getline(in, s);
-                fprintf(stderr, "s[0] = %c\n", s[0]);
-                fprintf(stderr, "s is: %s\n", s.c_str());
             } while (s[0] == '%');  // skip comments
             split(s, ' ', elem);
-            fprintf(stderr, "s is: %s\n", s.c_str());
             n = elem[0];
             e = elem[1];
 
@@ -400,18 +381,23 @@ namespace Graph {
 
             g = new MutableGraph(n);
             while(in.good()){
-                getline(in, s);
                 elem.clear();
-                split(s, ' ', elem);
-                int is = (int) elem.size();
-                for(int i = 0; i < is; i++){
-                    g->add_edge(count,elem[i] - 1);
+                getline(in, s);
+                if(s[0] != '%') {
+                    split(s, ' ', elem);
+                    int is = (int) elem.size();
+                    for(int i = 0; i < is; i++){
+                        if(! g->is_edge(count,elem[i] - 1)){
+                            g->add_edge(count,elem[i] - 1);
+                        }
+                    }
+                    count++;
                 }
-                count++;
             }
 
             in.close();
         }
+        return g;
     } // read_metis
 }
 

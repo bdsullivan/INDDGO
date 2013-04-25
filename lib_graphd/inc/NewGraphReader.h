@@ -38,7 +38,7 @@ namespace Graph {
         MutableGraph *read_dimacs(const char *filename);
         MutableGraph *read_adjmatrix(const char *filename);
         MutableGraph *read_metis(const char *filename);
-        void split(const string& s, char c, vector<int>& v);  // used in metisgraph reader
+        void split(const string& s, char sep, vector<int>& v);  // used in metisgraph reader
         
     };
 }
