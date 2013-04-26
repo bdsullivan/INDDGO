@@ -1,6 +1,7 @@
 include ../make.inc
 
-DOCS_DIR = ./doc/*
+#DOCS_DIR = ./doc/*
+DOX_DIR = ./doc/
 DOXYFILE = ./Doxyfile
 
 INC_DIR= -I./inc -I$(GRAPH)/inc  $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) $(PARMETIS_INCDIR)
@@ -53,9 +54,11 @@ clean:
 	-rm -rf $(INDDGO_LIB_DIR)/$(TD_LIB_NAME) ./lib/$(TD_LIB_NAME)
 	-rm -rf $(TD_VALGRIND_LIB)
 	-rm -rf $(TD_PROF_LIB)
-	-rm -rf $(DOCS_DIR)
 
-docs: $(DOXYFILE)
+clean_doc:
+	-rm -rf $(DOX_DIR)
+
+doc: $(DOXYFILE)
 	doxygen $(DOXYFILE)
 
 

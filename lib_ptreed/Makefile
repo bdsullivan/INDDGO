@@ -1,5 +1,8 @@
 include ../make.inc
 
+DOX_DIR = ./doc/
+DOXYFILE = ./Doxyfile
+
 INC_DIR= -I./inc -I$(GRAPH)/inc -I$(TREE)/inc $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) $(PARMETIS_INCDIR)
 
 LIBS = -lm $(INDDGO_LIB) -ltreed -lgraphd $(METIS_LIB) $(SSPARSE_LIB) $(ARPACK_LIB) $(MPILIBS) $(MADNESS_LIB) $(GMP_LIB) $(PARMETIS_LIB) 
@@ -19,3 +22,9 @@ $(INDDGO_LIB_DIR)/$(PTD_LIB_NAME): $(OBJS)
 	ranlib $@
 clean: 
 	-rm -f $(INDDGO_LIB_DIR)/$(PTD_LIB_NAME) $(OBJS)
+
+clean_doc:
+	-rm -rf $(DOX_DIR)
+
+doc: $(DOXYFILE)
+	doxygen $(DOXYFILE)
