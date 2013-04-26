@@ -32,13 +32,13 @@ namespace Graph {
     }
 
     void DIMACSGraphReader::read_graph(const char *filename){
-        char line[100], format[100], x;
-        int i, j, m, n, retval, id, count;
+        char line[100], format[100];
+        int i, j, m, n, retval, id;
         int val;
         FILE *in;
 
         m = n = 0;
-        count = 0;
+        //count = 0;
         // Use the above to count # of connected nodes, etc. and make sure that it
         // matches what is in the existing Graph struct.
 
@@ -186,7 +186,7 @@ namespace Graph {
             };             // end switch
 
             // Advance to next line if there is format at the end of it
-            while(!feof(in) && (x = getc(in)) != '\n'){
+            while(!feof(in) && (getc(in)) != '\n'){
                 ;
             }
         }

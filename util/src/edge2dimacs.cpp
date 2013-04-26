@@ -55,9 +55,7 @@ int main(int argc, char **argv)
     }
 
     Graph::MutableGraph *g;
-    char inputfile[100];
-    char outputfile[100];
-    int seed;
+    int seed=0;
     
     if(!seed)
         // Set the seed to a rand int in 0,2^24
@@ -68,7 +66,7 @@ int main(int argc, char **argv)
 
     
     Graph::GraphCreatorFile *gcf;
-    Graph::GraphReader *reader;
+
     Graph::GraphWriter *writer;
     Graph::GraphReaderWriterFactory rwf;
     Graph::GraphProperties prop;

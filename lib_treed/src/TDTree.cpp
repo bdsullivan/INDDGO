@@ -317,7 +317,7 @@ void TDTree::remove_subset_bags()
 	int p;
 	list<int>::iterator cit, git, dit; 
 	TDTreeNode *parent, *child; 
-	vector<int>::iterator vit; 
+
 	vector<int> diff(2*(this->width));
 	list<int> dead_nodes;
 
@@ -916,7 +916,7 @@ void TDTree::construct_gavril(vector<int> *elim_order)
 	int i, k, m, v, minpos, num_fwd_neighbors;
 	list<int> neighbors;
 	list<int>::iterator ii;
-	vector<int>::iterator vi;
+
 	vector<int> W;
 	int num_nodes=this->G->get_num_nodes();
 	vector<int> t(num_nodes,-1);
@@ -1791,7 +1791,7 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 {
 	int i, j; 
 	FILE *out; 
-	Graph::WeightedMutableGraph *G = this->G;
+
 	list<int>::iterator L;
 	char rgb[8];
 	int k=0, rcolor; 
@@ -1944,7 +1944,7 @@ void TDTree::write_scored_graphviz_file(bool spline, const char *GVIZ_file, cons
 {
 	int i, j; 
 	FILE *out; 
-	Graph::WeightedMutableGraph *G = this->G;
+
 	list<int>::iterator L;
 	char rgb[8];
 	int k=0; 
@@ -2264,7 +2264,7 @@ void TDTree::highlight_subtree_scored_graphviz_file(int v, const char *GVIZ_file
 
 	int i, j; 
 	FILE *out; 
-	Graph::WeightedMutableGraph *G = this->G;
+
 	list<int>::iterator L;
 	char node_rgb[8];
 	//for now we'll make the highlights a purple to make heat map labels readable
@@ -3873,8 +3873,8 @@ Graph::MutableGraph *TDTree::export_tree()
 	{   
 		if(this->tree_nodes[i] != NULL)
 		{
-			L = this->tree_nodes[i]->adj.begin(); 
-			for(L;L!=this->tree_nodes[i]->adj.end();++L)
+
+			for(L = this->tree_nodes[i]->adj.begin();L!=this->tree_nodes[i]->adj.end();++L)
 			{
 				j=*L;
 				if(j > i)
