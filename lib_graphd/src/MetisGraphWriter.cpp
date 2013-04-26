@@ -61,7 +61,6 @@ namespace Graph {
 
         fprintf(out, "%d %d\n", num_nodes, num_edges);
         list<int>::iterator ii;
-        int edges_written = 0;
         list<int> *nbrs;
         for(int i = 0; i < num_nodes; i++){
             nbrs = nodes[i].get_nbrs_ptr();
