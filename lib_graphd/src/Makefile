@@ -43,7 +43,7 @@ all: $(INDDGO_LIB)/$(LIBNAME)  $(GVIZ)
 	$(CXX) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -c $< 	
 
 $(INDDGO_LIB)/$(LIBNAME): $(OBJ) $(POBJ)
-	ar -rv $(INDDGO_LIB_DIR)/$(LIBNAME) $^
+	$(AR) -rv $(INDDGO_LIB_DIR)/$(LIBNAME) $^
 
 #builds the library to the lib directory inside lib_graphd
 locallib: $(INDDGO_LIB_DIR)/$(LIBNAME)

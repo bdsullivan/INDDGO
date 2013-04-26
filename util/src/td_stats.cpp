@@ -115,12 +115,11 @@ int main(int argc, char **argv)
   for (int index = optind; index < argc; index++)
     printf ("Non-option argument %s\n", argv[index]);
   
-  int t, e, i, s;
+  int t, e, s;
   Graph::WeightedMutableGraph *G;
   TDTree *T;
   int treewidth, treelength, minecc;
   double kcore_max, kcore_min; 
-  int degree_max, degree_min;
   std::ofstream out;
   std::ostream outStream(cout.rdbuf());
   std::stringstream sstm;

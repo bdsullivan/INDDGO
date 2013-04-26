@@ -32,14 +32,12 @@ namespace Graph {
     }
 
     void EdgelistGraphReader::read_graph(const char *filename){
-        char line[100], line2[100], format[100], x;
-        int i, j, m, n, retval, id, count;
-        char *retp;
-        int val;
+        char line[100];
+        int i, j, m, n, retval;
+
         FILE *in;
 
         m = n = 0;
-        count = 0;
         // Use the above to count # of connected nodes, etc. and make sure that it
         // matches what is in the existing Graph struct.
 
@@ -50,11 +48,11 @@ namespace Graph {
         }
 
         // get the first non-comment lines
-        retp = fgets(line, 100, in);
-        fprintf(stderr, "retval=%d\n", retval);
+        fgets(line, 100, in);
+        //fprintf(stderr, "retval=%d\n", retval);
         while(line[0] == '#'){
-            retp = fgets(line, 100, in);
-            fprintf(stderr, "retval=%d\n", retval);
+            fgets(line, 100, in);
+            //fprintf(stderr, "retval=%d\n", retval);
         }
         // it has out number of nodes and number of edges
         retval = sscanf(line, "%d %d", &n, &m);
@@ -65,7 +63,7 @@ namespace Graph {
         this->capacity = n;
 
         while(!feof(in)){
-            retp = fgets(line, 100, in);
+            fgets(line, 100, in);
 
             // not sure why this doesn't trigger correctly in the while condition....
             if(feof(in)){
