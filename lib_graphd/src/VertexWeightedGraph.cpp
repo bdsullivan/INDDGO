@@ -30,7 +30,8 @@ namespace Graph {
     }
 
     VertexWeightedGraph::VertexWeightedGraph(int n) :
-        Graph(n), WeightedGraph(n){
+        Graph(n){
+        weight.resize(n, 0);
     }
 
     VertexWeightedGraph::~VertexWeightedGraph(){
@@ -59,6 +60,18 @@ namespace Graph {
 
         return *this;
     } // =
+
+    void VertexWeightedGraph::set_weight(vector<int> weight){
+        this->weight = weight;
+    }
+
+    vector<int> VertexWeightedGraph::get_weight() const {
+        return weight;
+    }
+
+    int VertexWeightedGraph::get_vertex_weight(int k){
+        return this->weight[k];
+    }
 
     /* This should really live in Graph, but all the GraphCreator code is currently for WMGs only.
      * Finds all connected components and saves one with largest number of nodes to the specified filename.

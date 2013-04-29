@@ -119,7 +119,6 @@ static const char EO_NAMES[][30] = {
 #include "Graph.h"
 #include "GraphReaderWriterFactory.h"
 #include "Graph.h"
-#include "WeightedGraph.h"
 #include "DIMACSGraphReader.h"
 #include "DIMACSGraphWriter.h"
 #include "GraphDisplay.h"

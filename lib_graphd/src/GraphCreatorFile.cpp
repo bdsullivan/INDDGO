@@ -21,7 +21,7 @@
 
 #include "GraphCreatorFile.h"
 #include "Graph.h"
-#include "WeightedGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphException.h"
 #include <iostream>
 
@@ -52,8 +52,8 @@ namespace Graph {
         this->file_name = fileName;
     }
 
-    WeightedGraph *GraphCreatorFile::create_weighted_graph(){
-        WeightedGraph *wg = new WeightedGraph();
+    VertexWeightedGraph *GraphCreatorFile::create_vertex_weighted_graph(){
+        VertexWeightedGraph *wg = new VertexWeightedGraph();
         GraphReader *gr = factory_rw->create_reader(graph_type);
 
         try
