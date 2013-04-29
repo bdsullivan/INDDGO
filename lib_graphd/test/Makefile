@@ -52,7 +52,7 @@ ParmetisTest.cpp
 
 ifeq ($(HAS_GTEST), 1)
 
-all : ${EXECUTABLES}
+all: ${EXECUTABLES}
 
 .cpp.o:
 	$(CXX) $(INCLUDES) $(CFLAGS) -c $<

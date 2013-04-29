@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    Graph::MutableGraph *g;
+    Graph::Graph *g;
     int seed=0;
     
     if(!seed)

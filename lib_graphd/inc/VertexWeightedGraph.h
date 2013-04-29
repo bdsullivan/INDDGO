@@ -24,11 +24,10 @@
 
 #include "Graph.h"
 #include "WeightedGraph.h"
-#include "MutableGraph.h"
+#include "Graph.h"
 
 namespace Graph {
-    class VertexWeightedGraph : public MutableGraph,
-        public WeightedGraph
+    class VertexWeightedGraph : public WeightedGraph
     {
 public:
     VertexWeightedGraph();

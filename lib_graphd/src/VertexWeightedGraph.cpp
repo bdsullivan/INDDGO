@@ -30,7 +30,7 @@ namespace Graph {
     }
 
     VertexWeightedGraph::VertexWeightedGraph(int n) :
-        Graph(n), MutableGraph(n), WeightedGraph(n){
+        Graph(n), WeightedGraph(n){
     }
 
     VertexWeightedGraph::~VertexWeightedGraph(){
@@ -60,7 +60,7 @@ namespace Graph {
         return *this;
     } // =
 
-    /* This should really live in MutableGraph, but all the GraphCreator code is currently for WMGs only.
+    /* This should really live in Graph, but all the GraphCreator code is currently for WMGs only.
      * Finds all connected components and saves one with largest number of nodes to the specified filename.
      * If you desire normalized DIMACS files, you must run that after the component file is created.
      */

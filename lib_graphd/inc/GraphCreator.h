@@ -24,7 +24,7 @@
 
 #include "Graph.h"
 #include "WeightedGraph.h"
-#include "MutableGraph.h"
+#include "Graph.h"
 #include "VertexWeightedGraph.h"
 
 using namespace std;
@@ -52,7 +52,7 @@ public:
 
     virtual Graph *create_graph() = 0;
     virtual WeightedGraph *create_weighted_graph() = 0;
-    virtual MutableGraph *create_mutable_graph() = 0;
+    virtual Graph *create_mutable_graph() = 0;
     virtual VertexWeightedGraph *create_weighted_mutable_graph() = 0;
 
     GraphCreator();

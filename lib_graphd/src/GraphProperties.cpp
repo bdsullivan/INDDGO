@@ -32,36 +32,36 @@ namespace Graph {
     /**
      * Removes all loops and duplicate edges. Sets the simple flag to true.
      */
-    void GraphProperties::make_simple(MutableGraph *mg){
+    void GraphProperties::make_simple(Graph *g){
         int i;
         list<int>::iterator it;
         GraphUtil graph_util;
 
-        for(i = 0; i < mg->capacity; i++){
+        for(i = 0; i < g->capacity; i++){
             //loop through the active nodes
-            if(mg->nodes[i].label != -1){
+            if(g->nodes[i].label != -1){
                 //necessary prereq to using unique()
-                mg->nodes[i].nbrs.sort();
+                g->nodes[i].nbrs.sort();
                 //remove duplicate edges
-                mg->nodes[i].nbrs.unique();
+                g->nodes[i].nbrs.unique();
                 //remove loops
-                mg->nodes[i].nbrs.remove(i);
+                g->nodes[i].nbrs.remove(i);
             }
         }
 
-        mg->simple = true;
+        g->simple = true;
         //update degrees and number of edges
-        graph_util.recompute_degrees(mg);
+        graph_util.recompute_degrees(g);
         return;
     } // make_simple
 
     /**
-     * mg forces the graph to have symmetric adjacency lists and be simple (no loops/duplicate edges) and updates flags accordingly.
+     * g forces the graph to have symmetric adjacency lists and be simple (no loops/duplicate edges) and updates flags accordingly.
      */
-    void GraphProperties::make_canonical(MutableGraph *mg){
-        // CSG -Should we also have mg->capacity==mg->num_nodes?
-        make_simple(mg);
-        mg->canonical = true;
+    void GraphProperties::make_canonical(Graph *g){
+        // CSG -Should we also have g->capacity==g->num_nodes?
+        make_simple(g);
+        g->canonical = true;
 
         return;
     }
@@ -70,43 +70,43 @@ namespace Graph {
      * Increments the value of Graph.key and sets adj_vec[u]=key for all neighbors u of v.
      * returns the value of the key used.
      */
-    int GraphProperties::fill_adj_vec(MutableGraph *mg, int v){
-        if(!mg->canonical){
+    int GraphProperties::fill_adj_vec(Graph *g, int v){
+        if(!g->canonical){
             fatal_error("%s:  Graph must be in canonical form\n", __FUNCTION__);
         }
 
-        if(mg->key == 1 << 31){
+        if(g->key == 1 << 31){
             // The key is big. Reset the key and zero out the adj_vec
-            mg->key = 0;
-            for(int i = 0; i < mg->capacity; i++){
-                mg->adj_vec[i] = 0;
+            g->key = 0;
+            for(int i = 0; i < g->capacity; i++){
+                g->adj_vec[i] = 0;
             }
         }
 
-        mg->key++;
-        for(list<int>::iterator L = mg->nodes[v].nbrs.begin(); L
-            != mg->nodes[v].nbrs.end(); ++L){
-            mg->adj_vec[*L] = mg->key;
+        g->key++;
+        for(list<int>::iterator L = g->nodes[v].nbrs.begin(); L
+            != g->nodes[v].nbrs.end(); ++L){
+            g->adj_vec[*L] = g->key;
         }
 
-        return mg->key;
+        return g->key;
     } // fill_adj_vec
 
     /**
      * Adds edges as necessary so that the vertices form a clique.  Returns the number
      * of edges added to the graph.
      */
-    int GraphProperties::make_clique(MutableGraph *mg, list<int> *vertices){
+    int GraphProperties::make_clique(Graph *g, list<int> *vertices){
         int m = 0;
         list<int>::iterator ii, jj;
 
         for(ii = vertices->begin(); ii != vertices->end(); ++ii){
-            int current_key = fill_adj_vec(mg, *ii);
+            int current_key = fill_adj_vec(g, *ii);
             for(jj = ii; ++jj != vertices->end(); ){
-                if(mg->adj_vec[*jj] != current_key){
+                if(g->adj_vec[*jj] != current_key){
                     // Add the edge *ii-*jj
                     m++;
-                    mg->add_edge(*ii, *jj);
+                    g->add_edge(*ii, *jj);
                 }
             }
         }
@@ -119,15 +119,15 @@ namespace Graph {
      * Returns true of the list of vertices forms a clique in the
      * graph, false otherwise.
      */
-    bool GraphProperties::is_clique(MutableGraph *mg, list<int> *vertices){
+    bool GraphProperties::is_clique(Graph *g, list<int> *vertices){
         list<int>::iterator ii, jj;
 
         for(ii = vertices->begin(); ii != vertices->end(); ++ii){
             jj = vertices->begin();
-            int current_key = fill_adj_vec(mg, *ii);
+            int current_key = fill_adj_vec(g, *ii);
             while(jj != vertices->end()){
                 // CSG - ignoring self loops here!
-                if((mg->adj_vec[*jj] != current_key) && (*ii != *jj) ){
+                if((g->adj_vec[*jj] != current_key) && (*ii != *jj) ){
                     //				print_message(0, "Did not find required clique edge %d-%d\n",
                     //						*ii, *jj);
                     return false;
@@ -143,16 +143,16 @@ namespace Graph {
      * Manually verify if current graph is simple - time intensive with data copies (checks adj lists for duplicates & loops).
      * Returns true or false.
      */
-    bool GraphProperties::check_simple(MutableGraph *mg){
+    bool GraphProperties::check_simple(Graph *g){
         int i;
         list<int> *tmp;
         size_t newdeg;
 
-        for(i = 0; i < mg->capacity; i++){
+        for(i = 0; i < g->capacity; i++){
             //loop through the active nodes
-            if(mg->nodes[i].label != -1){
+            if(g->nodes[i].label != -1){
                 //copy the list of neighbors
-                tmp = new list<int> (mg->nodes[i].nbrs);
+                tmp = new list<int> (g->nodes[i].nbrs);
                 //sort it and remove duplicates and loops
                 tmp->sort();
                 tmp->unique();
@@ -160,7 +160,7 @@ namespace Graph {
                 newdeg = tmp->size();
                 delete tmp;
                 //check to see if anything changed & return false if it did (graph was not simple)
-                if(newdeg != mg->nodes[i].nbrs.size()){
+                if(newdeg != g->nodes[i].nbrs.size()){
                     return false;
                 }
             }
@@ -169,11 +169,11 @@ namespace Graph {
         return true;
     } // check_simple
 
-    bool GraphProperties::is_connected(MutableGraph *mg){
+    bool GraphProperties::is_connected(Graph *g){
         list<int> m;
         GraphUtil util;
-        if(util.find_component(mg, 0, &m) == mg->num_nodes){
-            mg->num_connected_components = 1;
+        if(util.find_component(g, 0, &m) == g->num_nodes){
+            g->num_connected_components = 1;
             return true;
         }
         else {
@@ -181,7 +181,7 @@ namespace Graph {
         }
     }
 
-    bool GraphProperties::is_independent_set(MutableGraph *mg, list<int> *vertices){
+    bool GraphProperties::is_independent_set(Graph *g, list<int> *vertices){
         /**
          * Returns true of the list of vertices forms an independent set in the
          * graph, false otherwise.
@@ -194,9 +194,9 @@ namespace Graph {
         list<int>::iterator ii, jj;
 
         for(ii = vertices->begin(); ii != vertices->end(); ++ii){
-            int current_key = fill_adj_vec(mg, *ii);
+            int current_key = fill_adj_vec(g, *ii);
             for(jj = ii; ++jj != vertices->end(); ){
-                if(mg->adj_vec[*jj] == current_key){
+                if(g->adj_vec[*jj] == current_key){
                     return false;
                 }
             }
@@ -210,7 +210,7 @@ namespace Graph {
      * Returns true of the list of vertices forms an independent set in the
      * graph, false otherwise. Sets val to be the weight of the set.
      */
-    bool GraphProperties::is_independent_set(VertexWeightedGraph *wmg,
+    bool GraphProperties::is_independent_set(VertexWeightedGraph *wg,
                                              list<int> *vertices, int *val){
         if(vertices->size() == 1){
             return true;
@@ -219,14 +219,14 @@ namespace Graph {
         list<int>::iterator ii, jj;
 
         for(ii = vertices->begin(); ii != vertices->end(); ++ii){
-            int current_key = fill_adj_vec(wmg, *ii);
+            int current_key = fill_adj_vec(wg, *ii);
             for(jj = ii; ++jj != vertices->end(); ){
-                if(wmg->adj_vec[*jj] == current_key){
+                if(wg->adj_vec[*jj] == current_key){
                     return false;
                 }
             }
 
-            *val += wmg->weight[*ii];
+            *val += wg->weight[*ii];
         }
 
         // Found no adjacent vertices
@@ -238,17 +238,17 @@ namespace Graph {
      * graph that passes through only those vertices k such that t[k]=true.
      */
 
-    bool GraphProperties::is_path(MutableGraph *mg, int start, int end, bool *t){
+    bool GraphProperties::is_path(Graph *g, int start, int end, bool *t){
         // Returns true if we find a path b/w start and end that uses only vertices v
         // such that t[v]=true, false o/w
         // We need the graph to be symmetric, as we're going to walk through a neighbor list
-        if(!mg->canonical){
+        if(!g->canonical){
             fatal_error("%s:  must be in canonical format\n", __FUNCTION__);
         }
 
         int j;
-        bool *visited = new bool[mg->capacity];
-        for(j = 0; j < mg->capacity; j++){
+        bool *visited = new bool[g->capacity];
+        for(j = 0; j < g->capacity; j++){
             visited[j] = false;
         }
 
@@ -276,13 +276,13 @@ namespace Graph {
                 visited[j] = true;
 
                 // Check j's neighbors
-                for(ii = mg->nodes[j].nbrs.begin(); ii != mg->nodes[j].nbrs.end(); ++ii){
+                for(ii = g->nodes[j].nbrs.begin(); ii != g->nodes[j].nbrs.end(); ++ii){
                     if(*ii == end){
                         delete[] visited;
                         return true;
                     }
                     if((visited[*ii] == false) && (t[*ii] == true) ){
-                        // Note - mg is the only place that we refer to the t[] vector
+                        // Note - g is the only place that we refer to the t[] vector
                         // We haven't seen *ii before and it is an "acceptable" vertex,
                         // so it is a candidate to be in the path - add it to the Stack
                         S.push_back(*ii);                         // used to be push_front - does it matter?
@@ -300,18 +300,18 @@ namespace Graph {
      * Uses BFS to determine if there is a path between start and end in the
      * graph.
      */
-    bool GraphProperties::is_path(MutableGraph *mg, int start, int end){
+    bool GraphProperties::is_path(Graph *g, int start, int end){
         // Returns true if we find a path b/w start and end that uses only vertices v
         // such that t[v]=true, false o/w
 
         // We need the graph to be symmetric, as we're going to walk through a neighbor list
-        if(!mg->canonical){
+        if(!g->canonical){
             fatal_error("%s:  must be in canonical format\n", __FUNCTION__);
         }
 
         int j;
-        bool *visited = new bool[mg->capacity];
-        for(j = 0; j < mg->capacity; j++){
+        bool *visited = new bool[g->capacity];
+        for(j = 0; j < g->capacity; j++){
             visited[j] = false;
         }
 
@@ -332,7 +332,7 @@ namespace Graph {
                 // We have now visited j
                 visited[j] = true;
 
-                for(ii = mg->nodes[j].nbrs.begin(); ii != mg->nodes[j].nbrs.end(); ++ii){
+                for(ii = g->nodes[j].nbrs.begin(); ii != g->nodes[j].nbrs.end(); ++ii){
                     if(*ii == end){
                         delete[] visited;
                         return true;

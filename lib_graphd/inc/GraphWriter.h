@@ -23,7 +23,7 @@
 #define GRAPHWRITER_H_
 #include "Graph.h"
 #include "WeightedGraph.h"
-#include "MutableGraph.h"
+#include "Graph.h"
 #include "VertexWeightedGraph.h"
 #include <string>
 #include <algorithm>

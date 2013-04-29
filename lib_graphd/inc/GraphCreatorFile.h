@@ -42,7 +42,7 @@ public:
     virtual ~GraphCreatorFile();
     virtual Graph *create_graph();
     virtual WeightedGraph *create_weighted_graph();
-    virtual MutableGraph *create_mutable_graph();
+    virtual Graph *create_mutable_graph();
     virtual VertexWeightedGraph *create_weighted_mutable_graph();
 
     std::string get_file_name() const;

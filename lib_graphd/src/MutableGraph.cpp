@@ -19,35 +19,35 @@
 
  */
 
-#include "MutableGraph.h"
+#include "Graph.h"
 #include "Log.h"
 #include "Debug.h"
 #include "GraphProperties.h"
 #include <string.h>
 
 namespace Graph {
-    MutableGraph::MutableGraph(){
+    Graph::Graph(){
         simple = true;
         canonical = true;
         key = 0;
     }
 
-    MutableGraph::~MutableGraph(){
+    Graph::~Graph(){
     }
 
-    bool MutableGraph::is_canonical() const {
+    bool Graph::is_canonical() const {
         return canonical;
     }
 
-    bool MutableGraph::is_simple() const {
+    bool Graph::is_simple() const {
         return simple;
     }
 
-    void MutableGraph::set_canonical(bool c){
+    void Graph::set_canonical(bool c){
         canonical = c;
     }
 
-    void MutableGraph::add_edge_advance(int u, int v){
+    void Graph::add_edge_advance(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
             fatal_error(
                 "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
@@ -111,7 +111,7 @@ namespace Graph {
         }
     } // add_edge_advance
 
-    bool MutableGraph::remove_edge(int u, int v){
+    bool Graph::remove_edge(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
             fatal_error(
                 "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
@@ -159,7 +159,7 @@ namespace Graph {
         return false;
     } // remove_edge
 
-    void MutableGraph::remove_vertex(int v){
+    void Graph::remove_vertex(int v){
         if(!canonical){
             print_message(0, "%s:  Graph must be in canonical form\n", __FUNCTION__);
         }
@@ -199,7 +199,7 @@ namespace Graph {
         num_nodes--;
     } // remove_vertex
 
-    int MutableGraph::contract_edge(int u, int v){
+    int Graph::contract_edge(int u, int v){
         int i;
         if(simple != true){
             fatal_error("%s: called on a non-simple graph!\n", __FUNCTION__);
@@ -251,11 +251,11 @@ namespace Graph {
         return u;
     } // contract_edge
 
-    void MutableGraph::set_simple(bool si){
+    void Graph::set_simple(bool si){
         simple = si;
     }
 
-    void MutableGraph::add_edge(int u, int v){
+    void Graph::add_edge(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
             fatal_error(
                 "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
@@ -285,39 +285,39 @@ namespace Graph {
         num_edges++;
     } // add_edge
 
-    void MutableGraph::resize_adj_vec(int n){
+    void Graph::resize_adj_vec(int n){
         adj_vec.resize(n, 0);
     }
 
-    vector<int> MutableGraph::get_adj_vec() const {
+    vector<int> Graph::get_adj_vec() const {
         return adj_vec;
     }
 
-    vector<int> *MutableGraph::get_adj_vec_ptr(){
+    vector<int> *Graph::get_adj_vec_ptr(){
         return (&(this->adj_vec));
     }
 
-    vector<int> MutableGraph::get_adjncy() const {
+    vector<int> Graph::get_adjncy() const {
         return adjncy;
     }
 
-    vector<int> MutableGraph::get_xadj() const {
+    vector<int> Graph::get_xadj() const {
         return xadj;
     }
 
-    void MutableGraph::set_adjncy(vector<int> adjncy){
+    void Graph::set_adjncy(vector<int> adjncy){
         this->adjncy = adjncy;
     }
 
-    MutableGraph::MutableGraph(int n) :
+    Graph::Graph(int n) :
         Graph(n){
     }
 
-    void MutableGraph::set_xadj(vector<int> xadj){
+    void Graph::set_xadj(vector<int> xadj){
         this->xadj = xadj;
     }
 
-    void MutableGraph::eliminate_vertex(int v, list<int> *forward_neighbors,
+    void Graph::eliminate_vertex(int v, list<int> *forward_neighbors,
                                         bool remove){
         if(!this->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n", __FUNCTION__);
@@ -441,7 +441,7 @@ namespace Graph {
      * Also checks and sets num_components.
      *
      */
-    void MutableGraph::initialize_params(){
+    void Graph::initialize_params(){
         fatal_error("Initialize params not yet implemented\n");
 
         //Graph::GraphProperties properties;
@@ -458,7 +458,7 @@ namespace Graph {
      * For advanced users - allows you to set number of connected components, and whether the graph is simple/canonical
      * Will not verify that the values passed in are accurate.
      */
-    void MutableGraph::initialize_params(bool simple, bool canonical, int num_comp){
+    void Graph::initialize_params(bool simple, bool canonical, int num_comp){
         this->simple = simple;
         this->canonical = canonical;
         this->num_connected_components = num_comp;
