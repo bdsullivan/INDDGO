@@ -38,12 +38,12 @@ inddgo-info@googlegroups.com
 #define WRAP_UTHASH 0
 
 #include "weighted_ind_set.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 
 int main(int argc, char **argv)
 {
 	int i;
-	Graph::WeightedMutableGraph *G;
+	Graph::VertexWeightedGraph *G;
 	TDTree *T = NULL;
 	DP_info info;
 	list<int> optimal_solution;

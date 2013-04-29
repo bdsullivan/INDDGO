@@ -19,24 +19,24 @@
 
  */
 
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphProperties.h"
 #include "GraphReaderWriterFactory.h"
 #include "GraphCreatorFile.h"
 #include <string.h>
 
 namespace Graph {
-    WeightedMutableGraph::WeightedMutableGraph(){
+    VertexWeightedGraph::VertexWeightedGraph(){
     }
 
-    WeightedMutableGraph::WeightedMutableGraph(int n) :
+    VertexWeightedGraph::VertexWeightedGraph(int n) :
         Graph(n), MutableGraph(n), WeightedGraph(n){
     }
 
-    WeightedMutableGraph::~WeightedMutableGraph(){
+    VertexWeightedGraph::~VertexWeightedGraph(){
     }
 
-    WeightedMutableGraph& WeightedMutableGraph::operator=(const WeightedMutableGraph& rhs){
+    VertexWeightedGraph& VertexWeightedGraph::operator=(const VertexWeightedGraph& rhs){
         weight = rhs.weight;
         simple = rhs.simple;
         canonical = rhs.canonical;
@@ -64,7 +64,7 @@ namespace Graph {
      * Finds all connected components and saves one with largest number of nodes to the specified filename.
      * If you desire normalized DIMACS files, you must run that after the component file is created.
      */
-    void WeightedMutableGraph::write_largest_component(std::string filetype, std::string filename){
+    void VertexWeightedGraph::write_largest_component(std::string filetype, std::string filename){
         GraphProperties properties;
         GraphWriter *writer;
         GraphReaderWriterFactory factory;
@@ -76,11 +76,11 @@ namespace Graph {
         // Put the input graph in canonical form for the tests
         properties.make_canonical(this);
 
-        list<WeightedMutableGraph *> C;
+        list<VertexWeightedGraph *> C;
         C = creator.create_all_components(this, true);
         print_message(10, "Found %d components\n", C.size());
-        list<WeightedMutableGraph *>::iterator cc;
-        list<WeightedMutableGraph *>::iterator maxcomp;
+        list<VertexWeightedGraph *>::iterator cc;
+        list<VertexWeightedGraph *>::iterator maxcomp;
         int max_size = -1;
 
         for(cc = C.begin(); cc != C.end(); ++cc){

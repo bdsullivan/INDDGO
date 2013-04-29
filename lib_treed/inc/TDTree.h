@@ -24,7 +24,7 @@ inddgo-info@googlegroups.com
 #ifdef __PARALLEL__
 #include <mpi.h>
 #endif
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "TDTreeNode.h"
 
 /**
@@ -33,10 +33,10 @@ inddgo-info@googlegroups.com
 class TDTree
 {
 	friend ostream &operator<<(ostream &, const TDTree &);
-	//friend class Graph::WeightedMutableGraph;
+	//friend class Graph::VertexWeightedGraph;
 
 public:
-	TDTree(Graph::WeightedMutableGraph *);                  // Constructor given an input graph
+	TDTree(Graph::VertexWeightedGraph *);                  // Constructor given an input graph
 	TDTree();                          // Default constructor
 	~TDTree();                         // Destructor
 
@@ -75,7 +75,7 @@ public:
 	/**
 	* Pointer to the graph being decomposed
 	*/
-	Graph::WeightedMutableGraph *G;
+	Graph::VertexWeightedGraph *G;
 
 	/**
 	* Place for the file containing the graph G.

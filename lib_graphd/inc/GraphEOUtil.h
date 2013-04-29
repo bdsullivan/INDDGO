@@ -130,7 +130,7 @@ public:
     void find_elimination_ordering(MutableGraph *mg, vector<int> *ordering,
                                    int algorithm, bool triangulate);
     #ifdef HAS_PARMETIS
-    void parmetis_elimination_ordering(WeightedMutableGraph *mg, vector<int> &ordering,
+    void parmetis_elimination_ordering(VertexWeightedGraph *mg, vector<int> &ordering,
                                        int algorithm, bool triangulate, MPI_Comm comm);
 
     #endif // HAS_PARMETIS

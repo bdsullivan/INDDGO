@@ -42,7 +42,7 @@ public:
 
     bool is_clique(MutableGraph *mg, list<int> *vertices);
     bool is_independent_set(MutableGraph *mg, list<int> *vertices);
-    bool is_independent_set(WeightedMutableGraph *mg, list<int> *vertices,
+    bool is_independent_set(VertexWeightedGraph *mg, list<int> *vertices,
                             int *val);
     bool is_path(MutableGraph *mg, int start, int end, bool *t);             // Determines existence of a path between start
     // and end involving only vertices v with t[v]=true

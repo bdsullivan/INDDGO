@@ -112,8 +112,8 @@ namespace Graph {
         return mg;
     } // create_mutable_graph
 
-    WeightedMutableGraph *GraphCreatorFile::create_weighted_mutable_graph(){
-        WeightedMutableGraph *wmg = new WeightedMutableGraph();
+    VertexWeightedGraph *GraphCreatorFile::create_weighted_mutable_graph(){
+        VertexWeightedGraph *wmg = new VertexWeightedGraph();
         GraphReader *gr = factory_rw->create_reader(graph_type);
 
         try

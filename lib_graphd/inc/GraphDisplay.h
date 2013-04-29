@@ -21,7 +21,7 @@
 
 #ifndef GRAPHDISPLAY_H_
 #define GRAPHDISPLAY_H_
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 namespace Graph {
     class GraphDisplay
     {

@@ -447,7 +447,7 @@ namespace Graph {
         //Graph::GraphProperties properties;
         //properties.make_canonical(G);
         //if (!properties.is_connected(G))
-        //	list<Graph::WeightedMutableGraph *> C;
+        //	list<Graph::VertexWeightedGraph *> C;
         //	C = creator.create_all_components(G, true);
         //  print_message(0, "Found %d components\n", C.size());
 

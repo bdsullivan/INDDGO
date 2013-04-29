@@ -2130,7 +2130,7 @@ int compute_weighted_ind_set_table(TDTree *T, int k)
 * If solved, the solution is written to <DIMACS_file>.IND_SET.sol.
 */
 void write_ind_set_model(const char *DIMACS_file, const char *model_file,
-	Graph::WeightedMutableGraph *G)
+	Graph::VertexWeightedGraph *G)
 {
 	int i, j;
 	char sol_file[200];
@@ -2255,7 +2255,7 @@ void compute_contribution(TDTree *T, int k, bigint_t *mask,
 			Graph::GraphProperties properties;
 
 			if (properties.is_independent_set(
-				(Graph::WeightedMutableGraph *) (T->G), &missing_set, &val))
+				(Graph::VertexWeightedGraph *) (T->G), &missing_set, &val))
 				print_message(0, "Missing set is independent with weight %f\n",
 				val);
 			else
@@ -2579,7 +2579,7 @@ int reconstruct_solution(TDTree *T, list<int> *optimal_solution,
 * Populates the provided Graph structure with the necessary information to 
 * do the WIS calculation.
 */
-void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
+void create_WIS_graph(DP_info *info, Graph::VertexWeightedGraph *&G)
 {
 	int i;
 
@@ -2622,11 +2622,11 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 	{
 		print_message(0,
 			"WIS only runs on connected graphs.  This graph has more than one component!\n");
-		list<Graph::WeightedMutableGraph *> C;
+		list<Graph::VertexWeightedGraph *> C;
 
 		C = creator.create_all_components(G, true);
 		print_message(0, "Found %d components\n", C.size());
-		list<Graph::WeightedMutableGraph *>::iterator cc;
+		list<Graph::VertexWeightedGraph *>::iterator cc;
 		int comp_number = 0;
 		char temp_file[100], comp_file[100];
 		int max_size = -1;
@@ -2700,7 +2700,7 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 * Creates a tree decomposition for the provided tree and the DP options
 * contained in DP_info.
 */
-void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
+void create_tree_decomposition(DP_info *info, Graph::VertexWeightedGraph *G,
 	TDTree **T)
 {
 	create_tree_decomposition(info, G, T, true);
@@ -2710,7 +2710,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 * Creates a tree decomposition for the provided tree and the DP options
 * contained in DP_info.
 */
-void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
+void create_tree_decomposition(DP_info *info, Graph::VertexWeightedGraph *G,
 	TDTree **T, bool suppress_timing)
 {
 	// Create a copy of G to do the triangulation and elim order
@@ -2721,7 +2721,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 		return;
 	}
 
-	Graph::WeightedMutableGraph H = *G;
+	Graph::VertexWeightedGraph H = *G;
 
 	//Run (optional) lower bound heuristics and print information
 	if(info->lower_bounds)

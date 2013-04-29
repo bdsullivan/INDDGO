@@ -1844,7 +1844,7 @@ namespace Graph {
     } // find_elimination_ordering
 
     #ifdef HAS_PARMETIS
-    void GraphEOUtil::parmetis_elimination_ordering(WeightedMutableGraph *mg, vector<int> &orderingout,
+    void GraphEOUtil::parmetis_elimination_ordering(VertexWeightedGraph *mg, vector<int> &orderingout,
                                                     int algorithm, bool triangulate, MPI_Comm comm){
         int ws;
         int wr;
@@ -1856,7 +1856,7 @@ namespace Graph {
         MPI_Comm_size(comm, &ws);
         MPI_Comm_rank(comm, &wr);
 
-        WeightedMutableGraph G(*mg);
+        VertexWeightedGraph G(*mg);
         double xtime = MPI_Wtime();
         sprintf(eoname, "%s.order.%d", mg->get_input_file().c_str(), ws);
         sprintf(eoname_other, "%s.order_other.%d", mg->get_input_file().c_str(), ws);
@@ -1968,7 +1968,7 @@ namespace Graph {
         }
 
         GraphCreatorFile gf;
-        WeightedMutableGraph *wg;
+        VertexWeightedGraph *wg;
         GraphEOUtil eoutil;
         GraphProperties prop;
         list<int>members(ordering.begin(), ordering.end());

@@ -22,7 +22,7 @@
 #include "GraphDecomposition.h"
 #include "GraphProperties.h"
 #include "Log.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphException.h" 
 
 using namespace std;

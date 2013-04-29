@@ -38,14 +38,14 @@ LIBGRAPHDECOMP=$(GRAPH)/lib/libgraphd.a
 
 EXECUTABLES = $(LIBGTEST) testDimacsReader testGraphReader testGraphCreatorFile \
 testGraphReaderWriterFactory testGraph testWeightedGraph testMutableGraph \
-testWeightedMutableGraph testAdjMatrixGraphWriter testAdjMatrixGraphReader \
+testVertexWeightedGraph testAdjMatrixGraphWriter testAdjMatrixGraphReader \
 testDIMACSGraphWriter testGraphVizGraphWriter testGraphProperty testGraphUtil\
 testGraphEOUtil testMetisGraphWriter testMetisGraphReader testParMetis
 
 
 SRC=DIMACSReaderTest.cpp GraphReaderTest.cpp GraphCreatorFileTest.cpp \
 GraphReaderWriterFactoryTest.cpp GraphTest.cpp WeightedGraphTest.cpp MutableGraphTest.cpp\
-WeightedMutableGraphTest.cpp AdjMatrixGraphWriterTest.cpp AdjMatrixGraphReaderTest.cpp\
+VertexWeightedGraphTest.cpp AdjMatrixGraphWriterTest.cpp AdjMatrixGraphReaderTest.cpp\
 DIMACSGraphWriterTest.cpp GraphVizGraphWriterTest.cpp GraphPropertyTest.cpp\
 GraphUtilTest.cpp GraphEOUtilTest.cpp MetisGraphWriterTest.cpp MetisGraphReaderTest.cpp\
 ParmetisTest.cpp
@@ -77,7 +77,7 @@ testWeightedGraph: WeightedGraphTest.o
 testMutableGraph: MutableGraphTest.o
 	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
-testWeightedMutableGraph: WeightedMutableGraphTest.o
+testVertexWeightedGraph: VertexWeightedGraphTest.o
 	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testAdjMatrixGraphWriter: AdjMatrixGraphWriterTest.o

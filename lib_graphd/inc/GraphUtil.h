@@ -86,7 +86,7 @@ public:
     int subset_max_dist(MutableGraph *mg, vector<int> subset);
     };
 
-    void create_largestcomponent_graph(char *graph_file, WeightedMutableGraph *&G);
+    void create_largestcomponent_graph(char *graph_file, VertexWeightedGraph *&G);
 }
 
 #endif /* GRAPHUTIL_H_ */

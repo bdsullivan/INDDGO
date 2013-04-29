@@ -21,7 +21,7 @@
 
 #include "GraphDecomposition.h"
 #include "Log.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphException.h" 
 
 using namespace std;
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     int t = 1;
     int ktree_n=-1, ktree_k=-1, ktree_p=-1;
     int seed=0;
-	Graph::WeightedMutableGraph *G=NULL, *H=NULL; 
+	Graph::VertexWeightedGraph *G=NULL, *H=NULL; 
     time_t start, stop;
     char filename[100];
     char *prefix= (char *)"pkt";

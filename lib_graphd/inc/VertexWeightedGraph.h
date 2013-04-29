@@ -27,14 +27,14 @@
 #include "MutableGraph.h"
 
 namespace Graph {
-    class WeightedMutableGraph : public MutableGraph,
+    class VertexWeightedGraph : public MutableGraph,
         public WeightedGraph
     {
 public:
-    WeightedMutableGraph();
-    WeightedMutableGraph(int n);
-    virtual ~WeightedMutableGraph();
-    WeightedMutableGraph& operator=(const WeightedMutableGraph& wmg);
+    VertexWeightedGraph();
+    VertexWeightedGraph(int n);
+    virtual ~VertexWeightedGraph();
+    VertexWeightedGraph& operator=(const VertexWeightedGraph& wmg);
     void write_largest_component(std::string filetype, std::string filename);
 
     friend class GraphUtil;

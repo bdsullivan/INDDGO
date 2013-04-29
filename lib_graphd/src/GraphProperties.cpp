@@ -210,7 +210,7 @@ namespace Graph {
      * Returns true of the list of vertices forms an independent set in the
      * graph, false otherwise. Sets val to be the weight of the set.
      */
-    bool GraphProperties::is_independent_set(WeightedMutableGraph *wmg,
+    bool GraphProperties::is_independent_set(VertexWeightedGraph *wmg,
                                              list<int> *vertices, int *val){
         if(vertices->size() == 1){
             return true;

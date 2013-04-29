@@ -24,7 +24,7 @@
 #include "Graph.h"
 #include "WeightedGraph.h"
 #include "MutableGraph.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include <string>
 #include <algorithm>
 

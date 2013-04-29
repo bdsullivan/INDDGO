@@ -777,7 +777,7 @@ using namespace std;
  * Assumes graph_file is in DIMACS format.
  * If needed, stores the largest connected components in DIMACS format at graph_file.giantcomp (and populates Graph from this).
  */
-void Graph::create_largestcomponent_graph(char *graph_file, WeightedMutableGraph *&G){
+void Graph::create_largestcomponent_graph(char *graph_file, VertexWeightedGraph *&G){
     GraphCreatorFile creator;
     creator.set_file_name(graph_file);
     creator.set_graph_type("DIMACS");

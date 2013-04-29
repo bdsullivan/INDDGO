@@ -34,7 +34,7 @@ void parmetis_with_amd ()
     int size, rank;
     MPI_Comm comm;
 	Graph::GraphEOUtil eoutil;
-    Graph::WeightedMutableGraph *wmg;
+    Graph::VertexWeightedGraph *wmg;
 	Graph::GraphCreatorFile creator;
 
 	int output[] =
@@ -65,7 +65,7 @@ void parmetis_only ()
     int size, rank;
     MPI_Comm comm;
 	Graph::GraphEOUtil eoutil;
-    Graph::WeightedMutableGraph *wmg;
+    Graph::VertexWeightedGraph *wmg;
 	Graph::GraphCreatorFile creator;
 
 	int output[] =
@@ -96,7 +96,7 @@ void parmetis_with_metmmd ()
     int size, rank;
     MPI_Comm comm;
 	Graph::GraphEOUtil eoutil;
-    Graph::WeightedMutableGraph *wmg;
+    Graph::VertexWeightedGraph *wmg;
 	Graph::GraphCreatorFile creator;
 
 	int output[] =

@@ -126,7 +126,7 @@ static const char EO_NAMES[][30] = {
 #include "GraphInterface.h"
 #include "GraphUtil.h"
 #include "Node.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphCreatorFile.h"
 #include "GraphEOUtil.h"
 #include "GraphProperties.h"
