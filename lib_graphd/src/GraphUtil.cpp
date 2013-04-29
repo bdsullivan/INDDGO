@@ -54,7 +54,6 @@ namespace Graph {
             size_t origsize, newsize;
             int loops = 0;
             int j;
-<<<<<<< HEAD
             for(i = 0; i < g->capacity; i++){
                 origsize = g->nodes[i].nbrs.size();
                 g->nodes[i].nbrs.remove(i);
@@ -89,15 +88,9 @@ namespace Graph {
         int max_deg = -INT_MAX;
         int i, j;
         j = 0;
-<<<<<<< HEAD
-        for(i = 0; i < mg->capacity; i++){
-            if((mg->nodes[i].label != -1)
-               && ( (int) (mg->nodes[i].nbrs.size())
-=======
         for(i = 0; i < g->capacity; i++){
             if((g->nodes[i].label != -1)
-               && ( (int) (((((((((((((((g->nodes[i].nbrs.size())))))))))))))))
->>>>>>> classremoval
+               && ( (int) (g->nodes[i].nbrs.size())
                     >= max_deg) ){
                 max_deg = g->nodes[i].nbrs.size();
                 high_degree_vs[j] = i;
@@ -133,17 +126,9 @@ namespace Graph {
         int min_deg = INT_MAX;
         int i, j;
         j = 0;
-<<<<<<< HEAD
-        for(i = 0; i < mg->capacity; i++){
-            if((mg->nodes[i].label != -1) && (( (int) (mg->nodes[i].nbrs.size())) <= min_deg) ){
-                min_deg = mg->nodes[i].nbrs.size();
-=======
         for(i = 0; i < g->capacity; i++){
-            if((g->nodes[i].label != -1)
-               && ( (int) ((((((((((((((g->nodes[i].nbrs.size()))))))))))))))
-                    <= min_deg) ){
+            if((g->nodes[i].label != -1) && (( (int) (g->nodes[i].nbrs.size())) <= min_deg) ){
                 min_deg = g->nodes[i].nbrs.size();
->>>>>>> classremoval
                 low_degree_vs[j] = i;
                 print_message(1, "Low[%d]=%d(deg=%d)\n", j, i, min_deg);
                 j++;
@@ -194,11 +179,7 @@ namespace Graph {
         }
 
         print_message(1, "Labeling component of vertex %d with %d\n", v, label);
-<<<<<<< HEAD
-        if((int) (components->size()) < mg->capacity){
-=======
-        if((int) (((((((((((((components->size()))))))))))))) < g->capacity){
->>>>>>> classremoval
+        if((int) (components->size()) < g->capacity){
             fatal_error("%s:  Component vector does not have enough space.\n",
                         __FUNCTION__);
         }
@@ -255,11 +236,7 @@ namespace Graph {
         }
 
         print_message(1, "Labeling component of vertex %d with %d\n", v, label);
-<<<<<<< HEAD
-        if((int) (components->size()) < mg->capacity){
-=======
-        if((int) ((((((((((((components->size())))))))))))) < g->capacity){
->>>>>>> classremoval
+        if((int) (components->size()) < g->capacity){
             fatal_error("%s:  Component vector does not have enough space.\n",
                         __FUNCTION__);
         }
@@ -304,13 +281,8 @@ namespace Graph {
     int GraphUtil::label_all_components(Graph *g,
                                         vector<int> *components){
         // Make sure the components vector is the right size
-<<<<<<< HEAD
-        if((int) (components->size()) < mg->capacity){
-            components->resize(mg->capacity, -1);
-=======
-        if((int) (((((((((((components->size()))))))))))) < g->capacity){
+        if((int) (components->size()) < g->capacity){
             components->resize(g->capacity, -1);
->>>>>>> classremoval
         }
 
         else {
@@ -389,13 +361,8 @@ namespace Graph {
     int GraphUtil::rec_label_all_components(Graph *g,
                                             vector<int> *components){
         // Make sure the components vector is the right size
-<<<<<<< HEAD
-        if((int) (components->size()) < mg->capacity){
-            components->resize(mg->capacity, -1);
-=======
-        if((int) ((((((((((components->size())))))))))) < g->capacity){
+        if((int) (components->size()) < g->capacity){
             components->resize(g->capacity, -1);
->>>>>>> classremoval
         }
 
         else {
