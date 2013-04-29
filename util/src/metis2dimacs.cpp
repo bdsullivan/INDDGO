@@ -53,29 +53,33 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    Graph::MutableGraph *g;
-    char inputfile[100];
-    char outputfile[100];
+    Graph::MutableGraph *g=NULL;
     int seed;
     
-    if(!seed)
-        // Set the seed to a rand int in 0,2^24
-        seed=Graph::rand_int(0,0xffffff);
+    seed=Graph::rand_int(0,0xffffff);
     // Spin the RNG seed times
     for(int ss=0;ss<seed;ss++)
         Graph::lcgrand(0);
 
     
     Graph::GraphCreatorFile *gcf;
-    Graph::GraphReader *reader;
     Graph::GraphWriter *writer;
     Graph::GraphReaderWriterFactory rwf;
     Graph::GraphProperties prop;
     Graph::NewGraphReader ngr;
 
-    fprintf(stderr,"g before: 0x%x\n", g);
     g = ngr.read_graph<Graph::WeightedMutableGraph>(argv[1], "MeTiS");
-    fprintf(stderr,"g after: 0x%x\n", g);
+
+    // mucking with stuff
+    //
+    Graph::MutableGraph *mg;
+    mg = new Graph::MutableGraph();
+    //fprintf(stderr,"mg number of nodes (before): %d\n", mg->get_num_nodes());
+    //fprintf(stderr,"mg before: 0x%x\n", mg);
+    ngr.new_readgraph(mg, argv[1], "MeTiS");
+    fprintf(stderr,"mg after: 0x%x\n", mg);
+    fprintf(stderr,"mg number of nodes (after) : %d\n", mg->get_num_nodes());
+
 
     // if we don't get rid of duplicate edges, bad things happen
     // when trying to output the graph
