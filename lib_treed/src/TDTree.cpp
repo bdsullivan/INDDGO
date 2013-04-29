@@ -31,7 +31,7 @@ inddgo-info@googlegroups.com
 * The constructor for the TDTree class. Allocates necessary data structures
 * based on the size of the provided Graph.
 */
-TDTree::TDTree(Graph::WeightedMutableGraph *H)
+TDTree::TDTree(Graph::VertexWeightedGraph *H)
 {
 	this->G=H;
 	// This was new list<int>(this->G->get_capacity()); ??
@@ -814,7 +814,7 @@ void TDTree::construct_BK(vector<int> *elim_order)
 
 	// We change the graph G, so we should use a copy. Note that this is potentially
 	// expensive for large graphs
-	Graph::WeightedMutableGraph H=*(this->G);
+	Graph::VertexWeightedGraph H=*(this->G);
 
 	int i, v, minpos, num_fwd_neighbors;
 	list<int> neighbors;
@@ -2116,7 +2116,7 @@ void TDTree::highlight_subtree_gviz(int v, const char *GVIZ_file, int style)
 
 	int i, j; 
 	FILE *out; 
-	Graph::WeightedMutableGraph *G = this->G;
+	Graph::VertexWeightedGraph *G = this->G;
 	list<int>::iterator L;
 	char rgb[8];
 	//You can modify this to make the uniform circle bags bigger or smaller.
@@ -2526,7 +2526,7 @@ void TDTree::construct_knice(vector<int> *elim_order, int k, bool descend_one)
 	int n = (this->G)->get_num_nodes();
 
 	// We're not going to modify G but we do need a graph H to hold our k-tree. Initialize it as a copy of G.
-	Graph::WeightedMutableGraph H=*(this->G);
+	Graph::VertexWeightedGraph H=*(this->G);
 
 	// This keeps track of a treenode so that the bag associated with it contains C[i] \cup {i}
 	// initialized to -1 (an invalid node ID)
@@ -3848,13 +3848,13 @@ void TDTree::sort_bags()
 * Nodes in TDTree will be stored as {1,2, ... num_tree_nodes} in G so that 
 * the label of nodes[i] < the label of nodes[j] whenever i < j. 
 */
-Graph::MutableGraph *TDTree::export_tree()
+Graph::Graph *TDTree::export_tree()
 {
 	int n = this->num_tree_nodes;
 	int i,j,k;
-	Graph::MutableGraph *mg = new Graph::MutableGraph(n);
+	Graph::Graph *g = new Graph::Graph(n);
 	//set up the Graph allocations and default variables.    
-	mg->initialize_params(true, true, 1);
+	g->initialize_params(true, true, 1);
 
 	//figure out how to go back and forth from tree node vector to graph nodes 
 	//If there are no gaps in the tree_nodes array, this just maps i <-> i.
@@ -3878,14 +3878,14 @@ Graph::MutableGraph *TDTree::export_tree()
 			{
 				j=*L;
 				if(j > i)
-					mg->add_edge(graph_labels[i], graph_labels[j]);
-				mg->add_edge(graph_labels[j], graph_labels[i]);
+					g->add_edge(graph_labels[i], graph_labels[j]);
+				g->add_edge(graph_labels[j], graph_labels[i]);
 			}
 		}
 	}
 
 	Graph::GraphUtil util; 
-	util.recompute_degrees(mg); 
+	util.recompute_degrees(g); 
 
-	return mg;
+	return g;
 }

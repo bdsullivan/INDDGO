@@ -28,7 +28,7 @@
 
 #include "PTD.h"
 #include "weighted_ind_set.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #define GLPSOL "glpsol"
 
 using namespace std;
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 	World world(MPI::COMM_WORLD);
 	redirectio(world);
 
-	Graph::WeightedMutableGraph *G;
+	Graph::VertexWeightedGraph *G;
     PTD  *p;
 
 	DP_info info;

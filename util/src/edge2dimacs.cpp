@@ -22,7 +22,7 @@
 #include "GraphDecomposition.h"
 #include "GraphProperties.h"
 #include "Log.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphException.h" 
 #include "NewGraphReader.h"
 
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    Graph::MutableGraph *g;
+    Graph::Graph *g;
     int seed=0;
     
     if(!seed)

@@ -30,40 +30,40 @@ namespace Graph {
     GraphEOUtil::~GraphEOUtil(){
     }
 
-    int GraphEOUtil::triangulate(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::triangulate(Graph *g, vector<int> *ordering){
         int i, j, w, x, num_fill_edges = 0;
         list<int> neighbors;
         list<int>::iterator k1, k2;
 
-        if(mg->num_connected_components != 1){
-            fatal_error("%s:  Must have 1 component\nmg graph has %d components\n",
-                        __FUNCTION__, mg->num_connected_components);
+        if(g->num_connected_components != 1){
+            fatal_error("%s:  Must have 1 component\ng graph has %d components\n",
+                        __FUNCTION__, g->num_connected_components);
         }
 
-        if(!mg->canonical){
+        if(!g->canonical){
             fatal_error("%s:  Requires canonical form\n", __FUNCTION__);
         }
 
         if((int) (ordering->size())
-           != mg->num_nodes){
+           != g->num_nodes){
             fatal_error("%s:  Ordering appears to be of incorrect size? (%d!=%d)\n",
-                        __FUNCTION__, ordering->size(), mg->num_nodes);
+                        __FUNCTION__, ordering->size(), g->num_nodes);
         }
 
-        int *f = new int[mg->num_nodes];
-        int *index = new int[mg->num_nodes];
-        int *fwd_nbrs = new int[mg->num_nodes];
+        int *f = new int[g->num_nodes];
+        int *index = new int[g->num_nodes];
+        int *fwd_nbrs = new int[g->num_nodes];
         int tree_w = 0;
-        mg->key = 1;
+        g->key = 1;
         //start = clock();
-        for(i = 0; i < mg->num_nodes; i++){
+        for(i = 0; i < g->num_nodes; i++){
             w = ordering->at(i);
             f[w] = w;
             index[w] = i;
             neighbors.clear();
-            mg->key++;
-            find_backward_neighbors(mg, w, ordering, i, &neighbors, &j);
-            fwd_nbrs[w] = mg->nodes[w].nbrs.size() - neighbors.size();
+            g->key++;
+            find_backward_neighbors(g, w, ordering, i, &neighbors, &j);
+            fwd_nbrs[w] = g->nodes[w].nbrs.size() - neighbors.size();
             if(fwd_nbrs[w] > tree_w){
                 tree_w = fwd_nbrs[w];
             }
@@ -72,13 +72,13 @@ namespace Graph {
                 x = *k1;
                 while(index[x] < i){
                     index[x] = i;
-                    if(mg->adj_vec[x] != mg->key){
+                    if(g->adj_vec[x] != g->key){
                         num_fill_edges++;
-                        mg->nodes[w].nbrs.push_back(x);
-                        mg->nodes[x].nbrs.push_back(w);
-                        mg->degree[w]++;
-                        mg->degree[x]++;
-                        mg->num_edges++;
+                        g->nodes[w].nbrs.push_back(x);
+                        g->nodes[x].nbrs.push_back(w);
+                        g->degree[w]++;
+                        g->degree[x]++;
+                        g->num_edges++;
                         fwd_nbrs[x]++;
                         if(fwd_nbrs[x] > tree_w){
                             tree_w = fwd_nbrs[x];
@@ -102,20 +102,20 @@ namespace Graph {
         return tree_w;
     } // triangulate
 
-    int GraphEOUtil::find_backward_neighbors(MutableGraph *mg, int v,
+    int GraphEOUtil::find_backward_neighbors(Graph *g, int v,
                                              vector<int> *W, int end_pos, list<int> *neighbors, int *min_pos){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
 
-        if((v < 0) || (v >= mg->capacity) ){
+        if((v < 0) || (v >= g->capacity) ){
             fatal_error(
                 "%s:  find_forward_neighbors() called with vertex %d and there are %d connected nodes\n",
-                __FUNCTION__, v, mg->capacity);
+                __FUNCTION__, v, g->capacity);
         }
 
-        if((mg->nodes[v].nbrs.size() == 0) && (mg->num_nodes > 1) ){
+        if((g->nodes[v].nbrs.size() == 0) && (g->num_nodes > 1) ){
             print_message(
                 0,
                 "%s:  Calling find_forward_neighbors for node %d which has no neighbors!\n",
@@ -124,7 +124,7 @@ namespace Graph {
 
         int j, cnt;
         GraphProperties properties;
-        int current_key = properties.fill_adj_vec(mg, v);
+        int current_key = properties.fill_adj_vec(g, v);
         *min_pos = INT_MAX;
         neighbors->clear();
         cnt = 0;
@@ -133,7 +133,7 @@ namespace Graph {
             "Checking %d neighbors\n",
             (int) ((((((((((((((((((((((((((W->size())))))))))))))))))))))))))));
         for(j = 0; j <= end_pos; j++){
-            if(mg->adj_vec[W->at(j)] == current_key){
+            if(g->adj_vec[W->at(j)] == current_key){
                 if(j < *min_pos){
                     *min_pos = j;
                 }
@@ -146,8 +146,8 @@ namespace Graph {
         return cnt;
     } // find_backward_neighbors
 
-    int GraphEOUtil::get_max_min_degree_lower_bound(MutableGraph *mg){
-        if(!mg->canonical){
+    int GraphEOUtil::get_max_min_degree_lower_bound(Graph *g){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -157,7 +157,7 @@ namespace Graph {
 
         // Create a copy of G - otherwise we would have to restore it at the end
         //Changed from = *this to copy constructor July 19 - BDS
-        MutableGraph G(*mg);
+        Graph G(*g);
 
         //Make sure the degrees are up to date before we start
         GraphUtil util;
@@ -208,15 +208,15 @@ namespace Graph {
         return max_recorded_degree;
     } // get_max_min_degree_lower_bound
 
-    int GraphEOUtil::get_mcs_lower_bound(MutableGraph *mg, int start_v){
-        vector<int> ordering(mg->num_nodes, -1);
-        int lb = find_mcs_ordering(mg, &ordering, start_v);
+    int GraphEOUtil::get_mcs_lower_bound(Graph *g, int start_v){
+        vector<int> ordering(g->num_nodes, -1);
+        int lb = find_mcs_ordering(g, &ordering, start_v);
         return lb;
     }
 
-    int GraphEOUtil::find_mcs_ordering(MutableGraph *mg, vector<int> *ordering,
+    int GraphEOUtil::find_mcs_ordering(Graph *g, vector<int> *ordering,
                                        int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -226,23 +226,23 @@ namespace Graph {
         list<int> neighbors;
         char *mcs_labels;
         if((int) ((((((((((((((((((((((ordering->size()))))))))))))))))))))))
-           < mg->capacity){
+           < g->capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
-                        __FUNCTION__, ordering->size(), mg->capacity);
+                        __FUNCTION__, ordering->size(), g->capacity);
         }
 
         m = start_v;
-        mcs_labels = new char[mg->capacity];
-        memset(mcs_labels, 0, mg->capacity * sizeof(char));
+        mcs_labels = new char[g->capacity];
+        memset(mcs_labels, 0, g->capacity * sizeof(char));
         mcs_labels[m] = 1;
-        ordering->at(mg->num_nodes - 1) = m;
+        ordering->at(g->num_nodes - 1) = m;
         i = 1;
-        while(i < mg->num_nodes){
+        while(i < g->num_nodes){
             int max_deg = -1, max_pos = -1;
-            for(j = 0; j < mg->capacity; j++){
-                if((mg->nodes[j].label != -1) && (mcs_labels[j] == 0) ){
+            for(j = 0; j < g->capacity; j++){
+                if((g->nodes[j].label != -1) && (mcs_labels[j] == 0) ){
                     neighbors.clear();
-                    find_forward_neighbors(mg, j, ordering, mg->num_nodes - i,
+                    find_forward_neighbors(g, j, ordering, g->num_nodes - i,
                                            &neighbors, &x);
                     if((int) ((((((((((((((((((((((neighbors.size()))))))))))))))))))))))
                        > max_deg){
@@ -259,7 +259,7 @@ namespace Graph {
             }
 
             mcs_labels[max_pos] = 1;
-            ordering->at(mg->num_nodes - 1 - i) = max_pos;
+            ordering->at(g->num_nodes - 1 - i) = max_pos;
             i++;
         }
 
@@ -267,20 +267,20 @@ namespace Graph {
         return global_max_deg;
     } // find_mcs_ordering
 
-    int GraphEOUtil::find_forward_neighbors(MutableGraph *mg, int v, vector<int> *W,
+    int GraphEOUtil::find_forward_neighbors(Graph *g, int v, vector<int> *W,
                                             int start_pos, list<int> *neighbors, int *min_pos){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
 
-        if((v < 0) || (v >= mg->capacity) ){
+        if((v < 0) || (v >= g->capacity) ){
             fatal_error(
                 "%s:  find_forward_neighbors() called with vertex %d and there are %d connected nodes\n",
-                __FUNCTION__, v, mg->capacity);
+                __FUNCTION__, v, g->capacity);
         }
 
-        if((mg->nodes[v].nbrs.size() == 0) && (mg->num_nodes > 1) ){
+        if((g->nodes[v].nbrs.size() == 0) && (g->num_nodes > 1) ){
             print_message(
                 0,
                 "%s:  Calling find_forward_neighbors for node %d which has no neighbors!\n",
@@ -291,7 +291,7 @@ namespace Graph {
         list<int>::iterator k;
         //vector<int>::iterator i;
         GraphProperties properties;
-        int current_key = properties.fill_adj_vec(mg, v);
+        int current_key = properties.fill_adj_vec(g, v);
         *min_pos = INT_MAX;
         neighbors->clear();
         cnt = 0;
@@ -299,7 +299,7 @@ namespace Graph {
                       (int) (((((((((((((((((((((W->size()))))))))))))))))))))));
         for(j = start_pos;
             j < (int) (((((((((((((((((((((W->size()))))))))))))))))))))); j++){
-            if(mg->adj_vec[W->at(j)] == current_key){
+            if(g->adj_vec[W->at(j)] == current_key){
                 if(j < *min_pos){
                     *min_pos = j;
                 }
@@ -312,9 +312,9 @@ namespace Graph {
         return cnt;
     } // find_forward_neighbors
 
-    int GraphEOUtil::find_forward_neighbors_2(MutableGraph *mg, int v,
+    int GraphEOUtil::find_forward_neighbors_2(Graph *g, int v,
                                               vector<int> *W, int start_pos, list<int> *neighbors, int *min_pos){
-        vector<short int> frontvals(mg->get_num_nodes(), -1);
+        vector<short int> frontvals(g->get_num_nodes(), -1);
         neighbors->clear();
 
         for(int j = start_pos; j < (int) W->size(); j++){
@@ -322,7 +322,7 @@ namespace Graph {
         }
 
         list<int>::iterator it;
-        Node *n = mg->get_node(v);
+        Node *n = g->get_node(v);
         list<int> *nbrs = n->get_nbrs_ptr();
         it = nbrs->begin();
         int count = 0;
@@ -341,7 +341,7 @@ namespace Graph {
         return count;
     } // find_forward_neighbors_2
 
-    int GraphEOUtil::METIS_triangulate(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::METIS_triangulate(Graph *g, vector<int> *ordering){
         #if !HAS_METIS
         fatal_error("Called METIS triangulation without HAS_METIS.\n");
         // Not reached but MSVC complains
@@ -351,29 +351,29 @@ namespace Graph {
         idx_t maxlnz, maxsub;
         idx_t *xadj, *adjncy;        //need to be idx_t for METIS, but int* for use elsewhere in Graph; this is a problem on 64-bit.
         idx_t *perm, *xlnz, *xnzsub, *nzsub, *iperm;
-        nvtxs = mg->num_nodes;
+        nvtxs = g->num_nodes;
         //print_message(0,"nvtxs=num_nodes=%d\n",nvtxs);
         GraphUtil util;
-        util.populate_CRS(mg);
+        util.populate_CRS(g);
 
         /**
          * This block is to allow compatibility with 64-bit metis where idx_t is not an int, and replaces the original code below it.
          */
-        int sizexa = mg->get_num_nodes() + 1;
-        int sizead = mg->xadj[nvtxs];         //2*(mg->get_num_edges());
+        int sizexa = g->get_num_nodes() + 1;
+        int sizead = g->xadj[nvtxs];         //2*(g->get_num_edges());
 
         maxsub = 4 * sizead;
 
         xadj = new idx_t[sizexa];
         adjncy = new idx_t[sizead];
         for(i = 0; i < sizexa; i++){
-            xadj[i] = ((mg->xadj)[i]) + 1;
+            xadj[i] = ((g->xadj)[i]) + 1;
         }
         for(i = 0; i < sizead; i++){
-            adjncy[i] = (mg->adjncy)[i] + 1;
+            adjncy[i] = (g->adjncy)[i] + 1;
         }
-        // xadj = &(mg->xadj[0]);
-        // adjncy = &(mg->adjncy[0]);
+        // xadj = &(g->xadj[0]);
+        // adjncy = &(g->adjncy[0]);
         // maxsub = 4 * xadj[nvtxs];
         // k = xadj[nvtxs];
         // for (i = 0; i < k; i++)
@@ -412,9 +412,9 @@ namespace Graph {
 
         for(i = 0; i < nvtxs; i++){
             xlnz[i]--;
-            mg->nodes[i].nbrs.clear();
+            g->nodes[i].nbrs.clear();
         }
-        mg->num_edges = 0;
+        g->num_edges = 0;
         int width = 0;
         for(i = 0; i < nvtxs - 1; i++){
             k = 0;
@@ -422,13 +422,13 @@ namespace Graph {
                 //print_message(0, "[%d,%d]: (%d-%d; %d)\n", i,j, perm[i],
                 //	perm[nzsub[xnzsub[i] - 1 + j - xlnz[i]] - 1],
                 //	perm[nzsub[xnzsub[i] - 1 + j - xlnz[i]] - 1] - 1);
-                mg->nodes[perm[i] - 1].nbrs.push_back(
+                g->nodes[perm[i] - 1].nbrs.push_back(
                     perm[nzsub[xnzsub[i] - 1 + j - xlnz[i]] - 1] - 1);
-                mg->nodes[perm[nzsub[xnzsub[i] - 1 + j - xlnz[i]] - 1] - 1].nbrs.push_back(
+                g->nodes[perm[nzsub[xnzsub[i] - 1 + j - xlnz[i]] - 1] - 1].nbrs.push_back(
                     perm[i] - 1);
-                mg->num_edges++;
-                mg->degree[perm[nzsub[xnzsub[i] - 1 + j - xlnz[i]] - 1] - 1]++;
-                mg->degree[perm[i] - 1]++;
+                g->num_edges++;
+                g->degree[perm[nzsub[xnzsub[i] - 1 + j - xlnz[i]] - 1] - 1]++;
+                g->degree[perm[i] - 1]++;
                 if(iperm[perm[i] - 1]
                    < iperm[perm[nzsub[xnzsub[i] - 1 + j - xlnz[i]] - 1] - 1]){
                     k++;
@@ -439,7 +439,7 @@ namespace Graph {
             }
         }
 
-        util.free_CRS(mg);
+        util.free_CRS(g);
 
         delete[] xadj;
         delete[] adjncy;
@@ -453,21 +453,21 @@ namespace Graph {
         #endif // if !HAS_METIS
     } // METIS_triangulate
 
-    bool GraphEOUtil::is_perfect_ordering(MutableGraph *mg, vector<int> *ordering){
-        if(!mg->canonical){
+    bool GraphEOUtil::is_perfect_ordering(Graph *g, vector<int> *ordering){
+        if(!g->canonical){
             fatal_error("%s:  Requires canonical form\n", __FUNCTION__);
         }
 
         if((int) (((((((((((((((((((ordering->size())))))))))))))))))))
-           != mg->num_nodes){
+           != g->num_nodes){
             fatal_error("%s:  Ordering appears to be of incorrect size? (%d!=%d)\n",
-                        __FUNCTION__, ordering->size(), mg->num_nodes);
+                        __FUNCTION__, ordering->size(), g->num_nodes);
         }
 
         int i, v;
         list<int>::iterator jj;
         GraphProperties properties;
-        MutableGraph H(*mg);
+        Graph H(*g);
         for(i = 0; i < H.num_nodes; i++){
             v = ordering->at(i);
             if(properties.is_clique(&H, &(H.nodes[v].nbrs)) == false){
@@ -486,35 +486,35 @@ namespace Graph {
         return true;
     } // is_perfect_ordering
 
-    int GraphEOUtil::find_mcs_ordering(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::find_mcs_ordering(Graph *g, vector<int> *ordering){
         GraphUtil util;
-        int start_v = util.get_random_low_degree_vertex(mg);
-        return find_mcs_ordering(mg, ordering, start_v);
+        int start_v = util.get_random_low_degree_vertex(g);
+        return find_mcs_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_min_degree_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_min_degree_ordering(Graph *g,
                                               vector<int> *ordering, int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
 
         int i, m, min_deg, min_pos = -1;
-        MutableGraph G(*mg);
+        Graph G(*g);
         if((int) (((((((((((((((((ordering->size()))))))))))))))))) < G.capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
                         __FUNCTION__, ordering->size(), G.capacity);
         }
 
         GraphUtil util;
-        util.recompute_degrees(mg);
+        util.recompute_degrees(g);
         i = 0;
         ordering->at(i) = start_v;
         G.eliminate_vertex(start_v, NULL, true);
         G.degree[start_v] = INT_MAX;
         int width = 0;
         for(i = 1; i < G.num_nodes; i++){
-            // CSG - mg should be ok if num_nodes!=capacity since in the for(m=..) loop
+            // CSG - g should be ok if num_nodes!=capacity since in the for(m=..) loop
             // below we check for -1 labels and will encounter exactly num_nodes
             // active nodes
             // Find the minimum degree node in the current graph
@@ -533,29 +533,29 @@ namespace Graph {
 
             ordering->at(i) = min_pos;
             // Now "eliminate" node min_pos from the graph
-            // Note that mg modifies G.degree[] array!
+            // Note that g modifies G.degree[] array!
             if((int) (G.nodes[min_pos].nbrs.size()) > width){
                 width = G.nodes[min_pos].nbrs.size();
             }
 
             G.eliminate_vertex(min_pos, NULL, true);
-            // Artificially inflate degree[min_pos] to infinity - G is a copy so mg abuse is ok
+            // Artificially inflate degree[min_pos] to infinity - G is a copy so g abuse is ok
             G.degree[min_pos] = INT_MAX;
         }
         print_message(1, "Width in %s: %d\n", __FUNCTION__, width);
         return 1;
     } // find_min_degree_ordering
 
-    int GraphEOUtil::find_min_degree_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_min_degree_ordering(Graph *g,
                                               vector<int> *ordering){
         GraphUtil util;
-        int start_v = util.get_random_low_degree_vertex(mg);
-        return find_min_degree_ordering(mg, ordering, start_v);
+        int start_v = util.get_random_low_degree_vertex(g);
+        return find_min_degree_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_mul_min_degree_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_mul_min_degree_ordering(Graph *g,
                                                   vector<int> *ordering, int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -563,8 +563,8 @@ namespace Graph {
         int i, m, min_deg;
 
         // Make a copy of this graph
-        //Changed from =*mg to copy constructor - BDS July 19
-        MutableGraph G(*mg);
+        //Changed from =*g to copy constructor - BDS July 19
+        Graph G(*g);
 
         // Make sure ordering[] is big enough for the graph
         if((int) ordering->size() < G.capacity){
@@ -625,32 +625,32 @@ namespace Graph {
         return 1;
     } // find_mul_min_degree_ordering
 
-    int GraphEOUtil::find_mul_min_degree_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_mul_min_degree_ordering(Graph *g,
                                                   vector<int> *ordering){
         GraphUtil util;
-        int start_v = util.get_random_low_degree_vertex(mg);
-        return find_mul_min_degree_ordering(mg, ordering, start_v);
+        int start_v = util.get_random_low_degree_vertex(g);
+        return find_mul_min_degree_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_pkt_sort_ordering(MutableGraph *mg, vector<int> *ordering,
+    int GraphEOUtil::find_pkt_sort_ordering(Graph *g, vector<int> *ordering,
                                             int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
 
-        if((int) (((((((((((((((ordering->size()))))))))))))))) < mg->capacity){
+        if((int) (((((((((((((((ordering->size()))))))))))))))) < g->capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
-                        __FUNCTION__, ordering->size(), mg->capacity);
+                        __FUNCTION__, ordering->size(), g->capacity);
         }
 
         GraphUtil util;
-        util.recompute_degrees(mg);
+        util.recompute_degrees(g);
         int i, j;
         i = 0;
         ordering->at(i) = start_v;
-        j = mg->num_nodes - 1;
-        for(i = 1; i < mg->num_nodes; i++){
+        j = g->num_nodes - 1;
+        for(i = 1; i < g->num_nodes; i++){
             if(j != start_v){
                 ordering->at(i) = j;
             }
@@ -665,31 +665,31 @@ namespace Graph {
         return 1;
     } // find_pkt_sort_ordering
 
-    int GraphEOUtil::find_pkt_sort_ordering(MutableGraph *mg, vector<int> *ordering){
-        int start_v = mg->num_nodes - 1;
-        return find_pkt_sort_ordering(mg, ordering, start_v);
+    int GraphEOUtil::find_pkt_sort_ordering(Graph *g, vector<int> *ordering){
+        int start_v = g->num_nodes - 1;
+        return find_pkt_sort_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_lexm_bfs_ordering(MutableGraph *mg, vector<int> *ordering,
+    int GraphEOUtil::find_lexm_bfs_ordering(Graph *g, vector<int> *ordering,
                                             int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
 
         VertexLabel *labels;
-        labels = new VertexLabel[mg->capacity];
+        labels = new VertexLabel[g->capacity];
         VertexLabel largest_label, current_label;
         bool *S, *t;
-        S = new bool[mg->capacity];
-        t = new bool[mg->capacity];
+        S = new bool[g->capacity];
+        t = new bool[g->capacity];
         list<int>::iterator ii;
         int i, j, u, v;
         list<int> nodes_to_relabel;
         list<int> path;
         GraphProperties properties;
-        for(i = 0; i < mg->capacity; i++){
-            if(mg->nodes[i].label != -1){
+        for(i = 0; i < g->capacity; i++){
+            if(g->nodes[i].label != -1){
                 S[i] = true;
                 labels[i].id = i;
                 labels[i].entries.clear();
@@ -702,8 +702,8 @@ namespace Graph {
         }
 
         bool started = false;
-        for(i = mg->capacity - 1; i >= 0; i--){
-            if(mg->nodes[i].label != -1){
+        for(i = g->capacity - 1; i >= 0; i--){
+            if(g->nodes[i].label != -1){
                 u = -1;
                 if(!started){
                     started = true;
@@ -713,7 +713,7 @@ namespace Graph {
                     v = -1;
                     largest_label.id = -1;
                     largest_label.entries.clear();
-                    for(j = mg->capacity - 1; j >= 0; j--){
+                    for(j = g->capacity - 1; j >= 0; j--){
                         if(S[j] && (largest_label < labels[j]) ){
                             largest_label.id = labels[j].id;
                             largest_label.entries.clear();
@@ -734,13 +734,13 @@ namespace Graph {
 
                 ordering->at(i) = v;
                 S[v] = false;
-                int current_key = properties.fill_adj_vec(mg, v);
+                int current_key = properties.fill_adj_vec(g, v);
                 nodes_to_relabel.clear();
-                for(u = 0; u < mg->capacity; u++){
-                    if((S[u] == true) && (mg->nodes[u].label != -1) ){
+                for(u = 0; u < g->capacity; u++){
+                    if((S[u] == true) && (g->nodes[u].label != -1) ){
                         print_message(1, "Finding path from %d to %d\n", u, v);
-                        for(int k = 0; k < mg->capacity; k++){
-                            if((mg->nodes[k].label != -1) && (S[k] == true)
+                        for(int k = 0; k < g->capacity; k++){
+                            if((g->nodes[k].label != -1) && (S[k] == true)
                                && (labels[k] < labels[u]) ){
                                 t[k] = true;
                             }
@@ -749,8 +749,8 @@ namespace Graph {
                                 t[k] = false;
                             }
                         }
-                        if((mg->adj_vec[u] == current_key)
-                           || properties.is_path(mg, u, v, t)){
+                        if((g->adj_vec[u] == current_key)
+                           || properties.is_path(g, u, v, t)){
                             if(path.size() > 0){
                                 print_message(
                                     0,
@@ -778,32 +778,32 @@ namespace Graph {
         return 1;
     } // find_lexm_bfs_ordering
 
-    int GraphEOUtil::find_lexm_bfs_ordering(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::find_lexm_bfs_ordering(Graph *g, vector<int> *ordering){
         GraphUtil util;
-        int start_v = util.get_random_low_degree_vertex(mg);
-        return find_lexm_bfs_ordering(mg, ordering, start_v);
+        int start_v = util.get_random_low_degree_vertex(g);
+        return find_lexm_bfs_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_lexp_bfs_ordering(MutableGraph *mg, vector<int> *ordering,
+    int GraphEOUtil::find_lexp_bfs_ordering(Graph *g, vector<int> *ordering,
                                             int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
 
         VertexLabel *labels;
-        labels = new VertexLabel[mg->capacity];
+        labels = new VertexLabel[g->capacity];
         VertexLabel largest_label, current_label;
         bool *S;
-        S = new bool[mg->capacity];
+        S = new bool[g->capacity];
         list<int>::iterator ii;
         int i, j, u, v;
         list<int> nodes_to_relabel;
         GraphProperties properties;
-        for(i = 0; i < mg->capacity; i++){
+        for(i = 0; i < g->capacity; i++){
             // The set S consists of all nodes to be placed into the ordering
             // Once i is in the ordering we set S[i]=false;
-            if(mg->nodes[i].label != GD_UNDEFINED){
+            if(g->nodes[i].label != GD_UNDEFINED){
                 S[i] = true;
                 labels[i].id = i;
             }
@@ -813,8 +813,8 @@ namespace Graph {
             }
         }
         bool started = false;
-        for(i = mg->capacity - 1; i >= 0; i--){
-            if(mg->nodes[i].label != GD_UNDEFINED){
+        for(i = g->capacity - 1; i >= 0; i--){
+            if(g->nodes[i].label != GD_UNDEFINED){
                 u = GD_UNDEFINED;
                 if(!started){
                     started = true;
@@ -825,7 +825,7 @@ namespace Graph {
                     v = GD_UNDEFINED;
                     largest_label.id = GD_UNDEFINED;
                     largest_label.entries.clear();
-                    for(j = mg->capacity - 1; j >= 0; j--){
+                    for(j = g->capacity - 1; j >= 0; j--){
                         if(S[j] && (largest_label < labels[j]) ){
                             largest_label.id = labels[j].id;
                             largest_label.entries.clear();
@@ -849,12 +849,12 @@ namespace Graph {
                 S[v] = false;
                 // Now look for all unlabeled vertices u such that there is a path
                 // u=x0-x1-...-xk=v where L(x_j)<L(u)
-                int current_key = properties.fill_adj_vec(mg, v);
+                int current_key = properties.fill_adj_vec(g, v);
                 // Clear the list of nodes whose weight we will increment
                 nodes_to_relabel.clear();
-                for(u = 0; u < mg->capacity; u++){
-                    if((S[u] == true) && (mg->nodes[u].label != GD_UNDEFINED) ){
-                        if(mg->adj_vec[u] == current_key){
+                for(u = 0; u < g->capacity; u++){
+                    if((S[u] == true) && (g->nodes[u].label != GD_UNDEFINED) ){
+                        if(g->adj_vec[u] == current_key){
                             // We will augment the label of u
                             nodes_to_relabel.push_back(u);
                         }
@@ -875,15 +875,15 @@ namespace Graph {
         return 1;
     } // find_lexp_bfs_ordering
 
-    int GraphEOUtil::find_lexp_bfs_ordering(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::find_lexp_bfs_ordering(Graph *g, vector<int> *ordering){
         GraphUtil util;
-        int start_v = util.get_random_low_degree_vertex(mg);
-        return find_lexp_bfs_ordering(mg, ordering, start_v);
+        int start_v = util.get_random_low_degree_vertex(g);
+        return find_lexp_bfs_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_mcsm_ordering(MutableGraph *mg, vector<int> *ordering,
+    int GraphEOUtil::find_mcsm_ordering(Graph *g, vector<int> *ordering,
                                         int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -894,28 +894,28 @@ namespace Graph {
         list<int> path;
         list<int> nodes_to_increment;
         GraphProperties properties;
-        S = new bool[mg->capacity];
-        t = new bool[mg->capacity];
-        mcs_weight = new int[mg->capacity];
+        S = new bool[g->capacity];
+        t = new bool[g->capacity];
+        mcs_weight = new int[g->capacity];
         int i, j, u, v;
-        for(i = 0; i < mg->capacity; i++){
+        for(i = 0; i < g->capacity; i++){
             S[i] = true;
             mcs_weight[i] = 0;
-            if(mg->nodes[i].label == GD_UNDEFINED){
+            if(g->nodes[i].label == GD_UNDEFINED){
                 mcs_weight[i] = -GD_INFINITY;
                 S[i] = false;
             }
         }
         bool started = false;
-        int *perm = new int[mg->capacity];
-        for(i = 0; i < mg->capacity; i++){
+        int *perm = new int[g->capacity];
+        for(i = 0; i < g->capacity; i++){
             perm[i] = i;
         }
 
-        random_permutation(perm, mg->capacity);
-        for(i = 0; i <= mg->capacity - 1; i++){
-            if(mg->nodes[i].label == GD_UNDEFINED){
-                // Treat mg as fatal for now
+        random_permutation(perm, g->capacity);
+        for(i = 0; i <= g->capacity - 1; i++){
+            if(g->nodes[i].label == GD_UNDEFINED){
+                // Treat g as fatal for now
                 fatal_error("Undefined label in MCSM !\n");
             }
 
@@ -927,11 +927,11 @@ namespace Graph {
             }
             else {
                 int max_val = -1;
-                for(int l = 0; l < mg->capacity; l++){
+                for(int l = 0; l < g->capacity; l++){
                     j = l;
                     print_message(10, "MCS_M: j=%d\n", j);
                     // There could be numerous tiebreaking strategies here
-                    if((mg->nodes[j].label != GD_UNDEFINED)
+                    if((g->nodes[j].label != GD_UNDEFINED)
                        && (mcs_weight[j] >= max_val) && (S[j] == true) ){
                         max_val = mcs_weight[j];
                         v = j;
@@ -944,7 +944,7 @@ namespace Graph {
             }
 
             // Add v to the ordering
-            ordering->at(mg->num_nodes - 1 - i) = v;
+            ordering->at(g->num_nodes - 1 - i) = v;
             // Remove v from S
             S[v] = false;
             print_message(
@@ -955,11 +955,11 @@ namespace Graph {
             // u=x0-x1-x2-...-xk=v where mcs_weight[x_j] < mcs_weight[u] for
             // j=1,2,...k-1
             // Create the adj_vec for v
-            int current_key = properties.fill_adj_vec(mg, v);
+            int current_key = properties.fill_adj_vec(g, v);
             // Clear the list of nodes whose mcs_weight we will increment
             nodes_to_increment.clear();
-            for(u = 0; u < mg->capacity; u++){
-                if((S[u] == true) && (mg->nodes[u].label != GD_UNDEFINED) ){
+            for(u = 0; u < g->capacity; u++){
+                if((S[u] == true) && (g->nodes[u].label != GD_UNDEFINED) ){
                     // u is a valid node index and not yet in the ordering
                     // Try and find a path from u to v that traverses
                     // only nodes with lower mcs_weight values
@@ -968,8 +968,8 @@ namespace Graph {
                     // Construct t[] to be the vector where t[m]=true for all vertices m with lower weight than u
                     // We could be much more efficient here - maintain a sorted list of the weights
                     // and then just know where in the list we need to start for a particular u, etc.
-                    for(int m = 0; m < mg->capacity; m++){
-                        if((mg->nodes[m].label != GD_UNDEFINED) && (S[m] == true)
+                    for(int m = 0; m < g->capacity; m++){
+                        if((g->nodes[m].label != GD_UNDEFINED) && (S[m] == true)
                            && (mcs_weight[m] < mcs_weight[u]) ){
                             t[m] = true;
                         }
@@ -978,8 +978,8 @@ namespace Graph {
                             t[m] = false;
                         }
                     }
-                    if((mg->adj_vec[u] == current_key)
-                       || properties.is_path(mg, u, v, t)){
+                    if((g->adj_vec[u] == current_key)
+                       || properties.is_path(g, u, v, t)){
                         print_message(
                             1,
                             "Found path from %d[%d] to %d[%d] through un-numbered, lower-weighted vertices\n",
@@ -995,14 +995,14 @@ namespace Graph {
 
             print_message(1,
                           "Incrementing the weights of %d vertices (%d possible)\n",
-                          nodes_to_increment.size(), mg->capacity - i);
+                          nodes_to_increment.size(), g->capacity - i);
             // Now increment the weights
             for(ii = nodes_to_increment.begin(); ii != nodes_to_increment.end();
                 ++ii){
                 mcs_weight[*ii]++;
             }
 
-            for(u = 0; u < mg->capacity; u++){
+            for(u = 0; u < g->capacity; u++){
                 print_message(1, "Weight[%d]=%d\n", u, mcs_weight[u]);
             }
         }
@@ -1013,21 +1013,21 @@ namespace Graph {
         return 1;
     } // find_mcsm_ordering
 
-    int GraphEOUtil::find_mcsm_ordering(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::find_mcsm_ordering(Graph *g, vector<int> *ordering){
         GraphUtil util;
-        int start_v = util.get_random_high_degree_vertex(mg);
-        return find_mcsm_ordering(mg, ordering, start_v);
+        int start_v = util.get_random_high_degree_vertex(g);
+        return find_mcsm_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_min_fill_ordering(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::find_min_fill_ordering(Graph *g, vector<int> *ordering){
         GraphUtil util;
-        int start_v = util.get_random_low_degree_vertex(mg);
-        return find_min_fill_ordering(mg, ordering, start_v);
+        int start_v = util.get_random_low_degree_vertex(g);
+        return find_min_fill_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_min_fill_ordering(MutableGraph *mg, vector<int> *ordering,
+    int GraphEOUtil::find_min_fill_ordering(Graph *g, vector<int> *ordering,
                                             int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -1036,11 +1036,11 @@ namespace Graph {
         int u;
         list<int>::iterator nbr_it, twohop_it;
         GraphUtil util;
-        int *fill = new int[mg->num_nodes];
-        for(i = 0; i < mg->num_nodes; i++){
+        int *fill = new int[g->num_nodes];
+        for(i = 0; i < g->num_nodes; i++){
             fill[i] = GD_UNDEFINED;
         }
-        MutableGraph G(*mg);
+        Graph G(*g);
         if((int) ((((((((((ordering->size())))))))))) < G.capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
                         __FUNCTION__, ordering->size(), G.capacity);
@@ -1078,7 +1078,7 @@ namespace Graph {
                                 for(nbr_it = G.nodes[j].nbrs.begin();
                                     nbr_it != G.nodes[j].nbrs.end(); ++nbr_it){
                                     if((vn[*nbr_it] == 1) && (j <= *nbr_it) ){
-                                        // mg is a common neighbor - if we have self-loops mg could cause a problem.
+                                        // g is a common neighbor - if we have self-loops g could cause a problem.
                                         my_num_edges++;
                                     }
                                 }
@@ -1119,9 +1119,9 @@ namespace Graph {
         return 1;
     } // find_min_fill_ordering
 
-    int GraphEOUtil::find_batch_min_fill_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_batch_min_fill_ordering(Graph *g,
                                                   vector<int> *ordering, int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -1129,13 +1129,13 @@ namespace Graph {
         int i, m, min_fill, min_pos = -1, my_num_edges;
         int u;
         list<int>::iterator nbr_it, twohop_it;
-        int *fill = new int[mg->num_nodes];
-        for(i = 0; i < mg->num_nodes; i++){
+        int *fill = new int[g->num_nodes];
+        for(i = 0; i < g->num_nodes; i++){
             fill[i] = GD_UNDEFINED;
         }
         GraphUtil util;
         list<int> min_list;
-        MutableGraph G(*mg);
+        Graph G(*g);
         if((int) (((((((((ordering->size()))))))))) < G.capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
                         __FUNCTION__, ordering->size(), G.capacity);
@@ -1175,7 +1175,7 @@ namespace Graph {
                                 for(nbr_it = G.nodes[j].nbrs.begin();
                                     nbr_it != G.nodes[j].nbrs.end(); ++nbr_it){
                                     if((vn[*nbr_it] == 1) && (j <= *nbr_it) ){
-                                        // mg is a common neighbor - if we have self-loops mg could cause a problem.
+                                        // g is a common neighbor - if we have self-loops g could cause a problem.
                                         my_num_edges++;
                                     }
                                 }
@@ -1224,7 +1224,7 @@ namespace Graph {
                 fill[min_pos] = GD_INFINITY;
             }
 
-            print_message(1, "Eliminated %d vertices in mg batch\n", eliminated);
+            print_message(1, "Eliminated %d vertices in g batch\n", eliminated);
             i--;             // correct the index term
             //continue to next step in finding ordering
         }
@@ -1233,15 +1233,15 @@ namespace Graph {
         return 1;
     } // find_batch_min_fill_ordering
 
-    int GraphEOUtil::find_batch_min_fill_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_batch_min_fill_ordering(Graph *g,
                                                   vector<int> *ordering){
         GraphUtil util;
-        int start_v = util.get_random_low_degree_vertex(mg);
-        return find_batch_min_fill_ordering(mg, ordering, start_v);
+        int start_v = util.get_random_low_degree_vertex(g);
+        return find_batch_min_fill_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::find_beta_ordering(MutableGraph *mg, vector<int> *ordering){
-        if(!mg->canonical){
+    int GraphEOUtil::find_beta_ordering(Graph *g, vector<int> *ordering){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -1251,31 +1251,31 @@ namespace Graph {
         list<int_int> fill;
         list<int_int> ties;
         GraphUtil util;
-        if((int) ((((((((ordering->size())))))))) < mg->capacity){
+        if((int) ((((((((ordering->size())))))))) < g->capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
-                        __FUNCTION__, ordering->size(), mg->capacity);
+                        __FUNCTION__, ordering->size(), g->capacity);
         }
 
-        util.recompute_degrees(mg);
-        int *vn = new int[mg->num_nodes];
+        util.recompute_degrees(g);
+        int *vn = new int[g->num_nodes];
         int h, j;
         list<int>::iterator it;
-        for(m = 0; m < mg->num_nodes; m++){
+        for(m = 0; m < g->num_nodes; m++){
             int_int curr;
-            for(j = 0; j < mg->num_nodes; j++){
+            for(j = 0; j < g->num_nodes; j++){
                 vn[j] = 0;
             }
 
-            it = mg->nodes[m].nbrs.begin();
-            while(it != mg->nodes[m].nbrs.end()){
+            it = g->nodes[m].nbrs.begin();
+            while(it != g->nodes[m].nbrs.end()){
                 vn[*it] = 1;
                 ++it;
             }
             my_num_edges = 0;
-            for(j = 0; j < mg->num_nodes; j++){
+            for(j = 0; j < g->num_nodes; j++){
                 if(vn[j] == 1){
-                    for(nbr_it = mg->nodes[j].nbrs.begin();
-                        nbr_it != mg->nodes[j].nbrs.end(); ++nbr_it){
+                    for(nbr_it = g->nodes[j].nbrs.begin();
+                        nbr_it != g->nodes[j].nbrs.end(); ++nbr_it){
                         if((vn[*nbr_it] == 1) && (j <= *nbr_it) ){
                             my_num_edges++;
                         }
@@ -1283,7 +1283,7 @@ namespace Graph {
                 }
             }
 
-            h = mg->degree[m];
+            h = g->degree[m];
             curr.p1 = (h * (h - 1)) / 2 - my_num_edges;
             curr.p2 = m;
             fill.push_front(curr);
@@ -1298,7 +1298,7 @@ namespace Graph {
             min = fill.front().p1;
             while(fill.size() > 0 && fill.front().p1 == min){
                 ties.push_front(fill.front());
-                ties.front().p1 = mg->degree[ties.front().p2];
+                ties.front().p1 = g->degree[ties.front().p2];
                 fill.pop_front();
             }
             ties.sort();
@@ -1312,7 +1312,7 @@ namespace Graph {
         return 1;
     } // find_beta_ordering
 
-    int GraphEOUtil::find_metis_mmd_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_metis_mmd_ordering(Graph *g,
                                              vector<int> *ordering){
         #if !HAS_METIS
         fatal_error("Called METIS MMD without HAS_METIS.\n");
@@ -1321,13 +1321,13 @@ namespace Graph {
         #else
         int i;
         GraphUtil util;
-        util.populate_CRS(mg);
+        util.populate_CRS(g);
         //BDS April 3, 2012 switched from GraphType, ControlType with metis4->metis5
         graph_t graph;
         ctrl_t *ctrl;
 
-        graph.nvtxs = mg->get_num_nodes();
-        graph.nedges = mg->get_num_edges();
+        graph.nvtxs = g->get_num_nodes();
+        graph.nedges = g->get_num_edges();
         graph.label = imalloc(graph.nvtxs, (char *) "TD Graph: graph label");
         for(i = 0; i < graph.nvtxs; i++){
             graph.label[i] = i;
@@ -1338,19 +1338,19 @@ namespace Graph {
          * Concern: in triangulation, we increment all vertex numbers by 1 in
          * xadj and adjncy; this wasn't being done in this function. Are we getting correct results in both?
          */
-        int sizexa = mg->get_num_nodes() + 1;
-        int sizead = 2 * (mg->get_num_edges());
+        int sizexa = g->get_num_nodes() + 1;
+        int sizead = 2 * (g->get_num_edges());
         idx_t *xadj = new idx_t[sizexa];
         idx_t *adjncy = new idx_t[sizead];
         for(i = 0; i < sizexa; i++){
-            xadj[i] = (mg->xadj)[i];        //++;
+            xadj[i] = (g->xadj)[i];        //++;
         }
         for(i = 0; i < sizead; i++){
-            adjncy[i] = (mg->adjncy)[i];        //++;
+            adjncy[i] = (g->adjncy)[i];        //++;
         }
 
-        graph.adjncy = adjncy;        //&(mg->adjncy[0]);
-        graph.xadj = xadj;        //&(mg->xadj[0]);
+        graph.adjncy = adjncy;        //&(g->adjncy[0]);
+        graph.xadj = xadj;        //&(g->xadj[0]);
         //workspace mem alloc uses graph->ncon, which we were not setting before
         graph.ncon = 1;
 
@@ -1359,10 +1359,10 @@ namespace Graph {
         /* allocate workspace memory */
         AllocateWorkSpace(ctrl, &graph);
 
-        vector<idx_t> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
+        vector<idx_t> metis_order(g->get_num_nodes(), GD_UNDEFINED);
         MMDOrder(ctrl, &graph, &(metis_order[0]), graph.nvtxs);
-        util.free_CRS(mg);
-        for(i = 0; i < mg->get_num_nodes(); i++){
+        util.free_CRS(g);
+        for(i = 0; i < g->get_num_nodes(); i++){
             ordering->at(metis_order[i]) = i;
         }
 
@@ -1373,7 +1373,7 @@ namespace Graph {
         #endif // if !HAS_METIS
     } // find_metis_mmd_ordering
 
-    int GraphEOUtil::find_metis_node_nd_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_metis_node_nd_ordering(Graph *g,
                                                  vector<int> *ordering){
         #if !HAS_METIS
         fatal_error("Called METIS node_nd without HAS_METIS.\n");
@@ -1381,14 +1381,14 @@ namespace Graph {
         return 0;
         #else
         GraphUtil util;
-        util.populate_CRS(mg);
-        vector<idx_t> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
-        idx_t nvtxs = (idx_t)mg->num_nodes;
+        util.populate_CRS(g);
+        vector<idx_t> metis_order(g->get_num_nodes(), GD_UNDEFINED);
+        idx_t nvtxs = (idx_t)g->num_nodes;
         int numflag = 0;
 
         //int options[10];
         //options[0] = 0;
-        //METIS_NodeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), &numflag, options,
+        //METIS_NodeND(&nvtxs, &(g->xadj[0]), &(g->adjncy[0]), &numflag, options,
         //		&(ordering->at(0)), &(metis_order[0]));
 
         //BDS 04/03/11 - testing with Metis5.0.2 numflag is now set within ctrl structure
@@ -1420,22 +1420,22 @@ namespace Graph {
          * xadj and adjncy; this wasn't being done in this function. Are we getting correct results in both?
          */
         int i;
-        int sizexa = mg->get_num_nodes() + 1;
-        int sizead = 2 * (mg->get_num_edges());
+        int sizexa = g->get_num_nodes() + 1;
+        int sizead = 2 * (g->get_num_edges());
         idx_t *xadj = new idx_t[sizexa];
         idx_t *adjncy = new idx_t[sizead];
         for(i = 0; i < sizexa; i++){
-            xadj[i] = (mg->xadj)[i];        //++;
+            xadj[i] = (g->xadj)[i];        //++;
         }
         for(i = 0; i < sizead; i++){
-            adjncy[i] = (mg->adjncy)[i];        //++;
+            adjncy[i] = (g->adjncy)[i];        //++;
         }
-        vector<idx_t> my_order(mg->get_num_nodes(), GD_UNDEFINED);
+        vector<idx_t> my_order(g->get_num_nodes(), GD_UNDEFINED);
         METIS_NodeND(&nvtxs, xadj, adjncy, NULL, options,
                      &(my_order[0]), &(metis_order[0]));
-        util.free_CRS(mg);
+        util.free_CRS(g);
 
-        for(i = 0; i < mg->get_num_nodes(); i++){
+        for(i = 0; i < g->get_num_nodes(); i++){
             ordering->at(i) = (int) my_order[i];
         }
 
@@ -1449,20 +1449,20 @@ namespace Graph {
 
     //DEPRECATED in Metis 5.0.2 as per discussion with G. Karypis.
     //Removed from INDDGO Aug 17, 2012.
-    //     int GraphEOUtil::find_metis_edge_nd_ordering(MutableGraph *mg,
+    //     int GraphEOUtil::find_metis_edge_nd_ordering(Graph *g,
     //                                                  vector<int> *ordering)
     //     {
     // #if !HAS_METIS
     //       fatal_error("Called METIS edge_nd without HAS_METIS.\n");
     // #else
     //         GraphUtil util;
-    //         util.populate_CRS(mg);
-    //         vector<int> metis_order(mg->get_num_nodes(), GD_UNDEFINED);
-    //         int nvtxs = mg->num_nodes;
+    //         util.populate_CRS(g);
+    //         vector<int> metis_order(g->get_num_nodes(), GD_UNDEFINED);
+    //         int nvtxs = g->num_nodes;
     //         int numflag = 0;
     //         //	int options[10];
     //         //options[0] = 0;
-    //         //METIS_EdgeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), &numflag, options,
+    //         //METIS_EdgeND(&nvtxs, &(g->xadj[0]), &(g->adjncy[0]), &numflag, options,
     //         //		&(ordering->at(0)), &(metis_order[0]));
 
     //         //BDS 04/03/11 - testing with Metis5.0.2. numflag is now set within ctrl structure
@@ -1485,14 +1485,14 @@ namespace Graph {
     //         options[METIS_OPTION_NITER] = 10;
     //         options[METIS_OPTION_PFACTOR] = 0;
     //         options[METIS_OPTION_COMPRESS] = 1;
-    //         METIS_NodeND(&nvtxs, &(mg->xadj[0]), &(mg->adjncy[0]), NULL, options,
+    //         METIS_NodeND(&nvtxs, &(g->xadj[0]), &(g->adjncy[0]), NULL, options,
     //                      &(ordering->at(0)), &(metis_order[0]));
-    //         util.free_CRS(mg);
+    //         util.free_CRS(g);
     //         return 1;
     // #endif
     //     }
 
-    int GraphEOUtil::find_amd_ordering(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::find_amd_ordering(Graph *g, vector<int> *ordering){
         #if !HAS_SUITESPARSE
         fatal_error("%s:  AMD only available with SuiteSparse installed and configured in make.inc"
                     , __FUNCTION__);
@@ -1500,17 +1500,17 @@ namespace Graph {
         return 0;
         #else
         GraphUtil util;
-        util.populate_CRS(mg);
-        amd_order(mg->num_nodes, &(mg->xadj[0]), &(mg->adjncy[0]), &ordering->at(0),
+        util.populate_CRS(g);
+        amd_order(g->num_nodes, &(g->xadj[0]), &(g->adjncy[0]), &ordering->at(0),
                   (double *) NULL, (double *) NULL);
-        util.free_CRS(mg);
+        util.free_CRS(g);
         return 1;
         #endif
     }
 
-    int GraphEOUtil::find_minmaxdegree_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_minmaxdegree_ordering(Graph *g,
                                                 vector<int> *ordering, int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -1520,11 +1520,11 @@ namespace Graph {
         list<int>::iterator nbr_it;
         GraphUtil util;
         GraphProperties properties;
-        int *maxd = new int[mg->num_nodes];
-        for(i = 0; i < mg->num_nodes; i++){
+        int *maxd = new int[g->num_nodes];
+        for(i = 0; i < g->num_nodes; i++){
             maxd[i] = GD_UNDEFINED;
         }
-        MutableGraph G(*mg);
+        Graph G(*g);
         if((int) ((((ordering->size())))) < G.capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
                         __FUNCTION__, ordering->size(), G.capacity);
@@ -1561,7 +1561,7 @@ namespace Graph {
                             for(jt = G.nodes[*it].nbrs.begin();
                                 jt != G.nodes[*it].nbrs.end(); ++jt){
                                 if(G.adj_vec[*jt]){
-                                    //m is also adjacent to mg neighbor of *it
+                                    //m is also adjacent to g neighbor of *it
                                     delta--;                                     //we gain one less edge from elimination
                                 }
                             }
@@ -1603,13 +1603,13 @@ namespace Graph {
         return 1;
     } // find_minmaxdegree_ordering
 
-    int GraphEOUtil::find_minmaxdegree_ordering(MutableGraph *mg,
+    int GraphEOUtil::find_minmaxdegree_ordering(Graph *g,
                                                 vector<int> *ordering){
         int start_v = -1;
-        return find_minmaxdegree_ordering(mg, ordering, start_v);
+        return find_minmaxdegree_ordering(g, ordering, start_v);
     }
 
-    int GraphEOUtil::get_tree_width(MutableGraph *mg, vector<int> *ordering){
+    int GraphEOUtil::get_tree_width(Graph *g, vector<int> *ordering){
         int width = 0;
         int i, k;
         vector<int> inv_order(ordering->size());
@@ -1617,13 +1617,13 @@ namespace Graph {
             inv_order[ordering->at(i)] = i;
         }
 
-        for(i = 0; i < mg->capacity; i++){
-            // Note that degree[i] must be greater than the current width in order for mg
+        for(i = 0; i < g->capacity; i++){
+            // Note that degree[i] must be greater than the current width in order for g
             // node to possibly have more than width higher #'ed nbrs
-            if((mg->nodes[i].label != GD_UNDEFINED) && (mg->degree[i] > width) ){
+            if((g->nodes[i].label != GD_UNDEFINED) && (g->degree[i] > width) ){
                 k = 0;
-                for(list<int>::iterator ii = mg->nodes[i].nbrs.begin();
-                    ii != mg->nodes[i].nbrs.end(); ++ii){
+                for(list<int>::iterator ii = g->nodes[i].nbrs.begin();
+                    ii != g->nodes[i].nbrs.end(); ++ii){
                     if(inv_order[*ii] > inv_order[i]){
                         k++;
                     }
@@ -1636,9 +1636,9 @@ namespace Graph {
         return width;
     } // get_tree_width
 
-    int GraphEOUtil::get_tw_lower_bound(MutableGraph *mg, int algorithm,
+    int GraphEOUtil::get_tw_lower_bound(Graph *g, int algorithm,
                                         int start_v){
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
@@ -1647,12 +1647,12 @@ namespace Graph {
         switch(algorithm)
         {
         case GD_MAX_MIN_DEGREE_LB:
-            // Ignoring start_v here - is there a better way to handle mg??
-            lb = get_max_min_degree_lower_bound(mg);
+            // Ignoring start_v here - is there a better way to handle g??
+            lb = get_max_min_degree_lower_bound(g);
             break;
 
         case GD_MCS_LB:
-            lb = get_mcs_lower_bound(mg, start_v);
+            lb = get_mcs_lower_bound(g, start_v);
             break;
 
         default:
@@ -1673,61 +1673,61 @@ namespace Graph {
      * allocated to the ordering[] array.  The elimination ordering algorithm begins with
      * the provided start_v vertex.
      */
-    void GraphEOUtil::find_elimination_ordering(MutableGraph *mg,
+    void GraphEOUtil::find_elimination_ordering(Graph *g,
                                                 vector<int> *ordering, int algorithm, int start_v, bool triangulate){
         // Valid algorithms: GD_MIN_DEGREE, GD_MCS, GD_MCSM, GD_LEXM_BFS, GD_LEXP_BFS, GD_MIN_FILL, PKT_SORT, GD_BATCH_MF, GD_MINMAX_DEGREE
 
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
 
         // Make sure ordering[] is big enough for the graph
-        if((int) ordering->size() < mg->capacity){
+        if((int) ordering->size() < g->capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
-                        __FUNCTION__, ordering->size(), mg->capacity);
+                        __FUNCTION__, ordering->size(), g->capacity);
         }
 
         switch(algorithm)
         {
         case GD_MIN_DEGREE:
-            this->find_min_degree_ordering(mg, ordering, start_v);
+            this->find_min_degree_ordering(g, ordering, start_v);
             break;
 
         case GD_MINMAX_DEGREE:
-            this->find_minmaxdegree_ordering(mg, ordering, start_v);
+            this->find_minmaxdegree_ordering(g, ordering, start_v);
             break;
 
         case GD_MUL_MIN_DEGREE:
-            this->find_mul_min_degree_ordering(mg, ordering, start_v);
+            this->find_mul_min_degree_ordering(g, ordering, start_v);
             break;
 
         case GD_MCS:
-            this->find_mcs_ordering(mg, ordering, start_v);
+            this->find_mcs_ordering(g, ordering, start_v);
             break;
 
         case GD_MCSM:
-            this->find_mcsm_ordering(mg, ordering, start_v);
+            this->find_mcsm_ordering(g, ordering, start_v);
             break;
 
         case GD_LEXM_BFS:
-            this->find_lexm_bfs_ordering(mg, ordering, start_v);
+            this->find_lexm_bfs_ordering(g, ordering, start_v);
             break;
 
         case GD_LEXP_BFS:
-            this->find_lexp_bfs_ordering(mg, ordering, start_v);
+            this->find_lexp_bfs_ordering(g, ordering, start_v);
             break;
 
         case GD_MIN_FILL:
-            this->find_min_fill_ordering(mg, ordering, start_v);
+            this->find_min_fill_ordering(g, ordering, start_v);
             break;
 
         case GD_BATCH_MF:
-            this->find_batch_min_fill_ordering(mg, ordering, start_v);
+            this->find_batch_min_fill_ordering(g, ordering, start_v);
             break;
 
         case GD_PKT_SORT:
-            this->find_pkt_sort_ordering(mg, ordering, start_v);
+            this->find_pkt_sort_ordering(g, ordering, start_v);
             break;
         default:
             fatal_error("%s:  Didn't understand provided algorithm of %d\n",
@@ -1737,7 +1737,7 @@ namespace Graph {
 
         // Triangulate the graph if desired
         if(triangulate){
-            this->triangulate(mg, ordering);
+            this->triangulate(g, ordering);
         }
 
         return;
@@ -1750,83 +1750,83 @@ namespace Graph {
      * allocated to the ordering[] array.  Routines begin with a randomly chosen low
      * degree vertex.
      */
-    void GraphEOUtil::find_elimination_ordering(MutableGraph *mg,
+    void GraphEOUtil::find_elimination_ordering(Graph *g,
                                                 vector<int> *ordering, int algorithm, bool triangulate){
         // Valid algorithms: GD_MIN_DEGREE, GD_MCS, GD_MCSM, GD_LEXM_BFS, GD_LEXP_BFS, GD_MIN_FILL, PKT_SORT,
         // GD_BATCH_MF, GD_METIS_MMD, GD_METIS_NODE_ND, GD_BETA, GD_MINMAX_DEGREE
         // Removed GD_METIS_EDGE_ND Aug 17
 
-        if(!mg->canonical){
+        if(!g->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n",
                           __FUNCTION__);
         }
 
         // Make sure ordering[] is big enough for the graph
-        if((int) ordering->size() < mg->capacity){
+        if((int) ordering->size() < g->capacity){
             fatal_error("%s:  The ordering[] array is not big enough: %d<%d\n",
-                        __FUNCTION__, ordering->size(), mg->capacity);
+                        __FUNCTION__, ordering->size(), g->capacity);
         }
 
         switch(algorithm)
         {
         case GD_MIN_DEGREE:
-            this->find_min_degree_ordering(mg, ordering);
+            this->find_min_degree_ordering(g, ordering);
             break;
 
         case GD_MINMAX_DEGREE:
-            this->find_minmaxdegree_ordering(mg, ordering);
+            this->find_minmaxdegree_ordering(g, ordering);
             break;
 
         case GD_MUL_MIN_DEGREE:
-            this->find_mul_min_degree_ordering(mg, ordering);
+            this->find_mul_min_degree_ordering(g, ordering);
             break;
 
         case GD_MCS:
-            this->find_mcs_ordering(mg, ordering);
+            this->find_mcs_ordering(g, ordering);
             break;
 
         case GD_MCSM:
-            this->find_mcsm_ordering(mg, ordering);
+            this->find_mcsm_ordering(g, ordering);
             break;
 
         case GD_LEXM_BFS:
-            this->find_lexm_bfs_ordering(mg, ordering);
+            this->find_lexm_bfs_ordering(g, ordering);
             break;
 
         case GD_LEXP_BFS:
-            this->find_lexp_bfs_ordering(mg, ordering);
+            this->find_lexp_bfs_ordering(g, ordering);
             break;
 
         case GD_MIN_FILL:
-            this->find_min_fill_ordering(mg, ordering);
+            this->find_min_fill_ordering(g, ordering);
             break;
 
         case GD_BATCH_MF:
-            this->find_batch_min_fill_ordering(mg, ordering);
+            this->find_batch_min_fill_ordering(g, ordering);
             break;
 
         case GD_BETA:
-            this->find_beta_ordering(mg, ordering);
+            this->find_beta_ordering(g, ordering);
             break;
 
         case GD_PKT_SORT:
-            this->find_pkt_sort_ordering(mg, ordering);
+            this->find_pkt_sort_ordering(g, ordering);
             break;
 
         case GD_METIS_MMD:
-            this->find_metis_mmd_ordering(mg, ordering);
+            this->find_metis_mmd_ordering(g, ordering);
             break;
 
         case GD_METIS_NODE_ND:
-            this->find_metis_node_nd_ordering(mg, ordering);
+            this->find_metis_node_nd_ordering(g, ordering);
             break;
 
         //case GD_METIS_EDGE_ND:
-        //this->find_metis_edge_nd_ordering(mg, ordering);
+        //this->find_metis_edge_nd_ordering(g, ordering);
         //break;
 
         case GD_AMD:
-            this->find_amd_ordering(mg, ordering);
+            this->find_amd_ordering(g, ordering);
             break;
 
         default:
@@ -1837,14 +1837,14 @@ namespace Graph {
 
         // Triangulate the graph if desired
         if(triangulate){
-            this->triangulate(mg, ordering);
+            this->triangulate(g, ordering);
         }
 
         return;
     } // find_elimination_ordering
 
     #ifdef HAS_PARMETIS
-    void GraphEOUtil::parmetis_elimination_ordering(WeightedMutableGraph *mg, vector<int> &orderingout,
+    void GraphEOUtil::parmetis_elimination_ordering(VertexWeightedGraph *g, vector<int> &orderingout,
                                                     int algorithm, bool triangulate, MPI_Comm comm){
         int ws;
         int wr;
@@ -1856,10 +1856,10 @@ namespace Graph {
         MPI_Comm_size(comm, &ws);
         MPI_Comm_rank(comm, &wr);
 
-        WeightedMutableGraph G(*mg);
+        VertexWeightedGraph G(*g);
         double xtime = MPI_Wtime();
-        sprintf(eoname, "%s.order.%d", mg->get_input_file().c_str(), ws);
-        sprintf(eoname_other, "%s.order_other.%d", mg->get_input_file().c_str(), ws);
+        sprintf(eoname, "%s.order.%d", g->get_input_file().c_str(), ws);
+        sprintf(eoname_other, "%s.order_other.%d", g->get_input_file().c_str(), ws);
 
         DEBUG("size: %d, rank %d \n", ws, wr);
         int n = G.get_num_nodes();
@@ -1968,7 +1968,7 @@ namespace Graph {
         }
 
         GraphCreatorFile gf;
-        WeightedMutableGraph *wg;
+        VertexWeightedGraph *wg;
         GraphEOUtil eoutil;
         GraphProperties prop;
         list<int>members(ordering.begin(), ordering.end());
@@ -2009,7 +2009,7 @@ namespace Graph {
 /**
  * Helper functions for creating elimination orderings. Allow reading from file (normal or SCOTCH), or generating internally (with or without start vertex)
  */
-void Graph::form_eo(bool read_order, bool scotch, char *ord_file, int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering){
+void Graph::form_eo(bool read_order, bool scotch, char *ord_file, int elim_order_type, int start_v, Graph *G, vector<int> *ordering){
     GraphEOUtil eoutil;
     if(read_order){
         if(scotch){
@@ -2029,15 +2029,15 @@ void Graph::form_eo(bool read_order, bool scotch, char *ord_file, int elim_order
     }
 } // form_eo
 
-void Graph::form_eo(bool read_order, bool scotch, char *ord_file, MutableGraph *G,   vector<int> *ordering){
+void Graph::form_eo(bool read_order, bool scotch, char *ord_file, Graph *G,   vector<int> *ordering){
     form_eo(read_order, scotch, ord_file, 0, 0, G, ordering);
 }
 
-void Graph::form_eo(int elim_order_type, int start_v, MutableGraph *G, vector<int> *ordering){
+void Graph::form_eo(int elim_order_type, int start_v, Graph *G, vector<int> *ordering){
     form_eo(false, false, NULL, elim_order_type, start_v, G, ordering);
 }
 
-void Graph::form_eo(int elim_order_type, MutableGraph *G, vector<int> *ordering){
+void Graph::form_eo(int elim_order_type, Graph *G, vector<int> *ordering){
     form_eo(false, false, NULL, elim_order_type, GD_UNDEFINED, G, ordering);
 }
 

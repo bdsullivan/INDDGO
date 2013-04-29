@@ -24,7 +24,7 @@
 #include "MutableGraph.h"
 #include "GraphUtil.h"
 #include "Node.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include <gtest/gtest.h>
 
 using namespace std;

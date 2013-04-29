@@ -82,57 +82,57 @@ namespace Graph {
         return wg;
     } // create_weighted_graph
 
-    MutableGraph *GraphCreatorFile::create_mutable_graph(){
-        MutableGraph *mg = new MutableGraph();
+    Graph *GraphCreatorFile::create_mutable_graph(){
+        Graph *g = new Graph();
         GraphReader *gr = factory_rw->create_reader(graph_type);
 
         try
         {
             gr->read_graph(file_name.c_str());
-            mg->set_input_file(file_name);
-            mg->set_degree(gr->get_degree());
-            mg->set_nodes(gr->get_nodes());
-            mg->set_num_edges(gr->get_num_edges());
-            mg->set_num_nodes(gr->get_nodes().size());
-            mg->set_capacity(gr->get_capacity());
-            mg->set_next_label(gr->get_capacity() + 1);
-            mg->resize_adj_vec(gr->get_capacity());
-            mg->set_graph_type(graph_type);
+            g->set_input_file(file_name);
+            g->set_degree(gr->get_degree());
+            g->set_nodes(gr->get_nodes());
+            g->set_num_edges(gr->get_num_edges());
+            g->set_num_nodes(gr->get_nodes().size());
+            g->set_capacity(gr->get_capacity());
+            g->set_next_label(gr->get_capacity() + 1);
+            g->resize_adj_vec(gr->get_capacity());
+            g->set_graph_type(graph_type);
         }
         catch(GraphException& e)
         {
             delete gr;
-            delete mg;
+            delete g;
             cerr << "exception caught: " << e.what() << endl;
             const string desc("Can not create a mutable graph\n");
             throw GraphException(desc);
         }
 
         delete gr;
-        return mg;
+        return g;
     } // create_mutable_graph
 
-    WeightedMutableGraph *GraphCreatorFile::create_weighted_mutable_graph(){
-        WeightedMutableGraph *wmg = new WeightedMutableGraph();
+    VertexWeightedGraph *GraphCreatorFile::create_weighted_mutable_graph(){
+        VertexWeightedGraph *wg = new VertexWeightedGraph();
         GraphReader *gr = factory_rw->create_reader(graph_type);
 
         try
         {
             gr->read_graph(file_name.c_str());
-            wmg->set_input_file(file_name);
-            wmg->set_degree(gr->get_degree());
-            wmg->set_nodes(gr->get_nodes());
-            wmg->set_num_edges(gr->get_num_edges());
-            wmg->set_num_nodes(gr->get_nodes().size());
-            wmg->set_capacity(gr->get_capacity());
-            wmg->set_next_label(gr->get_capacity() + 1);
-            wmg->resize_adj_vec(gr->get_capacity());
-            wmg->set_graph_type(graph_type);
-            wmg->set_weight(gr->get_weights());
+            wg->set_input_file(file_name);
+            wg->set_degree(gr->get_degree());
+            wg->set_nodes(gr->get_nodes());
+            wg->set_num_edges(gr->get_num_edges());
+            wg->set_num_nodes(gr->get_nodes().size());
+            wg->set_capacity(gr->get_capacity());
+            wg->set_next_label(gr->get_capacity() + 1);
+            wg->resize_adj_vec(gr->get_capacity());
+            wg->set_graph_type(graph_type);
+            wg->set_weight(gr->get_weights());
         }
         catch(GraphException& e)
         {
-            delete wmg;
+            delete wg;
             delete gr;
             cerr << "exception caught: " << e.what() << endl;
             const string desc("Can not create a weighted mutable graph\n");
@@ -140,7 +140,7 @@ namespace Graph {
         }
 
         delete gr;
-        return wmg;
+        return wg;
     } // create_weighted_mutable_graph
 
     void GraphCreatorFile::set_graph_type(string graphType){

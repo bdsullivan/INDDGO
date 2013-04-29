@@ -47,7 +47,7 @@ public:
     Node & operator =(const Node & n);
 
     //Declare friend classes
-    friend class MutableGraph;
+    friend class Graph;
     friend class GraphUtil;
     friend class GraphProperties;
     friend class GraphDisplay;

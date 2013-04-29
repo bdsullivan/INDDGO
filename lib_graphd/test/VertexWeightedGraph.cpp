@@ -21,15 +21,15 @@
 
 #include "Log.h"
 #include "GraphCreatorFile.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include <gtest/gtest.h>
 
 using namespace std;
-class WeightedMutableGraphTest: public testing::Test
+class VertexWeightedGraphTest: public testing::Test
 {
 public:
 	Graph::GraphCreatorFile creator;
-	Graph::WeightedMutableGraph *wmg;
+	Graph::VertexWeightedGraph *wmg;
 
 	virtual void SetUp()
 	{
@@ -47,22 +47,22 @@ public:
 	}
 };
 
-TEST_F(WeightedMutableGraphTest, testNumNodes)
+TEST_F(VertexWeightedGraphTest, testNumNodes)
 {
 	EXPECT_EQ(128, wmg->get_num_nodes());
 }
 
-TEST_F(WeightedMutableGraphTest, testNumEdges)
+TEST_F(VertexWeightedGraphTest, testNumEdges)
 {
 	EXPECT_EQ(1471, wmg->get_num_edges());
 }
 
-TEST_F(WeightedMutableGraphTest, testGraphType)
+TEST_F(VertexWeightedGraphTest, testGraphType)
 {
 	EXPECT_EQ("DIMACS", wmg->get_graph_type());
 }
 
-TEST_F(WeightedMutableGraphTest, testGetNode)
+TEST_F(VertexWeightedGraphTest, testGetNode)
 {
 	Graph::Node *n;
 	n = wmg->get_node(108);
@@ -70,7 +70,7 @@ TEST_F(WeightedMutableGraphTest, testGetNode)
 	EXPECT_EQ(24, nbrs.size());
 }
 
-TEST_F(WeightedMutableGraphTest, testIsEdge)
+TEST_F(VertexWeightedGraphTest, testIsEdge)
 {
 	Graph::Node *n;
 	n = wmg->get_node(108);
@@ -81,12 +81,12 @@ TEST_F(WeightedMutableGraphTest, testIsEdge)
 
 }
 
-TEST_F(WeightedMutableGraphTest, testGetDegree)
+TEST_F(VertexWeightedGraphTest, testGetDegree)
 {
 	EXPECT_EQ(19, wmg->get_degree(28));
 }
 
-TEST_F(WeightedMutableGraphTest, testNodeNbrs)
+TEST_F(VertexWeightedGraphTest, testNodeNbrs)
 {
 	vector<Graph::Node> n;
 	int i;
@@ -112,30 +112,30 @@ TEST_F(WeightedMutableGraphTest, testNodeNbrs)
 	EXPECT_EQ(8, nbrs[3l]);
 }
 
-TEST_F(WeightedMutableGraphTest, testGetDegrees)
+TEST_F(VertexWeightedGraphTest, testGetDegrees)
 {
 	vector<int> degree = wmg->get_degree();
 	EXPECT_EQ(31, degree[86]);
 }
 
-TEST_F(WeightedMutableGraphTest, testGetNumComponents)
+TEST_F(VertexWeightedGraphTest, testGetNumComponents)
 {
 	EXPECT_EQ(1, wmg->get_num_components());
 }
 
-TEST_F(WeightedMutableGraphTest, testGetNextLabel)
+TEST_F(VertexWeightedGraphTest, testGetNextLabel)
 {
 	EXPECT_EQ(129, wmg->get_next_label());
 }
 
-TEST_F(WeightedMutableGraphTest, testSetNextLabel)
+TEST_F(VertexWeightedGraphTest, testSetNextLabel)
 {
 	EXPECT_EQ(129, wmg->get_next_label());
 	wmg->set_next_label(140);
 	EXPECT_EQ(140, wmg->get_next_label());
 }
 
-TEST_F(WeightedMutableGraphTest, testAddEdge)
+TEST_F(VertexWeightedGraphTest, testAddEdge)
 {
 	EXPECT_FALSE(wmg->is_edge(80, 12));
 	EXPECT_EQ(1471, wmg->get_num_edges());
@@ -149,7 +149,7 @@ TEST_F(WeightedMutableGraphTest, testAddEdge)
 	EXPECT_EQ(20, wmg->get_degree(12));
 }
 
-TEST_F(WeightedMutableGraphTest, testAddEdgeAdvance)
+TEST_F(VertexWeightedGraphTest, testAddEdgeAdvance)
 {
 	EXPECT_FALSE(wmg->is_edge(80, 12));
 	EXPECT_EQ(1471, wmg->get_num_edges());
@@ -163,7 +163,7 @@ TEST_F(WeightedMutableGraphTest, testAddEdgeAdvance)
 	EXPECT_EQ(20, wmg->get_degree(12));
 }
 
-TEST_F(WeightedMutableGraphTest, testRemoveEdge)
+TEST_F(VertexWeightedGraphTest, testRemoveEdge)
 {
 	EXPECT_TRUE(wmg->is_edge(108, 100));
 	EXPECT_EQ(1471, wmg->get_num_edges());
@@ -179,7 +179,7 @@ TEST_F(WeightedMutableGraphTest, testRemoveEdge)
 	EXPECT_EQ(23, wmg->get_degree(108));
 }
 
-TEST_F(WeightedMutableGraphTest, testRemoveVertex)
+TEST_F(VertexWeightedGraphTest, testRemoveVertex)
 {
 	EXPECT_TRUE(wmg->is_edge(108, 100));
 	EXPECT_EQ(1471, wmg->get_num_edges());
@@ -195,7 +195,7 @@ TEST_F(WeightedMutableGraphTest, testRemoveVertex)
 	EXPECT_EQ(0, wmg->get_degree(108));
 }
 
-TEST_F(WeightedMutableGraphTest, testContractEdge)
+TEST_F(VertexWeightedGraphTest, testContractEdge)
 {
 	EXPECT_TRUE(wmg->is_edge(108, 100));
 	EXPECT_EQ(1471, wmg->get_num_edges());
@@ -239,7 +239,7 @@ TEST_F(WeightedMutableGraphTest, testContractEdge)
 	EXPECT_EQ(final_degree, wmg->get_degree(108));
 }
 
-TEST_F(WeightedMutableGraphTest, testEliminateVertex)
+TEST_F(VertexWeightedGraphTest, testEliminateVertex)
 {
 	EXPECT_TRUE(wmg->is_edge(108, 100));
 	EXPECT_EQ(1471, wmg->get_num_edges());
@@ -283,7 +283,7 @@ TEST_F(WeightedMutableGraphTest, testEliminateVertex)
 	EXPECT_EQ(0, wmg->get_degree(108));
 }
 
-TEST_F(WeightedMutableGraphTest, testSetWeight)
+TEST_F(VertexWeightedGraphTest, testSetWeight)
 {
 	creator.set_file_name("../data/x.245.txt");
 	creator.set_graph_type("DIMACS");

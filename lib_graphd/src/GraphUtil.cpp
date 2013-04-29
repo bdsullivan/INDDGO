@@ -32,21 +32,21 @@ namespace Graph {
      * Recomputes the entries in the degree[] array using the size of
      * the adjacency lists. Updates the number of edges in the graph.
      */
-    void GraphUtil::recompute_degrees(MutableGraph *wmg){
-        wmg->num_edges = 0;
+    void GraphUtil::recompute_degrees(Graph *g){
+        g->num_edges = 0;
         int i;
-        //set the degrees to 0 - should wmg be -1 if the nodes label is -1?
+        //set the degrees to 0 - should g be -1 if the nodes label is -1?
         // CSG - all these loops used to start at i=1?
-        fill(wmg->degree.begin(), wmg->degree.end(), 0);
+        fill(g->degree.begin(), g->degree.end(), 0);
 
         //not strictly necessary to symmetrize, but much easier - lists are sorted now.
-        if(wmg->simple == true){
-            for(i = 0; i < wmg->capacity; i++){
-                wmg->degree[i] = wmg->nodes[i].nbrs.size();
-                wmg->num_edges += wmg->degree[i];
+        if(g->simple == true){
+            for(i = 0; i < g->capacity; i++){
+                g->degree[i] = g->nodes[i].nbrs.size();
+                g->num_edges += g->degree[i];
             }
             // We double counted all the edges;
-            wmg->num_edges = wmg->num_edges / 2;
+            g->num_edges = g->num_edges / 2;
         }
         else {
             print_message(0,"Not simple??\n");
@@ -54,26 +54,27 @@ namespace Graph {
             size_t origsize, newsize;
             int loops = 0;
             int j;
-            for(i = 0; i < wmg->capacity; i++){
-                origsize = wmg->nodes[i].nbrs.size();
-                wmg->nodes[i].nbrs.remove(i);
-                newsize = wmg->nodes[i].nbrs.size();
-                if(wmg->nodes[i].nbrs.size() < origsize){
+<<<<<<< HEAD
+            for(i = 0; i < g->capacity; i++){
+                origsize = g->nodes[i].nbrs.size();
+                g->nodes[i].nbrs.remove(i);
+                newsize = g->nodes[i].nbrs.size();
+                if(g->nodes[i].nbrs.size() < origsize){
                     loops += (int) (origsize - newsize);
-                    wmg->num_edges += (int) (newsize);                         //all but the loop are normal edges
+                    g->num_edges += (int) (newsize);                         //all but the loop are normal edges
                     for(j = 0; j < (int) (origsize - newsize); j++){
-                        wmg->nodes[i].nbrs.push_back(i);                         //add it back
+                        g->nodes[i].nbrs.push_back(i);                         //add it back
                     }
-                    wmg->degree[i] = wmg->nodes[i].nbrs.size();
+                    g->degree[i] = g->nodes[i].nbrs.size();
                 }
                 else {
-                    wmg->degree[i] = origsize;
-                    wmg->num_edges += wmg->degree[i];                     //all are normal edges
+                    g->degree[i] = origsize;
+                    g->num_edges += g->degree[i];                     //all are normal edges
                 }
             }
 
             // We double counted all the normal edges & need to add the loops
-            wmg->num_edges = wmg->num_edges / 2 + loops;
+            g->num_edges = g->num_edges / 2 + loops;
         }
 
         return;
@@ -83,16 +84,22 @@ namespace Graph {
      * Returns the index of a vertex with the lowest degree. If there are multiple minimum degree vertices,
      * then a random representative is selected.
      */
-    int GraphUtil::get_random_high_degree_vertex(MutableGraph *mg) const {
-        vector<int> high_degree_vs(mg->capacity, -1);
+    int GraphUtil::get_random_high_degree_vertex(Graph *g) const {
+        vector<int> high_degree_vs(g->capacity, -1);
         int max_deg = -INT_MAX;
         int i, j;
         j = 0;
+<<<<<<< HEAD
         for(i = 0; i < mg->capacity; i++){
             if((mg->nodes[i].label != -1)
                && ( (int) (mg->nodes[i].nbrs.size())
+=======
+        for(i = 0; i < g->capacity; i++){
+            if((g->nodes[i].label != -1)
+               && ( (int) (((((((((((((((g->nodes[i].nbrs.size())))))))))))))))
+>>>>>>> classremoval
                     >= max_deg) ){
-                max_deg = mg->nodes[i].nbrs.size();
+                max_deg = g->nodes[i].nbrs.size();
                 high_degree_vs[j] = i;
                 //print_message(0, "High[%d]=%d(deg=%d)\n", j, i, max_deg);
                 j++;
@@ -121,14 +128,22 @@ namespace Graph {
      * Returns the index of a vertex with the lowest degree. If there are multiple minimum degree vertices,
      * then a random representative is selected.
      */
-    int GraphUtil::get_random_low_degree_vertex(MutableGraph *mg) const {
-        vector<int> low_degree_vs(mg->capacity, -1);
+    int GraphUtil::get_random_low_degree_vertex(Graph *g) const {
+        vector<int> low_degree_vs(g->capacity, -1);
         int min_deg = INT_MAX;
         int i, j;
         j = 0;
+<<<<<<< HEAD
         for(i = 0; i < mg->capacity; i++){
             if((mg->nodes[i].label != -1) && (( (int) (mg->nodes[i].nbrs.size())) <= min_deg) ){
                 min_deg = mg->nodes[i].nbrs.size();
+=======
+        for(i = 0; i < g->capacity; i++){
+            if((g->nodes[i].label != -1)
+               && ( (int) ((((((((((((((g->nodes[i].nbrs.size()))))))))))))))
+                    <= min_deg) ){
+                min_deg = g->nodes[i].nbrs.size();
+>>>>>>> classremoval
                 low_degree_vs[j] = i;
                 print_message(1, "Low[%d]=%d(deg=%d)\n", j, i, min_deg);
                 j++;
@@ -158,17 +173,17 @@ namespace Graph {
     } // get_random_low_degree_vertex
 
     /**
-     * Given the components vector of size capacity, mg uses a non-recursive
+     * Given the components vector of size capacity, g uses a non-recursive
      * procedure to find the positions in the nodes[] array of those nodes that
      * belong to the same component C as v and sets component[i]=label for
      * all i in C.  The value of label should be non-negative and the components
      * vector should be initially set with all entries -1.  Returns the
-     * number of nodes in mg component.
+     * number of nodes in g component.
      */
-    int GraphUtil::label_component(MutableGraph *mg, int v, int label,
+    int GraphUtil::label_component(Graph *g, int v, int label,
                                    vector<int> *components){
-        // mg assumes that components vector is initially set to all -1's (-1's)
-        if(mg->nodes[v].label == -1){
+        // g assumes that components vector is initially set to all -1's (-1's)
+        if(g->nodes[v].label == -1){
             fatal_error("%s:  Tried to find component for -1 position??\n",
                         __FUNCTION__);
         }
@@ -179,12 +194,16 @@ namespace Graph {
         }
 
         print_message(1, "Labeling component of vertex %d with %d\n", v, label);
+<<<<<<< HEAD
         if((int) (components->size()) < mg->capacity){
+=======
+        if((int) (((((((((((((components->size()))))))))))))) < g->capacity){
+>>>>>>> classremoval
             fatal_error("%s:  Component vector does not have enough space.\n",
                         __FUNCTION__);
         }
 
-        //components->resize(mg->capacity,-1);
+        //components->resize(g->capacity,-1);
         // Just return 0 if we have already labeled v in the components array
         if(components->at(v) != -1){
             return 0;
@@ -201,7 +220,7 @@ namespace Graph {
             if(components->at(j) != label){
                 components->at(j) = label;
                 cnt++;
-                for(ii = mg->nodes[j].nbrs.begin(); ii != mg->nodes[j].nbrs.end();
+                for(ii = g->nodes[j].nbrs.begin(); ii != g->nodes[j].nbrs.end();
                     ++ii){
                     if(components->at(*ii) != label){
                         print_message(100, "Pushing %d\n", *ii);
@@ -215,17 +234,17 @@ namespace Graph {
     } // label_component
 
     /**
-     * Given the components vector of size capacity, mg uses a recursive
+     * Given the components vector of size capacity, g uses a recursive
      * procedure to find the positions in the nodes[] array of those nodes that
      * belong to the same component C as v and sets component[i]=label for
      * all i in C.  The value of label should be non-negative and the components
      * vector should be initially set with all entries -1.  Returns the
-     * number of nodes in mg component.
+     * number of nodes in g component.
      */
-    int GraphUtil::rec_label_component(MutableGraph *mg, int v, int label,
+    int GraphUtil::rec_label_component(Graph *g, int v, int label,
                                        vector<int> *components){
-        // mg assumes that components vector is initially set to all -1's (-1's)
-        if(mg->nodes[v].label == -1){
+        // g assumes that components vector is initially set to all -1's (-1's)
+        if(g->nodes[v].label == -1){
             fatal_error("%s:  Tried to find component for -1 position??\n",
                         __FUNCTION__);
         }
@@ -236,12 +255,16 @@ namespace Graph {
         }
 
         print_message(1, "Labeling component of vertex %d with %d\n", v, label);
+<<<<<<< HEAD
         if((int) (components->size()) < mg->capacity){
+=======
+        if((int) ((((((((((((components->size())))))))))))) < g->capacity){
+>>>>>>> classremoval
             fatal_error("%s:  Component vector does not have enough space.\n",
                         __FUNCTION__);
         }
 
-        //components->resize(mg->capacity,-1);
+        //components->resize(g->capacity,-1);
         // Just return 0 if we have already labeled v in the components array
         if(components->at(v) != -1){
             return 0;
@@ -251,16 +274,16 @@ namespace Graph {
         components->at(v) = label;
         list<int>::iterator ii;
         // Recursive DFS
-        for(ii = mg->nodes[v].nbrs.begin(); ii != mg->nodes[v].nbrs.end(); ++ii){
+        for(ii = g->nodes[v].nbrs.begin(); ii != g->nodes[v].nbrs.end(); ++ii){
             print_message(1, "Neighbor %d of %d\n", *ii, v);
             // Put if check here to eliminate unnecessary function calls?
             if(components->at(*ii) == -1){
-                rec_label_component(mg, *ii, label, components);
+                rec_label_component(g, *ii, label, components);
             }
         }
-        // Count the # of nodes in mg component
+        // Count the # of nodes in g component
         int cnt = 0;
-        for(int i = 0; i < mg->capacity; i++){
+        for(int i = 0; i < g->capacity; i++){
             if(components->at(i) == label){
                 cnt++;
             }
@@ -274,15 +297,20 @@ namespace Graph {
      * by filling the components vector with the component label for each node.
      * Every entry in the components vector is initially set to
      * -1 and is eventually populated with integers in the range
-     * 0,1,...,num_components-1.  If components[i]=k, then mg means
+     * 0,1,...,num_components-1.  If components[i]=k, then g means
      * that the node in position i in the nodes[] array is in component k.
      * Returns the number of components found.
      */
-    int GraphUtil::label_all_components(MutableGraph *mg,
+    int GraphUtil::label_all_components(Graph *g,
                                         vector<int> *components){
         // Make sure the components vector is the right size
+<<<<<<< HEAD
         if((int) (components->size()) < mg->capacity){
             components->resize(mg->capacity, -1);
+=======
+        if((int) (((((((((((components->size()))))))))))) < g->capacity){
+            components->resize(g->capacity, -1);
+>>>>>>> classremoval
         }
 
         else {
@@ -292,23 +320,23 @@ namespace Graph {
 
         int i = 0, j = 0;
         // Find the first "active" node
-        while(mg->nodes[j].label == -1){
+        while(g->nodes[j].label == -1){
             j++;
         }
 
         list<int> S;
         list<int>::iterator ii;
         // Use S as a stack - use only push_front, pop_front
-        bool *visited = new bool[mg->capacity];
-        int *origin = new int[mg->capacity];
-        int *component_labels = new int[mg->capacity];
-        for(i = 0; i < mg->capacity; i++){
+        bool *visited = new bool[g->capacity];
+        int *origin = new int[g->capacity];
+        int *component_labels = new int[g->capacity];
+        for(i = 0; i < g->capacity; i++){
             visited[i] = false;
             origin[i] = component_labels[i] = -1;
         }
         int numc = 0;
-        for(i = 0; i < mg->capacity; i++){
-            if(!(visited[i]) && (mg->nodes[i].label != -1) ){
+        for(i = 0; i < g->capacity; i++){
+            if(!(visited[i]) && (g->nodes[i].label != -1) ){
                 S.push_front(i);
                 while(!(S.empty())){
                     j = S.front();
@@ -317,16 +345,16 @@ namespace Graph {
                         visited[j] = true;
                         origin[j] = i;
                         if(origin[j] == j){
-                            // mg indicates a new component
-                            // Any node u in mg component will have origin[u]=j
+                            // g indicates a new component
+                            // Any node u in g component will have origin[u]=j
                             // Keep track of these "special" values by marking position
                             // j in the component_labels[] array and incrementing numc
                             component_labels[j] = numc;
                             numc++;
                         }
                         // Check out j's neighbors - assume these are not -1 nodes!
-                        for(ii = mg->nodes[j].nbrs.begin();
-                            ii != mg->nodes[j].nbrs.end(); ++ii){
+                        for(ii = g->nodes[j].nbrs.begin();
+                            ii != g->nodes[j].nbrs.end(); ++ii){
                             if(!visited[*ii]){
                                 S.push_front(*ii);
                             }
@@ -335,7 +363,7 @@ namespace Graph {
                 }
             }
 
-            if(mg->nodes[i].label != -1){
+            if(g->nodes[i].label != -1){
                 // i is visited once we get here, so we know the value of components[i]
                 components->at(i) = component_labels[origin[i]];
             }
@@ -345,8 +373,8 @@ namespace Graph {
         delete[] origin;
         delete[] component_labels;
         // Set the value of and return the # of connected components
-        mg->num_connected_components = numc;
-        return mg->num_connected_components;
+        g->num_connected_components = numc;
+        return g->num_connected_components;
     } // label_all_components
 
     /**
@@ -354,15 +382,20 @@ namespace Graph {
      * by filling the components vector with the component label for each node.
      * Every entry in the components vector is initially set to
      * -1 and is eventually populated with integers in the range
-     * 0,1,...,num_components-1.  If components[i]=k, then mg means
+     * 0,1,...,num_components-1.  If components[i]=k, then g means
      * that the node in position i in the nodes[] array is in component k.
      * Returns the number of components found.
      */
-    int GraphUtil::rec_label_all_components(MutableGraph *mg,
+    int GraphUtil::rec_label_all_components(Graph *g,
                                             vector<int> *components){
         // Make sure the components vector is the right size
+<<<<<<< HEAD
         if((int) (components->size()) < mg->capacity){
             components->resize(mg->capacity, -1);
+=======
+        if((int) ((((((((((components->size())))))))))) < g->capacity){
+            components->resize(g->capacity, -1);
+>>>>>>> classremoval
         }
 
         else {
@@ -372,43 +405,43 @@ namespace Graph {
 
         int i = 0, label = 0, j = 0;
         // Find the first "active" node
-        while(mg->nodes[j].label == -1){
+        while(g->nodes[j].label == -1){
             j++;
         }
 
         // Label the component containing node i
-        rec_label_component(mg, j, label, components);
-        for(i = j + 1; i < mg->capacity; i++){
-            if((components->at(i) == -1) && (mg->nodes[i].label != -1) ){
+        rec_label_component(g, j, label, components);
+        for(i = j + 1; i < g->capacity; i++){
+            if((components->at(i) == -1) && (g->nodes[i].label != -1) ){
                 // We found an active node that we haven't seen before
                 label++;
-                rec_label_component(mg, i, label, components);
+                rec_label_component(g, i, label, components);
             }
         }
 
         // We now know number of components
-        mg->num_connected_components = label + 1;
+        g->num_connected_components = label + 1;
         // components[] will now contain integers in 0,1,...,label-1
         // where components[v]=c means that node v is in component c
-        // If components[v]=-1, then mg node must have an -1 label
+        // If components[v]=-1, then g node must have an -1 label
         // and is therefore not in a component of the graph
         // Return the # of components we discovered
-        return mg->num_connected_components;
+        return g->num_connected_components;
     } // rec_label_all_components
 
     /**
      * Uses a recursive function to populate the members list with the
      * positions in the nodes[] array of those
      * nodes that belong to the saem component as v.
-     * Returns the number of nodes in mg component.
+     * Returns the number of nodes in g component.
      */
-    int GraphUtil::rec_find_component(MutableGraph *mg, int v,
+    int GraphUtil::rec_find_component(Graph *g, int v,
                                       list<int> *members){
         // Create a vector of -1's and then label v's component w/ 0
-        vector<int> components(mg->capacity, -1);
-        rec_label_component(mg, v, 0, &components);
+        vector<int> components(g->capacity, -1);
+        rec_label_component(g, v, 0, &components);
         members->clear();
-        for(int i = 0; i < mg->capacity; i++){
+        for(int i = 0; i < g->capacity; i++){
             if(components.at(i) == 0){
                 members->push_back(i);
             }
@@ -422,19 +455,19 @@ namespace Graph {
      * Uses a non-recursive function to populate the members list with the
      * positions in the nodes[] array of those
      * nodes that belong to the saem component as v.
-     * Returns the number of nodes in mg component.
+     * Returns the number of nodes in g component.
      * Oct 18 2010 - was not populating members list, so corrected.
      */
-    int GraphUtil::find_component(MutableGraph *mg, int v, list<int> *members){
-        // mg assumes that components vector is initially set to all -1's (-1's)
-        if(mg->nodes[v].label == -1){
+    int GraphUtil::find_component(Graph *g, int v, list<int> *members){
+        // g assumes that components vector is initially set to all -1's (-1's)
+        if(g->nodes[v].label == -1){
             fatal_error("%s:  Tried to find component for -1 position??\n",
                         __FUNCTION__);
         }
 
         members->clear();
         int j, cnt = 0;
-        vector<bool> visited(mg->capacity, false);
+        vector<bool> visited(g->capacity, false);
         list<int> S;
         list<int>::iterator ii;
         // Put v on the stack
@@ -446,7 +479,7 @@ namespace Graph {
                 visited[j] = true;
                 cnt++;
                 members->push_back(j);
-                for(ii = mg->nodes[j].nbrs.begin(); ii != mg->nodes[j].nbrs.end();
+                for(ii = g->nodes[j].nbrs.begin(); ii != g->nodes[j].nbrs.end();
                     ++ii){
                     if(visited[*ii] == false){
                         print_message(100, "Pushing %d\n", *ii);
@@ -462,40 +495,40 @@ namespace Graph {
     /**
      * Populate the xadj and adjncy vectors with the graph data.
      */
-    void GraphUtil::populate_CRS(MutableGraph *mg){
+    void GraphUtil::populate_CRS(Graph *g){
         // Only works if capacity=num_nodes
-        if(mg->capacity != mg->num_nodes){
+        if(g->capacity != g->num_nodes){
             fatal_error("%s:  Requires capacity=num_nodes!\n", __FUNCTION__);
         }
 
-        mg->xadj.resize(mg->num_nodes + 1);
-        mg->adjncy.resize(2 * mg->num_edges);
-        print_message(10, "%s:  %d nodes, %d edges\n", __FUNCTION__, mg->num_nodes,
-                      mg->num_edges);
+        g->xadj.resize(g->num_nodes + 1);
+        g->adjncy.resize(2 * g->num_edges);
+        print_message(10, "%s:  %d nodes, %d edges\n", __FUNCTION__, g->num_nodes,
+                      g->num_edges);
         // Nodes are numbered 0,1,...,n-1
         // The neighbors of node i are adjncy[xadj[i]],adjncy[xadj[i]+1],...adjncy[xadj[i+1]-1]
         int i, j = 0;
-        for(i = 0; i < mg->num_nodes; i++){
-            mg->xadj[i] = j;
-            for(list<int>::iterator ii = mg->nodes[i].nbrs.begin();
-                ii != mg->nodes[i].nbrs.end(); ++ii){
-                mg->adjncy[j] = *ii;
+        for(i = 0; i < g->num_nodes; i++){
+            g->xadj[i] = j;
+            for(list<int>::iterator ii = g->nodes[i].nbrs.begin();
+                ii != g->nodes[i].nbrs.end(); ++ii){
+                g->adjncy[j] = *ii;
                 j++;
             }
         }
 
-        mg->xadj[mg->num_nodes] = j;
-        print_message(1, "Set xadj[%d]=%d (nedges=%d)\n", mg->num_nodes, j,
-                      mg->num_edges);
+        g->xadj[g->num_nodes] = j;
+        print_message(1, "Set xadj[%d]=%d (nedges=%d)\n", g->num_nodes, j,
+                      g->num_edges);
         return;
     } // populate_CRS
 
     /**
      * Free the memory used to create the CRS format.
      */
-    void GraphUtil::free_CRS(MutableGraph *mg){
-        mg->xadj.clear();
-        mg->adjncy.clear();
+    void GraphUtil::free_CRS(Graph *g){
+        g->xadj.clear();
+        g->adjncy.clear();
     }
 
     /**
@@ -505,11 +538,11 @@ namespace Graph {
      * entries and members[i] is a pointer to a list of the nodes in the
      * i-th component.
      */
-    int GraphUtil::find_all_components(MutableGraph *mg,
+    int GraphUtil::find_all_components(Graph *g,
                                        vector<list<int> *> *members){
         int i = 0, j = 0;
         // Find the first "active" node
-        while(mg->nodes[j].label == GD_UNDEFINED){
+        while(g->nodes[j].label == GD_UNDEFINED){
             j++;
         }
 
@@ -517,16 +550,16 @@ namespace Graph {
         list<int> S;
         list<int>::iterator ii;
         // Use S as a stack - use only push_front, pop_front
-        bool *visited = new bool[mg->capacity];
-        int *origin = new int[mg->capacity];
-        int *component_labels = new int[mg->capacity];
-        for(i = 0; i < mg->capacity; i++){
+        bool *visited = new bool[g->capacity];
+        int *origin = new int[g->capacity];
+        int *component_labels = new int[g->capacity];
+        for(i = 0; i < g->capacity; i++){
             visited[i] = false;
             origin[i] = component_labels[i] = -1;
         }
         int numc = 0;
-        for(i = 0; i < mg->capacity; i++){
-            if(!(visited[i]) && (mg->nodes[i].label != GD_UNDEFINED) ){
+        for(i = 0; i < g->capacity; i++){
+            if(!(visited[i]) && (g->nodes[i].label != GD_UNDEFINED) ){
                 S.push_front(i);
                 while(!(S.empty())){
                     j = S.front();
@@ -535,8 +568,8 @@ namespace Graph {
                         visited[j] = true;
                         origin[j] = i;
                         if(origin[j] == j){
-                            // mg indicates a new component
-                            // Any node u in mg component will have origin[u]=j
+                            // g indicates a new component
+                            // Any node u in g component will have origin[u]=j
                             // Keep track of these "special" values by marking position
                             // j in the component_labels[] array and incrementing numc
                             component_labels[j] = numc;
@@ -548,8 +581,8 @@ namespace Graph {
                             numc++;
                         }
                         // Check out j's neighbors - assume these are not GD_UNDEFINED nodes!
-                        for(ii = mg->nodes[j].nbrs.begin();
-                            ii != mg->nodes[j].nbrs.end(); ++ii){
+                        for(ii = g->nodes[j].nbrs.begin();
+                            ii != g->nodes[j].nbrs.end(); ++ii){
                             if(!visited[*ii]){
                                 S.push_front(*ii);
                             }
@@ -557,7 +590,7 @@ namespace Graph {
                     }
                 }
             }
-            if(mg->nodes[i].label != GD_UNDEFINED){
+            if(g->nodes[i].label != GD_UNDEFINED){
                 // i is visited once we get here, so we know that i belongs in list
                 // component_labels[origin[i]]
                 members->at(component_labels[origin[i]])->push_back(i);                 // Obviously...
@@ -574,15 +607,15 @@ namespace Graph {
         }
 
         // Set the value of and return the # of connected components
-        mg->num_connected_components = numc;
-        return mg->num_connected_components;
+        g->num_connected_components = numc;
+        return g->num_connected_components;
     } // find_all_components
 
-    int GraphUtil::vertex_separator(MutableGraph *mg, list<int> *V,
+    int GraphUtil::vertex_separator(Graph *g, list<int> *V,
                                     vector<list<int> *> *members){
         //create a copy of G
-        //Changed from = *mg to copy constructor July 19 - BDS
-        MutableGraph H(*mg);
+        //Changed from = *g to copy constructor July 19 - BDS
+        Graph H(*g);
         //remove the vertices in V
         list<int>::iterator i;
         for(i = V->begin(); i != V->end(); ++i){
@@ -596,14 +629,14 @@ namespace Graph {
     //runs a BFS from start using
     //only vertices with allowed[v] = true. If a vertex u  is reachable,
     //Returns an array of booleans which is true for vertices which are found in the search.
-    //num_reached is the number of vertices which are reachable. mg does not include
+    //num_reached is the number of vertices which are reachable. g does not include
     //disallowed vertices, and does include the start.
-    bool *GraphUtil::bfs(MutableGraph *mg, int start, bool *allowed,
+    bool *GraphUtil::bfs(Graph *g, int start, bool *allowed,
                          int *num_reached){
-        int *dists = bfs_dist(mg, start, allowed, num_reached);
+        int *dists = bfs_dist(g, start, allowed, num_reached);
         int j;
-        bool *visited = new bool[mg->capacity];
-        for(j = 0; j < mg->capacity; j++){
+        bool *visited = new bool[g->capacity];
+        for(j = 0; j < g->capacity; j++){
             if(dists[j] == GD_INFINITY
                ){
                 visited[j] = false;
@@ -621,11 +654,11 @@ namespace Graph {
      * list with their positions in the nodes[] array.  Returns the
      * number of isolated nodes.
      */
-    int GraphUtil::find_isolated_nodes(MutableGraph *mg, list<int> *isolated_nodes){
+    int GraphUtil::find_isolated_nodes(Graph *g, list<int> *isolated_nodes){
         int i, k = 0;
 
-        for(i = 0; i < mg->capacity; i++){
-            if((mg->nodes[i].label != -1) && (mg->nodes[i].nbrs.size() == 0) ){
+        for(i = 0; i < g->capacity; i++){
+            if((g->nodes[i].label != -1) && (g->nodes[i].nbrs.size() == 0) ){
                 isolated_nodes->push_back(i);
                 k++;
             }
@@ -636,21 +669,21 @@ namespace Graph {
     //runs a BFS from start using only vertices with allowed[v] = true.
     //Returns an array of integers giving distance from the source (0 for source).
     //Unreachable vertices have value GD_INFINITY.
-    //num_reached is the number of vertices which are reachable. mg does not include
+    //num_reached is the number of vertices which are reachable. g does not include
     //disallowed vertices, and does include the start.
     //Returns the maximum distance (vertex eccentricity of start) in ecc.
 
-    int *GraphUtil::bfs_dist(MutableGraph *mg, int start, bool *allowed,
+    int *GraphUtil::bfs_dist(Graph *g, int start, bool *allowed,
                              int *num_reached, int *ecc){
         // We need the graph to be symmetric, as we're going to walk through a neighbor list
-        if(!mg->canonical){
+        if(!g->canonical){
             fatal_error("%s:  must be in canonical format\n", __FUNCTION__);
         }
         int num_found = 0;
 
         int j;
-        int *dists = new int[mg->capacity];
-        for(j = 0; j < mg->capacity; j++){
+        int *dists = new int[g->capacity];
+        for(j = 0; j < g->capacity; j++){
             dists[j] = GD_INFINITY;
         }
 
@@ -683,10 +716,10 @@ namespace Graph {
                 num_found++;
 
                 // Check j's neighbors
-                for(ii = mg->nodes[j].nbrs.begin(); ii != mg->nodes[j].nbrs.end();
+                for(ii = g->nodes[j].nbrs.begin(); ii != g->nodes[j].nbrs.end();
                     ++ii){
                     if((dists[*ii] == GD_INFINITY) && (allowed[*ii] == true) ){
-                        // Note - mg is the only place that we refer to the allowed[] vector
+                        // Note - g is the only place that we refer to the allowed[] vector
                         // We haven't seen *ii before and it is an "acceptable" vertex,
                         // so it is a candidate to be in the path - add it to the Stack
                         S.push_back(*ii);                         // must be push_back since we pop_front and need FIFO.
@@ -702,31 +735,31 @@ namespace Graph {
         return dists;
     } // bfs_dist
 
-    int *GraphUtil::bfs_dist(MutableGraph *mg, int start, bool *allowed,
+    int *GraphUtil::bfs_dist(Graph *g, int start, bool *allowed,
                              int *num_reached){
         int ecc;
-        return bfs_dist(mg, start, allowed, num_reached, &ecc);
+        return bfs_dist(g, start, allowed, num_reached, &ecc);
     }
 
     //Find the eccentricity of each vertex and store it in ecc, which is resized appropriately within this function.
-    void GraphUtil::find_ecc(MutableGraph *mg, vector<int> *ecc){
-        ecc->resize(mg->capacity);
+    void GraphUtil::find_ecc(Graph *g, vector<int> *ecc){
+        ecc->resize(g->capacity);
 
         //all nodes are allowed
         // CSG fixing this
-        //bool allowed[mg->capacity];
+        //bool allowed[g->capacity];
         bool *allowed;
-        allowed = new bool[mg->capacity];
-        for(int i = 0; i < mg->capacity; i++){
+        allowed = new bool[g->capacity];
+        for(int i = 0; i < g->capacity; i++){
             allowed[i] = true;
         }
         int num_reached;
         int e;
         int *dists;
-        for(int i = 0; i < mg->capacity; i++){
+        for(int i = 0; i < g->capacity; i++){
             //for valid nodes
-            if(mg->nodes[i].label != -1){
-                dists = this->bfs_dist(mg, (mg->nodes[i]).get_label() - 1, allowed, &num_reached, &e);
+            if(g->nodes[i].label != -1){
+                dists = this->bfs_dist(g, (g->nodes[i]).get_label() - 1, allowed, &num_reached, &e);
                 (*ecc)[i] = e;
             }
         }
@@ -737,22 +770,22 @@ namespace Graph {
 
     //Calculate the maximum distance between nodes within a subset of vertices
     //given as a list
-    int GraphUtil::subset_max_dist(MutableGraph *mg,  vector<int> subset){
+    int GraphUtil::subset_max_dist(Graph *g,  vector<int> subset){
         int max = 0;
 
         //all nodes are allowed
-        //bool allowed[mg->capacity];
+        //bool allowed[g->capacity];
 
         bool *allowed;
-        allowed = new bool[mg->capacity];
-        for(int i = 0; i < mg->capacity; i++){
+        allowed = new bool[g->capacity];
+        for(int i = 0; i < g->capacity; i++){
             allowed[i] = true;
         }
         int num_reached;
         vector<int>::iterator it, it2;
         int *dists;
         for(it = subset.begin(); it != subset.end(); ++it){
-            dists = this->bfs_dist(mg, *it, allowed, &num_reached);
+            dists = this->bfs_dist(g, *it, allowed, &num_reached);
             for(it2 = subset.begin(); it2 != subset.end(); ++it2){
                 if(max < dists[*it2]){
                     max = dists[*it2];
@@ -770,7 +803,7 @@ using namespace std;
  * Assumes graph_file is in DIMACS format.
  * If needed, stores the largest connected components in DIMACS format at graph_file.giantcomp (and populates Graph from this).
  */
-void Graph::create_largestcomponent_graph(char *graph_file, WeightedMutableGraph *&G){
+void Graph::create_largestcomponent_graph(char *graph_file, VertexWeightedGraph *&G){
     GraphCreatorFile creator;
     creator.set_file_name(graph_file);
     creator.set_graph_type("DIMACS");

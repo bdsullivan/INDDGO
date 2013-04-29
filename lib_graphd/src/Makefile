@@ -14,8 +14,8 @@ INCLUDES = -I../inc/ -I/usr/local/include $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(
 # libraries
 LIBS = -L/usr/local/lib $(INDDGO_LIB) $(SSPARSE_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB)
 # source
-SRC := Log.cpp NewGraphReader.cpp GraphReader.cpp DIMACSGraphReader.cpp AdjMatrixGraphReader.cpp EdgelistGraphReader.cpp Node.cpp GraphReaderWriterFactory.cpp \
-	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp WeightedGraph.cpp MutableGraph.cpp WeightedMutableGraph.cpp GraphProperties.cpp\
+SRC := Log.cpp GraphReader.cpp DIMACSGraphReader.cpp AdjMatrixGraphReader.cpp EdgelistGraphReader.cpp Node.cpp GraphReaderWriterFactory.cpp \
+	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp WeightedGraph.cpp VertexWeightedGraph.cpp GraphProperties.cpp\
 	GraphUtil.cpp Debug.cpp GraphEOUtil.cpp GraphDisplay.cpp RndNumGen.cpp Util.cpp AdjMatrixGraphWriter.cpp GraphWriter.cpp\
 	DIMACSGraphWriter.cpp GraphVizGraphWriter.cpp MetisGraphWriter.cpp MetisGraphReader.cpp
 # source files.

@@ -24,7 +24,8 @@ include make.inc
 MADLIB = ./madness/deploy/lib/libMADworld.a
 
 .PHONY : deps all wis viz util cleandeps cleanwis cleanviz cleanmisc clean cleangraph cleantree testgraph testtree cleanutil
-all: wis viz util doc 
+#all: wis viz util doc 
+all: wis viz util
 deps: $(MADLIB)
 libs: graph tree ptree
 test: testgraph testtree

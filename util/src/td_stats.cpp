@@ -116,7 +116,7 @@ int main(int argc, char **argv)
     printf ("Non-option argument %s\n", argv[index]);
   
   int t, e, s;
-  Graph::WeightedMutableGraph *G;
+  Graph::VertexWeightedGraph *G;
   TDTree *T;
   int treewidth, treelength, minecc;
   double kcore_max, kcore_min; 
@@ -254,7 +254,7 @@ int main(int argc, char **argv)
 		}
 
 	      /*Eccentricity*/
-	      Graph::MutableGraph *GT = T->export_tree();
+	      Graph::Graph *GT = T->export_tree();
 	      vector<int> ecc;
 	      minecc = INT_MAX;
 	      gutil.find_ecc(GT, &ecc);

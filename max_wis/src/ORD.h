@@ -31,7 +31,7 @@ class ORD
 
 private:
 	vector<int> ordering;
-	Graph::WeightedMutableGraph *G;
+	Graph::VertexWeightedGraph *G;
 	int width;
     MPI_Comm comm;
     string filename;
@@ -46,7 +46,7 @@ public:
     const char *get_filename() const;
     int find_elim_ordering();
     void outputMetisFormat();
-    Graph::WeightedMutableGraph *get_graph();
+    Graph::VertexWeightedGraph *get_graph();
     bool is_original();
     void set_original(bool x);
 
