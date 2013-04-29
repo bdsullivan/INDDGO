@@ -66,7 +66,8 @@ DATA_DIR=../sample_graphs/
 
 VALGRIND_COMMAND = valgrind --leak-check=yes --show-reachable=yes -v
 
-DOCS_DIR = ./doc/*
+#DOX_DIR = ./doc/*
+DOX_DIR = ./doc/
 DOXYFILE = ./Doxyfile
 ARPACK_LIBDIR= ../../ARPACK
 
@@ -91,7 +92,7 @@ all: #$(OBJS)
 .c.o	:	
 	$(CXXC) -c $(CFLAGS) $(INC_DIR) $< -o $@
 
-docs: $(DOXYFILE)
+doc: $(DOXYFILE)
 	doxygen $(DOXYFILE)
 
 clean: 
@@ -99,5 +100,7 @@ clean:
 	-rm -rf $(BDTEST_EXE)
 	-rm -rf $(GEN_BD_SPLIT_EXE)
 	-rm -rf $(GEN_BD_SPAWN_EXE)
-	-rm -rf $(DOCS_DIR)
+
+clean_doc:
+	-rm -rf $(DOX_DIR)
 
