@@ -46,7 +46,7 @@ int main(int argc, char **argv){
     GraphWriter *writer;
     GraphReaderWriterFactory rwf;
     gc = new GraphCreatorFile(argv[1], "DIMACS");
-    VertexWeightedGraph *wmg = gc->create_weighted_mutable_graph();
+    VertexWeightedGraph *wmg = gc->create_vertex_weighted_graph();
     writer = rwf.create_writer("graphviz");
     writer->set_out_file_name(argv[2]);
     writer->write_graph(wmg);

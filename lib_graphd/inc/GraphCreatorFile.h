@@ -41,7 +41,7 @@ public:
 
     virtual ~GraphCreatorFile();
     virtual Graph *create_graph();
-    virtual WeightedGraph *create_weighted_graph();
+    virtual VertexWeightedGraph *create_vertex_weighted_graph();
     virtual Graph *create_mutable_graph();
     virtual VertexWeightedGraph *create_weighted_mutable_graph();
 
