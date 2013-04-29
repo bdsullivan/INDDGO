@@ -24,8 +24,7 @@
 
 #include "Node.h"
 #include "Graph.h"
-#include "MutableGraph.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "Log.h"
 #include "Debug.h"
 #include <stdio.h>
