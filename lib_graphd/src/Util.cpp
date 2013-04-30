@@ -383,7 +383,6 @@ void get_DIMACS_dimensions(const char *DIMACS_file, int *n, int *m){
             fclose(in);
             return;
 
-
         case 'c':
             // Comment line - skip and move on
             break;

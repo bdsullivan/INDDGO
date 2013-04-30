@@ -284,7 +284,7 @@ namespace Graph {
      * is guaranteed to be simple.
      */
     VertexWeightedGraph *GraphCreator::create_component(VertexWeightedGraph *g,
-                                                         list<int> *members, bool make_simple){
+                                                        list<int> *members, bool make_simple){
         VertexWeightedGraph *wmg;
         wmg = create_induced_subgraph(g, members, make_simple);
         // Set num_connected_components to 1 since g is known - not verified - should it be??

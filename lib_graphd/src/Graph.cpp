@@ -28,7 +28,6 @@
 #include <algorithm>
 #include <string.h>
 
-
 /* GRAPH_H_ */
 namespace Graph {
     Graph::Graph(){
@@ -57,12 +56,15 @@ namespace Graph {
     void Graph::set_canonical(bool c){
         canonical = c;
     }
+
     void Graph::set_degree(vector<int> degree){
         this->degree = degree;
     }
+
     vector<int> Graph::get_degree() const {
         return degree;
     }
+
     vector<Node> Graph::get_nodes() const {
         return nodes;
     }
@@ -94,7 +96,6 @@ namespace Graph {
     void Graph::set_nodes(vector<Node> nodes){
         this->nodes = nodes;
     }
-
 
     int Graph::get_degree(int v) const {
         return this->degree[v];
@@ -134,7 +135,6 @@ namespace Graph {
     int Graph::get_num_components() const {
         return num_connected_components;
     }
-
 
     void Graph::set_num_components(int num_components){
         this->num_connected_components = num_components;
@@ -225,7 +225,6 @@ namespace Graph {
     bool Graph::is_simple() const {
         return simple;
     }
-
 
     void Graph::add_edge_advance(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
@@ -494,7 +493,7 @@ namespace Graph {
     }
 
     void Graph::eliminate_vertex(int v, list<int> *forward_neighbors,
-                                        bool remove){
+                                 bool remove){
         if(!this->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n", __FUNCTION__);
         }
