@@ -17,7 +17,7 @@ LIBS = -L/usr/local/lib $(INDDGO_LIB) $(SSPARSE_LIB) -lm $(METIS_LIB) $(PARMETIS
 SRC := Log.cpp GraphReader.cpp DIMACSGraphReader.cpp AdjMatrixGraphReader.cpp EdgelistGraphReader.cpp Node.cpp GraphReaderWriterFactory.cpp \
 	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp VertexWeightedGraph.cpp GraphProperties.cpp\
 	GraphUtil.cpp Debug.cpp GraphEOUtil.cpp GraphDisplay.cpp RndNumGen.cpp Util.cpp AdjMatrixGraphWriter.cpp GraphWriter.cpp\
-	DIMACSGraphWriter.cpp GraphVizGraphWriter.cpp MetisGraphWriter.cpp MetisGraphReader.cpp
+	DIMACSGraphWriter.cpp GraphVizGraphWriter.cpp MetisGraphWriter.cpp MetisGraphReader.cpp NewGraphReader.cpp
 # source files.
 OBJ = $(SRC:.cpp=.o) 
 POBJ =  

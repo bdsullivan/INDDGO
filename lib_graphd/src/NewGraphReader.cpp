@@ -79,15 +79,12 @@
     template <class gtype>
         gtype *NewGraphReader::read_edgelist(const char *filename){
             char line[100];
-            int i, j, m, n, retval, count;
+            int i, j, m, n, retval;
             char *retp;
             FILE *in;
             gtype *g;
 
             m = n = 0;
-            count = 0;
-            // Use the above to count # of connected nodes, etc. and make sure that it
-            // matches what is in the existing Graph struct.
 
             if((in = fopen(filename, "r")) == NULL){
                 FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename);
@@ -168,16 +165,13 @@
 
         template <class gtype>
         gtype *NewGraphReader::read_dimacs(const char *filename){
-            char line[100], format[100], x;
-            int i, j, m, n, retval, id, count;
+            char line[100], format[100];
+            int i, j, m, n, retval, id, x;
             int val;
             FILE *in;
             gtype *g;
 
             m = n = 0;
-            count = 0;
-            // Use the above to count # of connected nodes, etc. and make sure that it
-            // matches what is in the existing Graph struct.
 
             if((in = fopen(filename, "r")) == NULL){
                 FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename);
@@ -455,8 +449,8 @@
                     fatal_error("Metis read error - didn't understand problem line!");
                 }
 
-                MutableGraph *mg = dynamic_cast<MutableGraph *>(g);
-                *mg = MutableGraph(n);
+                Graph *mg = dynamic_cast<Graph *>(g);
+                *mg = Graph(n);
 
                 while(in.good()){
                     elem.clear();
@@ -482,11 +476,11 @@
 // Just follow the pattern if you want to add new methods/graph types
 // FIXME: figure out if this really should be a .tpp file (but then have to deal with
 // dependency issues)
-    template MutableGraph *NewGraphReader::read_graph<MutableGraph>(const char *filename, char *type);
-    template WeightedMutableGraph *NewGraphReader::read_graph<WeightedMutableGraph>(const char *filename, char *type);
-    template MutableGraph *NewGraphReader::read_edgelist<MutableGraph>(const char *filename);
-    template MutableGraph *NewGraphReader::read_dimacs<MutableGraph>(const char *filename);
-    template MutableGraph *NewGraphReader::read_adjmatrix<MutableGraph>(const char *filename);
-    template MutableGraph *NewGraphReader::read_metis<MutableGraph>(const char *filename);
-    template WeightedMutableGraph *NewGraphReader::read_edgelist<WeightedMutableGraph>(const char *filename);
+    template Graph *NewGraphReader::read_graph<Graph>(const char *filename, char *type);
+    template VertexWeightedGraph *NewGraphReader::read_graph<VertexWeightedGraph>(const char *filename, char *type);
+    template Graph *NewGraphReader::read_edgelist<Graph>(const char *filename);
+    template Graph *NewGraphReader::read_dimacs<Graph>(const char *filename);
+    template Graph *NewGraphReader::read_adjmatrix<Graph>(const char *filename);
+    template Graph *NewGraphReader::read_metis<Graph>(const char *filename);
+    template VertexWeightedGraph *NewGraphReader::read_edgelist<VertexWeightedGraph>(const char *filename);
 }

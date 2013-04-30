@@ -22,7 +22,7 @@
 #include "GraphDecomposition.h"
 #include "GraphProperties.h"
 #include "Log.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphException.h" 
 #include "NewGraphReader.h"
 
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    Graph::MutableGraph *g=NULL;
+    Graph::Graph *g=NULL;
     int seed;
     
     seed=Graph::rand_int(0,0xffffff);
@@ -68,12 +68,12 @@ int main(int argc, char **argv)
     Graph::GraphProperties prop;
     Graph::NewGraphReader ngr;
 
-    g = ngr.read_graph<Graph::WeightedMutableGraph>(argv[1], "MeTiS");
+    g = ngr.read_graph<Graph::VertexWeightedGraph>(argv[1], "MeTiS");
 
     // mucking with stuff
     //
-    Graph::MutableGraph *mg;
-    mg = new Graph::MutableGraph();
+    Graph::Graph *mg;
+    mg = new Graph::Graph();
     //fprintf(stderr,"mg number of nodes (before): %d\n", mg->get_num_nodes());
     //fprintf(stderr,"mg before: 0x%x\n", mg);
     ngr.new_readgraph(mg, argv[1], "MeTiS");
