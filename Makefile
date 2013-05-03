@@ -42,6 +42,10 @@ doc:
 	@($(CD) "$(TREE)";\
 	$(MAKE) doc;\
 	$(CD) ..;)
+	test -d $(UTIL)
+	@($(CD) "$(UTIL)";\
+	$(MAKE) doc;\
+	$(CD) ..;)
 ifeq ($(HAS_MADNESS), 1)
 	test -d $(PTREE)
 	@($(CD) "$(PTREE)";\
