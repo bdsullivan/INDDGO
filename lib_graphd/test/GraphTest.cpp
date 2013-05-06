@@ -34,7 +34,8 @@ public:
 
     virtual void SetUp(){
         LOG_INIT("test.log", NULL, 0);
-        creator.set_file_name("../data/1dc.128.txt");
+        //creator.set_file_name("../data/1dc.128.txt");
+        creator.set_file_name("data/1dc.128.txt");
         creator.set_graph_type("DIMACS");
 		g = creator.create_graph();
     }

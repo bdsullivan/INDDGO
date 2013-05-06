@@ -31,7 +31,7 @@ HAS_PARMETIS	= 0
 HAS_METIS	= 0
 HAS_IGRAPH	= 0
 HAS_GMP		= 0
-HAS_GTEST	= 0
+HAS_GTEST	= 1
 # Set whether serial or parallel version is desired for WIS.
 IS_PARALLEL	= 0
 HAS_MADNESS	= 0
@@ -209,11 +209,11 @@ $(error When HAS_GMP = 1, you must define the GMP directory variable)
 endif
 endif
 
-ifeq ($(HAS_GTEST),1)
-ifeq ($(GTEST_DIR), )
-$(error When HAS_GTEST = 1, you must define the GTEST_DIR directory variable)  
-endif
-endif
+#ifeq ($(HAS_GTEST),1)
+#ifeq ($(GTEST_DIR), )
+#$(error When HAS_GTEST = 1, you must define the GTEST_DIR directory variable)  
+#endif
+#endif
 
 #------------------------------------------------------------------
 # 
@@ -224,9 +224,9 @@ endif
 MPILIBS =
 MADLIBS = -lMADworld
 
-ifeq ($(HAS_GTEST),1)
-LIBGTEST=libgtest.a
-endif
+#ifeq ($(HAS_GTEST),1)
+#LIBGTEST=libgtest.a
+#endif
 
 METIS_INCLUDES=
 ifeq ($(HAS_METIS),1)

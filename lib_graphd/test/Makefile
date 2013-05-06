@@ -28,11 +28,15 @@ include ../../make.inc
 
 CXXFLAGS = $(INCLUDES) -g
 
-INCLUDES = -I ../inc -I. -I $(GTEST_DIR)/include -I$(GTEST_DIR) -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
-LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib -L $(INDDGO_LIB)
-LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest $(METIS_LIB) 
+#INCLUDES = -I ../inc -I. -I $(GTEST_DIR)/include -I$(GTEST_DIR) -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
+INCLUDES = -I../inc -I. -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
+LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib $(INDDGO_LIB)
+#LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest $(METIS_LIB) 
+#LIB=  $(MPILIBS) -lpthread -lgtest $(METIS_LIB) 
+LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest -lgtest_main $(METIS_LIB) 
 LFLAGS = $(CFLAGS)
-LIBGRAPHDECOMP=$(GRAPH)/lib/libgraphd.a
+#LIBGRAPHDECOMP=$(GRAPH)/lib/libgraphd.a
+#LIBGRAPHDECOMP=$(SRC_DIR)/lib/libgraphd.a
 
 #----changes are below this line----------------------------------------------
 
@@ -70,7 +74,8 @@ testGraphReaderWriterFactory: GraphReaderWriterFactoryTest.o
 	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
 testGraph: GraphTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	#${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
+	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 testWeightedGraph: WeightedGraphTest.o
 	${CXX} ${LFLAGS} -o bin/$@   $(LIBGRAPHDECOMP) $< ${INCLUDES} $(LIB) $(LIBDIR)
 
@@ -111,14 +116,14 @@ testParMetis: ParmetisTest.o
 	${CXX} ${LFLAGS} -o bin/$@ $^ $(LIBGRAPHDECOMP) $(PARMETISOBJ) ${INCLUDES} $(LIB) $(LIBDIR)
 #---- no change below this line--------------------------------------------------
 
-gtest-all.o: ${GTEST_DIR}/src/gtest-all.cc
-	$(CXX) -c $< $(CXXFLAGS)	
-
-gtest_main.o: ${GTEST_DIR}/src/gtest_main.cc
-	$(CXX) -c $< $(CXXFLAGS)	
-
-$(LIBGTEST): gtest-all.o gtest_main.o
-	ar -rv ../lib/$(LIBGTEST) $^
+#gtest-all.o: ${GTEST_DIR}/src/gtest-all.cc
+#	$(CXX) -c $< $(CXXFLAGS)	
+#
+#gtest_main.o: ${GTEST_DIR}/src/gtest_main.cc
+#	$(CXX) -c $< $(CXXFLAGS)	
+#
+#$(LIBGTEST): gtest-all.o gtest_main.o
+#	ar -rv ../lib/$(LIBGTEST) $^
 
 test:
 	sh run_test.sh
