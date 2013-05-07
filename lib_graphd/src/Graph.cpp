@@ -48,7 +48,7 @@ namespace Graph {
         for(int i = 0; i < n; i++){
             nodes[i].set_label(i + 1);
         }
-        this->next_label = n+2;
+        this->next_label = n + 2;
     }
 
     Graph::~Graph(){
@@ -101,7 +101,6 @@ namespace Graph {
     int Graph::get_degree(int v) const {
         return this->degree[v];
     }
-
 
     /**
      * \param[in] n number of elements
@@ -451,7 +450,7 @@ namespace Graph {
     void Graph::add_edge(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
             fatal_error( "%s: called with vertices %d and %d but there are %d connected nodes\n",
-                __FUNCTION__, u, v, capacity);
+                         __FUNCTION__, u, v, capacity);
         }
 
         if(nodes[u].label == -1){
@@ -480,19 +479,19 @@ namespace Graph {
     /**
      * does some stuff
      * and other stuff
-     * 
-    */
+     *
+     */
     int Graph::add_vertices(int n){
         int old_size = this->num_nodes;
-        this->num_nodes = this->num_nodes+n;
+        this->num_nodes = this->num_nodes + n;
         this->nodes.resize(this->num_nodes);
         this->degree.resize(this->num_nodes);
         this->capacity = this->num_nodes;
-        for(int i=old_size; i < this->num_nodes; i++){
+        for(int i = old_size; i < this->num_nodes; i++){
             this->nodes[i].set_label(this->next_label);
             this->next_label++;
         }
-        return this->num_nodes-1;
+        return this->num_nodes - 1;
     }
 
     /**

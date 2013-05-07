@@ -59,7 +59,6 @@ private:
     int read_dimacs(Graph *g, const char *filename, bool read_vertex_weights);
     int read_adjmatrix(Graph *g, const char *filename);
     int read_metis(Graph *g, const char *filename);
-    void split(const std::string& s, char sep, vector<int>& v);      // used in metisgraph reader
     };
 }
 

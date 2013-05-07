@@ -22,6 +22,7 @@
 #include "NewGraphReader.h"
 #include "Log.h"
 #include "Debug.h"
+#include "Util.h"
 #include <strings.h>
 #include <stdlib.h>
 #include <iostream>
@@ -39,25 +40,12 @@ namespace Graph {
     NewGraphReader::~NewGraphReader(){
     }
 
-    void NewGraphReader::split(const std::string& s, char sep, vector<int>& v){
-        stringstream ss(s);      //< a stringstream to do our parsing for us
-        int k = -1;    //< just some variable
-        string temp;
-        while(std::getline(ss, temp, sep)){
-            stringstream convert(temp);
-            convert >> k;
-            if(k != -1){
-                v.push_back(k);
-            }
-            k = -1;
-        }
-    }     // split
 
     int NewGraphReader::read_graph(Graph *g, const char *filename, char *type, bool read_vertex_weights){
         // FIXME: use regexes here
         fprintf(stderr,"- in read_graph type is %s\n", type);
         if(strcasecmp("edge", type) == 0){
-            if(read_vertex_weights) {
+            if(read_vertex_weights){
                 fprintf(stderr, "Error: cannot currently read vertex weights from edgelists\n");
                 return -1;
             }
@@ -65,7 +53,7 @@ namespace Graph {
             return NewGraphReader::read_edgelist(g, filename);
         }
         else if(strncasecmp("adjmatrix",type, 9) == 0){
-            if(read_vertex_weights) {
+            if(read_vertex_weights){
                 fprintf(stderr, "Error: cannot currently read vertex weights from adjaceny matrix\n");
                 return -1;
             }
@@ -74,7 +62,7 @@ namespace Graph {
         }
         else if(strncasecmp("metis", type, 5) == 0){
             fprintf(stderr,"- calling read_metis\n");
-            if(read_vertex_weights) {
+            if(read_vertex_weights){
                 fprintf(stderr, "Error: cannot currently read vertex weights from metis files\n");
                 return -1;
             }
@@ -254,7 +242,7 @@ namespace Graph {
                 // Store value - first allocate the value array if NULL
                 if(read_vertex_weights){
                     VertexWeightedGraph *vg = (VertexWeightedGraph *)g;
-                    if((int)vg->weight.size()!=n){
+                    if((int)vg->weight.size() != n){
                         vg->weight.resize(n);
                     }
 
@@ -330,7 +318,7 @@ namespace Graph {
         fscanf(in, "%d\n", &n);
         //printf("%s:  Graph has %d nodes\n", __FUNCTION__, n);
         // Each row will have n binary entries, and there will be n rows.
-        
+
         g->add_vertices(n);
 
         i = 0;             // Use i to keep track of row
@@ -390,7 +378,6 @@ namespace Graph {
             fprintf(stderr, "n is %d\n", n);
 
             g->add_vertices(n);
-
 
             if((n <= 0) || (e <= 0) ){
                 fatal_error("Metis read error - didn't understand problem line!");
