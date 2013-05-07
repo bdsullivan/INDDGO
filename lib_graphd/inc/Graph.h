@@ -71,6 +71,8 @@ public:
     void set_num_components(int num_components);
     void set_adjncy(vector<int> adjncy);
     void set_xadj(vector<int> xadj);
+    /** \brief Try to pre-allocate memory for node and degree vectors **/
+    void resize(int n);
 
     vector<int> get_adj_vec() const;
     vector<int> *get_adj_vec_ptr();
@@ -99,8 +101,20 @@ public:
     /* other methods from mutable */
     void add_edge(int u, int v);
     void add_edge_advance(int u, int v);
+    /**
+     * \brief Adds a number of vertices to the graph
+     * \param[out] x index of the last newly added vertex
+     * \param[in] n the number of new vertices to add
+     **/
+    int add_vertices(int n);
+    /**
+     * \brief Adds a single vertex to the graph
+     * \param[out] x index of the vertex
+     */
+    int add_vertex();
     bool remove_edge(int u, int v);
     void remove_vertex(int u);
+
     int contract_edge(int u, int v);
     void resize_adj_vec(int n);
     void eliminate_vertex(int v, list<int> *forward_neighbors, bool remove);

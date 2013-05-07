@@ -33,7 +33,7 @@ namespace Graph {
     Graph::Graph(){
         this->num_nodes = 0;
         this->num_edges = 0;
-        this->graph_type = "DIMACS";
+        this->graph_type = "Graph";
         this->next_label = 1;
         this->num_connected_components = 1;
     }
@@ -48,6 +48,7 @@ namespace Graph {
         for(int i = 0; i < n; i++){
             nodes[i].set_label(i + 1);
         }
+        this->next_label = n+2;
     }
 
     Graph::~Graph(){
@@ -99,6 +100,19 @@ namespace Graph {
 
     int Graph::get_degree(int v) const {
         return this->degree[v];
+    }
+
+
+    /**
+     * \param[in] n number of elements
+     * */
+    void Graph::resize(int n){
+        nodes.reserve(n);
+        nodes.resize(n);
+        degree.reserve(n);
+        degree.resize(n);
+        num_nodes = n;
+        capacity = n;
     }
 
     bool Graph::is_edge(int u, int v) const {
@@ -229,7 +243,7 @@ namespace Graph {
     void Graph::add_edge_advance(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
             fatal_error(
-                "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
+                "%s:  add_edge_advance() called with vertices %d and %d but there are %d connected nodes\n",
                 __FUNCTION__, u, v, capacity);
         }
 
@@ -293,7 +307,7 @@ namespace Graph {
     bool Graph::remove_edge(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
             fatal_error(
-                "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
+                "%s:  remove_edge() called with vertices %d and %d but there are %d connected nodes\n",
                 __FUNCTION__, u, v, capacity);
         }
         if(nodes[u].label == -1){
@@ -436,18 +450,17 @@ namespace Graph {
 
     void Graph::add_edge(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
-            fatal_error(
-                "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
+            fatal_error( "%s: called with vertices %d and %d but there are %d connected nodes\n",
                 __FUNCTION__, u, v, capacity);
         }
 
         if(nodes[u].label == -1){
-            fatal_error("%s:  Tried to use  GD_UNDEFINED vertex %d\n",
+            fatal_error("%s: Tried to use  GD_UNDEFINED vertex %d\n",
                         __FUNCTION__, u);
         }
 
         if(nodes[v].label == -1){
-            fatal_error("%s:  Tried to use GD_UNDEFINED vertex %d\n", __FUNCTION__,
+            fatal_error("%s: Tried to use GD_UNDEFINED vertex %d\n", __FUNCTION__,
                         v);
         }
 
@@ -463,6 +476,31 @@ namespace Graph {
 
         num_edges++;
     } // add_edge
+
+    /**
+     * does some stuff
+     * and other stuff
+     * 
+    */
+    int Graph::add_vertices(int n){
+        int old_size = this->num_nodes;
+        this->num_nodes = this->num_nodes+n;
+        this->nodes.resize(this->num_nodes);
+        this->degree.resize(this->num_nodes);
+        this->capacity = this->num_nodes;
+        for(int i=old_size; i < this->num_nodes; i++){
+            this->nodes[i].set_label(this->next_label);
+            this->next_label++;
+        }
+        return this->num_nodes-1;
+    }
+
+    /**
+     * Convenience function to add a single vertex
+     */
+    int Graph::add_vertex(){
+        return this->add_vertices(1);
+    }
 
     void Graph::resize_adj_vec(int n){
         adj_vec.resize(n, 0);
