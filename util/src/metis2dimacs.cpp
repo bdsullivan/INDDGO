@@ -68,17 +68,12 @@ int main(int argc, char **argv)
     Graph::GraphProperties prop;
     Graph::NewGraphReader ngr;
 
-    g = ngr.read_graph<Graph::VertexWeightedGraph>(argv[1], "MeTiS");
-
-    // mucking with stuff
-    //
-    Graph::Graph *mg;
-    mg = new Graph::Graph();
+    g = new Graph::Graph();
     //fprintf(stderr,"mg number of nodes (before): %d\n", mg->get_num_nodes());
     //fprintf(stderr,"mg before: 0x%x\n", mg);
-    ngr.new_readgraph(mg, argv[1], "MeTiS");
-    fprintf(stderr,"mg after: 0x%x\n", mg);
-    fprintf(stderr,"mg number of nodes (after) : %d\n", mg->get_num_nodes());
+    ngr.read_graph(g, argv[1], "MeTiS", false);
+    fprintf(stderr,"mg after: 0x%x\n", g);
+    fprintf(stderr,"mg number of nodes (after) : %d\n", g->get_num_nodes());
 
 
     // if we don't get rid of duplicate edges, bad things happen
