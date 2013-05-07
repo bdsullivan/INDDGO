@@ -53,15 +53,12 @@ public:
      * \param filename file to read graph from
      * \param type string specifying the type of the graph
      */
-    int new_readgraph(Graph *g, const char *filename, char *type);
-
-    template <class gtype> gtype *read_graph(const char *filename, char *type);
+    int read_graph(Graph *g, const char *filename, char *type, bool read_vertex_weights);
 private:
-    template <class gtype> gtype *read_edgelist(const char *filename);
-    template <class gtype> gtype *read_dimacs(const char *filename);
-    template <class gtype> gtype *read_adjmatrix(const char *filename);
-    template <class gtype> gtype *read_metis(const char *filename);
-    int new_read_metis(Graph *g, const char *filename);
+    int read_edgelist(Graph *g, const char *filename);
+    int read_dimacs(Graph *g, const char *filename, bool read_vertex_weights);
+    int read_adjmatrix(Graph *g, const char *filename);
+    int read_metis(Graph *g, const char *filename);
     void split(const std::string& s, char sep, vector<int>& v);      // used in metisgraph reader
     };
 }
