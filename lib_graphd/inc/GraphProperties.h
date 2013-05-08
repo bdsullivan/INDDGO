@@ -47,6 +47,10 @@ public:
     bool is_path(MutableGraph *mg, int start, int end, bool *t);             // Determines existence of a path between start
     // and end involving only vertices v with t[v]=true
     bool is_path(MutableGraph *mg, int start, int end);
+    
+    float edgeDensity(Graph *g);
+    int graphSize(Graph *g);
+    vector<int> degDist(Graph *g);
     };
 }
 
