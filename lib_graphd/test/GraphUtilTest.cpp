@@ -39,7 +39,7 @@ public:
 	{
 		//SetUp is called before every test
 		LOG_INIT("test.log", NULL, 0);
-		creator.set_file_name("../data/1dc.128.txt");
+		creator.set_file_name("data/1dc.128.txt");
 		creator.set_graph_type("DIMACS");
 		mg = creator.create_mutable_graph();
 	}
@@ -94,7 +94,7 @@ public:
 
 TEST_F(GraphUtilTest, testFindAllComponent)
 {
-	creator.set_file_name("../data/1et.64.txt");
+	creator.set_file_name("data/1et.64.txt");
 	creator.set_graph_type("DIMACS");
 	mg = creator.create_mutable_graph();
 
@@ -105,7 +105,7 @@ TEST_F(GraphUtilTest, testFindAllComponent)
 
 TEST_F(GraphUtilTest, testFindComponent)
 {
-	creator.set_file_name("../data/1et.64.txt");
+	creator.set_file_name("data/1et.64.txt");
 	creator.set_graph_type("DIMACS");
 	mg = creator.create_mutable_graph();
 
@@ -199,7 +199,7 @@ TEST_F(GraphUtilTest, testGetRandomLowDegreeVertex)
 
 TEST_F(GraphUtilTest, testLabelComponent)
 {
-	creator.set_file_name("../data/1et.64.txt");
+	creator.set_file_name("data/1et.64.txt");
 	creator.set_graph_type("DIMACS");
 	mg = creator.create_mutable_graph();
 
@@ -218,7 +218,7 @@ TEST_F(GraphUtilTest, testLabelComponent)
 
 TEST_F(GraphUtilTest, testRecLabelComponent)
 {
-	creator.set_file_name("../data/1et.64.txt");
+	creator.set_file_name("data/1et.64.txt");
 	creator.set_graph_type("DIMACS");
 	mg = creator.create_mutable_graph();
 
@@ -237,7 +237,7 @@ TEST_F(GraphUtilTest, testRecLabelComponent)
 
 TEST_F(GraphUtilTest, testLabelAllComponent)
 {
-	creator.set_file_name("../data/1et.64.txt");
+	creator.set_file_name("data/1et.64.txt");
 	creator.set_graph_type("DIMACS");
 	mg = creator.create_mutable_graph();
 
@@ -256,7 +256,7 @@ TEST_F(GraphUtilTest, testLabelAllComponent)
 
 TEST_F(GraphUtilTest, testRecLabelAllComponent)
 {
-	creator.set_file_name("../data/1et.64.txt");
+	creator.set_file_name("data/1et.64.txt");
 	creator.set_graph_type("DIMACS");
 	mg = creator.create_mutable_graph();
 
@@ -301,7 +301,7 @@ TEST_F(GraphUtilTest, testPopulateCrs)
 
 TEST_F(GraphUtilTest, testVertexSeparator)
 {
-	creator.set_file_name("../data/1et.64.txt");
+	creator.set_file_name("data/1et.64.txt");
 	creator.set_graph_type("DIMACS");
 	mg = creator.create_mutable_graph();
 
@@ -329,4 +329,3 @@ TEST_F(GraphUtilTest, testVertexSeparator)
 		}
 	}
 }
-

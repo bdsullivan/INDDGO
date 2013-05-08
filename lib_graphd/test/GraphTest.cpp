@@ -155,10 +155,3 @@ TEST_F(GraphTest, testComplement)
     EXPECT_EQ(96, d);
     EXPECT_FALSE(g->is_edge(108, 100));
 }
-
-
-
-
-
-
-
