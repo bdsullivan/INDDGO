@@ -33,7 +33,7 @@ endif
 
 .SUFFIXES: .cpp .c
 
-all: $(INDDGO_LIB)/$(LIBNAME)  $(GVIZ)
+all: $(INDDGO_LIB_DIR)/$(LIBNAME)  $(GVIZ)
 
 #This is a problem if they're not using gcc 
 %.o: $(METIS_PROG_DIR)/%.c
@@ -42,8 +42,8 @@ all: $(INDDGO_LIB)/$(LIBNAME)  $(GVIZ)
 .cpp.o:
 	$(CXX) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -c $< 	
 
-$(INDDGO_LIB)/$(LIBNAME): $(OBJ) $(POBJ)
-	ar -rv $(INDDGO_LIB_DIR)/$(LIBNAME) $^
+$(INDDGO_LIB_DIR)/$(LIBNAME): $(OBJ) $(POBJ)
+	$(AR) -rv $(INDDGO_LIB_DIR)/$(LIBNAME) $^
 
 #builds the library to the lib directory inside lib_graphd
 locallib: $(INDDGO_LIB_DIR)/$(LIBNAME)

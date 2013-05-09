@@ -34,7 +34,7 @@ namespace Graph {
         int i, j, w, x, num_fill_edges = 0;
         list<int> neighbors;
         list<int>::iterator k1, k2;
-        time_t start, stop;
+
         if(mg->num_connected_components != 1){
             fatal_error("%s:  Must have 1 component\nmg graph has %d components\n",
                         __FUNCTION__, mg->num_connected_components);
@@ -44,7 +44,7 @@ namespace Graph {
             fatal_error("%s:  Requires canonical form\n", __FUNCTION__);
         }
 
-        if((int) (((((((((((((((((((((((((((ordering->size())))))))))))))))))))))))))))
+        if((int) (ordering->size())
            != mg->num_nodes){
             fatal_error("%s:  Ordering appears to be of incorrect size? (%d!=%d)\n",
                         __FUNCTION__, ordering->size(), mg->num_nodes);
@@ -55,7 +55,7 @@ namespace Graph {
         int *fwd_nbrs = new int[mg->num_nodes];
         int tree_w = 0;
         mg->key = 1;
-        start = clock();
+        //start = clock();
         for(i = 0; i < mg->num_nodes; i++){
             w = ordering->at(i);
             f[w] = w;
@@ -93,7 +93,7 @@ namespace Graph {
             }
         }
 
-        stop = clock();
+        //stop = clock();
         print_message(1, "Found Y-T arrays - %d fill edges found. Width is %d\n",
                       num_fill_edges, tree_w);
         delete[] f;
@@ -289,7 +289,7 @@ namespace Graph {
 
         int j, cnt;
         list<int>::iterator k;
-        vector<int>::iterator i;
+        //vector<int>::iterator i;
         GraphProperties properties;
         int current_key = properties.fill_adj_vec(mg, v);
         *min_pos = INT_MAX;
