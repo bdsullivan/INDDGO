@@ -41,9 +41,9 @@ public:
 	{
 		LOG_INIT("test.log", NULL, 0);
 		gr = factory.create_reader("DIMACS");
-		gr->read_graph("../data/1dc.128.txt");
+		gr->read_graph("data/1dc.128.txt");
 
-		creator.set_file_name("../data/1dc.128.txt");
+		creator.set_file_name("data/1dc.128.txt");
 		creator.set_graph_type("DIMACS");
 		g = creator.create_graph();
 	}
@@ -92,10 +92,10 @@ TEST_F(GraphReaderWriterFactoryTest, testNodeNbrs)
 TEST_F(GraphReaderWriterFactoryTest, testAdjMatrixGraphWriter)
 {
 	gw = factory.create_writer("adjmatrix");
-	gw->set_out_file_name("../data/adjmatrix.out");
+	gw->set_out_file_name("data/adjmatrix.out");
 	gw->write_graph(g);
 
-	creator.set_file_name("../data/adjmatrix.out");
+	creator.set_file_name("data/adjmatrix.out");
 	creator.set_graph_type("adjmatrix");
 	g = creator.create_graph();
 
@@ -105,10 +105,10 @@ TEST_F(GraphReaderWriterFactoryTest, testAdjMatrixGraphWriter)
 TEST_F(GraphReaderWriterFactoryTest, testAdjMatrixGraphWriterNodeNbrs)
 {
 	gw = factory.create_writer("adjmatrix");
-	gw->set_out_file_name("../data/adjmatrix.out");
+	gw->set_out_file_name("data/adjmatrix.out");
 	gw->write_graph(g);
 
-	creator.set_file_name("../data/adjmatrix.out");
+	creator.set_file_name("data/adjmatrix.out");
 	creator.set_graph_type("adjmatrix");
 	g = creator.create_graph();
 
@@ -139,10 +139,10 @@ TEST_F(GraphReaderWriterFactoryTest, testAdjMatrixGraphWriterNodeNbrs)
 TEST_F(GraphReaderWriterFactoryTest, testDimacsGraphWriterGetNumEdges)
 {
 	gw = factory.create_writer("dimacs");
-	gw->set_out_file_name("../data/dimacsout.out");
+	gw->set_out_file_name("data/dimacsout.out");
 	gw->write_graph(g);
 
-	creator.set_file_name("../data/dimacsout.out");
+	creator.set_file_name("data/dimacsout.out");
 	creator.set_graph_type("dimacs");
 	g = creator.create_graph();
 
@@ -151,10 +151,10 @@ TEST_F(GraphReaderWriterFactoryTest, testDimacsGraphWriterGetNumEdges)
 
 TEST_F(GraphReaderWriterFactoryTest, testDimacsGraphWriterGetNode)
 {
-	gw = factory.create_writer("dimacs", "../data/dimacsout.out");
+	gw = factory.create_writer("dimacs", "data/dimacsout.out");
 	gw->write_graph(g);
 
-	creator.set_file_name("../data/dimacsout.out");
+	creator.set_file_name("data/dimacsout.out");
 	creator.set_graph_type("dimacs");
 	g = creator.create_graph();
 	Graph::Node *n;
@@ -166,8 +166,7 @@ TEST_F(GraphReaderWriterFactoryTest, testDimacsGraphWriterGetNode)
 TEST_F(GraphReaderWriterFactoryTest, testGraphVizWriter)
 {
 	gw = factory.create_writer("graphviz");
-	gw->set_out_file_name("../data/graphviz.out");
+	gw->set_out_file_name("data/graphviz.out");
 	gw->write_graph(g);
 	EXPECT_TRUE(true);
 }
-

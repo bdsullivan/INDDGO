@@ -66,9 +66,6 @@ IGRAPH_INSTALL_DIR = $(IGRAPH)/deploy
 
 GMP    = 
 
-GTEST_DIR=
-
-
 #----------------------------------------------------------------
 #
 # Compilers, Flags and System Tools
@@ -209,12 +206,6 @@ $(error When HAS_GMP = 1, you must define the GMP directory variable)
 endif
 endif
 
-ifeq ($(HAS_GTEST),1)
-ifeq ($(GTEST_DIR), )
-$(error When HAS_GTEST = 1, you must define the GTEST_DIR directory variable)  
-endif
-endif
-
 #------------------------------------------------------------------
 # 
 # Setting auxiliary library variables. 
@@ -223,10 +214,6 @@ endif
 
 MPILIBS =
 MADLIBS = -lMADworld
-
-ifeq ($(HAS_GTEST),1)
-LIBGTEST=libgtest.a
-endif
 
 METIS_INCLUDES=
 ifeq ($(HAS_METIS),1)
