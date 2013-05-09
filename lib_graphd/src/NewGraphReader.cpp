@@ -22,6 +22,7 @@
 #include "NewGraphReader.h"
 #include "Log.h"
 #include "Debug.h"
+#include "Util.h"
 #include <strings.h>
 #include <stdlib.h>
 #include <iostream>
@@ -39,51 +40,46 @@ namespace Graph {
     NewGraphReader::~NewGraphReader(){
     }
 
-    void NewGraphReader::split(const std::string& s, char sep, vector<int>& v){
-        stringstream ss(s);      //< a stringstream to do our parsing for us
-        int k = -1;    //< just some variable
-        string temp;
-        while(std::getline(ss, temp, sep)){
-            stringstream convert(temp);
-            convert >> k;
-            if(k != -1){
-                v.push_back(k);
-            }
-            k = -1;
-        }
-    }     // split
 
-    template <class gtype>
-    gtype *NewGraphReader::read_graph(const char *filename, char *type){
-        gtype *g;
+    int NewGraphReader::read_graph(Graph *g, const char *filename, char *type, bool read_vertex_weights){
         // FIXME: use regexes here
         fprintf(stderr,"- in read_graph type is %s\n", type);
         if(strcasecmp("edge", type) == 0){
+            if(read_vertex_weights){
+                fprintf(stderr, "Error: cannot currently read vertex weights from edgelists\n");
+                return -1;
+            }
             fprintf(stderr,"- calling read_edgelist\n");
-            g = NewGraphReader::read_edgelist<gtype>(filename);
+            return NewGraphReader::read_edgelist(g, filename);
         }
         else if(strncasecmp("adjmatrix",type, 9) == 0){
+            if(read_vertex_weights){
+                fprintf(stderr, "Error: cannot currently read vertex weights from adjaceny matrix\n");
+                return -1;
+            }
             fprintf(stderr,"- calling read_adjmatrix\n");
-            g = NewGraphReader::read_adjmatrix<gtype>(filename);
+            return NewGraphReader::read_adjmatrix(g, filename);
         }
         else if(strncasecmp("metis", type, 5) == 0){
             fprintf(stderr,"- calling read_metis\n");
-            g = NewGraphReader::read_metis<gtype>(filename);
+            if(read_vertex_weights){
+                fprintf(stderr, "Error: cannot currently read vertex weights from metis files\n");
+                return -1;
+            }
+            return NewGraphReader::read_metis(g, filename);
         }
         else {
-            fprintf(stderr, "WTF\n");
-            return NULL;
+            fprintf(stderr, "Error: type %s not currently supported\n", type);
+            return -1;
         }
-        return g;
+        return 0;
     } // read_graph
 
-    template <class gtype>
-    gtype *NewGraphReader::read_edgelist(const char *filename){
+    int NewGraphReader::read_edgelist(Graph *g, const char *filename){
         char line[100];
         int i, j, m, n, retval;
         char *retp;
         FILE *in;
-        gtype *g;
 
         m = n = 0;
 
@@ -110,7 +106,7 @@ namespace Graph {
                     __FUNCTION__);
         }
 
-        g = new gtype(n);
+        g->add_vertices(n);
 
         while(!feof(in)){
             retp = fgets(line, 100, in);
@@ -161,16 +157,14 @@ namespace Graph {
            }
 
          */
-        return g;
+        return 0;
     } // read_edgelist
 
-    template <class gtype>
-    gtype *NewGraphReader::read_dimacs(const char *filename){
+    int NewGraphReader::read_dimacs(Graph *g, const char *filename, bool read_vertex_weights){
         char line[100], format[100];
         int i, j, m, n, retval, id, x;
         int val;
         FILE *in;
-        gtype *g;
 
         m = n = 0;
 
@@ -213,13 +207,13 @@ namespace Graph {
                     exit(-1);
                 }
 
-                g = new gtype(n);
-
                 if((strncasecmp(format, "e", 1) != 0) && (strncasecmp(format, "edge", 4) != 0)){
                     FERROR(
                         "%s:  DIMACS read error - problem line - FORMAT must be one of\n"
                         " e, E, edge, or EDGE\n", __FUNCTION__);
                 }
+
+                g->add_vertices(n);
 
                 break;
 
@@ -246,13 +240,17 @@ namespace Graph {
                            __FUNCTION__, id, n);
                 }
                 // Store value - first allocate the value array if NULL
-                //if((int)this->weight.size()!=n)
-                //    this->weight.resize(n);
+                if(read_vertex_weights){
+                    VertexWeightedGraph *vg = (VertexWeightedGraph *)g;
+                    if((int)vg->weight.size() != n){
+                        vg->weight.resize(n);
+                    }
 
-                // Store value
-                // FIXME:: figure out how weighted graphs work
-                // this->weights[id - 1] = val;                 // 1->0
-                // DEBUG("Storing weight[%d]= %d\n", id - 1, this->weights[id - 1]);
+                    // Store value
+                    // FIXME:: figure out how weighted graphs work
+                    vg->weight[id - 1] = val;                 // 1->0
+                    // DEBUG("Storing weight[%d]= %d\n", id - 1, this->weights[id - 1]);
+                }
 
                 break;
 
@@ -305,14 +303,12 @@ namespace Graph {
         fclose(in);
         DEBUG("Finish reading DIMACS file\n");
 
-        return g;
+        return 0;
     }     // read_dimacs
 
-    template <class gtype>
-    gtype *NewGraphReader::read_adjmatrix(const char *filename){
+    int NewGraphReader::read_adjmatrix(Graph *g, const char *filename){
         int i, j, k, m, n, retval;
         FILE *in;
-        gtype *g;
 
         if((in = fopen(filename, "r")) == NULL){
             fatal_error("%s:  Error opening %s for reading\n", __FUNCTION__,
@@ -323,7 +319,7 @@ namespace Graph {
         //printf("%s:  Graph has %d nodes\n", __FUNCTION__, n);
         // Each row will have n binary entries, and there will be n rows.
 
-        g = new gtype(n);
+        g->add_vertices(n);
 
         i = 0;             // Use i to keep track of row
         m = 0;             // To count edges
@@ -359,16 +355,14 @@ namespace Graph {
                 __FUNCTION__, m);
         }
 
-        return g;
+        return 0;
     }     // read_adjmatrix
 
-    template <class gtype>
-    gtype *NewGraphReader::read_metis(const char *filename){
+    int NewGraphReader::read_metis(Graph *g, const char *filename){
         // here we assume metis graphs are based on 1.
         string s;
         ifstream in(filename);
         vector<int> elem;
-        gtype *g;
         int n, e = 0;
         int count = 0;
 
@@ -382,11 +376,13 @@ namespace Graph {
             e = elem[1];
 
             fprintf(stderr, "n is %d\n", n);
+
+            g->add_vertices(n);
+
             if((n <= 0) || (e <= 0) ){
                 fatal_error("Metis read error - didn't understand problem line!");
             }
 
-            g = new gtype(n);
             while(in.good()){
                 elem.clear();
                 getline(in, s);
@@ -404,85 +400,6 @@ namespace Graph {
 
             in.close();
         }
-        return g;
-    }     // read_metis
-
-    /**
-     * some more comments
-     * on multiple lines
-     * \param g Pointer to a graph
-     * \param filename file to read graph from
-     * \param type string specifying the type of the graph
-     */
-    int NewGraphReader::new_readgraph(Graph *g, const char *filename, char *type){
-        // FIXME: use regexes here
-        fprintf(stderr,"- in read_graph type is %s\n", type);
-        if(strncasecmp("metis", type, 5) == 0){
-            fprintf(stderr,"- calling read_metis\n");
-            NewGraphReader::new_read_metis(g, filename);
-        }
-        else {
-            fprintf(stderr, "WTF\n");
-            return NULL;
-        }
-        return 0;
-    }
-
-    int NewGraphReader::new_read_metis(Graph *g, const char *filename){
-        // here we assume metis graphs are based on 1.
-        string s;
-        ifstream in(filename);
-        vector<int> elem;
-        int n, e = 0;
-        int count = 0;
-
-        if(in.is_open()){
-            elem.clear();
-            do {
-                getline(in, s);
-            } while(s[0] == '%');       // skip comments
-            split(s, ' ', elem);
-            n = elem[0];
-            e = elem[1];
-
-            fprintf(stderr, "n is %d\n", n);
-            if((n <= 0) || (e <= 0) ){
-                fatal_error("Metis read error - didn't understand problem line!");
-            }
-
-            Graph *mg = dynamic_cast<Graph *>(g);
-            *mg = Graph(n);
-
-            while(in.good()){
-                elem.clear();
-                getline(in, s);
-                if(s[0] != '%'){
-                    split(s, ' ', elem);
-                    int is = (int) elem.size();
-                    for(int i = 0; i < is; i++){
-                        if(!mg->is_edge(count,elem[i] - 1)){
-                            mg->add_edge(count,elem[i] - 1);
-                        }
-                    }
-                    count++;
-                }
-            }
-
-            in.close();
-        }
         return 0;
     }     // read_metis
-
-// We declare these template instantiations so that we we can
-// keep the implementations in a .cpp file
-// Just follow the pattern if you want to add new methods/graph types
-// FIXME: figure out if this really should be a .tpp file (but then have to deal with
-// dependency issues)
-    template Graph *NewGraphReader::read_graph<Graph>(const char *filename, char *type);
-    template VertexWeightedGraph *NewGraphReader::read_graph<VertexWeightedGraph>(const char *filename, char *type);
-    template Graph *NewGraphReader::read_edgelist<Graph>(const char *filename);
-    template Graph *NewGraphReader::read_dimacs<Graph>(const char *filename);
-    template Graph *NewGraphReader::read_adjmatrix<Graph>(const char *filename);
-    template Graph *NewGraphReader::read_metis<Graph>(const char *filename);
-    template VertexWeightedGraph *NewGraphReader::read_edgelist<VertexWeightedGraph>(const char *filename);
 }

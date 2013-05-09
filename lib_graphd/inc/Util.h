@@ -27,7 +27,7 @@
 #define GD_STAT_MED 3 // median
 #define GD_STAT_COUNT 4 //number of vertices with non-negative score
 
-class int_double
+class int_double 
 {
 friend std::ostream &operator<<(std::ostream &, const int_double &);
 public:
@@ -87,6 +87,10 @@ double get_statistics(const vector<int> & nodes, const vector<double> & scores, 
 void normalize_DIMACS_file(const char *DIMACS_file,const char *new_file);
 
 const char *eo_name(int eo_id);
+
+// String manipulation functions
+std::string str_to_up(std::string s);
+void split(const std::string& s, char sep, vector<int>& v);      // used in metisgraph reader
 
 int_int mylog2(int x);
 

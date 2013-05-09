@@ -19,8 +19,8 @@
 
  */
 
-#ifndef NEWGRAPHREADER_H_
-#define NEWGRAPHREADER_H_
+#ifndef NEWGRAPHWRITER_H_
+#define NEWGRAPHWRITER_H_
 
 #include "Node.h"
 #include "Graph.h"
@@ -39,27 +39,34 @@
 #include <vector>
 
 namespace Graph {
-    class NewGraphReader {
+    class NewGraphWriter {
 public:
 
-    NewGraphReader();
-    virtual ~NewGraphReader();
+    NewGraphWriter();
+    virtual ~NewGraphWriter();
     /**
-     * \brief Reads in a graph of the specified type
-     *
-     * some more comments
-     * on multiple lines
-     * \param g Pointer to a graph
-     * \param filename file to read graph from
-     * \param type string specifying the type of the graph
+     * \brief Writes a graph of the specified type
      */
-    int read_graph(Graph *g, const char *filename, char *type, bool read_vertex_weights);
+    int write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights);
 private:
-    int read_edgelist(Graph *g, const char *filename);
-    int read_dimacs(Graph *g, const char *filename, bool read_vertex_weights);
-    int read_adjmatrix(Graph *g, const char *filename);
-    int read_metis(Graph *g, const char *filename);
+    /**
+     * \brief Writes a given graph to file in the METIS format
+     */
+    int write_metis(Graph *g, const string filename);
+    /**
+     * \brief Writes a given graph to file in the DIMACS format
+     */
+    int write_dimacs(Graph *g, const string filename, bool write_vertex_weights);
+    /**
+     * \brief Writes a given graph to file in our adjacency matrix format
+     */
+    int write_adjmatrix(Graph *g, const string filename);
+    /**
+     * \brief Writes a given graph to file in GraphViz format
+     */
+    int write_graphviz(Graph *g, const string filename);
+
     };
 }
 
-#endif /* GRAPHREADER_H_ */
+#endif /* GRAPHWRITER_H_ */

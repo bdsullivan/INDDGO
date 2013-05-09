@@ -22,6 +22,9 @@
 #include "GraphDecomposition.h"
 #include <fstream>
 #include <limits>
+#include <string>
+#include <sstream>
+
 
 /*BDS - added to get memory highwater mark*/
 int parseLine(char *line){
@@ -826,3 +829,21 @@ int_int mylog2(int x){
     return ans;
 }
 
+std::string str_to_up(string s){
+    std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+    return s;
+}
+
+void split(const std::string& s, char sep, vector<int>& v){
+    stringstream ss(s);      //< a stringstream to do our parsing for us
+    int k = -1;    //< just some variable
+    string temp;
+    while(std::getline(ss, temp, sep)){
+        stringstream convert(temp);
+        convert >> k;
+        if(k != -1){
+            v.push_back(k);
+        }
+        k = -1;
+    }
+}     // split
