@@ -25,7 +25,7 @@ HAS_PARMETIS	= 1
 HAS_METIS	= 1
 HAS_IGRAPH	= 0
 HAS_GMP		= 0
-HAS_GTEST	= 1
+HAS_GTEST	= 0
 # Set whether serial or parallel version is desired for WIS.
 IS_PARALLEL	= 1
 HAS_MADNESS	= 1
