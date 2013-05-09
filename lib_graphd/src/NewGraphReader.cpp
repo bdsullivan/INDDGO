@@ -40,42 +40,51 @@ namespace Graph {
     NewGraphReader::~NewGraphReader(){
     }
 
-
-    int NewGraphReader::read_graph(Graph *g, const char *filename, char *type, bool read_vertex_weights){
-        // FIXME: use regexes here
-        fprintf(stderr,"- in read_graph type is %s\n", type);
-        if(strcasecmp("edge", type) == 0){
+/**
+ * Public function to read in a graph
+ * \param[in,out] g a graph object
+ * \param[in] filename full path to the file to read in (relative or absolute)
+ * \param[in] type type of file to be read in
+ * \param[in] read_vertex_weights read vertex weights from input file
+ * \return code 0 on success, nonzero on failure
+ */
+    int NewGraphReader::read_graph(Graph *g, const string filename, string type, bool read_vertex_weights){
+        string t = str_to_up(type);
+        if("EDGE" == t){
             if(read_vertex_weights){
-                fprintf(stderr, "Error: cannot currently read vertex weights from edgelists\n");
+                cerr << "Error: cannot currently read vertex weights from edgelist" << endl;
                 return -1;
             }
-            fprintf(stderr,"- calling read_edgelist\n");
             return NewGraphReader::read_edgelist(g, filename);
         }
-        else if(strncasecmp("adjmatrix",type, 9) == 0){
+        else if("ADJMATRIX" == t){
             if(read_vertex_weights){
-                fprintf(stderr, "Error: cannot currently read vertex weights from adjaceny matrix\n");
+                cerr << "Error: cannot currently read vertex weights from adjaceny matrix" << endl;
                 return -1;
             }
-            fprintf(stderr,"- calling read_adjmatrix\n");
             return NewGraphReader::read_adjmatrix(g, filename);
         }
-        else if(strncasecmp("metis", type, 5) == 0){
-            fprintf(stderr,"- calling read_metis\n");
+        else if("METIS" == t){
             if(read_vertex_weights){
-                fprintf(stderr, "Error: cannot currently read vertex weights from metis files\n");
+                cerr << "Error: cannot currently read vertex weights from metis files" << endl;
                 return -1;
             }
             return NewGraphReader::read_metis(g, filename);
         }
         else {
-            fprintf(stderr, "Error: type %s not currently supported\n", type);
+            cerr << "Error: type " << type << " not currently supported" << endl;
             return -1;
         }
         return 0;
     } // read_graph
 
-    int NewGraphReader::read_edgelist(Graph *g, const char *filename){
+/**
+ * Private function to read in a graph in edgelist format
+ * \param[in,out] g a graph object
+ * \param[in] filename full path to the file to read in (relative or absolute)
+ * \return code 0 on success, nonzero on failure
+ */
+    int NewGraphReader::read_edgelist(Graph *g, const string filename){
         char line[100];
         int i, j, m, n, retval;
         char *retp;
@@ -83,10 +92,10 @@ namespace Graph {
 
         m = n = 0;
 
-        if((in = fopen(filename, "r")) == NULL){
+        if((in = fopen(filename.c_str(), "r")) == NULL){
             FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename);
             fatal_error("%s:  Error opening %s for reading\n", __FUNCTION__,
-                        filename);
+                        filename.c_str());
         }
 
         // get the first non-comment lines
@@ -160,7 +169,14 @@ namespace Graph {
         return 0;
     } // read_edgelist
 
-    int NewGraphReader::read_dimacs(Graph *g, const char *filename, bool read_vertex_weights){
+/**
+ * Private function to read in a graph in DIMACS format
+ * \param[in,out] g a graph object
+ * \param[in] filename full path to the file to read in (relative or absolute)
+ * \param[in] read_vertex_weights read vertex weights from input file
+ * \return code 0 on success, nonzero on failure
+ */
+    int NewGraphReader::read_dimacs(Graph *g, const string filename, bool read_vertex_weights){
         char line[100], format[100];
         int i, j, m, n, retval, id, x;
         int val;
@@ -168,10 +184,10 @@ namespace Graph {
 
         m = n = 0;
 
-        if((in = fopen(filename, "r")) == NULL){
+        if((in = fopen(filename.c_str(), "r")) == NULL){
             FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename);
             fatal_error("%s:  Error opening %s for reading\n", __FUNCTION__,
-                        filename);
+                        filename.c_str());
         }
 
         while(!feof(in)){
@@ -306,13 +322,21 @@ namespace Graph {
         return 0;
     }     // read_dimacs
 
-    int NewGraphReader::read_adjmatrix(Graph *g, const char *filename){
+/**
+ * Private function to read in a graph in adjacency matrix format.  This is an
+ * INDDGO-specific format - no claims are made to compatibility with other files.
+ *
+ * \param[in,out] g a graph object
+ * \param[in] filename full path to the file to read in (relative or absolute)
+ * \return code 0 on success, nonzero on failure
+ */
+    int NewGraphReader::read_adjmatrix(Graph *g, const string filename){
         int i, j, k, m, n, retval;
         FILE *in;
 
-        if((in = fopen(filename, "r")) == NULL){
+        if((in = fopen(filename.c_str(), "r")) == NULL){
             fatal_error("%s:  Error opening %s for reading\n", __FUNCTION__,
-                        filename);
+                        filename.c_str());
         }
 
         fscanf(in, "%d\n", &n);
@@ -358,10 +382,16 @@ namespace Graph {
         return 0;
     }     // read_adjmatrix
 
-    int NewGraphReader::read_metis(Graph *g, const char *filename){
+/**
+ * Private function to read in a graph in METIS format
+ * \param[in,out] g a graph object
+ * \param[in] filename full path to the file to read in (relative or absolute)
+ * \return code 0 on success, nonzero on failure
+ */
+    int NewGraphReader::read_metis(Graph *g, const string filename){
         // here we assume metis graphs are based on 1.
         string s;
-        ifstream in(filename);
+        ifstream in(filename.c_str());
         vector<int> elem;
         int n, e = 0;
         int count = 0;

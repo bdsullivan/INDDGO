@@ -53,12 +53,16 @@ public:
      * \param filename file to read graph from
      * \param type string specifying the type of the graph
      */
-    int read_graph(Graph *g, const char *filename, char *type, bool read_vertex_weights);
+    int read_graph(Graph *g, const string filename, string type, bool read_vertex_weights);
 private:
-    int read_edgelist(Graph *g, const char *filename);
-    int read_dimacs(Graph *g, const char *filename, bool read_vertex_weights);
-    int read_adjmatrix(Graph *g, const char *filename);
-    int read_metis(Graph *g, const char *filename);
+    /** \brief read an edgelist */
+    int read_edgelist(Graph *g, const string filename);
+    /** \brief read a DIMACS file */
+    int read_dimacs(Graph *g, const string filename, bool read_vertex_weights);
+    /** \brief read an adjacency matrix */
+    int read_adjmatrix(Graph *g, const string filename);
+    /** \brief read a METIS file */
+    int read_metis(Graph *g, const string filename);
     };
 }
 
