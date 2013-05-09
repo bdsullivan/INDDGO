@@ -71,7 +71,6 @@ namespace Graph {
         // here we assume metis graphs are based on 1.
         string s;
         ifstream in(filename);
-        char c = ' ';
         vector<int> elem;
         int n, e = 0;
         int count = 0;

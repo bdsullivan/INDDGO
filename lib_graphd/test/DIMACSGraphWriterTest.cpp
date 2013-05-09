@@ -39,11 +39,11 @@ public:
 	{
 		//SetUp is called before every test
 		LOG_INIT("test.log", NULL, 0);
-		creator.set_file_name("../data/1dc.128.adj");
+		creator.set_file_name("data/1dc.128.adj");
 		creator.set_graph_type("adjmatrix");
 		g = creator.create_graph();
 
-		string out_file("../data/1dc.128.out");
+		string out_file("data/1dc.128.out");
 		dim_writer = new Graph::DIMACSGraphWriter(out_file);
 	}
 
@@ -58,7 +58,7 @@ TEST_F(DIMACSGraphWriterTest, testNumNodes)
 {
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.out");
+	creator.set_file_name("data/1dc.128.out");
 	creator.set_graph_type("DIMACS");
 	g = creator.create_graph();
 
@@ -69,7 +69,7 @@ TEST_F(DIMACSGraphWriterTest, testGetDegrees)
 {
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.out");
+	creator.set_file_name("data/1dc.128.out");
 	creator.set_graph_type("DIMACS");
 	g = creator.create_graph();
 
@@ -81,7 +81,7 @@ TEST_F(DIMACSGraphWriterTest, testGetNode)
 {
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.out");
+	creator.set_file_name("data/1dc.128.out");
 	creator.set_graph_type("DIMACS");
 	g = creator.create_graph();
 
@@ -95,7 +95,7 @@ TEST_F(DIMACSGraphWriterTest, testIsEdge)
 {
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.out");
+	creator.set_file_name("data/1dc.128.out");
 	creator.set_graph_type("DIMACS");
 	g = creator.create_graph();
 
@@ -110,12 +110,12 @@ TEST_F(DIMACSGraphWriterTest, testIsEdge)
 
 TEST_F(DIMACSGraphWriterTest, testshuffle)
 {
-    string out_file("../data/1dc.128.out.shuf");
+    string out_file("data/1dc.128.out.shuf");
     dim_writer->set_out_file_name(out_file);
     dim_writer->shuffle(g, time(NULL));
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.out.shuf");
+	creator.set_file_name("data/1dc.128.out.shuf");
 	creator.set_graph_type("DIMACS");
 	g = creator.create_graph();
 

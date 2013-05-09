@@ -91,7 +91,7 @@ void create_tree_decomposition(Graph::WeightedMutableGraph *G, TDTree **T, bool 
   char *cstr = new char[G->get_input_file().length()+1];
   strcpy(cstr, (G->get_input_file()).c_str());
   (*T)->graph_file = cstr;
-  int i;
+
   
   // create a vector for the elimination ordering
   vector<int> ordering(H.get_num_nodes(), GD_UNDEFINED);
@@ -168,7 +168,7 @@ void bag_statistics(TDTree *T, const vector<double> &scores, vector<double> *sta
   TDTreeNode *curr;
   int curr_node = 0;
   stats->resize(T->num_tree_nodes);
-  for(int i; i < size; i++)
+  for(int i=0; i < size; i++)
     {
       curr = T->tree_nodes[i];
       if(curr != NULL)
@@ -194,7 +194,7 @@ void bag_lengths(TDTree *T, vector<int> *lengths)
   Graph::GraphUtil util;
   int curr_node = 0;
   lengths->resize(T->num_tree_nodes);
-  for(int i; i < size; i++)
+  for(int i=0; i < size; i++)
     {
       curr = T->tree_nodes[i];
       if(curr != NULL)

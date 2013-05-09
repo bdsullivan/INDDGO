@@ -341,7 +341,7 @@ void score_sort(list<int> *mylist, vector<int> *scores){
  * we can allocate correctly sized data structures.
  */
 void get_DIMACS_dimensions(const char *DIMACS_file, int *n, int *m){
-    char line[100], format[100], x;
+    char line[100], format[100];
     int retval;
     FILE *in;
 
@@ -382,7 +382,7 @@ void get_DIMACS_dimensions(const char *DIMACS_file, int *n, int *m){
 
             fclose(in);
             return;
-            break;
+
 
         case 'c':
             // Comment line - skip and move on
@@ -406,7 +406,7 @@ void get_DIMACS_dimensions(const char *DIMACS_file, int *n, int *m){
             break;
         }        // end switch
                  // Advance to next line if there is format at the end of it
-        while(!feof(in) && (x = getc(in)) != '\n'){
+        while(!feof(in) && (getc(in)) != '\n'){
             ;
         }
     }    // end while
@@ -568,7 +568,7 @@ int read_SCOTCH_ordering_file(const char *ordering_file, vector<int> *ordering){
  * the relabeling and writes to new_file in DIMACS format.
  */
 void normalize_DIMACS_file(const char *DIMACS_file, const char *new_file){
-    char line[100], format[100], x;
+    char line[100], format[100];
     int i,j,m,n,retval, max_label = -1;
     FILE *in;
     bool has_zero = false;
@@ -651,7 +651,7 @@ void normalize_DIMACS_file(const char *DIMACS_file, const char *new_file){
             break;
         }        // end switch
                  // Advance to next line if there is format at the end of it
-        while(!feof(in) && (x = getc(in)) != '\n'){
+        while(!feof(in) && (getc(in)) != '\n'){
             ;
         }
     }    // end while
@@ -706,7 +706,7 @@ void normalize_DIMACS_file(const char *DIMACS_file, const char *new_file){
             break;
         }        // end switch
                  // Advance to next line if there is format at the end of it
-        while(!feof(in) && (x = getc(in)) != '\n'){
+        while(!feof(in) && (getc(in)) != '\n'){
             ;
         }
     }    // end while
@@ -785,7 +785,7 @@ void normalize_DIMACS_file(const char *DIMACS_file, const char *new_file){
             break;
         }        // end switch
                  // Advance to next line if there is format at the end of it
-        while(!feof(in) && (x = getc(in)) != '\n'){
+        while(!feof(in) && (getc(in)) != '\n'){
             ;
         }
     }    // end while

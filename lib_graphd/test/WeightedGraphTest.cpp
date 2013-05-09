@@ -35,7 +35,7 @@ public:
 	{
 		//SetUp is called before every test
 		LOG_INIT("test.log", NULL, 0);
-		creator.set_file_name("../data/x.245.txt");
+		creator.set_file_name("data/x.245.txt");
 		creator.set_graph_type("DIMACS");
 		wg = creator.create_weighted_graph();
 	}

@@ -33,7 +33,7 @@ public:
 
     virtual void SetUp(){
         LOG_INIT("test.log", NULL, 0);
-        dr.read_graph("../data/1dc.128.txt");
+        dr.read_graph("data/1dc.128.txt");
     }
 
     virtual void TearDown(){
@@ -79,6 +79,3 @@ TEST_F(DIMACSGraphReaderTest, testNodeNbrs)
     EXPECT_EQ(8, nbrs[3l]);
 
 }
-
-
-

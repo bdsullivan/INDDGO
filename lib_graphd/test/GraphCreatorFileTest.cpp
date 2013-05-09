@@ -35,7 +35,7 @@ public:
 	virtual void SetUp()
         {
             LOG_INIT("test.log", NULL, 0);
-            creator = new Graph::GraphCreatorFile("../data/1dc.128.txt", "DIMACS");
+            creator = new Graph::GraphCreatorFile("data/1dc.128.txt", "DIMACS");
         }
 
 	virtual void TearDown()
@@ -130,7 +130,7 @@ TEST_F(GraphCreatorFileTest, testGetRandomEdgeSubgraph)
 {
 	Graph::WeightedMutableGraph *wmg;
 	Graph::WeightedMutableGraph *wmg_sub;
-	creator->set_file_name("../data/1dc.128.txt");
+	creator->set_file_name("data/1dc.128.txt");
 	creator->set_graph_type("DIMACS");
 	wmg = creator->create_weighted_mutable_graph();
 	wmg_sub = creator->create_random_edge_subgraph(wmg, 70);
@@ -155,7 +155,7 @@ TEST_F(GraphCreatorFileTest, testCreateInducedSubGraph)
 	Graph::WeightedMutableGraph *wmg_sub;
 	Graph::GraphUtil util;
 
-	creator->set_file_name("../data/1et.64.txt");
+	creator->set_file_name("data/1et.64.txt");
 	creator->set_graph_type("DIMACS");
 
 	wmg = creator->create_weighted_mutable_graph();
@@ -205,7 +205,7 @@ TEST_F(GraphCreatorFileTest, testCreateComponent)
 	Graph::WeightedMutableGraph *wmg_sub;
 	Graph::GraphUtil util;
 
-	creator->set_file_name("../data/1et.64.txt");
+	creator->set_file_name("data/1et.64.txt");
 	creator->set_graph_type("DIMACS");
 
 	wmg = creator->create_weighted_mutable_graph();
@@ -255,7 +255,7 @@ TEST_F(GraphCreatorFileTest, testCreateAllComponents)
 	Graph::GraphUtil util;
 	Graph::WeightedMutableGraph *wmg;
 
-	creator->set_file_name("../data/1et.64.txt");
+	creator->set_file_name("data/1et.64.txt");
 	creator->set_graph_type("DIMACS");
 	wmg = creator->create_weighted_mutable_graph();
 
@@ -299,7 +299,7 @@ TEST_F(GraphCreatorFileTest, testCreateRecAllComponents)
 	Graph::GraphUtil util;
 	Graph::WeightedMutableGraph *wmg;
 
-	creator->set_file_name("../data/1et.64.txt");
+	creator->set_file_name("data/1et.64.txt");
 	creator->set_graph_type("DIMACS");
 	wmg = creator->create_weighted_mutable_graph();
 
@@ -336,6 +336,3 @@ TEST_F(GraphCreatorFileTest, testCreateRecAllComponents)
 		i++;
 	}
 }
-
-
-
