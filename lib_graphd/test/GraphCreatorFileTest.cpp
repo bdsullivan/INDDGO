@@ -46,36 +46,7 @@ public:
 
 TEST_F(GraphCreatorFileTest, testGraph)
 {
-	Graph::Graph *g = creator->create_graph();
-	EXPECT_EQ(128, g->get_num_nodes());
-	EXPECT_EQ(1471, g->get_num_edges());
-
-	vector<Graph::Node> n;
-	n = g->get_nodes();
-
-	EXPECT_EQ(128, n.size());
-
-	list<int> nbrlist = n[35].get_nbrs();
-	vector<int> nbrs(nbrlist.begin(), nbrlist.end());
-	EXPECT_EQ(75, nbrs[20]);
-
-	nbrlist = n[127].get_nbrs();
-	nbrs.clear();
-	nbrs.insert(nbrs.end(), nbrlist.begin(), nbrlist.end());
-	EXPECT_EQ(111, nbrs[2]);
-
-	nbrlist = n[0].get_nbrs();
-	nbrs.clear();
-	nbrs.insert(nbrs.end(), nbrlist.begin(), nbrlist.end());
-	EXPECT_EQ(1, nbrs[0]);
-	EXPECT_EQ(64, nbrs[6l]);
-	EXPECT_EQ(8, nbrs[3l]);
-
-}
-
-TEST_F(GraphCreatorFileTest, testMutableGraph)
-{
-	Graph::MutableGraph *mg = creator->create_mutable_graph();
+	Graph::Graph *mg = creator->create_mutable_graph();
 	EXPECT_EQ(128, mg->get_num_nodes())
 		;
 	EXPECT_EQ(1471, mg->get_num_edges())
@@ -143,7 +114,7 @@ TEST_F(GraphCreatorFileTest, testGetRandomEdgeSubgraph)
 
 TEST_F(GraphCreatorFileTest, testCreateKTree)
 {
-	Graph::MutableGraph *mg;
+	Graph::Graph *mg;
 	mg = creator->initialize_ktree(100, 50);
 	EXPECT_EQ(100, mg->get_num_nodes())
 		;
