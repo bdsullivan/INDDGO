@@ -35,7 +35,7 @@ public:
 	{
 		//SetUp is called before every test
 		LOG_INIT("test.log", NULL, 0);
-		creator.set_file_name("../data/1dc.128.txt");
+		creator.set_file_name("data/1dc.128.txt");
 		creator.set_graph_type("DIMACS");
 		wmg = creator.create_weighted_mutable_graph();
 	}
@@ -285,7 +285,7 @@ TEST_F(VertexWeightedGraphTest, testEliminateVertex)
 
 TEST_F(VertexWeightedGraphTest, testSetWeight)
 {
-	creator.set_file_name("../data/x.245.txt");
+	creator.set_file_name("data/x.245.txt");
 	creator.set_graph_type("DIMACS");
 	wmg = creator.create_weighted_mutable_graph();
 

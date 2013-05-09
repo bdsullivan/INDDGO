@@ -37,7 +37,7 @@ public:
 	{
 		//SetUp is called before every test
 		LOG_INIT("test.log", NULL, 0);
-		creator.set_file_name("../data/1dc.128.txt");
+		creator.set_file_name("data/1dc.128.txt");
 		creator.set_graph_type("DIMACS");
 		mg = creator.create_mutable_graph();
 	}
@@ -99,7 +99,7 @@ TEST_F(GraphPropertyTest, testClique)
 
 TEST_F(GraphPropertyTest, testIsConnected)
 {
-	creator.set_file_name("../data/1et.64.txt");
+	creator.set_file_name("data/1et.64.txt");
 	creator.set_graph_type("DIMACS");
 	mg = creator.create_mutable_graph();
 
@@ -145,4 +145,3 @@ TEST_F(GraphPropertyTest, testIsPath)
 	EXPECT_FALSE(properties.is_path(mg, nbrs.front(), nbrs.back()));
 	EXPECT_GT(mg->get_num_edges(), 0);
 }
-
