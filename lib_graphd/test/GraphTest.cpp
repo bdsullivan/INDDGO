@@ -34,7 +34,8 @@ public:
 
     virtual void SetUp(){
         LOG_INIT("test.log", NULL, 0);
-        creator.set_file_name("../data/1dc.128.txt");
+        //creator.set_file_name("../data/1dc.128.txt");
+        creator.set_file_name("data/1dc.128.txt");
         creator.set_graph_type("DIMACS");
 		g = creator.create_graph();
     }
@@ -154,10 +155,3 @@ TEST_F(GraphTest, testComplement)
     EXPECT_EQ(96, d);
     EXPECT_FALSE(g->is_edge(108, 100));
 }
-
-
-
-
-
-
-
