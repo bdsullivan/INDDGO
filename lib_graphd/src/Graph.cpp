@@ -36,6 +36,9 @@ namespace Graph {
         this->graph_type = "Graph";
         this->next_label = 1;
         this->num_connected_components = 1;
+        this->simple = true;   //FIXME: check if this is correct behavior
+        this->canonical = true;
+        this->key = 0;
     }
 
     Graph::Graph(int n){

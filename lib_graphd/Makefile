@@ -3,6 +3,8 @@ include ../make.inc
 DOX_DIR = ./doc/
 DOXYFILE = ./Doxyfile
 
+.PHONY: test
+
 all:
 	cd src;	make all;
 
