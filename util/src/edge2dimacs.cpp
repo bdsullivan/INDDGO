@@ -71,6 +71,8 @@ int main(int argc, char **argv)
     Graph::GraphProperties prop;
     Graph::NewGraphReader ngr;
 
+    g = new Graph::Graph();
+
     fprintf(stderr,"g before: 0x%x\n", g);
     ngr.read_graph(g, argv[1], "Edge", false);
     fprintf(stderr,"g after: 0x%x\n", g);
