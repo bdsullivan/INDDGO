@@ -21,7 +21,6 @@
 
 #include "Log.h"
 #include "GraphCreatorFile.h"
-#include "MutableGraph.h"
 #include "GraphUtil.h"
 #include "Node.h"
 #include "VertexWeightedGraph.h"
@@ -32,7 +31,7 @@ class GraphUtilTest: public testing::Test
 {
 public:
 	Graph::GraphCreatorFile creator;
-	Graph::MutableGraph *mg;
+	Graph::Graph *mg;
 	Graph::GraphUtil util;
 
 	virtual void SetUp()

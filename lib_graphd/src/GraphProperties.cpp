@@ -75,6 +75,7 @@ namespace Graph {
             fatal_error("%s:  Graph must be in canonical form\n", __FUNCTION__);
         }
 
+        //FIXME: this will surely lead to 64 bit issues
         if(g->key == 1 << 31){
             // The key is big. Reset the key and zero out the adj_vec
             g->key = 0;

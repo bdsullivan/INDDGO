@@ -148,31 +148,6 @@ namespace Graph {
     }
 
     Graph *GraphCreatorFile::create_graph(){
-        Graph *g = new Graph();
-        GraphReader *gr = factory_rw->create_reader(graph_type);
-
-        try
-        {
-            gr->read_graph(file_name.c_str());
-            g->set_input_file(file_name);
-            g->set_degree(gr->get_degree());
-            g->set_nodes(gr->get_nodes());
-            g->set_num_edges(gr->get_num_edges());
-            g->set_num_nodes(gr->get_nodes().size());
-            g->set_capacity(gr->get_capacity());
-            g->set_next_label(gr->get_capacity() + 1);
-            g->set_graph_type(graph_type);
-        }
-        catch(GraphException& e)
-        {
-            delete gr;
-            delete g;
-            cerr << "exception caught: " << e.what() << endl;
-            const string desc("Can not create a graph\n");
-            throw GraphException(desc);
-        }
-
-        delete gr;
-        return g;
+        return GraphCreatorFile::create_mutable_graph();
     } // create_graph
 }
