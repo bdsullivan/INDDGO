@@ -99,6 +99,11 @@ namespace Graph {
         wmg->capacity = n;
         wmg->num_nodes = n;
 
+        //if(wmg->capacity > H->weight.size()){
+        //   FERROR("%s: too much capacity in wmg for H", __FUNCTION__);
+        //  throw GraphException("element is out of bounds\n");
+        //}
+
         for(int i = 0; i < wmg->capacity; i++){
             wmg->weight[i] = H->weight[i];
         }

@@ -50,32 +50,44 @@ namespace Graph {
  */
     int NewGraphReader::read_graph(Graph *g, const string filename, string type, bool read_vertex_weights){
         string t = str_to_up(type);
+        int retcode = -1;
         if("EDGE" == t){
+            retcode = NewGraphReader::read_edgelist(g, filename);
             if(read_vertex_weights){
-                cerr << "Error: cannot currently read vertex weights from edgelist" << endl;
-                return -1;
+                VertexWeightedGraph *vg;
+                vg = (VertexWeightedGraph *) g;
+                vg->weight.resize(vg->num_nodes, 1);
             }
-            return NewGraphReader::read_edgelist(g, filename);
         }
         else if("ADJMATRIX" == t){
+            retcode = NewGraphReader::read_adjmatrix(g, filename);
             if(read_vertex_weights){
-                cerr << "Error: cannot currently read vertex weights from adjaceny matrix" << endl;
-                return -1;
+                VertexWeightedGraph *vg;
+                vg = (VertexWeightedGraph *) g;
+                vg->weight.resize(vg->num_nodes, 1);
             }
-            return NewGraphReader::read_adjmatrix(g, filename);
         }
         else if("METIS" == t){
+            retcode = NewGraphReader::read_metis(g, filename);
             if(read_vertex_weights){
-                cerr << "Error: cannot currently read vertex weights from metis files" << endl;
-                return -1;
+                VertexWeightedGraph *vg;
+                vg = (VertexWeightedGraph *) g;
+                vg->weight.resize(vg->num_nodes, 1);
             }
-            return NewGraphReader::read_metis(g, filename);
+        } 
+        else if ("DIMACS" == t){
+            retcode = NewGraphReader::read_dimacs(g, filename, read_vertex_weights);
         }
         else {
             cerr << "Error: type " << type << " not currently supported" << endl;
             return -1;
         }
-        return 0;
+
+        g->set_input_file(filename);
+        g->set_graph_type(type);
+        g->resize_adj_vec(g->get_capacity());
+
+        return retcode;
     } // read_graph
 
 /**
@@ -230,6 +242,14 @@ namespace Graph {
                 }
 
                 g->add_vertices(n);
+
+                /* here we assume that we initialize all weights to 1 */
+                if(read_vertex_weights){
+                    VertexWeightedGraph *vg = (VertexWeightedGraph *)g;
+                    if((int)vg->weight.size() != n){
+                        vg->weight.resize(n, 1);
+                    }
+                }
 
                 break;
 

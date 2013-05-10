@@ -23,6 +23,7 @@
 #define GRAPHCREATORFILE_H_
 
 #include "GraphCreator.h"
+#include "NewGraphReader.h"
 #include "GraphReaderWriterFactory.h"
 #include <string>
 #include <vector>
@@ -43,6 +44,10 @@ public:
     virtual Graph *create_graph();
     virtual VertexWeightedGraph *create_vertex_weighted_graph();
     virtual Graph *create_mutable_graph();
+    /**
+     * Compatibility function, simply calls create_vertex_weighted_graph under the hood.  Deprecated.
+     * \return G new graph
+     */
     virtual VertexWeightedGraph *create_weighted_mutable_graph();
 
     std::string get_file_name() const;
