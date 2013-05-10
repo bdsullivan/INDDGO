@@ -384,7 +384,9 @@ namespace Graph {
                 if(j == 1){
                     //ignore self loops!
                     if(i != k){
-                        g->add_edge(i, k);
+                        if(k > i){  // assume we have already seen this edge
+                            g->add_edge(i, k);
+                        }
                         m++;
                     }
                 }
