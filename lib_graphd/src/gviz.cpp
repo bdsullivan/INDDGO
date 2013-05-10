@@ -26,8 +26,7 @@
  **/
 
 #include <iostream>
-#include <GraphReaderWriterFactory.h>
-#include <GraphWriter.h>
+#include "NewGraphWriter.h"
 #include <Log.h>
 #include <GraphCreator.h>
 #include <GraphCreatorFile.h>
@@ -43,17 +42,13 @@ int main(int argc, char **argv){
         return 0;
     }
     GraphCreator *gc;
-    GraphWriter *writer;
-    GraphReaderWriterFactory rwf;
+    NewGraphWriter writer;
     gc = new GraphCreatorFile(argv[1], "DIMACS");
-    VertexWeightedGraph *wmg = gc->create_vertex_weighted_graph();
-    writer = rwf.create_writer("graphviz");
-    writer->set_out_file_name(argv[2]);
-    writer->write_graph(wmg);
+    VertexWeightedGraph *vwg = gc->create_vertex_weighted_graph();
+    writer.write_graph(vwg, argv[2], "graphviz", false);
 
     LOG_CLOSE();
-    delete  gc;
-    delete writer;
+    delete gc;
     return 0;
 } // main
 

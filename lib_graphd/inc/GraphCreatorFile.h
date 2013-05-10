@@ -24,7 +24,6 @@
 
 #include "GraphCreator.h"
 #include "NewGraphReader.h"
-#include "GraphReaderWriterFactory.h"
 #include <string>
 #include <vector>
 
@@ -32,7 +31,6 @@ namespace Graph {
     class GraphCreatorFile : public GraphCreator
     {
 private:
-    GraphReaderWriterFactory *factory_rw;
     std::string file_name;
     std::string graph_type;
 

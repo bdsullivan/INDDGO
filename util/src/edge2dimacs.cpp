@@ -25,6 +25,7 @@
 #include "VertexWeightedGraph.h"
 #include "GraphException.h" 
 #include "NewGraphReader.h"
+#include "NewGraphWriter.h"
 
 using namespace std;
 
@@ -66,10 +67,9 @@ int main(int argc, char **argv)
     
     Graph::GraphCreatorFile *gcf;
 
-    Graph::GraphWriter *writer;
-    Graph::GraphReaderWriterFactory rwf;
     Graph::GraphProperties prop;
     Graph::NewGraphReader ngr;
+    Graph::NewGraphWriter writer;
 
     g = new Graph::Graph();
 
@@ -84,12 +84,10 @@ int main(int argc, char **argv)
     fprintf(stderr, "edges read in: %d nodes read in: %d\n", g->get_num_edges(), g->get_num_nodes());
 
     //reader->read_graph(g, argv[1]);
-    gcf = new Graph::GraphCreatorFile(argv[1], "Edge");
-   
-    writer = rwf.create_writer("DIMACS", "t");
-
-    writer->set_out_file_name(argv[2]);
-    writer->write_graph(g);
+    //gcf = new Graph::GraphCreatorFile(argv[1], "Edge");
+    //writer = rwf.create_writer("DIMACS", "t");
+    //writer->set_out_file_name(argv[2]);
+    writer.write_graph(g, argv[2], "DIMACS");
 
     return 0;
 }

@@ -25,6 +25,7 @@
 #include "VertexWeightedGraph.h"
 #include "GraphException.h" 
 #include "NewGraphReader.h"
+#include "NewGraphWriter.h"
 
 using namespace std;
 
@@ -63,32 +64,19 @@ int main(int argc, char **argv)
 
     
     Graph::GraphCreatorFile *gcf;
-    Graph::GraphWriter *writer;
-    Graph::GraphReaderWriterFactory rwf;
     Graph::GraphProperties prop;
     Graph::NewGraphReader ngr;
+    Graph::NewGraphWriter writer;
 
     g = new Graph::Graph();
     //fprintf(stderr,"mg number of nodes (before): %d\n", mg->get_num_nodes());
     //fprintf(stderr,"mg before: 0x%x\n", mg);
     ngr.read_graph(g, argv[1], "MeTiS", false);
-    fprintf(stderr,"mg after: 0x%x\n", g);
-    fprintf(stderr,"mg number of nodes (after) : %d\n", g->get_num_nodes());
-
-
     // if we don't get rid of duplicate edges, bad things happen
     // when trying to output the graph
     //prop.make_simple(g);
-
     fprintf(stderr, "edges read in: %d nodes read in: %d\n", g->get_num_edges(), g->get_num_nodes());
-
-    //reader->read_graph(g, argv[1]);
-    gcf = new Graph::GraphCreatorFile(argv[1], "METIS");
-   
-    writer = rwf.create_writer("DIMACS", "t");
-
-    writer->set_out_file_name(argv[2]);
-    writer->write_graph(g);
+    writer.write_graph(g, argv[2], "DIMACS");
 
     return 0;
 }

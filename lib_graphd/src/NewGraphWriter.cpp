@@ -20,16 +20,32 @@
  */
 
 #include "NewGraphWriter.h"
+#include "Util.h"
 
 using namespace std;
 
 namespace Graph {
     NewGraphWriter::NewGraphWriter(){
+        this->shuffle = false;
+        this->shuffle_seed = 42;
     }
 
     NewGraphWriter::~NewGraphWriter(){
     }
 
+    /**
+     * \param[in] shuf bool, shuffle graphs out from this GraphWriter
+     */
+    void NewGraphWriter::set_shuffle(bool shuf){
+        this->shuffle = shuf;
+    }
+
+    /**
+     * \param[in] shuf bool, shuffle graphs out from this GraphWriter
+     */
+    void NewGraphWriter::set_shuffle_seed(int seed){
+        this->shuffle_seed = seed;
+    }
     /**
      * \return 0 on success, nonzero on failure
      * \param[in] g Pointer to the graph to be written
@@ -37,7 +53,7 @@ namespace Graph {
      * \param[in] type format of the file to write
      * \param[in] write_vertex_weights whether to write vertex weights to the output file
      */
-    int NewGraphWriter::write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights){
+    int NewGraphWriter::write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights, bool shuffle){
         string t = str_to_up(type);
         if(t == "ADJMATRIX"){
             write_adjmatrix(g, filename);
@@ -141,10 +157,15 @@ namespace Graph {
         int num_edges = g->get_num_edges();
         vector<Node> nodes = g->get_nodes();
 
-        if(perm.size() != capacity){
-            perm.clear();
-            for(int i = 0; i < capacity; i++){
-                perm.push_back(i);
+        perm.resize(capacity);
+        for(int i = 0; i < capacity; i++){
+            perm.push_back(i);
+        }
+
+        if(this->shuffle){
+            int s = this->shuffle_seed % 97;
+            for(int i = 0; i < s; i++){
+                random_shuffle(perm.begin(), perm.end());
             }
         }
 

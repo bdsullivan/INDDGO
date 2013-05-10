@@ -23,6 +23,7 @@
 #include "Log.h"
 #include "VertexWeightedGraph.h"
 #include "GraphException.h" 
+#include "NewGraphWriter.h"
 
 using namespace std;
 
@@ -114,16 +115,14 @@ int main(int argc, char **argv)
 	}
     
     Graph::GraphCreatorFile creator;
-    Graph::GraphWriter *writer;
-    Graph::GraphReaderWriterFactory rwf;
     Graph::GraphProperties prop;
+    Graph::NewGraphWriter writer;
 
-    writer = rwf.create_writer("DIMACS", "t");
+    //writer = rwf.create_writer("DIMACS", "t");
 
     DEBUG("Graph generation loop\n");
     DEBUG("n : %d k: %d\n", ktree_n, ktree_p);
-    for(i = 0; i < t; i++)
-    {
+    for(i = 0; i < t; i++) {
 	    // Create the Ktree
 	    //H = new Graph::Graph(ktree_n, ktree_k);
         H = creator.initialize_ktree(ktree_n, ktree_k);
@@ -137,12 +136,14 @@ int main(int argc, char **argv)
 	    sprintf(filename, "%s.%d.%d.%d_%d.dimacs", prefix, ktree_n,ktree_k,ktree_p, i);
         print_message(0,"Writing file %s\n",filename);
 
-        writer->set_out_file_name(filename);
+        //writer->set_out_file_name(filename);
 
-        if (random)
-            writer->shuffle(G, seed);
+        if (random) {
+            writer.set_shuffle(true);
+            writer.set_shuffle_seed(seed);
+        }
 
-        writer->write_graph(G);
+        writer.write_graph(G,filename, "DIMACS");
 
  	    delete G; 
 	    delete H; 

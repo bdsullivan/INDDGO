@@ -23,7 +23,6 @@
 #define GRAPHCREATOR_H_
 
 #include "Graph.h"
-#include "Graph.h"
 #include "VertexWeightedGraph.h"
 
 using namespace std;

@@ -23,7 +23,7 @@ inddgo-info@googlegroups.com
 #include "TreeDecomposition.h"
 #include "weighted_ind_set.h"
 #include "Debug.h"
-#include "DIMACSGraphWriter.h"
+#include "NewGraphWriter.h"
 
 void usage(const char *s)
 {
@@ -2611,10 +2611,9 @@ void create_WIS_graph(DP_info *info, Graph::VertexWeightedGraph *&G)
 
 	Graph::GraphProperties properties;
 	Graph::GraphEOUtil eoutil;
-	Graph::GraphWriter *writer;
-	Graph::GraphReaderWriterFactory factory;
+	Graph::NewGraphWriter writer;
 
-	writer = factory.create_writer("DIMACS");
+	//writer = factory.create_writer("DIMACS");
 	// Put the input graph in canonical form for the tests
 	properties.make_canonical(G);
 	// Make sure there is only 1 component in the graph!
@@ -2639,8 +2638,8 @@ void create_WIS_graph(DP_info *info, Graph::VertexWeightedGraph *&G)
 					info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
 				sprintf(comp_file, "%s_%d_node_component_%d.comp",
 					info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
-				writer->set_out_file_name(temp_file);
-				writer->write_graph(*cc);
+				//writer->set_out_file_name(temp_file);
+				writer.write_graph(*cc, temp_file, "DIMACS", true);
 
 				normalize_DIMACS_file(temp_file, comp_file);
 				remove(temp_file);
@@ -2690,8 +2689,6 @@ void create_WIS_graph(DP_info *info, Graph::VertexWeightedGraph *&G)
 			C.pop_front();
 		}
 	}
-
-	delete writer;
 
 }
 

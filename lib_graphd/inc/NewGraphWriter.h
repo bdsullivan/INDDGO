@@ -47,8 +47,19 @@ public:
     /**
      * \brief Writes a graph of the specified type
      */
-    int write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights);
+    int write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights=false, bool shuffle=false);
+
+    /**
+     * \brief Sets whether to shuffle output graphs (for formats where we support it)
+     */
+    void set_shuffle(bool shuf);
+    /**
+     * \brief Sets the seed for shuffling
+     */
+    void set_shuffle_seed(int seed);
 private:
+    bool shuffle;
+    int shuffle_seed;
     /**
      * \brief Writes a given graph to file in the METIS format
      */

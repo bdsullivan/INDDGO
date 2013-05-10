@@ -27,17 +27,14 @@
 
 namespace Graph {
     GraphCreatorFile::GraphCreatorFile(){
-        this->factory_rw = new GraphReaderWriterFactory();
     }
 
     GraphCreatorFile::GraphCreatorFile(string file, string graphType){
-        this->factory_rw = new GraphReaderWriterFactory();
         this->file_name = file;
         this->graph_type = graphType;
     }
 
     GraphCreatorFile::~GraphCreatorFile(){
-        delete this->factory_rw;
     }
 
     string GraphCreatorFile::get_file_name() const {
