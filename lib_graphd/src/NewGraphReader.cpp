@@ -74,8 +74,8 @@ namespace Graph {
                 vg = (VertexWeightedGraph *) g;
                 vg->weight.resize(vg->num_nodes, 1);
             }
-        } 
-        else if ("DIMACS" == t){
+        }
+        else if("DIMACS" == t){
             retcode = NewGraphReader::read_dimacs(g, filename, read_vertex_weights);
         }
         else {

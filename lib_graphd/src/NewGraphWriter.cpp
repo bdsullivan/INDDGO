@@ -46,6 +46,7 @@ namespace Graph {
     void NewGraphWriter::set_shuffle_seed(int seed){
         this->shuffle_seed = seed;
     }
+
     /**
      * \return 0 on success, nonzero on failure
      * \param[in] g Pointer to the graph to be written

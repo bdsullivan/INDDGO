@@ -27,7 +27,7 @@
 #define GD_STAT_MED 3 // median
 #define GD_STAT_COUNT 4 //number of vertices with non-negative score
 
-class int_double 
+class int_double
 {
 friend std::ostream &operator<<(std::ostream &, const int_double &);
 public:

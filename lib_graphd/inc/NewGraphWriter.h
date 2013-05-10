@@ -47,7 +47,7 @@ public:
     /**
      * \brief Writes a graph of the specified type
      */
-    int write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights=false, bool shuffle=false);
+    int write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights = false, bool shuffle = false);
 
     /**
      * \brief Sets whether to shuffle output graphs (for formats where we support it)
@@ -76,7 +76,6 @@ private:
      * \brief Writes a given graph to file in GraphViz format
      */
     int write_graphviz(Graph *g, const string filename);
-
     };
 }
 

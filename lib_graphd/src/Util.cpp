@@ -25,7 +25,6 @@
 #include <string>
 #include <sstream>
 
-
 /*BDS - added to get memory highwater mark*/
 int parseLine(char *line){
     int i = strlen(line);
@@ -847,3 +846,4 @@ void split(const std::string& s, char sep, vector<int>& v){
         k = -1;
     }
 }     // split
+
