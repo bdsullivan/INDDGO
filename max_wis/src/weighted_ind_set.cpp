@@ -173,7 +173,7 @@ int list_ind_sets(TDTree *T, int k, list<int> *bag_subset,
 	list<int>::iterator ii, jj, kk;
 	bigint_t current_mask(T->num_mask_words);
 	list<bigint_t*>::iterator LLit;
-	vector<int>::iterator vv;
+
 	list<TDSolution*>::iterator ss, tt;
 	vector<int> pos_vec(bag_subset->size(), -1);
 
@@ -615,7 +615,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 {
 	int i, j, w = (int) T->tree_nodes[k]->bag.size();
 	list<int>::iterator ii, jj;
-	vector<int>::iterator uu, vv;
+
 	bigint_t current_mask(T->num_mask_words);
 	list<bigint_t*>::iterator current_mask_it;
 	list<TDSolution*>::iterator ss, tt;
@@ -634,7 +634,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 	int num_ind_sets = 0;
 	TDSolution *hash_ptr, temp_set(T->num_mask_words);
 
-	clock_t loop_end, loop_start = clock();
+	clock_t loop_start = clock();
 	while (current_mask.words[two_w_word] < two_pow_w.words[two_w_word])
 	{
 		is_independent = true;
@@ -810,7 +810,7 @@ int compute_nonnice_table_standard(TDTree *T, int k)
 			++current_mask;
 		}
 	}
-	loop_end = clock();
+	//loop_end = clock();
 
 	int table_size = HASH_COUNT(T->tree_nodes[k]->hash_table);
 	T->info->total_pc_table_entries += (unsigned long long) table_size;
@@ -834,7 +834,7 @@ int compute_nonnice_table_split_bag(TDTree *T, int k)
 	bigint_t current_mask(T->num_mask_words);
 	list<bigint_t*>::iterator current_mask_it;
 	vector<int> I(w), D(w),	children(num_nbrs - 1);
-	vector<int>::iterator uu, vv;
+
 	list<TDSolution*>::iterator ss, tt;
 
 	// Create a vector of the children
@@ -1248,7 +1248,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 		bool is_independent, has_bit;
 
 		TDSolution *hash_ptr, temp_set(T->num_mask_words);
-		clock_t loop_end, loop_start = clock();
+		clock_t loop_start = clock();
 
 		while (current_mask.words[two_w_word] < two_pow_w.words[two_w_word])
 		{
@@ -1369,7 +1369,7 @@ int compute_nonnice_table_async(TDTree *T, int k)
 				++current_mask;
 			}
 		}
-		loop_end = clock();
+		//loop_end = clock();
 
 		T->info->aux_info[parent] = num_ind_sets;
 		// finish complete table creation and computation for k's parent.
@@ -1529,7 +1529,7 @@ int compute_ind_sets_nice(TDTree *T, int k)
 	list<bigint_t*>::iterator current_mask_it;
 	vector<int> I(w);
 	vector<int> D(w);
-	vector<int>::iterator uu, vv;
+
 	list<TDSolution*>::iterator ss, tt;
 
 	int parent = T->tree_nodes[k]->adj.front();
@@ -1660,7 +1660,7 @@ int compute_introduce_table(TDTree *T, int k)
 		k);
 
 	int i, j, v = GD_UNDEFINED, v_pos;
-	int parent = GD_UNDEFINED, child = GD_UNDEFINED;
+	int child = GD_UNDEFINED;
 	TDSolution *new_set = NULL, *new_v_set = NULL;
 	list<int>::iterator ii, jj, kk;
 
@@ -1670,7 +1670,7 @@ int compute_introduce_table(TDTree *T, int k)
 	list<TDSolution *>::iterator ss;
 
 	// First find the parents and children and the difference in the bags
-	parent = T->tree_nodes[k]->adj.front();
+	//parent = T->tree_nodes[k]->adj.front();
 	child = T->tree_nodes[k]->adj.back();
 
 	if (T->tree_nodes[k]->bag.size() <= T->tree_nodes[child]->bag.size())
@@ -1781,13 +1781,13 @@ int compute_forget_table(TDTree *T, int k)
 		fatal_error("Tree node %d does not appear to be a forget node!\n", k);
 	}
 	int i, v = GD_UNDEFINED;
-	int parent = GD_UNDEFINED, child = GD_UNDEFINED;
+	int child = GD_UNDEFINED;
 	list<int>::iterator ii, jj, kk;
 	vector<int> I(T->G->get_capacity());
 	vector<int>::iterator vv;
 	list<TDSolution *>::iterator ss;
 	// First find the parents and children and the difference in the bags
-	parent = T->tree_nodes[k]->adj.front();
+	//parent = T->tree_nodes[k]->adj.front();
 	child = T->tree_nodes[k]->adj.back();
 
 	// Compute the child difference
@@ -1892,7 +1892,7 @@ int compute_join_table(TDTree *T, int k)
 
 	int j, child1 = GD_UNDEFINED, child2 = GD_UNDEFINED;
 	list<int>::iterator ii;
-	vector<int>::iterator vv;
+
 	list<TDSolution *>::iterator ss;
 
 	// First get the 2 children
@@ -2130,7 +2130,7 @@ int compute_weighted_ind_set_table(TDTree *T, int k)
 * If solved, the solution is written to <DIMACS_file>.IND_SET.sol.
 */
 void write_ind_set_model(const char *DIMACS_file, const char *model_file,
-	Graph::WeightedMutableGraph *G)
+	Graph::VertexWeightedGraph *G)
 {
 	int i, j;
 	char sol_file[200];
@@ -2255,7 +2255,7 @@ void compute_contribution(TDTree *T, int k, bigint_t *mask,
 			Graph::GraphProperties properties;
 
 			if (properties.is_independent_set(
-				(Graph::WeightedMutableGraph *) (T->G), &missing_set, &val))
+				(Graph::VertexWeightedGraph *) (T->G), &missing_set, &val))
 				print_message(0, "Missing set is independent with weight %f\n",
 				val);
 			else
@@ -2296,7 +2296,7 @@ void record_children_solutions(TDTree *T, int k, bigint_t *mask,
 	// kset will be the actual subset of nodes from k's bag
 	list<int> kset;
 	vector<int> intersection(T->tree_nodes[k]->bag.size(), -1);
-	vector<int>::iterator vv, ww;
+	vector<int>::iterator vv;
 	vector<int> pos_vec(T->G->get_capacity() + 1, -1);
 	// pos_vec[j]=i means that j is the i'th entry in k's bag
 
@@ -2579,7 +2579,7 @@ int reconstruct_solution(TDTree *T, list<int> *optimal_solution,
 * Populates the provided Graph structure with the necessary information to 
 * do the WIS calculation.
 */
-void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
+void create_WIS_graph(DP_info *info, Graph::VertexWeightedGraph *&G)
 {
 	int i;
 
@@ -2622,11 +2622,11 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 	{
 		print_message(0,
 			"WIS only runs on connected graphs.  This graph has more than one component!\n");
-		list<Graph::WeightedMutableGraph *> C;
+		list<Graph::VertexWeightedGraph *> C;
 
 		C = creator.create_all_components(G, true);
 		print_message(0, "Found %d components\n", C.size());
-		list<Graph::WeightedMutableGraph *>::iterator cc;
+		list<Graph::VertexWeightedGraph *>::iterator cc;
 		int comp_number = 0;
 		char temp_file[100], comp_file[100];
 		int max_size = -1;
@@ -2700,7 +2700,7 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 * Creates a tree decomposition for the provided tree and the DP options
 * contained in DP_info.
 */
-void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
+void create_tree_decomposition(DP_info *info, Graph::VertexWeightedGraph *G,
 	TDTree **T)
 {
 	create_tree_decomposition(info, G, T, true);
@@ -2710,7 +2710,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 * Creates a tree decomposition for the provided tree and the DP options
 * contained in DP_info.
 */
-void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
+void create_tree_decomposition(DP_info *info, Graph::VertexWeightedGraph *G,
 	TDTree **T, bool suppress_timing)
 {
 	// Create a copy of G to do the triangulation and elim order
@@ -2721,7 +2721,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 		return;
 	}
 
-	Graph::WeightedMutableGraph H = *G;
+	Graph::VertexWeightedGraph H = *G;
 
 	//Run (optional) lower bound heuristics and print information
 	if(info->lower_bounds)

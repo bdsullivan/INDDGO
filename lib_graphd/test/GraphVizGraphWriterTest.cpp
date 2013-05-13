@@ -35,7 +35,7 @@ public:
     virtual void SetUp(){
  		//SetUp is called before every test
         LOG_INIT("test.log", NULL, 0);
-        creator.set_file_name("../data/1dc.128.txt");
+        creator.set_file_name("data/1dc.128.txt");
         creator.set_graph_type("DIMACS");
 		g = creator.create_graph();
     }
@@ -50,7 +50,7 @@ public:
 
 TEST_F(GraphVizGraphWriterTest, testWriteGraph)
 {
-	string outfile("../data/1dc.128.gviz");
+	string outfile("data/1dc.128.gviz");
 	gviz_writer = new Graph::GraphVizGraphWriter(outfile);
 	gviz_writer->write_graph(g);
 }

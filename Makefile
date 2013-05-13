@@ -24,10 +24,31 @@ include make.inc
 MADLIB = ./madness/deploy/lib/libMADworld.a
 
 .PHONY : deps all wis viz util cleandeps cleanwis cleanviz cleanmisc clean cleangraph cleantree testgraph testtree cleanutil
-all: wis viz util 
+#all: wis viz util doc 
+all: wis viz util
 deps: $(MADLIB)
 libs: graph tree ptree
 test: testgraph testtree
+
+#----------------------------------------------------------------
+#  Targets for documentation
+#
+doc:
+	test -d $(GRAPH)
+	@($(CD) "$(GRAPH)";\
+	$(MAKE) doc;\
+	$(CD) ..;)
+	test -d $(TREE)
+	@($(CD) "$(TREE)";\
+	$(MAKE) doc;\
+	$(CD) ..;)
+ifeq ($(HAS_MADNESS), 1)
+	test -d $(PTREE)
+	@($(CD) "$(PTREE)";\
+	$(MAKE) doc;\
+	$(CD) ..;)
+endif
+
 
 #----------------------------------------------------------------
 #  Targets for decomposition libraries
@@ -190,8 +211,12 @@ cleanutil:
 	  $(MAKE) clean;\
 	  $(CD) ..;)
 
-
-
-
-
-
+clean_doc:
+	test -d $(SRC_DIR)
+	@( \
+	for f in $(GRAPH) $(PTREE) $(TREE) ; \
+	do \
+		$(CD) "$$f"; \
+		$(MAKE) clean_doc;\
+		$(CD) ..; \
+	done );

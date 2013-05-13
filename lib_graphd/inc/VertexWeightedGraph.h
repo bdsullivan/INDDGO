@@ -19,27 +19,28 @@
 
  */
 
-#ifndef MUTABLEGRAPH_H_
-#define MUTABLEGRAPH_H_
+#ifndef VERTEXWEIGHTEDGRAPH_H_
+#define VERTEXWEIGHTEDGRAPH_H_
 
 #include "Graph.h"
 
 namespace Graph {
-    class Graph : virtual public Graph
-    {
+    class VertexWeightedGraph : public Graph {
 protected:
-    bool simple;
-    bool canonical;
-    int key;
-    // For CRS format, a la Metis
-    vector<int> xadj;
-    vector<int> adjncy;
-    vector<int> adj_vec;
-
+    vector<int> weight;
 public:
-    Graph();
-    Graph(int n);
-    virtual ~Graph();
+    VertexWeightedGraph();
+    VertexWeightedGraph(int n);
+    virtual ~VertexWeightedGraph();
+    /* FIXME: move this function to Graph */
+    VertexWeightedGraph& operator=(const VertexWeightedGraph& wmg);
+    /* FIXME: move this function to Graph */
+    void write_largest_component(std::string filetype, std::string filename);
+
+    // things dealing with weights
+    vector<int> get_weight() const;
+    int get_vertex_weight(int k);
+    void set_weight(vector<int> weights);
 
     friend class GraphUtil;
     friend class GraphProperties;
@@ -49,4 +50,4 @@ public:
     };
 }
 
-#endif /* MUTABLEGRAPH_H_ */
+#endif /* VERTEXWEIGHTEDGRAPH_H_ */

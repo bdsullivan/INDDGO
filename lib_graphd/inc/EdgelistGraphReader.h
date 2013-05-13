@@ -19,25 +19,36 @@
 
  */
 
-#ifndef GRAPHINTERFACE_H_
-#define GRAPHINTERFACE_H_
+#ifndef EdgelistGRAPHREADER_H_
+#define EdgelistGRAPHREADER_H_
 
-#include <string>
+#include "GraphReader.h"
+#include "Node.h"
+
 #include <vector>
 
+using namespace std;
+
 namespace Graph {
-    class GraphInterface
-    {
-    virtual bool is_edge(int i, int j) const = 0;
-    virtual int get_num_nodes() const = 0;
-    virtual int get_num_edges() const = 0;
-    virtual std::string get_graph_type() const = 0;
-    virtual int get_capacity() const = 0;
-    virtual int get_degree(int v) const = 0;
-    virtual std::vector <int> get_degree() const = 0;
-    virtual int *serialize() = 0;
-    virtual void deserialize(int *buffer) = 0;
+    class EdgelistGraphReader : public GraphReader {
+private:
+    vector<int> weights;
+    vector<int> degree;
+    vector<Node> nodes;
+    int num_edges;
+    int capacity;
+
+public:
+    EdgelistGraphReader();
+    virtual ~EdgelistGraphReader();
+    virtual void read_graph(const char *filename);
+    virtual vector<int> get_degree();
+    virtual vector<Node> get_nodes();
+    virtual int get_num_edges() const;
+    virtual vector<int> get_weights();
+    virtual int get_capacity() const;
+    virtual void set_capacity(int capacity);
     };
 }
 
-#endif /* GRAPHINTERFACE_H_ */
+#endif /* EdgelistGRAPHREADER_H_ */
