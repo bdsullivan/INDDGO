@@ -62,14 +62,11 @@ int main(int argc, char **argv){
     int lbt[] = {
         GD_MAX_MIN_DEGREE_LB, GD_MCS_LB
     };
-    const char *tdtype[] = {
-        "Super-E-Tree", "Gavril"
-    }; /*,"Bodlaender-Koster", "Nice"};*/                                               //Edited to speed up computations
-    const char *elimtype[] = {
-        "AMD", "MetisNodeND", "MetisMultMinD"
-    };
+    const char *tdtype[] = { "Super-E-Tree", "Gavril" ,"Bodlaender-Koster", "Nice"};
+    const char *elimtype[] = { "AMD", "MetisNodeND", "MetisMultMinD", "MinFill", "MCS" };
     bool lower_bounds = false;
     bool upper_bounds = true;
+    bool all_methods = false;
 
     vector<int> td_types(tdt, tdt + sizeof(tdt) / sizeof(tdt[0]));
     vector<int> elim_types(et, et + sizeof(et) / sizeof(et[0]));
@@ -85,14 +82,28 @@ int main(int argc, char **argv){
 
     //process arguments
     int c;
-    while((c = getopt (argc, argv, "hlLg:s:o:t:")) != -1){
+    while((c = getopt (argc, argv, "hlLag:s:o:t:")) != -1){
         switch(c)
         {
         case 'h':
             usage();
             return 0;
         case 'L':
+            if(all_methods){
+                cerr << "Error: cannot specify both -L and -a options" << endl;
+                exit(1);
+            }
             upper_bounds = false;
+            lower_bounds = true;
+            break;
+        case 'a':
+            if(!upper_bounds){
+                cerr << "Error: cannot specify both -L and -a options" << endl;
+                exit(1);
+            }
+            all_methods = true;
+            lower_bounds = true;
+            break;
         case 'l':
             lower_bounds = true;
             break;
@@ -138,6 +149,14 @@ int main(int argc, char **argv){
     std::ostream outStream(cout.rdbuf());
     std::stringstream sstm;
     int td_id;
+
+    /* Add methods to the stack if -a was passed */
+    if(all_methods) {
+        td_types.push_back(TD_BK);
+        td_types.push_back(TD_NICE);
+        elim_types.push_back(GD_MIN_FILL);
+        elim_types.push_back(GD_MCS);
+    }
 
     /*initialize log files if needed*/
     int pid;

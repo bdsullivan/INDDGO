@@ -28,7 +28,7 @@ all: $(PKT_EXE) $(STATS_EXE) $(E2D_EXE) $(M2D_EXE)
 $(PKT_EXE): $(PKT_OBJ) 
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(STATS_EXE): $(STATS_OBJ) 
+$(STATS_EXE): $(STATS_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 $(E2D_EXE): $(E2D_OBJ)  ../lib/libgraphd.a

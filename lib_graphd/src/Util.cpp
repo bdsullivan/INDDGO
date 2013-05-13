@@ -93,18 +93,17 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
     min_flag = false;
     max_color = 0;
     min_color = 0;
-    bool pound_flag = false;
 
     while(k_core_input.good()){
         string line;
         getline(k_core_input,line);
 
+        cerr << "Got color line: " << line << endl;
         if(line.substr(0,1) == "#"){
-            pound_flag = true;
             if(strcmp(line.substr(1,3).c_str(),"max") == 0){
                 size_t pos1 = line.find(" ");
                 size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
-                //cout<<"p1max: "<<pos1<<" p2max: "<<pos2<<"\n";
+                cout<<"p1max: "<<pos1<<" p2max: "<<pos2<<"\n";
 
                 max_color = atof(line.substr(pos1 + 1,pos2 + 1).c_str());
                 max_flag = true;
@@ -113,14 +112,12 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
             if(strcmp(line.substr(1,3).c_str(),"min") == 0){
                 size_t pos1 = line.find(" ");
                 size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
-                //cout<<"p1: "<<pos1<<" p2: "<<pos2<<"\n";
 
                 min_color = atof(line.substr(pos1 + 1,pos2 + 1).c_str());
                 min_flag = true;
             }
         }
-        else if(pound_flag){
-            pound_flag = false;
+        else if(line.length() != 0){
             size_t pos1 = 0;
             size_t pos2 = 0;
             size_t end = line.find_last_not_of("\t\f\v\n\r ");
@@ -132,11 +129,7 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
                 color_vector.push_back(atof(line.substr(pos1,pos2).c_str()));
 
                 pos1 = pos2;
-                //cout<<count<<"pos: "<<pos1<<" "<<pos2<<"\n";
             }
-        }
-        else {
-            pound_flag = false;
         }
     }
 
@@ -343,7 +336,7 @@ void score_sort(list<int> *mylist, vector<int> *scores){
  * we can allocate correctly sized data structures.
  */
 void get_DIMACS_dimensions(const char *DIMACS_file, int *n, int *m){
-    char line[100], format[100];
+    char line[100], format[100], x;
     int retval;
     FILE *in;
 
@@ -384,6 +377,7 @@ void get_DIMACS_dimensions(const char *DIMACS_file, int *n, int *m){
 
             fclose(in);
             return;
+            break;
 
         case 'c':
             // Comment line - skip and move on
@@ -407,7 +401,7 @@ void get_DIMACS_dimensions(const char *DIMACS_file, int *n, int *m){
             break;
         }        // end switch
                  // Advance to next line if there is format at the end of it
-        while(!feof(in) && (getc(in)) != '\n'){
+        while(!feof(in) && (x = getc(in)) != '\n'){
             ;
         }
     }    // end while
@@ -569,7 +563,7 @@ int read_SCOTCH_ordering_file(const char *ordering_file, vector<int> *ordering){
  * the relabeling and writes to new_file in DIMACS format.
  */
 void normalize_DIMACS_file(const char *DIMACS_file, const char *new_file){
-    char line[100], format[100];
+    char line[100], format[100], x;
     int i,j,m,n,retval, max_label = -1;
     FILE *in;
     bool has_zero = false;
@@ -652,7 +646,7 @@ void normalize_DIMACS_file(const char *DIMACS_file, const char *new_file){
             break;
         }        // end switch
                  // Advance to next line if there is format at the end of it
-        while(!feof(in) && (getc(in)) != '\n'){
+        while(!feof(in) && (x = getc(in)) != '\n'){
             ;
         }
     }    // end while
@@ -707,7 +701,7 @@ void normalize_DIMACS_file(const char *DIMACS_file, const char *new_file){
             break;
         }        // end switch
                  // Advance to next line if there is format at the end of it
-        while(!feof(in) && (getc(in)) != '\n'){
+        while(!feof(in) && (x = getc(in)) != '\n'){
             ;
         }
     }    // end while
@@ -786,7 +780,7 @@ void normalize_DIMACS_file(const char *DIMACS_file, const char *new_file){
             break;
         }        // end switch
                  // Advance to next line if there is format at the end of it
-        while(!feof(in) && (getc(in)) != '\n'){
+        while(!feof(in) && (x = getc(in)) != '\n'){
             ;
         }
     }    // end while
