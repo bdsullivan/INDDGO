@@ -19,22 +19,25 @@
 
  */
 
-#ifndef WEIGHTEDGRAPH_H_
-#define WEIGHTEDGRAPH_H_
+#ifndef VERTEXWEIGHTEDGRAPH_H_
+#define VERTEXWEIGHTEDGRAPH_H_
 
 #include "Graph.h"
-using namespace std;
 
 namespace Graph {
-    class WeightedGraph : virtual public Graph
-    {
+    class VertexWeightedGraph : public Graph {
 protected:
     vector<int> weight;
-
 public:
-    WeightedGraph();
-    WeightedGraph(int n);
-    virtual ~WeightedGraph();
+    VertexWeightedGraph();
+    VertexWeightedGraph(int n);
+    virtual ~VertexWeightedGraph();
+    /* FIXME: move this function to Graph */
+    VertexWeightedGraph& operator=(const VertexWeightedGraph& wmg);
+    /* FIXME: move this function to Graph */
+    void write_largest_component(std::string filetype, std::string filename);
+
+    // things dealing with weights
     vector<int> get_weight() const;
     int get_vertex_weight(int k);
     void set_weight(vector<int> weights);
@@ -47,4 +50,4 @@ public:
     };
 }
 
-#endif /* WEIGHTEDGRAPH_H_ */
+#endif /* VERTEXWEIGHTEDGRAPH_H_ */

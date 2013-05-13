@@ -28,7 +28,7 @@ static void *write_file(void *a)
 {
     Graph::GraphWriter *writer;
     Graph::GraphReaderWriterFactory factory;
-    Graph::WeightedMutableGraph *g;
+    Graph::VertexWeightedGraph *g;
 
     ORD *ord = reinterpret_cast<ORD*>(a);
     if (!ord->is_original())

@@ -45,8 +45,8 @@ class PTD: public WorldObject<PTD>
 
 	vector<int> ordering;
     vector<int> position;
-    Graph::WeightedMutableGraph G;
-    Graph::WeightedMutableGraph H;
+    Graph::VertexWeightedGraph G;
+    Graph::VertexWeightedGraph H;
 	int width;
     double xtime;
     Graph::GraphEOUtil eoutil;
@@ -59,7 +59,7 @@ class PTD: public WorldObject<PTD>
     MutexFair tlock;
     ofstream fw;
 
-    PTD(World& world, Graph::WeightedMutableGraph g);
+    PTD(World& world, Graph::VertexWeightedGraph g);
 	virtual ~PTD();
 
     int owner(int i);

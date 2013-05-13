@@ -31,16 +31,16 @@ CXXFLAGS = $(INCLUDES) -g
 INCLUDES = -I../inc -I. -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
 LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib $(INDDGO_LIB) $(MPILIB_DIR)
 LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest -lgtest_main $(METIS_LIB) 
-LFLAGS = $(CFLAGS)
+LFLAGS = -g -O0
 
 #----changes are below this line----------------------------------------------
 
 #EXECUTABLES = $(LIBGTEST) testDimacsReader testGraphReader testGraphCreatorFile 
-EXECUTABLES = testDimacsReader testGraphReader testGraphCreatorFile \
-testGraphReaderWriterFactory testGraph testWeightedGraph testMutableGraph \
-testWeightedMutableGraph testAdjMatrixGraphWriter testAdjMatrixGraphReader \
-testDIMACSGraphWriter testGraphVizGraphWriter testGraphProperty testGraphUtil\
-testMetisGraphWriter testMetisGraphReader
+EXECUTABLES = bin/testDimacsReader bin/testGraphReader bin/testGraphCreatorFile \
+bin/testGraphReaderWriterFactory bin/testGraph bin/testWeightedGraph  \
+bin/testVertexWeightedGraph bin/testAdjMatrixGraphWriter bin/testAdjMatrixGraphReader \
+bin/testDIMACSGraphWriter bin/testGraphVizGraphWriter bin/testGraphProperty bin/testGraphUtil\
+bin/testMetisGraphWriter bin/testMetisGraphReader
 
 ifeq ($(HAS_PARMETIS), 1)
 EXECUTABLES = $(EXECUTABLES) testParMetis testGraphEOUtil
@@ -48,72 +48,72 @@ endif
 
 SRC=DIMACSReaderTest.cpp GraphReaderTest.cpp GraphCreatorFileTest.cpp \
 GraphReaderWriterFactoryTest.cpp GraphTest.cpp WeightedGraphTest.cpp MutableGraphTest.cpp\
-WeightedMutableGraphTest.cpp AdjMatrixGraphWriterTest.cpp AdjMatrixGraphReaderTest.cpp\
+VertexWeightedGraphTest.cpp AdjMatrixGraphWriterTest.cpp AdjMatrixGraphReaderTest.cpp\
 DIMACSGraphWriterTest.cpp GraphVizGraphWriterTest.cpp GraphPropertyTest.cpp\
 GraphUtilTest.cpp GraphEOUtilTest.cpp MetisGraphWriterTest.cpp MetisGraphReaderTest.cpp\
 ParmetisTest.cpp
 
 ifeq ($(HAS_GTEST), 1)
 
-all : ${EXECUTABLES}
+all: ${EXECUTABLES}
 
 .cpp.o:
-	$(CXX) $(INCLUDES) $(CFLAGS) -c $<
+	$(CXX) $(INCLUDES) $(CFLAGS) -O0 -c $<
 
-testDimacsReader: DIMACSReaderTest.o 
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testDimacsReader: DIMACSReaderTest.o 
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testGraphReader: GraphReaderTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testGraphReader: GraphReaderTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testGraphCreatorFile: GraphCreatorFileTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testGraphCreatorFile: GraphCreatorFileTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testGraphReaderWriterFactory: GraphReaderWriterFactoryTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testGraphReaderWriterFactory: GraphReaderWriterFactoryTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testGraph: GraphTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testGraph: GraphTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testWeightedGraph: WeightedGraphTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testWeightedGraph: WeightedGraphTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testMutableGraph: MutableGraphTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testMutableGraph: MutableGraphTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testWeightedMutableGraph: WeightedMutableGraphTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testVertexWeightedGraph: VertexWeightedGraphTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testAdjMatrixGraphWriter: AdjMatrixGraphWriterTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testAdjMatrixGraphWriter: AdjMatrixGraphWriterTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testAdjMatrixGraphReader: AdjMatrixGraphReaderTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testAdjMatrixGraphReader: AdjMatrixGraphReaderTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testDIMACSGraphWriter: DIMACSGraphWriterTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testDIMACSGraphWriter: DIMACSGraphWriterTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testGraphVizGraphWriter: GraphVizGraphWriterTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testGraphVizGraphWriter: GraphVizGraphWriterTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testGraphProperty: GraphPropertyTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testGraphProperty: GraphPropertyTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testGraphUtil: GraphUtilTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testGraphUtil: GraphUtilTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testMetisGraphWriter: MetisGraphWriterTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testMetisGraphWriter: MetisGraphWriterTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-testMetisGraphReader: MetisGraphReaderTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testMetisGraphReader: MetisGraphReaderTest.o
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
 ifeq ($(HAS_PARMETIS), 1)
-testGraphEOUtil: GraphEOUtilTest.o
-	${CXX} ${LFLAGS} -o bin/$@   $< $(PARMETISOBJ) ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testGraphEOUtil: GraphEOUtilTest.o
+	${CXX} ${LFLAGS} -o $@   $< $(PARMETISOBJ) ${INCLUDES} $(LIBDIR) $(LIB)
 
-testParMetis: ParmetisTest.o 
-	${CXX} ${LFLAGS} -o bin/$@   $^ $(PARMETISOBJ) ${INCLUDES} $(LIBDIR) $(LIB)
+bin/testParMetis: ParmetisTest.o 
+	${CXX} ${LFLAGS} -o $@   $^ $(PARMETISOBJ) ${INCLUDES} $(LIBDIR) $(LIB)
 endif
 
 #---- no change below this line--------------------------------------------------

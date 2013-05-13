@@ -32,7 +32,7 @@
 using namespace std;
 using namespace madness;
 
-PTD::PTD(World &world, Graph::WeightedMutableGraph g) :
+PTD::PTD(World &world, Graph::VertexWeightedGraph g) :
     WorldObject<PTD>(world), G(g), H(g), xtime(MPI_Wtime()) 
 {
     r = world.rank();
