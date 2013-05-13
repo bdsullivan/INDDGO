@@ -24,7 +24,7 @@ all: $(PKT_EXE) $(STATS_EXE) $(OTHER_EXE)
 $(PKT_EXE): $(PKT_OBJ) 
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(STATS_EXE): $(STATS_OBJ) 
+$(STATS_EXE): $(STATS_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 $(OTHER_EXE): $(OTHER_OBJ) 
