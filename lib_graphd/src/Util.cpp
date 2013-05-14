@@ -819,4 +819,3 @@ int_int mylog2(int x){
     }
     return ans;
 }
-
