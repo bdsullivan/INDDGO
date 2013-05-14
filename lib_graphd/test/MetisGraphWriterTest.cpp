@@ -39,11 +39,11 @@ public:
 	{
 		//SetUp is called before every test
 		LOG_INIT("test.log", NULL, 0);
-		creator.set_file_name("../data/1dc.128.adj");
+		creator.set_file_name("data/1dc.128.adj");
 		creator.set_graph_type("adjmatrix");
 		g = creator.create_graph();
 
-		string out_file("../data/1dc.128.met");
+		string out_file("data/1dc.128.met");
 		dim_writer = new Graph::MetisGraphWriter(out_file);
 	}
 
@@ -58,7 +58,7 @@ TEST_F(MetisGraphWriterTest, testNumNodes)
 {
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.met");
+	creator.set_file_name("data/1dc.128.met");
 	creator.set_graph_type("Metis");
 	g = creator.create_graph();
 
@@ -69,7 +69,7 @@ TEST_F(MetisGraphWriterTest, testGetDegrees)
 {
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.met");
+	creator.set_file_name("data/1dc.128.met");
 	creator.set_graph_type("Metis");
 	g = creator.create_graph();
 
@@ -81,7 +81,7 @@ TEST_F(MetisGraphWriterTest, testGetNode)
 {
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.met");
+	creator.set_file_name("data/1dc.128.met");
 	creator.set_graph_type("Metis");
 	g = creator.create_graph();
 
@@ -95,7 +95,7 @@ TEST_F(MetisGraphWriterTest, testIsEdge)
 {
 	dim_writer->write_graph(g);
 
-	creator.set_file_name("../data/1dc.128.met");
+	creator.set_file_name("data/1dc.128.met");
 	creator.set_graph_type("Metis");
 	g = creator.create_graph();
 
@@ -107,4 +107,3 @@ TEST_F(MetisGraphWriterTest, testIsEdge)
 	EXPECT_TRUE(g->is_edge(108, 100));
 
 }
-

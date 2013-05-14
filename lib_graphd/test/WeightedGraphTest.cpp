@@ -21,23 +21,23 @@
 
 #include "Log.h"
 #include "GraphCreatorFile.h"
-#include "WeightedGraph.h"
+#include "VertexWeightedGraph.h"
 #include <gtest/gtest.h>
 
 using namespace std;
-class WeightedGraphTest: public testing::Test
+class VertexWeightedGraphTest: public testing::Test
 {
 public:
 	Graph::GraphCreatorFile creator;
-	Graph::WeightedGraph *wg;
+	Graph::VertexWeightedGraph *wg;
 
 	virtual void SetUp()
 	{
 		//SetUp is called before every test
 		LOG_INIT("test.log", NULL, 0);
-		creator.set_file_name("../data/x.245.txt");
+		creator.set_file_name("data/x.245.txt");
 		creator.set_graph_type("DIMACS");
-		wg = creator.create_weighted_graph();
+		wg = creator.create_vertex_weighted_graph();
 	}
 
 	virtual void TearDown()
@@ -47,22 +47,22 @@ public:
 	}
 };
 
-TEST_F(WeightedGraphTest, testNumNodes)
+TEST_F(VertexWeightedGraphTest, testNumNodes)
 {
 	EXPECT_EQ(23, wg->get_num_nodes());
 }
 
-TEST_F(WeightedGraphTest, testNumEdges)
+TEST_F(VertexWeightedGraphTest, testNumEdges)
 {
 	EXPECT_EQ(71, wg->get_num_edges());
 }
 
-TEST_F(WeightedGraphTest, testGraphType)
+TEST_F(VertexWeightedGraphTest, testGraphType)
 {
 	EXPECT_EQ("DIMACS", wg->get_graph_type());
 }
 
-TEST_F(WeightedGraphTest, testGetNode)
+TEST_F(VertexWeightedGraphTest, testGetNode)
 {
 	Graph::Node *n;
 	n = wg->get_node(19);
@@ -70,7 +70,7 @@ TEST_F(WeightedGraphTest, testGetNode)
 	EXPECT_EQ(4, nbrs.size());
 }
 
-TEST_F(WeightedGraphTest, testIsEdge)
+TEST_F(VertexWeightedGraphTest, testIsEdge)
 {
 	Graph::Node *n;
 	n = wg->get_node(19);
@@ -83,12 +83,12 @@ TEST_F(WeightedGraphTest, testIsEdge)
 
 }
 
-TEST_F(WeightedGraphTest, testGetDegree)
+TEST_F(VertexWeightedGraphTest, testGetDegree)
 {
 	EXPECT_EQ(6, wg->get_degree(6));
 }
 
-TEST_F(WeightedGraphTest, testNodeNbrs)
+TEST_F(VertexWeightedGraphTest, testNodeNbrs)
 {
 	vector<Graph::Node> n;
 	int i;
@@ -114,30 +114,30 @@ TEST_F(WeightedGraphTest, testNodeNbrs)
 	EXPECT_EQ(8, nbrs[3]);
 }
 
-TEST_F(WeightedGraphTest, testGetDegrees)
+TEST_F(VertexWeightedGraphTest, testGetDegrees)
 {
 	vector<int> degree = wg->get_degree();
 	EXPECT_EQ(4, degree[19]);
 }
 
-TEST_F(WeightedGraphTest, testGetNumComponents)
+TEST_F(VertexWeightedGraphTest, testGetNumComponents)
 {
 	EXPECT_EQ(1, wg->get_num_components());
 }
 
-TEST_F(WeightedGraphTest, testGetNextLabel)
+TEST_F(VertexWeightedGraphTest, testGetNextLabel)
 {
 	EXPECT_EQ(24, wg->get_next_label());
 }
 
-TEST_F(WeightedGraphTest, testSetNextLabel)
+TEST_F(VertexWeightedGraphTest, testSetNextLabel)
 {
 	EXPECT_EQ(24, wg->get_next_label());
 	wg->set_next_label(140);
 	EXPECT_EQ(140, wg->get_next_label());
 }
 
-TEST_F(WeightedGraphTest, testGetWeight)
+TEST_F(VertexWeightedGraphTest, testGetWeight)
 {
 	vector<int> weights = wg->get_weight();
 
@@ -148,7 +148,7 @@ TEST_F(WeightedGraphTest, testGetWeight)
 
 }
 
-TEST_F(WeightedGraphTest, testSetWeight)
+TEST_F(VertexWeightedGraphTest, testSetWeight)
 {
 	vector<int> weights = wg->get_weight();
 

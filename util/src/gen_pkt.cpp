@@ -21,7 +21,7 @@
 
 #include "GraphDecomposition.h"
 #include "Log.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphException.h" 
 
 using namespace std;
@@ -57,12 +57,12 @@ int main(int argc, char **argv)
     int t = 1;
     int ktree_n=-1, ktree_k=-1, ktree_p=-1;
     int seed=0;
-	Graph::WeightedMutableGraph *G=NULL, *H=NULL; 
+	Graph::VertexWeightedGraph *G=NULL, *H=NULL; 
     time_t start, stop;
     char filename[100];
     char *prefix= (char *)"pkt";
     
-    bool random = false, write_scotch=false;
+    bool random = false;
     char lfname[100];
     char efname[100];
     sprintf(lfname, "genpkt.log");
@@ -97,8 +97,6 @@ int main(int argc, char **argv)
             prefix = argv[i+1];
         if(strcmp(argv[i],"-r")==0)
             random = true;
-        if(strcmp(argv[i],"-scotch")==0)
-            write_scotch = true;
     }
 
     if(!seed)

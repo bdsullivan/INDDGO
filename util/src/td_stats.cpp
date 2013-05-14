@@ -49,7 +49,6 @@ int main(int argc, char **argv){
      * optional arguments:
      * -l : This computes lower bounds on the treewidth
      * -L : Lower bounds ONLY. Turns off the computation of all upper bounds, bag distributions, etc
-     * -a : Run all tree decomposition heuristics and elimination ordering routines
      */
 
     vector<double> *kcore_score = new vector<double>();
@@ -63,7 +62,7 @@ int main(int argc, char **argv){
     int lbt[] = {
         GD_MAX_MIN_DEGREE_LB, GD_MCS_LB
     };
-    const char *tdtype[] = { "Super-E-Tree", "Gavril" ,"Bodlaender-Koster"};
+    const char *tdtype[] = { "Super-E-Tree", "Gavril" ,"Bodlaender-Koster", "Nice"};
     const char *elimtype[] = { "AMD", "MetisNodeND", "MetisMultMinD", "MinFill", "MCS" };
     bool lower_bounds = false;
     bool upper_bounds = true;
@@ -141,12 +140,11 @@ int main(int argc, char **argv){
         printf ("Non-option argument %s\n", argv[index]);
     }
 
-    int t, e, i, s;
-    Graph::WeightedMutableGraph *G;
+    int t, e, s;
+    Graph::VertexWeightedGraph *G;
     TDTree *T;
     int treewidth, treelength, minecc;
     double kcore_max, kcore_min;
-    int degree_max, degree_min;
     std::ofstream out;
     std::ostream outStream(cout.rdbuf());
     std::stringstream sstm;
@@ -155,6 +153,7 @@ int main(int argc, char **argv){
     /* Add methods to the stack if -a was passed */
     if(all_methods) {
         td_types.push_back(TD_BK);
+        td_types.push_back(TD_NICE);
         elim_types.push_back(GD_MIN_FILL);
         elim_types.push_back(GD_MCS);
     }
@@ -232,10 +231,6 @@ int main(int argc, char **argv){
 
         /*populate appropriate score vectors*/
         bool range = read_color_file(kcore_file,kcore_max,kcore_min,*kcore_score);
-        for(int q =0 ; q<kcore_score->size(); q++){
-            fprintf(stderr," %lf", (*kcore_score)[q]);
-        }
-        fprintf(stderr, "\n");
         vector<int> idegree_score = G->get_degree();
         (*degree_score).resize(idegree_score.size());
         for(int i = 0; i < idegree_score.size(); i++){
@@ -287,7 +282,7 @@ int main(int argc, char **argv){
                 }
 
                 /*Eccentricity*/
-                Graph::MutableGraph *GT = T->export_tree();
+                Graph::Graph *GT = T->export_tree();
                 vector<int> ecc;
                 minecc = INT_MAX;
                 gutil.find_ecc(GT, &ecc);
@@ -387,4 +382,3 @@ int main(int argc, char **argv){
         return -1;
     }
 } // main
-

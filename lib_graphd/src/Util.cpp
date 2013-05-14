@@ -91,17 +91,17 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
     min_flag = false;
     max_color = 0;
     min_color = 0;
-    bool pound_flag = false;
 
     while(k_core_input.good()){
         string line;
         getline(k_core_input,line);
 
+        cerr << "Got color line: " << line << endl;
         if(line.substr(0,1) == "#"){
             if(strcmp(line.substr(1,3).c_str(),"max") == 0){
                 size_t pos1 = line.find(" ");
                 size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
-                //cout<<"p1max: "<<pos1<<" p2max: "<<pos2<<"\n";
+                cout<<"p1max: "<<pos1<<" p2max: "<<pos2<<"\n";
 
                 max_color = atof(line.substr(pos1 + 1,pos2 + 1).c_str());
                 max_flag = true;
@@ -110,14 +110,12 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
             if(strcmp(line.substr(1,3).c_str(),"min") == 0){
                 size_t pos1 = line.find(" ");
                 size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
-                //cout<<"p1: "<<pos1<<" p2: "<<pos2<<"\n";
 
                 min_color = atof(line.substr(pos1 + 1,pos2 + 1).c_str());
                 min_flag = true;
             }
         }
-        else if(line.length() != 0) {  // we must assume that this line has the scores
-            pound_flag = false;
+        else if(line.length() != 0){
             size_t pos1 = 0;
             size_t pos2 = 0;
             size_t end = line.find_last_not_of("\t\f\v\n\r ");
@@ -129,13 +127,11 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
                 color_vector.push_back(atof(line.substr(pos1,pos2).c_str()));
 
                 pos1 = pos2;
-                //cout<<count<<"pos: "<<pos1<<" "<<pos2<<"\n";
             }
         }
     }
 
     k_core_input.close();
-    fprintf(stderr, "number colors :%d\n", color_vector.size());
 
     return(min_flag && max_flag);
 } // read_color_file
@@ -823,4 +819,3 @@ int_int mylog2(int x){
     }
     return ans;
 }
-

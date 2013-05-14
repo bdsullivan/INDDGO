@@ -16,7 +16,7 @@ LIBDIR=-L.. -L/usr/local/lib -L/home/d8w/research/code/metis-4.0 -L/home/d8w/res
 LIBS = $(LIBDIR)-lamd -lm -lmetis
 # source
 SRC = Log.cpp GraphReader.cpp DIMACSGraphReader.cpp AdjMatrixGraphReader.cpp Node.cpp GraphReaderWriterFactory.cpp \
-	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp WeightedGraph.cpp MutableGraph.cpp WeightedMutableGraph.cpp GraphProperties.cpp\
+	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp WeightedGraph.cpp Graph.cpp VertexWeightedGraph.cpp GraphProperties.cpp\
 	GraphUtil.cpp Debug.cpp GraphEOUtil.cpp GraphDisplay.cpp RndNumGen.cpp Util.cpp AdjMatrixGraphWriter.cpp GraphWriter.cpp\
 	DIMACSGraphWriter.cpp GraphVizGraphWriter.cpp
 
