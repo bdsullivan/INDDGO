@@ -29,7 +29,7 @@ inddgo-info@googlegroups.com
 #endif
 
 void write_ind_set_model(const char *DIMACS_file, const char *model_file, 
-	Graph::WeightedMutableGraph *G);
+	Graph::VertexWeightedGraph *G);
 int create_subgraph_stats(TDTree *T, vector<int_int> *stats);
 int compute_weighted_ind_set_table(TDTree *T, int k);
 int compute_nonnice_table_parent_child(TDTree *T, int k);
@@ -45,9 +45,9 @@ int list_ind_sets(TDTree *T, int k, list<int> *bag_subset, list<TDSolution *> *i
 int hamming_weight(unsigned long long xx);
 bool hamming_compare(const int_bigint *x,const int_bigint *y);
 void usage(const char *s);
-void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G);
-void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G, TDTree **T, bool suppress_timing);
-void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G, TDTree **T);
+void create_WIS_graph(DP_info *info, Graph::VertexWeightedGraph *&G);
+void create_tree_decomposition(DP_info *info, Graph::VertexWeightedGraph *G, TDTree **T, bool suppress_timing);
+void create_tree_decomposition(DP_info *info, Graph::VertexWeightedGraph *G, TDTree **T);
 int reconstruct_solution(TDTree *T, list<int> *optimal_solution, const char *sol_file);
 void print_WIS_results(FILE *stream, TDTree *T, DP_info *info);
 int get_optimal_obj(TDTree *T, list<int> *root_intersection, list<int> *root_difference, 

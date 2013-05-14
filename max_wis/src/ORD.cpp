@@ -56,7 +56,7 @@ void ORD::buildGraph() {
     if (!properties.is_connected(G))
     {
         Graph::GraphReaderWriterFactory factory;
-        Graph::WeightedMutableGraph *H;
+        Graph::VertexWeightedGraph *H;
 
         // Since we are going to proceed with processing largest
         // component , set a mark as not original and write largest
@@ -231,7 +231,7 @@ int ORD::find_elim_ordering() {
     DEBUG("Scatterv completed\n");
 
     Graph::GraphCreatorFile gf;
-    Graph::WeightedMutableGraph *wg;
+    Graph::VertexWeightedGraph *wg;
     Graph::GraphEOUtil eoutil;
     Graph::GraphProperties prop;
     list<int>members(ordering.begin(), ordering.end());
@@ -299,7 +299,7 @@ const char *ORD::get_filename() const {
 }
 
 
-Graph::WeightedMutableGraph *ORD::get_graph() {
+Graph::VertexWeightedGraph *ORD::get_graph() {
     return this->G;
 }
 

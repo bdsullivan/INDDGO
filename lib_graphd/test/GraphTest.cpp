@@ -34,7 +34,8 @@ public:
 
     virtual void SetUp(){
         LOG_INIT("test.log", NULL, 0);
-        creator.set_file_name("../data/1dc.128.txt");
+        //creator.set_file_name("../data/1dc.128.txt");
+        creator.set_file_name("data/1dc.128.txt");
         creator.set_graph_type("DIMACS");
 		g = creator.create_graph();
     }
@@ -155,9 +156,151 @@ TEST_F(GraphTest, testComplement)
     EXPECT_FALSE(g->is_edge(108, 100));
 }
 
+TEST_F(GraphTest, testAddEdge)
+{
+	EXPECT_FALSE(g->is_edge(80, 12));
+	EXPECT_EQ(1471, g->get_num_edges());
+	EXPECT_EQ(22, g->get_degree(80));
+	EXPECT_EQ(19, g->get_degree(12));
+	g->add_edge(80, 12);
+	EXPECT_TRUE(g->is_edge(80, 12));
+	EXPECT_TRUE(g->is_edge(12, 80));
+	EXPECT_EQ(1472, g->get_num_edges());
+	EXPECT_EQ(23, g->get_degree(80));
+	EXPECT_EQ(20, g->get_degree(12));
+}
+
+TEST_F(GraphTest, testAddEdgeAdvance)
+{
+	EXPECT_FALSE(g->is_edge(80, 12));
+	EXPECT_EQ(1471, g->get_num_edges());
+	EXPECT_EQ(22, g->get_degree(80));
+	EXPECT_EQ(19, g->get_degree(12));
+	g->add_edge_advance(80, 12);
+	EXPECT_TRUE(g->is_edge(80, 12));
+	EXPECT_TRUE(g->is_edge(12, 80));
+	EXPECT_EQ(1472, g->get_num_edges());
+	EXPECT_EQ(23, g->get_degree(80));
+	EXPECT_EQ(20, g->get_degree(12));
+}
+
+TEST_F(GraphTest, testRemoveEdge)
+{
+	EXPECT_TRUE(g->is_edge(108, 100));
+	EXPECT_EQ(1471, g->get_num_edges());
+	EXPECT_EQ(24, g->get_degree(108));
+	EXPECT_EQ(24, g->get_degree(100));
+
+	g->remove_edge(108, 100);
+
+	EXPECT_FALSE(g->is_edge(108, 100));
+	EXPECT_FALSE(g->is_edge(100, 108));
+	EXPECT_EQ(1470, g->get_num_edges());
+	EXPECT_EQ(23, g->get_degree(100));
+	EXPECT_EQ(23, g->get_degree(108));
+}
+
+TEST_F(GraphTest, testRemoveVertex)
+{
+	EXPECT_TRUE(g->is_edge(108, 100));
+	EXPECT_EQ(1471, g->get_num_edges());
+	EXPECT_EQ(24, g->get_degree(108));
+	EXPECT_EQ(24, g->get_degree(100));
+
+	g->remove_vertex(108);
+
+	EXPECT_FALSE(g->is_edge(108, 100));
+	EXPECT_FALSE(g->is_edge(100, 108));
+	EXPECT_EQ(1447, g->get_num_edges());
+	EXPECT_EQ(23, g->get_degree(100));
+	EXPECT_EQ(0, g->get_degree(108));
+}
+
+TEST_F(GraphTest, testContractEdge)
+{
+	EXPECT_TRUE(g->is_edge(108, 100));
+	EXPECT_EQ(1471, g->get_num_edges());
+	EXPECT_EQ(24, g->get_degree(108));
+	EXPECT_EQ(24, g->get_degree(100));
+
+	Graph::Node *na;
+	na = g->get_node(108);
+	list<int> nbrs_a = na->get_nbrs();
+	vector<int> nbrsvec_a(nbrs_a.begin(), nbrs_a.end());
+
+	Graph::Node *nb;
+	nb = g->get_node(100);
+	list<int> nbrs_b = nb->get_nbrs();
+	vector<int> nbrsvec_b(nbrs_b.begin(), nbrs_b.end());
+
+	int common_nbrs = 0;
+	int final_degree = 0;
+	int new_edges = 0;
+
+	for (int ia = 0; ia < nbrsvec_a.size(); ia++)
+	{
+		for (int ib = 0; ib < nbrsvec_b.size(); ib++)
+		{
+			if (nbrsvec_a[ia] == nbrsvec_b[ib])
+			{
+				common_nbrs++;
+			}
+		}
+	}
+
+	final_degree = g->get_degree(108) + g->get_degree(100) - common_nbrs - 2;
+	new_edges = g->get_num_edges() - common_nbrs - 1;
+
+	int x = g->contract_edge(108, 100);
+
+	EXPECT_FALSE(g->is_edge(108, 100));
+	EXPECT_FALSE(g->is_edge(100, 108));
+	EXPECT_EQ(0, g->get_degree(100));
+	EXPECT_EQ(new_edges, g->get_num_edges());
+	EXPECT_EQ(final_degree, g->get_degree(108));
+}
+
+TEST_F(GraphTest, testEliminateVertex)
+{
+	EXPECT_TRUE(g->is_edge(108, 100));
+	EXPECT_EQ(1471, g->get_num_edges());
+	EXPECT_EQ(24, g->get_degree(108));
+	EXPECT_EQ(24, g->get_degree(100));
+
+	Graph::Node *na;
+	na = g->get_node(108);
+	list<int> nbrs_a = na->get_nbrs();
+	vector<int> nbrsvec_a(nbrs_a.begin(), nbrs_a.end());
+
+	Graph::Node *nb;
+	nb = g->get_node(100);
+	list<int> nbrs_b = nb->get_nbrs();
+	vector<int> nbrsvec_b(nbrs_b.begin(), nbrs_b.end());
+
+	int common_nbrs = 0;
+	int final_degree = 0;
+	int new_edges = 0;
+
+	for (int ia = 0; ia < nbrsvec_a.size(); ia++)
+	{
+		for (int ib = 0; ib < nbrsvec_b.size(); ib++)
+		{
+			if (nbrsvec_a[ia] == nbrsvec_b[ib])
+			{
+				common_nbrs++;
+			}
+		}
+	}
+
+	new_edges = g->get_degree(108) - common_nbrs - 1;
+	new_edges = new_edges + g->get_degree(100) - 1;
 
 
+	g->eliminate_vertex(108, NULL, true);
 
-
-
-
+	EXPECT_FALSE(g->is_edge(108, 100));
+	EXPECT_FALSE(g->is_edge(100, 108));
+	EXPECT_EQ(1597, g->get_num_edges());
+	EXPECT_EQ(new_edges, g->get_degree(100));
+	EXPECT_EQ(0, g->get_degree(108));
+}

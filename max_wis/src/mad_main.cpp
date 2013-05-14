@@ -38,7 +38,7 @@
 #define WRAP_UTHASH 0
 
 #include "weighted_ind_set.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #define GLPSOL "glpsol"
 
 #include "MadnessTableProcessor.h"
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
   // For debugging uncomment following line.
   //redirectio(world);
   
-  Graph::WeightedMutableGraph *G;
+  Graph::VertexWeightedGraph *G;
   TDTree *T = NULL;
   DP_info info;
   list<int> optimal_solution;

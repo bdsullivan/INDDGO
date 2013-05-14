@@ -35,7 +35,7 @@
 int main(int argc, char **argv)
 {
 	int i, j;
-	Graph::WeightedMutableGraph *G;
+	Graph::VertexWeightedGraph *G;
 	TDTree *T=NULL;
 	DP_info info;
 	list<int> optimal_solution;

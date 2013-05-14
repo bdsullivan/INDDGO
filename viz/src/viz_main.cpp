@@ -27,8 +27,8 @@
 
 int main(int argc, char **argv)
 {
-  int i;
-  Graph::WeightedMutableGraph *G;
+  //int i;
+  Graph::VertexWeightedGraph *G;
   TDTree *T = NULL;
   TD_info info; //note that there is no TD_info in T, so you need to use this one!
 

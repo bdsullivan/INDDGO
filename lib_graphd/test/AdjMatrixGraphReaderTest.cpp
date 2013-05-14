@@ -38,7 +38,7 @@ public:
 		LOG_INIT("test.log", NULL, 0);
 		try
 		{
-			creator.set_file_name("../data/1dc.128.adj");
+			creator.set_file_name("data/1dc.128.adj");
 			creator.set_graph_type("AdjMatrix");
 			g = creator.create_graph();
 

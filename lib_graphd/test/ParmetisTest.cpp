@@ -34,7 +34,7 @@ void parmetis_with_amd ()
     int size, rank;
     MPI_Comm comm;
 	Graph::GraphEOUtil eoutil;
-    Graph::WeightedMutableGraph *wmg;
+    Graph::VertexWeightedGraph *wmg;
 	Graph::GraphCreatorFile creator;
 
 	int output[] =
@@ -44,7 +44,7 @@ void parmetis_with_amd ()
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    creator.set_file_name("../data/1dc.128.txt");
+    creator.set_file_name("data/1dc.128.txt");
     creator.set_graph_type("DIMACS");
     wmg = creator.create_weighted_mutable_graph();
     
@@ -65,7 +65,7 @@ void parmetis_only ()
     int size, rank;
     MPI_Comm comm;
 	Graph::GraphEOUtil eoutil;
-    Graph::WeightedMutableGraph *wmg;
+    Graph::VertexWeightedGraph *wmg;
 	Graph::GraphCreatorFile creator;
 
 	int output[] =
@@ -75,7 +75,7 @@ void parmetis_only ()
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    creator.set_file_name("../data/1dc.128.txt");
+    creator.set_file_name("data/1dc.128.txt");
     creator.set_graph_type("DIMACS");
     wmg = creator.create_weighted_mutable_graph();
     
@@ -96,7 +96,7 @@ void parmetis_with_metmmd ()
     int size, rank;
     MPI_Comm comm;
 	Graph::GraphEOUtil eoutil;
-    Graph::WeightedMutableGraph *wmg;
+    Graph::VertexWeightedGraph *wmg;
 	Graph::GraphCreatorFile creator;
 
 	int output[] =
@@ -106,7 +106,7 @@ void parmetis_with_metmmd ()
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    creator.set_file_name("../data/1dc.128.txt");
+    creator.set_file_name("data/1dc.128.txt");
     creator.set_graph_type("DIMACS");
     wmg = creator.create_weighted_mutable_graph();
     
@@ -157,12 +157,3 @@ int main(int argc, char** argv)
 #endif // HAS_PARMETIS
 	return 0;
 }
-
-
-
-
-
-
-
-
-

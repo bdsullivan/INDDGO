@@ -1,0 +1,10 @@
+*.o
+*.a
+*~
+*.sw*
+bin/edge2dimacs
+bin/gen_pkt
+bin/serial_wis
+bin/td_stats
+bin/td_viz
+lib_graphd/bin/gviz
