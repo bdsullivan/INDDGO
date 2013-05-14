@@ -80,6 +80,25 @@ namespace Graph {
         nbrs.unique();
     }
 
+    /**
+     * Used to save some compares when calculating triangles. **ASSUMES NEIGHBOR LIST IS SORTED**
+     * \param[in] n the index below which to return the largest neighbor
+     * \return x the index of the largest neighbor below n
+     */
+    int Node::get_largest_neighbor_below(int n){
+    //FIXME: probably should be able to handle unsorted case, but how to do without sacrificing efficiency?
+    //       also maybe do a binary instead of linear search
+        int v;
+        std::list<int>::reverse_iterator it;
+
+        for(it = this->nbrs.rbegin(); it != this->nbrs.rend(); ++it){
+            if(*it < n) {
+                return *it;
+            }
+        }
+        return -1;
+    }
+
     Node & Node::operator=(const Node & n){
         nbrs = n.nbrs;
         label = n.label;

@@ -103,7 +103,7 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
             if(strcmp(line.substr(1,3).c_str(),"max") == 0){
                 size_t pos1 = line.find(" ");
                 size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
-                cout<<"p1max: "<<pos1<<" p2max: "<<pos2<<"\n";
+                cout << "p1max: " << pos1 << " p2max: " << pos2 << "\n";
 
                 max_color = atof(line.substr(pos1 + 1,pos2 + 1).c_str());
                 max_flag = true;

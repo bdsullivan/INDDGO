@@ -62,8 +62,12 @@ int main(int argc, char **argv){
     int lbt[] = {
         GD_MAX_MIN_DEGREE_LB, GD_MCS_LB
     };
-    const char *tdtype[] = { "Super-E-Tree", "Gavril" ,"Bodlaender-Koster", "Nice"};
-    const char *elimtype[] = { "AMD", "MetisNodeND", "MetisMultMinD", "MinFill", "MCS" };
+    const char *tdtype[] = {
+        "Super-E-Tree", "Gavril","Bodlaender-Koster", "Nice"
+    };
+    const char *elimtype[] = {
+        "AMD", "MetisNodeND", "MetisMultMinD", "MinFill", "MCS"
+    };
     bool lower_bounds = false;
     bool upper_bounds = true;
     bool all_methods = false;
@@ -151,7 +155,7 @@ int main(int argc, char **argv){
     int td_id;
 
     /* Add methods to the stack if -a was passed */
-    if(all_methods) {
+    if(all_methods){
         td_types.push_back(TD_BK);
         td_types.push_back(TD_NICE);
         elim_types.push_back(GD_MIN_FILL);

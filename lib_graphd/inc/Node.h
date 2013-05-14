@@ -44,6 +44,11 @@ public:
     void delete_node();
     void sort_nbr();
     void unique_nbr();
+
+    /**
+     * \brief get the index of the neighbor whose index is the largest below n
+     */
+    int get_largest_neighbor_below(int n);
     Node & operator =(const Node & n);
 
     //Declare friend classes

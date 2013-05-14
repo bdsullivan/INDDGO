@@ -351,4 +351,101 @@ namespace Graph {
         delete[] visited;
         return false;
     } // is_path
+
+    /**
+     * Equivalent to Algorithm 8 in Latapy 'new-vertex-listing'.  Increments elements in the triangle array.
+     * \param[in] g the graph
+     * \param[in] v the vertex we are listing triangles for
+     * \param[in,out] tr the counts of our triangles
+     */
+    void GraphProperties::vertex_listing(Graph *g, int v, vector<long int> &t){
+        vector<bool> A(g->get_num_nodes(), false);
+        int u;
+        list<int> *nbrs;
+        list<int> *nbr_nbrs;
+        list<int>::iterator inner, outer;
+
+        nbrs = g->get_node(v)->get_nbrs_ptr();
+
+        // set A[u] true for all neighbors of v
+        for(outer = nbrs->begin(); outer != nbrs->end(); ++outer){
+            A[*outer] = true;
+        }
+
+        for(outer = nbrs->begin(); outer != nbrs->end(); ++outer){
+            nbr_nbrs = g->get_node(*outer)->get_nbrs_ptr();
+            for(inner = nbr_nbrs->begin(); inner != nbr_nbrs->end(); ++inner){
+                if(A[*inner] == true){
+                    t[*inner]++;
+                    t[*outer]++;
+                    t[v]++;
+                }
+            }
+        }
+    } //vertex_listing
+
+    /**
+     * Equivalent to Algorithm 3 in Latapy 'edge-iterator'.  Increments elements in the triangle array.
+     * \param[in] g the graph
+     * \param[in] u first end of the we are listing triangles for
+     * \param[in] v second end of the we are listing triangles for
+     * \param[in,out] tr the counts of our triangles
+     */
+    void GraphProperties::edge_listing(Graph *g, int u, int v, vector<long int> &t, int number_high){
+        vector<int>::iterator it;
+        vector<int> intersection;
+        list<int> *un = g->get_node(u)->get_nbrs_ptr();
+        list<int> *vn = g->get_node(v)->get_nbrs_ptr();
+
+        // take adavantage of STL stuff
+        // back_inserter allows us to just declare a vector and not pre-determine size, saves space
+        // can remove and make vector the size of the smaller neighbor list if we find it's too slow
+        std::set_intersection(un->begin(), un->end(), vn->begin(), vn->end(), std::back_inserter(intersection));
+
+        for(it = intersection.begin(); it < intersection.end(); ++it){
+            if(*it >= number_high){
+                t[*it]++;
+            }
+        }
+    } // edge_listing
+
+    //FIXME: figure out where this should really live
+    struct sort_pair {
+        bool operator()(const pair<int, int> &left, const pair<int, int> &right){
+            return left.second < right.second;
+        }
+    };
+
+    void GraphProperties::all_triangles(Graph *g, vector<long int> &t, int number_high){
+        int i, j;
+        int u, v;
+        int retcode;
+        vector<pair <int, int> > sorted_indices(g->get_num_nodes());
+
+        // we want our list of vertices sorted by degree, with higest degree in element 0
+        // this is a goofy way to handle it, but that's life
+        for(i = 0; i < g->get_num_nodes(); i++){
+            sorted_indices[i].first = i;
+            sorted_indices[i].second = g->get_degree(i);
+        }
+
+        std::sort(sorted_indices.begin(), sorted_indices.end(), sort_pair());
+
+        // we need sorted neighbor lists for edge_listing
+        for(i = 0; i < g->get_num_nodes(); i++){
+            g->get_node(i)->sort_nbr();  //FIXME: make sure this actually does what i think it does -jkl
+        }
+
+        // count triangles using vertex_listing for 'high degree' vertices (1a)
+        for(i = 0; i < number_high; i++){
+            vertex_listing(g, sorted_indices[i], t);
+        }
+
+
+        for(u = number_high; u < g->get_num_nodes(); u++){
+            for(v = g->get_node(u)->get_largest_neighbor_below(u)
+            
+
+        // count triangles using edge_listing for 'low degree' vertices (2)
+    } // all_triangles
 }
