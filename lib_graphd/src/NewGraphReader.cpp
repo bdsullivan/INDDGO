@@ -127,7 +127,7 @@ namespace Graph {
                     __FUNCTION__);
         }
 
-        g->add_vertices(n);
+        g->add_vertices(n-1);
 
         while(!feof(in)){
             retp = fgets(line, 100, in);
