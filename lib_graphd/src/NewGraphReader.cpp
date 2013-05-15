@@ -127,7 +127,9 @@ namespace Graph {
                     __FUNCTION__);
         }
 
+        fprintf(stderr,"adding %d vertices\n", n);
         g->add_vertices(n);
+        fprintf(stderr,"Now we have %d vertices in g\n",g->get_num_nodes());
 
         while(!feof(in)){
             retp = fgets(line, 100, in);

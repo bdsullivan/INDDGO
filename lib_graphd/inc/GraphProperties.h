@@ -59,9 +59,18 @@ public:
     /**
      * \brief Returns an array of all triangles
      */
-
     void all_triangles(Graph *g, vector<long int> &t, int number_high);
+    /**
+     * \brief Returns an array of all triangles
+     */
+    void all_triangles_compact_forward(Graph *g, vector<long int> &t);
+    /**
+     * \brief Returns an array of all triangles
+     */
+    void all_triangles_edge_listing(Graph *g, vector<long int> &t);
+
     };
+
 }
 
 #endif /* GRAPHPROPERTIES_H_ */

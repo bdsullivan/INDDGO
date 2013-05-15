@@ -20,7 +20,12 @@ M2D_SRCS = ./src/metis2dimacs.cpp
 M2D_OBJ = $(M2D_SRCS:.cpp=.o)
 M2D_EXE = $(INDDGO_BIN)/metis2dimacs
 
-all: $(PKT_EXE) $(STATS_EXE) $(E2D_EXE) $(M2D_EXE)
+
+TRI_SRCS =  ./src/count-tri.cpp 
+TRI_OBJ =  $(TRI_SRCS:.cpp=.o)
+TRI_EXE = $(INDDGO_BIN)/count-tri
+
+all: $(PKT_EXE) $(STATS_EXE) $(E2D_EXE) $(M2D_EXE) $(TRI_EXE)
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
@@ -37,5 +42,8 @@ $(E2D_EXE): $(E2D_OBJ)  ../lib/libgraphd.a
 $(M2D_EXE): $(M2D_OBJ)  ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
+$(TRI_EXE): $(TRI_OBJ) ../lib/libgraphd.a
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
+
 clean: 
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(STATS_OBJ) $(STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ)
+	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(STATS_OBJ) $(STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(TRI_OBJ) $(TRI_EXE)

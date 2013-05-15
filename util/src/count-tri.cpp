@@ -54,32 +54,27 @@ int main(int argc, char **argv){
     Graph::Graph *g;
     int seed = 0;
 
-    if(!seed){
-        // Set the seed to a rand int in 0,2^24
-        seed = Graph::rand_int(0,0xffffff);
-    }
-    // Spin the RNG seed times
-    for(int ss = 0; ss < seed; ss++){
-        Graph::lcgrand(0);
-    }
-
-    Graph::GraphCreatorFile *gcf;
 
     Graph::GraphProperties prop;
     Graph::NewGraphReader ngr;
-    Graph::NewGraphWriter writer;
 
     g = new Graph::Graph();
 
+    //fprintf(stderr,"g before: 0x%x\n", g);
     ngr.read_graph(g, argv[1], "Edge", false);
+    //fprintf(stderr,"g after: 0x%x\n", g);
+    //
+    fprintf(stderr, "Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
-    // if we don't get rid of duplicate edges, bad things happen
-    // when trying to output the graph
-    //prop.make_simple(g);
+    vector<long int> triangles(g->get_num_nodes(), 0);
 
-    fprintf(stderr, "edges read in: %d nodes read in: %d\n", g->get_num_edges(), g->get_num_nodes());
+    //prop.all_triangles(g, triangles, 5);
+    prop.all_triangles_edge_listing(g, triangles);
 
-    writer.write_graph(g, argv[2], "DIMACS");
+    for(int i=0; i<g->get_num_nodes(); i++){
+        fprintf(stderr, "vertex: %d: %ld\n", i, triangles[i]);
+    }
+
 
     return 0;
 } // main
