@@ -567,6 +567,7 @@ namespace Graph {
         int i, j, u, v;
         std::list<int> *u_n, *v_n;
         vector<int>::iterator it;
+        list<int>::const_iterator cit;
         list<int>::iterator lt;
 
         // all the edgelists must be sorted
@@ -575,11 +576,13 @@ namespace Graph {
         }
 
         for(u = 0; u < g->get_num_nodes(); u++){
-            for(v = u+1 ; v < g->get_num_nodes(); v++){
-                vector<int> intersection;
-                u_n = g->get_node(u)->get_nbrs_ptr();
-                v_n = g->get_node(v)->get_nbrs_ptr();
-                if(g->is_edge(u, v)){
+            const list<int> &c_nbrs = g->get_node(u)->get_nbrs_ref();
+            for(cit = c_nbrs.begin(); cit != c_nbrs.end(); ++cit){
+                v = *cit;
+                if(v > u){
+                    vector<int> intersection;
+                    u_n = g->get_node(u)->get_nbrs_ptr();
+                    v_n = g->get_node(v)->get_nbrs_ptr();
                     //printf("looking at edge: %d-%d\n", u, v);
                     std::set_intersection(u_n->begin(), u_n->end(), v_n->begin(), v_n->end(), std::back_inserter(intersection));
                     /* 
