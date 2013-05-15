@@ -30,17 +30,7 @@
 using namespace std;
 
 void usage(const char *s){
-    fprintf(stderr,"Usage: %s [options]\n",s);
-    fprintf(stderr,
-            "\t -t [#] sets number of graphs to generate (t)\n"
-            "\t -n [#] Sets the number of vertices (n)\n"
-            "\t -k [#] sets value for tree-width (k)\n"
-            "\t -p [#] sets percent of edges to keep from complete k-tree (p)\n"
-            "\t -s seed : uses the given RNG seed\n"
-            "\t -fn [name] sets the prefix for the filenames written out\n"
-            "\t -r : randomizes the vertex labels before writing to file.\n"
-            "\t -scotch : writes a .scotch file in Scotch graph format as well\n"
-            );
+    fprintf(stderr,"Usage: %s filename\n",s);
 }
 
 int main(int argc, char **argv){
@@ -58,23 +48,21 @@ int main(int argc, char **argv){
     Graph::GraphProperties prop;
     Graph::GraphReader ngr;
 
+    // Create the graph object
     g = new Graph::Graph();
 
-    //fprintf(stderr,"g before: 0x%x\n", g);
+    // read the graph from the filename, assume it is an edgelist
     ngr.read_graph(g, argv[1], "Edge", false);
-    //fprintf(stderr,"g after: 0x%x\n", g);
-    //
     fprintf(stderr, "Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
+    //Now, do our calculations
     vector<long int> triangles(g->get_num_nodes(), 0);
 
-    //prop.all_triangles(g, triangles, 5);
     prop.all_triangles_edge_listing(g, triangles);
 
     for(int i=0; i<g->get_num_nodes(); i++){
         fprintf(stderr, "vertex: %d: %ld\n", i, triangles[i]);
     }
-
 
     return 0;
 } // main
