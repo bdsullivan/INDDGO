@@ -558,11 +558,21 @@ namespace Graph {
 
     }
 
+    /*
+     * Counts triangles using the edge-listing algorithm in Latapy
+     * \param[in] g input graph
+     * \param[out] t vector of long ints, length |V|, returns 3x number of triangles for each vertex
+     */
     void GraphProperties::all_triangles_edge_listing(Graph *g, vector<long int> &t){
         int i, j, u, v;
         std::list<int> *u_n, *v_n;
         vector<int>::iterator it;
         list<int>::iterator lt;
+
+        // all the edgelists must be sorted
+        for(i = 0; i<g->get_num_nodes(); i++){
+            g->get_node(i)->sort_nbr();
+        }
 
         for(u = 0; u < g->get_num_nodes(); u++){
             for(v = u+1 ; v < g->get_num_nodes(); v++){
@@ -570,23 +580,26 @@ namespace Graph {
                 u_n = g->get_node(u)->get_nbrs_ptr();
                 v_n = g->get_node(v)->get_nbrs_ptr();
                 if(g->is_edge(u, v)){
+                    //printf("looking at edge: %d-%d\n", u, v);
                     std::set_intersection(u_n->begin(), u_n->end(), v_n->begin(), v_n->end(), std::back_inserter(intersection));
-                    printf("nbrs_u(%d): ", u);
+                    /* 
+                    printf("  nbrs_u(%d): ", u);
                     for(lt = u_n->begin(); lt != u_n->end(); ++lt){
                         printf(" %d", *lt);
                     }
-                    printf("\nnbrs_v(%d): ", v);
+                    //printf("\n  nbrs_v(%d): ", v);
                     for(lt = v_n->begin(); lt != v_n->end(); ++lt){
                         printf(" %d", *lt);
                     }
-                    printf("\n    Intersection: ");
-                    for(it = intersection.begin(); it != intersection.end(); ++it){
+                    //printf("\n    Intersection: ");
+                    for(it = intersection.begin(); it != intersection.end(); it++){
                         printf(" %d", *it);
                     }
                     printf("\n");
+                    */
 
-                    for(it = intersection.begin(); it != intersection.end(); ++it){
-                        printf("found triangle: (%d,%d,%d)\n",*it, u, v);
+                    for(it = intersection.begin(); it != intersection.end(); it++){
+                        //printf("found triangle: (%d,%d,%d)\n",*it, u, v);
                         t[*it]++;
                         t[u]++;
                         t[v]++;

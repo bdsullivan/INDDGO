@@ -43,6 +43,7 @@ int main(int argc, char **argv){
 
     Graph::Graph *g;
     int seed = 0;
+    int sum;
 
 
     Graph::GraphProperties prop;
@@ -53,16 +54,20 @@ int main(int argc, char **argv){
 
     // read the graph from the filename, assume it is an edgelist
     ngr.read_graph(g, argv[1], "Edge", false);
-    fprintf(stderr, "Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
+    printf("Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
     //Now, do our calculations
     vector<long int> triangles(g->get_num_nodes(), 0);
 
     prop.all_triangles_edge_listing(g, triangles);
 
+    sum = 0;
     for(int i=0; i<g->get_num_nodes(); i++){
-        fprintf(stderr, "vertex: %d: %ld\n", i, triangles[i]);
+        sum += triangles[i];
+        printf("vertex: %d: %ld (%ld)\n", i, triangles[i]/3, triangles[i]);
     }
+
+    printf("Total triangle: %d (%d)\n", sum /3, sum);
 
     return 0;
 } // main

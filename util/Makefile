@@ -54,15 +54,10 @@ $(TRI_EXE): $(TRI_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 clean: 
-<<<<<<< HEAD
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(STATS_OBJ) $(STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(TRI_OBJ) $(TRI_EXE)
-=======
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ)
+	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE)
 
 doc: $(DOXYFILE)
 	doxygen $(DOXYFILE)
 
 clean_doc:
 	rm -rf $(DOX_DIR)
-
->>>>>>> master
