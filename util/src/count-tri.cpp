@@ -24,8 +24,8 @@
 #include "Log.h"
 #include "VertexWeightedGraph.h"
 #include "GraphException.h"
-#include "NewGraphReader.h"
-#include "NewGraphWriter.h"
+#include "GraphReader.h"
+#include "GraphWriter.h"
 
 using namespace std;
 
@@ -56,7 +56,7 @@ int main(int argc, char **argv){
 
 
     Graph::GraphProperties prop;
-    Graph::NewGraphReader ngr;
+    Graph::GraphReader ngr;
 
     g = new Graph::Graph();
 
