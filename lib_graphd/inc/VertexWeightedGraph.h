@@ -47,7 +47,7 @@ public:
     friend class GraphDisplay;
     friend class GraphEOUtil;
     friend class GraphCreator;
-    friend class NewGraphReader;
+    friend class GraphReader;
     };
 }
 

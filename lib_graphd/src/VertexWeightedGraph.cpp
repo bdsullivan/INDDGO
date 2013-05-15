@@ -21,7 +21,7 @@
 
 #include "VertexWeightedGraph.h"
 #include "GraphProperties.h"
-#include "NewGraphWriter.h"
+#include "GraphWriter.h"
 #include "GraphCreatorFile.h"
 #include <string.h>
 
@@ -79,7 +79,7 @@ namespace Graph {
      */
     void VertexWeightedGraph::write_largest_component(std::string filetype, std::string filename){
         GraphProperties properties;
-        NewGraphWriter gw;
+        GraphWriter gw;
         GraphCreatorFile creator;
 
         //writer = factory.create_writer(filetype);

@@ -23,7 +23,7 @@
 #define GRAPHCREATORFILE_H_
 
 #include "GraphCreator.h"
-#include "NewGraphReader.h"
+#include "GraphReader.h"
 #include <string>
 #include <vector>
 
