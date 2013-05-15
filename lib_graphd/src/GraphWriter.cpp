@@ -56,8 +56,17 @@ namespace Graph {
      */
     int GraphWriter::write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights, bool shuffle){
         string t = str_to_up(type);
-        if(t == "ADJMATRIX"){
+        if("ADJMATRIX" == t){
             write_adjmatrix(g, filename);
+        }
+        else if("DIMACS" == t){
+            write_dimacs(g, filename, write_vertex_weights);
+        }
+        else if("METIS" == t){
+            write_metis(g, filename);
+        }
+        else if("GRAPHVIZ" == t){
+            write_graphviz(g, filename);
         }
         else {
             cerr << "unknown type: " << type << endl;
@@ -156,9 +165,9 @@ namespace Graph {
         int capacity = g->get_capacity();
         int num_nodes = g->get_num_nodes();
         int num_edges = g->get_num_edges();
-        vector<Node> nodes = g->get_nodes();
+        //vector<Node> nodes = g->get_nodes();
+        Node *n;
 
-        perm.resize(capacity);
         for(int i = 0; i < capacity; i++){
             perm.push_back(i);
         }
@@ -201,16 +210,16 @@ namespace Graph {
         for(int i = 0; i < num_nodes; i++){
             // CSG- could add sort here although that won't work for the randomized labels
             // g->nodes[perm[i]].nbrs.sort();
-            nbrs = nodes[i].get_nbrs();
+            nbrs = g->get_node(i)->get_nbrs();
             for(ii = nbrs.begin(); ii != nbrs.end(); ++ii){
                 //if(i<=*ii)
                 // CSG - we want the edges in the file to be u-v with u<=v
-                if(nodes[perm[i]].get_label() <= nodes[perm[*ii]].get_label()){
+                if(g->get_node(perm[i])->get_label() <= g->get_node(perm[*ii])->get_label()){
                     // Changing june 21 for testing - not using labels
                     //if(i<=*ii)
                     edges_written++;
-                    fprintf(out, "e %d %d\n", nodes[perm[i]].get_label(),
-                            nodes[perm[*ii]].get_label());
+                    fprintf(out, "e %d %d\n", g->get_node(perm[i])->get_label(),
+                            g->get_node(perm[*ii])->get_label());
                     //,i+1,*ii+1);//
                 }
             }
