@@ -1,4 +1,6 @@
 include ../make.inc
+DOX_DIR = ./doc/
+DOXYFILE = ./Doxyfile
 
 INC_DIR = -I./inc -I$(GRAPH)/inc -I$(TREE)/inc $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) $(PARMETIS_INCDIR)
 
@@ -8,15 +10,23 @@ PKT_SRCS =  ./src/gen_pkt.cpp
 PKT_OBJ =  $(PKT_SRCS:.cpp=.o)
 PKT_EXE = $(INDDGO_BIN)/gen_pkt
 
-STATS_SRCS =  ./src/td_stats.cpp 
-STATS_OBJ =  $(STATS_SRCS:.cpp=.o)
-STATS_EXE = $(INDDGO_BIN)/td_stats
+TD_STATS_SRCS =  ./src/td_stats.cpp 
+TD_STATS_OBJ =  $(TD_STATS_SRCS:.cpp=.o)
+TD_STATS_EXE = $(INDDGO_BIN)/td_stats
 
-OTHER_SRCS = ./src/edge2dimacs.cpp
-OTHER_OBJ = $(OTHER_SRCS:.cpp=.o)
-OTHER_EXE = $(INDDGO_BIN)/edge2dimacs
+G_STATS_SRCS =  ./src/graph_stats.cpp 
+G_STATS_OBJ =  $(G_STATS_SRCS:.cpp=.o)
+G_STATS_EXE = $(INDDGO_BIN)/graph_stats
 
-all: $(PKT_EXE) $(STATS_EXE) $(OTHER_EXE)
+E2D_SRCS = ./src/edge2dimacs.cpp
+E2D_OBJ = $(E2D_SRCS:.cpp=.o)
+E2D_EXE = $(INDDGO_BIN)/edge2dimacs
+
+M2D_SRCS = ./src/metis2dimacs.cpp
+M2D_OBJ = $(M2D_SRCS:.cpp=.o)
+M2D_EXE = $(INDDGO_BIN)/metis2dimacs
+
+all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(M2D_EXE) $(G_STATS_EXE)
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
@@ -24,11 +34,24 @@ all: $(PKT_EXE) $(STATS_EXE) $(OTHER_EXE)
 $(PKT_EXE): $(PKT_OBJ) 
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(STATS_EXE): $(STATS_OBJ) 
+$(TD_STATS_EXE): $(TD_STATS_OBJ) 
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(OTHER_EXE): $(OTHER_OBJ) 
+$(G_STATS_EXE): $(G_STATS_OBJ) 
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
+
+$(E2D_EXE): $(E2D_OBJ)  ../lib/libgraphd.a
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
+
+$(M2D_EXE): $(M2D_OBJ)  ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 clean: 
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(STATS_OBJ) $(STATS_EXE) $(OTHER_OBJ) $(OTHER_EXE)
+	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ)
+
+doc: $(DOXYFILE)
+	doxygen $(DOXYFILE)
+
+clean_doc:
+	rm -rf $(DOX_DIR)
+

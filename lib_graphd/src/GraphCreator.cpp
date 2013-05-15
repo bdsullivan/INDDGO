@@ -23,7 +23,7 @@
 #include "RndNumGen.h"
 #include "Debug.h"
 #include "GraphUtil.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 
 namespace Graph {
     GraphCreator::GraphCreator(){
@@ -35,8 +35,8 @@ namespace Graph {
      * adds vertices k+1 up to n-1 with each being adjacent to a
      * randomly chosen k-clique in the existing graph at that step.
      */
-    WeightedMutableGraph *GraphCreator::initialize_ktree(int n, int k){
-        WeightedMutableGraph *mg = new WeightedMutableGraph(n);
+    VertexWeightedGraph *GraphCreator::initialize_ktree(int n, int k){
+        VertexWeightedGraph *mg = new VertexWeightedGraph(n);
 
         int i, j;
         int c, s;
@@ -89,15 +89,20 @@ namespace Graph {
      * with appropriate number of nodes, and other variables.  Creates a subgraph of H by selecting
      * random edges for removal and then adding them to the current Graph object.
      */
-    WeightedMutableGraph *GraphCreator::create_random_edge_subgraph(WeightedMutableGraph *H, int percent_edges){
+    VertexWeightedGraph *GraphCreator::create_random_edge_subgraph(VertexWeightedGraph *H, int percent_edges){
         //int n = H->Graph::Graph::capacity;
         int n = H->get_capacity();
 
-        WeightedMutableGraph *wmg = new WeightedMutableGraph(n);
+        VertexWeightedGraph *wmg = new VertexWeightedGraph(n);
         //set up the Graph allocations and default variables.
         wmg->num_edges = 0;
         wmg->capacity = n;
         wmg->num_nodes = n;
+
+        //if(wmg->capacity > H->weight.size()){
+        //   FERROR("%s: too much capacity in wmg for H", __FUNCTION__);
+        //  throw GraphException("element is out of bounds\n");
+        //}
 
         for(int i = 0; i < wmg->capacity; i++){
             wmg->weight[i] = H->weight[i];
@@ -168,8 +173,8 @@ namespace Graph {
      * by the members list.  If make_simple is true, then the resulting graph
      * is guaranteed to be simple.
      */
-    WeightedMutableGraph *GraphCreator::create_induced_subgraph(WeightedMutableGraph *g, list<int> *members, bool make_simple){
-        WeightedMutableGraph *wmg = new WeightedMutableGraph(members->size());
+    VertexWeightedGraph *GraphCreator::create_induced_subgraph(VertexWeightedGraph *g, list<int> *members, bool make_simple){
+        VertexWeightedGraph *wmg = new VertexWeightedGraph(members->size());
         // The caller of g function is responsible for allocating a Graph
         // of the appropriate size - make sure!
 
@@ -283,9 +288,9 @@ namespace Graph {
      * although g is not verified!  If make_simple is true, then the component
      * is guaranteed to be simple.
      */
-    WeightedMutableGraph *GraphCreator::create_component(WeightedMutableGraph *g,
-                                                         list<int> *members, bool make_simple){
-        WeightedMutableGraph *wmg;
+    VertexWeightedGraph *GraphCreator::create_component(VertexWeightedGraph *g,
+                                                        list<int> *members, bool make_simple){
+        VertexWeightedGraph *wmg;
         wmg = create_induced_subgraph(g, members, make_simple);
         // Set num_connected_components to 1 since g is known - not verified - should it be??
         wmg->num_connected_components = 1;
@@ -300,9 +305,9 @@ namespace Graph {
      * components is generally very fast (~3 seconds for 2^20 nodes).
      * If make_simple is true, then each component is guaranteed to be simple.
      */
-    list<WeightedMutableGraph *> GraphCreator::create_all_components(WeightedMutableGraph *g, bool make_simple){
+    list<VertexWeightedGraph *> GraphCreator::create_all_components(VertexWeightedGraph *g, bool make_simple){
         int i;
-        list<WeightedMutableGraph *> C;
+        list<VertexWeightedGraph *> C;
         // Use label_all_components
         // First find/label the components
         // Now create num_components lists - one for each component
@@ -324,7 +329,7 @@ namespace Graph {
         util.find_all_components(g, &members);
         // Now allocate room for each of the graphs
 
-        WeightedMutableGraph *H;
+        VertexWeightedGraph *H;
         for(i = 0; i < g->num_connected_components; i++){
             // Create the component for the i-th list in members
             // Respect the make_simple flag here!
@@ -352,11 +357,11 @@ namespace Graph {
      * and returns g value as well.  If make_simple is true, then each component
      * is guaranteed to be simple.
      */
-    list<WeightedMutableGraph *> GraphCreator::create_rec_all_components(WeightedMutableGraph *g, bool make_simple){
+    list<VertexWeightedGraph *> GraphCreator::create_rec_all_components(VertexWeightedGraph *g, bool make_simple){
         int i, cnum = -1;
-        list<WeightedMutableGraph *> C;
+        list<VertexWeightedGraph *> C;
         GraphUtil util;
-        WeightedMutableGraph *H;
+        VertexWeightedGraph *H;
 
         // First find the components - populate a components[] vector containing the labels
         vector<int> components(g->capacity, GD_UNDEFINED);
@@ -385,7 +390,7 @@ namespace Graph {
 
         // Now allocate room for each of the graphs
         for(i = 0; i < g->num_connected_components; i++){
-            //H = new WeightedMutableGraph();
+            //H = new VertexWeightedGraph();
             // Create the component for the i-th list in members
             // Respect the make_simple flag here!
             H = create_component(g, members + i, make_simple);

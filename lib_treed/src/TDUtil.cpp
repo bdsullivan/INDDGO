@@ -78,14 +78,14 @@ void td_size_histogram(TDTree *T, FILE *stream)
 * Set timings to true to print elapsed time (in seconds) for triangulation and tree decomposition construction.
 * Note, no timings will be produced if read_tree is used.   
 */
-void create_tree_decomposition(Graph::WeightedMutableGraph *G, TDTree **T, bool read_tree, char *tree_infile, bool read_ordering, bool scotch, char *ord_file, int elim_order_type, int start_v, int td_alg, bool make_nice, bool timings)
+void create_tree_decomposition(Graph::VertexWeightedGraph *G, TDTree **T, bool read_tree, char *tree_infile, bool read_ordering, bool scotch, char *ord_file, int elim_order_type, int start_v, int td_alg, bool make_nice, bool timings)
 {
   Graph::GraphEOUtil eoutil;
   if (!G)
     throw(Graph::GraphException("Null graph passed to create_tree_decomposition\n"));
   
   // Create a copy of G to do the triangulation and elim order 
-  Graph::WeightedMutableGraph H = *G;
+  Graph::VertexWeightedGraph H = *G;
   (*T) = new TDTree(&H);
   // Set the name of T's graph file
   char *cstr = new char[G->get_input_file().length()+1];

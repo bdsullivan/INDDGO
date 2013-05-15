@@ -23,7 +23,7 @@ inddgo-info@googlegroups.com
 #include "TreeDecomposition.h"
 #include "weighted_ind_set.h"
 #include "Debug.h"
-#include "DIMACSGraphWriter.h"
+#include "GraphWriter.h"
 
 void usage(const char *s)
 {
@@ -2130,7 +2130,7 @@ int compute_weighted_ind_set_table(TDTree *T, int k)
 * If solved, the solution is written to <DIMACS_file>.IND_SET.sol.
 */
 void write_ind_set_model(const char *DIMACS_file, const char *model_file,
-	Graph::WeightedMutableGraph *G)
+	Graph::VertexWeightedGraph *G)
 {
 	int i, j;
 	char sol_file[200];
@@ -2255,7 +2255,7 @@ void compute_contribution(TDTree *T, int k, bigint_t *mask,
 			Graph::GraphProperties properties;
 
 			if (properties.is_independent_set(
-				(Graph::WeightedMutableGraph *) (T->G), &missing_set, &val))
+				(Graph::VertexWeightedGraph *) (T->G), &missing_set, &val))
 				print_message(0, "Missing set is independent with weight %f\n",
 				val);
 			else
@@ -2579,7 +2579,7 @@ int reconstruct_solution(TDTree *T, list<int> *optimal_solution,
 * Populates the provided Graph structure with the necessary information to 
 * do the WIS calculation.
 */
-void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
+void create_WIS_graph(DP_info *info, Graph::VertexWeightedGraph *&G)
 {
 	int i;
 
@@ -2611,10 +2611,9 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 
 	Graph::GraphProperties properties;
 	Graph::GraphEOUtil eoutil;
-	Graph::GraphWriter *writer;
-	Graph::GraphReaderWriterFactory factory;
+	Graph::GraphWriter writer;
 
-	writer = factory.create_writer("DIMACS");
+	//writer = factory.create_writer("DIMACS");
 	// Put the input graph in canonical form for the tests
 	properties.make_canonical(G);
 	// Make sure there is only 1 component in the graph!
@@ -2622,11 +2621,11 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 	{
 		print_message(0,
 			"WIS only runs on connected graphs.  This graph has more than one component!\n");
-		list<Graph::WeightedMutableGraph *> C;
+		list<Graph::VertexWeightedGraph *> C;
 
 		C = creator.create_all_components(G, true);
 		print_message(0, "Found %d components\n", C.size());
-		list<Graph::WeightedMutableGraph *>::iterator cc;
+		list<Graph::VertexWeightedGraph *>::iterator cc;
 		int comp_number = 0;
 		char temp_file[100], comp_file[100];
 		int max_size = -1;
@@ -2639,8 +2638,8 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 					info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
 				sprintf(comp_file, "%s_%d_node_component_%d.comp",
 					info->DIMACS_file, (*cc)->get_num_nodes(), comp_number);
-				writer->set_out_file_name(temp_file);
-				writer->write_graph(*cc);
+				//writer->set_out_file_name(temp_file);
+				writer.write_graph(*cc, temp_file, "DIMACS", true);
 
 				normalize_DIMACS_file(temp_file, comp_file);
 				remove(temp_file);
@@ -2691,8 +2690,6 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 		}
 	}
 
-	delete writer;
-
 }
 
 
@@ -2700,7 +2697,7 @@ void create_WIS_graph(DP_info *info, Graph::WeightedMutableGraph *&G)
 * Creates a tree decomposition for the provided tree and the DP options
 * contained in DP_info.
 */
-void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
+void create_tree_decomposition(DP_info *info, Graph::VertexWeightedGraph *G,
 	TDTree **T)
 {
 	create_tree_decomposition(info, G, T, true);
@@ -2710,7 +2707,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 * Creates a tree decomposition for the provided tree and the DP options
 * contained in DP_info.
 */
-void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
+void create_tree_decomposition(DP_info *info, Graph::VertexWeightedGraph *G,
 	TDTree **T, bool suppress_timing)
 {
 	// Create a copy of G to do the triangulation and elim order
@@ -2721,7 +2718,7 @@ void create_tree_decomposition(DP_info *info, Graph::WeightedMutableGraph *G,
 		return;
 	}
 
-	Graph::WeightedMutableGraph H = *G;
+	Graph::VertexWeightedGraph H = *G;
 
 	//Run (optional) lower bound heuristics and print information
 	if(info->lower_bounds)

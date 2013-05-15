@@ -30,7 +30,7 @@ class GraphPropertyTest: public testing::Test
 {
 public:
 	Graph::GraphCreatorFile creator;
-	Graph::MutableGraph *mg;
+	Graph::Graph *mg;
 	Graph::GraphProperties properties;
 
 	virtual void SetUp()

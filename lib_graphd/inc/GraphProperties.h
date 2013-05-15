@@ -31,22 +31,22 @@ namespace Graph {
 public:
     GraphProperties();
     virtual ~GraphProperties();
-    void make_simple(MutableGraph *mg);             //Removes all loops and duplicate edges. Sets the simple flag to true.
-    void make_canonical(MutableGraph *mg);
-    int make_clique(MutableGraph *mg, list<int> *vertices);
-    int fill_adj_vec(MutableGraph *mg, int v);
-    bool check_simple(MutableGraph *mg);
+    void make_simple(Graph *g);             //Removes all loops and duplicate edges. Sets the simple flag to true.
+    void make_canonical(Graph *g);
+    int make_clique(Graph *g, list<int> *vertices);
+    int fill_adj_vec(Graph *g, int v);
+    bool check_simple(Graph *g);
     // Connectivity functions
 
-    bool is_connected(MutableGraph *mg);
+    bool is_connected(Graph *g);
 
-    bool is_clique(MutableGraph *mg, list<int> *vertices);
-    bool is_independent_set(MutableGraph *mg, list<int> *vertices);
-    bool is_independent_set(WeightedMutableGraph *mg, list<int> *vertices,
+    bool is_clique(Graph *g, list<int> *vertices);
+    bool is_independent_set(Graph *g, list<int> *vertices);
+    bool is_independent_set(VertexWeightedGraph *mg, list<int> *vertices,
                             int *val);
-    bool is_path(MutableGraph *mg, int start, int end, bool *t);             // Determines existence of a path between start
+    bool is_path(Graph *g, int start, int end, bool *t);             // Determines existence of a path between start
     // and end involving only vertices v with t[v]=true
-    bool is_path(MutableGraph *mg, int start, int end);
+    bool is_path(Graph *g, int start, int end);
     
     float edgeDensity(Graph *g);
     int graphSize(Graph *g);

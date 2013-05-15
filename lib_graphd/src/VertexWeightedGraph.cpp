@@ -19,24 +19,25 @@
 
  */
 
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 #include "GraphProperties.h"
-#include "GraphReaderWriterFactory.h"
+#include "GraphWriter.h"
 #include "GraphCreatorFile.h"
 #include <string.h>
 
 namespace Graph {
-    WeightedMutableGraph::WeightedMutableGraph(){
+    VertexWeightedGraph::VertexWeightedGraph(){
     }
 
-    WeightedMutableGraph::WeightedMutableGraph(int n) :
-        Graph(n), MutableGraph(n), WeightedGraph(n){
+    VertexWeightedGraph::VertexWeightedGraph(int n) :
+        Graph(n){
+        weight.resize(n, 0);
     }
 
-    WeightedMutableGraph::~WeightedMutableGraph(){
+    VertexWeightedGraph::~VertexWeightedGraph(){
     }
 
-    WeightedMutableGraph& WeightedMutableGraph::operator=(const WeightedMutableGraph& rhs){
+    VertexWeightedGraph& VertexWeightedGraph::operator=(const VertexWeightedGraph& rhs){
         weight = rhs.weight;
         simple = rhs.simple;
         canonical = rhs.canonical;
@@ -60,27 +61,38 @@ namespace Graph {
         return *this;
     } // =
 
-    /* This should really live in MutableGraph, but all the GraphCreator code is currently for WMGs only.
+    void VertexWeightedGraph::set_weight(vector<int> weight){
+        this->weight = weight;
+    }
+
+    vector<int> VertexWeightedGraph::get_weight() const {
+        return weight;
+    }
+
+    int VertexWeightedGraph::get_vertex_weight(int k){
+        return this->weight[k];
+    }
+
+    /* This should really live in Graph, but all the GraphCreator code is currently for WMGs only.
      * Finds all connected components and saves one with largest number of nodes to the specified filename.
      * If you desire normalized DIMACS files, you must run that after the component file is created.
      */
-    void WeightedMutableGraph::write_largest_component(std::string filetype, std::string filename){
+    void VertexWeightedGraph::write_largest_component(std::string filetype, std::string filename){
         GraphProperties properties;
-        GraphWriter *writer;
-        GraphReaderWriterFactory factory;
+        GraphWriter gw;
         GraphCreatorFile creator;
 
-        writer = factory.create_writer(filetype);
-        writer->set_out_file_name(filename);
+        //writer = factory.create_writer(filetype);
+        //writer->set_out_file_name(filename);
 
         // Put the input graph in canonical form for the tests
         properties.make_canonical(this);
 
-        list<WeightedMutableGraph *> C;
+        list<VertexWeightedGraph *> C;
         C = creator.create_all_components(this, true);
         print_message(10, "Found %d components\n", C.size());
-        list<WeightedMutableGraph *>::iterator cc;
-        list<WeightedMutableGraph *>::iterator maxcomp;
+        list<VertexWeightedGraph *>::iterator cc;
+        list<VertexWeightedGraph *>::iterator maxcomp;
         int max_size = -1;
 
         for(cc = C.begin(); cc != C.end(); ++cc){
@@ -93,7 +105,7 @@ namespace Graph {
             }
         }
 
-        writer->write_graph(*maxcomp);
+        gw.write_graph(*maxcomp, filename, filetype, true);
 
         /*cleanup*/
         int s = C.size();
@@ -101,7 +113,6 @@ namespace Graph {
             delete C.front();
             C.pop_front();
         }
-        delete writer;
     } // write_largest_component
 }
 

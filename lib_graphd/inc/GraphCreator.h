@@ -23,9 +23,7 @@
 #define GRAPHCREATOR_H_
 
 #include "Graph.h"
-#include "WeightedGraph.h"
-#include "MutableGraph.h"
-#include "WeightedMutableGraph.h"
+#include "VertexWeightedGraph.h"
 
 using namespace std;
 
@@ -33,27 +31,26 @@ namespace Graph {
     class GraphCreator
     {
 public:
-    virtual WeightedMutableGraph *create_random_edge_subgraph(WeightedMutableGraph *wmg, int percent_edges);
-    virtual WeightedMutableGraph *initialize_ktree(int n, int tw);
+    virtual VertexWeightedGraph *create_random_edge_subgraph(VertexWeightedGraph *wmg, int percent_edges);
+    virtual VertexWeightedGraph *initialize_ktree(int n, int tw);
     // Creates the induced subgraph on the given list of vertices (by position in adj_list).
     // Does not check connectedness. Caller must allocate space for the graph G.
-    virtual WeightedMutableGraph *create_induced_subgraph(WeightedMutableGraph *wmg, list<int> *members, bool make_simple);
+    virtual VertexWeightedGraph *create_induced_subgraph(VertexWeightedGraph *wmg, list<int> *members, bool make_simple);
 
     // Specialized induced subgraph functionality for components. Sets num_connected_components to 1.
-    virtual WeightedMutableGraph *create_component(WeightedMutableGraph *g,
-                                                   list<int> *members, bool make_simple);
+    virtual VertexWeightedGraph *create_component(VertexWeightedGraph *g,
+                                                  list<int> *members, bool make_simple);
 
     // Recursive and non-recursive functions that create all connected components of the graph,
     // which it places in the given vector
     // (each Graph is allocated with new inside the function). Labels transfer to adjlists.
     // Returns the number of components.
-    virtual list<WeightedMutableGraph *> create_rec_all_components(WeightedMutableGraph *g, bool make_simple);
-    virtual list<WeightedMutableGraph *> create_all_components(WeightedMutableGraph *g, bool make_simple);
+    virtual list<VertexWeightedGraph *> create_rec_all_components(VertexWeightedGraph *g, bool make_simple);
+    virtual list<VertexWeightedGraph *> create_all_components(VertexWeightedGraph *g, bool make_simple);
 
     virtual Graph *create_graph() = 0;
-    virtual WeightedGraph *create_weighted_graph() = 0;
-    virtual MutableGraph *create_mutable_graph() = 0;
-    virtual WeightedMutableGraph *create_weighted_mutable_graph() = 0;
+    virtual Graph *create_mutable_graph() = 0;
+    virtual VertexWeightedGraph *create_vertex_weighted_graph() = 0;
 
     GraphCreator();
     virtual ~GraphCreator();

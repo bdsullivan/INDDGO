@@ -23,7 +23,7 @@
 #define GRAPHCREATORFILE_H_
 
 #include "GraphCreator.h"
-#include "GraphReaderWriterFactory.h"
+#include "GraphReader.h"
 #include <string>
 #include <vector>
 
@@ -31,7 +31,6 @@ namespace Graph {
     class GraphCreatorFile : public GraphCreator
     {
 private:
-    GraphReaderWriterFactory *factory_rw;
     std::string file_name;
     std::string graph_type;
 
@@ -41,9 +40,13 @@ public:
 
     virtual ~GraphCreatorFile();
     virtual Graph *create_graph();
-    virtual WeightedGraph *create_weighted_graph();
-    virtual MutableGraph *create_mutable_graph();
-    virtual WeightedMutableGraph *create_weighted_mutable_graph();
+    virtual VertexWeightedGraph *create_vertex_weighted_graph();
+    virtual Graph *create_mutable_graph();
+    /**
+     * Compatibility function, simply calls create_vertex_weighted_graph under the hood.  Deprecated.
+     * \return G new graph
+     */
+    virtual VertexWeightedGraph *create_weighted_mutable_graph();
 
     std::string get_file_name() const;
     std::string get_graph_type() const;

@@ -55,7 +55,7 @@ int main(int argc, char **argv){
 
     //  DEBUG("Creating mutable graph\n");
     //  creator.set_file_name("house.txt");
-    //  Graph::MutableGraph mg = creator.create_mutable_graph();
+    //  Graph::Graph mg = creator.create_mutable_graph();
     //  cout << mg.get_num_edges() << endl;
 
     //  mg.add_edge_advance(1,1);
