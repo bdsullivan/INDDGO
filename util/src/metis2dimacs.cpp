@@ -24,8 +24,8 @@
 #include "Log.h"
 #include "VertexWeightedGraph.h"
 #include "GraphException.h"
-#include "NewGraphReader.h"
-#include "NewGraphWriter.h"
+#include "GraphReader.h"
+#include "GraphWriter.h"
 
 using namespace std;
 
@@ -62,8 +62,8 @@ int main(int argc, char **argv){
 
     Graph::GraphCreatorFile *gcf;
     Graph::GraphProperties prop;
-    Graph::NewGraphReader ngr;
-    Graph::NewGraphWriter writer;
+    Graph::GraphReader ngr;
+    Graph::GraphWriter writer;
 
     g = new Graph::Graph();
     //fprintf(stderr,"mg number of nodes (before): %d\n", mg->get_num_nodes());

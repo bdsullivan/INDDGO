@@ -51,7 +51,7 @@ namespace Graph {
 
     VertexWeightedGraph *GraphCreatorFile::create_vertex_weighted_graph(){
         VertexWeightedGraph *vwg = new VertexWeightedGraph();
-        NewGraphReader gr;
+        GraphReader gr;
 
         try
         {
@@ -71,7 +71,7 @@ namespace Graph {
 
     Graph *GraphCreatorFile::create_graph(){
         Graph *g = new Graph();
-        NewGraphReader gr;
+        GraphReader gr;
 
         try
         {

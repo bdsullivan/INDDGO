@@ -23,7 +23,7 @@ inddgo-info@googlegroups.com
 #include "TreeDecomposition.h"
 #include "weighted_ind_set.h"
 #include "Debug.h"
-#include "NewGraphWriter.h"
+#include "GraphWriter.h"
 
 void usage(const char *s)
 {
@@ -2611,7 +2611,7 @@ void create_WIS_graph(DP_info *info, Graph::VertexWeightedGraph *&G)
 
 	Graph::GraphProperties properties;
 	Graph::GraphEOUtil eoutil;
-	Graph::NewGraphWriter writer;
+	Graph::GraphWriter writer;
 
 	//writer = factory.create_writer("DIMACS");
 	// Put the input graph in canonical form for the tests

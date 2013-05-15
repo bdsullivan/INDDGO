@@ -23,7 +23,7 @@
 #include "Log.h"
 #include "VertexWeightedGraph.h"
 #include "GraphException.h"
-#include "NewGraphWriter.h"
+#include "GraphWriter.h"
 
 using namespace std;
 
@@ -110,7 +110,7 @@ int main(int argc, char **argv){
 
     Graph::GraphCreatorFile creator;
     Graph::GraphProperties prop;
-    Graph::NewGraphWriter writer;
+    Graph::GraphWriter writer;
 
     DEBUG("Graph generation loop\n");
     DEBUG("n : %d k: %d\n", ktree_n, ktree_p);

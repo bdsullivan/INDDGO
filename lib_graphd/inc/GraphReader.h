@@ -23,23 +23,46 @@
 #define GRAPHREADER_H_
 
 #include "Node.h"
+#include "Graph.h"
+#include "VertexWeightedGraph.h"
+#include "Log.h"
+#include "Debug.h"
+#include <stdio.h>
+#include <strings.h>
+#include <stdlib.h>
+#include <iostream>
+#include <algorithm>
+#include <iterator>
+#include <fstream>
+#include <string>
+#include <sstream>
 #include <vector>
 
 namespace Graph {
-    class GraphReader
-    {
+    class GraphReader {
 public:
 
     GraphReader();
     virtual ~GraphReader();
-
-    virtual void read_graph(const char *filename) = 0;
-    virtual std::vector<int> get_degree() = 0;
-    virtual std::vector<Node> get_nodes() = 0;
-    virtual int get_num_edges() const = 0;
-    virtual std::vector<int> get_weights() = 0;
-    virtual int get_capacity() const = 0;
-    virtual void set_capacity(int capacity) = 0;
+    /**
+     * \brief Reads in a graph of the specified type
+     *
+     * some more comments
+     * on multiple lines
+     * \param g Pointer to a graph
+     * \param filename file to read graph from
+     * \param type string specifying the type of the graph
+     */
+    int read_graph(Graph *g, const string filename, string type, bool read_vertex_weights);
+private:
+    /** \brief read an edgelist */
+    int read_edgelist(Graph *g, const string filename);
+    /** \brief read a DIMACS file */
+    int read_dimacs(Graph *g, const string filename, bool read_vertex_weights);
+    /** \brief read an adjacency matrix */
+    int read_adjmatrix(Graph *g, const string filename);
+    /** \brief read a METIS file */
+    int read_metis(Graph *g, const string filename);
     };
 }
 
