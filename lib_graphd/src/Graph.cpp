@@ -119,8 +119,8 @@ namespace Graph {
 
     bool Graph::is_edge(int u, int v) const {
         //      Assumes graph is symmetric
-        list<int> nbrs = nodes[u].get_nbrs();
-        list<int>::iterator it;
+        const list<int> &nbrs = nodes[u].get_nbrs_ref();  // passing a ref is much faster than copying a list
+        list<int>::const_iterator it;
         for(it = nbrs.begin(); it != nbrs.end(); ++it){
             if(*it == v){
                 return true;

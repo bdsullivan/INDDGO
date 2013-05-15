@@ -40,6 +40,12 @@ namespace Graph {
         return &(this->nbrs);
     }
 
+    /*
+     * \return r const ref to the node neighbors
+     */
+    const list<int> &Node::get_nbrs_ref() const{
+        return this->nbrs;
+    }
     void Node::set_label(int label){
         this->label = label;
     }

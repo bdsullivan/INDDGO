@@ -36,6 +36,11 @@ public:
     int get_label() const;
     list<int> get_nbrs() const;
     list<int> *get_nbrs_ptr();
+
+    /*
+     * \brief returns a ref to the nbrs of this Node
+     */
+    const list<int> &get_nbrs_ref() const;
     int get_degree() const;
     void set_label(int label);
     void set_nbr(list<int> nbr);
