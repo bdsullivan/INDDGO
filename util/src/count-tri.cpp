@@ -45,7 +45,6 @@ int main(int argc, char **argv){
     int seed = 0;
     int sum;
 
-
     Graph::GraphProperties prop;
     Graph::GraphReader ngr;
 
@@ -62,12 +61,12 @@ int main(int argc, char **argv){
     prop.all_triangles_edge_listing(g, triangles);
 
     sum = 0;
-    for(int i=0; i<g->get_num_nodes(); i++){
+    for(int i = 0; i < g->get_num_nodes(); i++){
         sum += triangles[i];
-        printf("vertex: %d: %ld (%ld)\n", i, triangles[i]/3, triangles[i]);
+        printf("vertex: %d: %ld (%ld)\n", i, triangles[i] / 3, triangles[i]);
     }
 
-    printf("Total triangle: %d (%d)\n", sum /3, sum);
+    printf("Total triangle: %d (%d)\n", sum / 3, sum);
 
     return 0;
 } // main

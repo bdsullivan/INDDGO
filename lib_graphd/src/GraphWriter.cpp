@@ -72,7 +72,7 @@ namespace Graph {
             cerr << "unknown type: " << type << endl;
         }
         return 0;
-    }
+    } // write_graph
 
     /**
      * \return 0 on success, nonzero on failure

@@ -68,9 +68,7 @@ public:
      * \brief Returns an array of all triangles
      */
     void all_triangles_edge_listing(Graph *g, vector<long int> &t);
-
     };
-
 }
 
 #endif /* GRAPHPROPERTIES_H_ */

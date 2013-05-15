@@ -378,7 +378,7 @@ namespace Graph {
         }
 
         fprintf(stderr,"  vertex_listing v->nbrs:");
-        for(inner=nbrs->begin(); inner != nbrs->end(); ++inner){
+        for(inner = nbrs->begin(); inner != nbrs->end(); ++inner){
             fprintf(stderr, " %d", *inner);
         }
         fprintf(stderr, "\n");
@@ -388,15 +388,15 @@ namespace Graph {
             nbr_nbrs = n->get_nbrs_ptr();
 
             fprintf(stderr,"    vertex_listing %d->nbrs:", *outer);
-            for(inner=nbr_nbrs->begin(); inner != nbr_nbrs->end(); ++inner){
+            for(inner = nbr_nbrs->begin(); inner != nbr_nbrs->end(); ++inner){
                 fprintf(stderr, " %d", *inner);
             }
             fprintf(stderr, "\n");
 
-        //    for(inner = nbr_nbrs->begin(); inner != nbr_nbrs->end(); ++inner){
+            //    for(inner = nbr_nbrs->begin(); inner != nbr_nbrs->end(); ++inner){
             stuff = n->get_largest_neighbor_below(*outer);
             fprintf(stderr, "Found closest to %d as %d\n", *outer, *stuff);
-            for(crit = stuff ; crit != nbr_nbrs->rend(); crit--){
+            for(crit = stuff; crit != nbr_nbrs->rend(); crit--){
                 if(*crit != v){
                     fprintf(stderr, "      vertex_listing: checking triangle (%d,%d,%d)\n", v,*crit,*outer);
                     if(A[*crit] == true){
@@ -408,9 +408,6 @@ namespace Graph {
                 }
             }
         }
-        
-            
-
     } //vertex_listing
 
     /**
@@ -425,7 +422,7 @@ namespace Graph {
         vector<int> intersection;
 
         fprintf(stderr,"edge_listing(%d-%d)\n", u, v);
-        
+
         list<int> *un = g->get_node(u)->get_nbrs_ptr();
         list<int> *vn = g->get_node(v)->get_nbrs_ptr();
 
@@ -491,14 +488,12 @@ namespace Graph {
             vertex_listing(g, sorted_indices[i].first, t);
         }
 
-
-        for(v = g->get_num_nodes() -1 ; v >= number_high; v--){
+        for(v = g->get_num_nodes() - 1; v >= number_high; v--){
             vn = g->get_node(sorted_indices[v].first);
             for(rit = vn->get_largest_neighbor_below(v); rit != vn->get_nbrs_ptr()->rbegin(); rit--){
                 if((g->get_degree(*rit) >= number_high)){
                     edge_listing(g, *rit, sorted_indices[v].first, t, number_high);
                 }
-
             }
         }
         // count triangles using edge_listing for 'low degree' vertices (2)
@@ -542,21 +537,15 @@ namespace Graph {
         list<int> *nbrs;
         Node *nv, *nu;
         int vp, up;
-        for(v = 0; v < g->get_num_nodes(); v++){//3
+        for(v = 0; v < g->get_num_nodes(); v++){ //3
             nv = g->get_node(v);
-            for(std::list<int>::iterator it=nbrs->begin(); it != nbrs->end(); it++){ //3a
+            for(std::list<int>::iterator it = nbrs->begin(); it != nbrs->end(); it++){ //3a
                 nu = g->get_node(*it);
                 if(nu->get_degree() > nv->get_degree()){ //3a
                 }
             }
         }
-
-                    
-                    
-            
-        
-
-    }
+    } // all_triangles_compact_forward
 
     /*
      * Counts triangles using the edge-listing algorithm in Latapy
@@ -571,7 +560,7 @@ namespace Graph {
         list<int>::iterator lt;
 
         // all the edgelists must be sorted
-        for(i = 0; i<g->get_num_nodes(); i++){
+        for(i = 0; i < g->get_num_nodes(); i++){
             g->get_node(i)->sort_nbr();
         }
 
@@ -585,21 +574,21 @@ namespace Graph {
                     v_n = g->get_node(v)->get_nbrs_ptr();
                     //printf("looking at edge: %d-%d\n", u, v);
                     std::set_intersection(u_n->begin(), u_n->end(), v_n->begin(), v_n->end(), std::back_inserter(intersection));
-                    /* 
-                    printf("  nbrs_u(%d): ", u);
-                    for(lt = u_n->begin(); lt != u_n->end(); ++lt){
+                    /*
+                       printf("  nbrs_u(%d): ", u);
+                       for(lt = u_n->begin(); lt != u_n->end(); ++lt){
                         printf(" %d", *lt);
-                    }
-                    //printf("\n  nbrs_v(%d): ", v);
-                    for(lt = v_n->begin(); lt != v_n->end(); ++lt){
+                       }
+                       //printf("\n  nbrs_v(%d): ", v);
+                       for(lt = v_n->begin(); lt != v_n->end(); ++lt){
                         printf(" %d", *lt);
-                    }
-                    //printf("\n    Intersection: ");
-                    for(it = intersection.begin(); it != intersection.end(); it++){
+                       }
+                       //printf("\n    Intersection: ");
+                       for(it = intersection.begin(); it != intersection.end(); it++){
                         printf(" %d", *it);
-                    }
-                    printf("\n");
-                    */
+                       }
+                       printf("\n");
+                     */
 
                     for(it = intersection.begin(); it != intersection.end(); it++){
                         //printf("found triangle: (%d,%d,%d)\n",*it, u, v);
@@ -610,5 +599,5 @@ namespace Graph {
                 }
             }
         }
-    }
+    } // all_triangles_edge_listing
 }

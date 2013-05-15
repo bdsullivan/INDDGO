@@ -80,7 +80,7 @@ int main(int argc, char **argv){
     cout << "Input  type: " << intype << "\n";
     cout << "Output file: " << outfile << "\n";
     cout << "Methods    :";
-    for(vector<string>::iterator it = methods.begin() ; it != methods.end(); ++it){
+    for(vector<string>::iterator it = methods.begin(); it != methods.end(); ++it){
         cout << " " << *it;
     }
     cout << "\n";

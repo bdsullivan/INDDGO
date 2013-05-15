@@ -43,9 +43,10 @@ namespace Graph {
     /*
      * \return r const ref to the node neighbors
      */
-    const list<int> &Node::get_nbrs_ref() const{
+    const list<int> &Node::get_nbrs_ref() const {
         return this->nbrs;
     }
+
     void Node::set_label(int label){
         this->label = label;
     }
@@ -97,13 +98,13 @@ namespace Graph {
      * \return x the index of the largest neighbor below n
      */
     std::list<int>::const_reverse_iterator Node::get_largest_neighbor_below(int n){
-    //FIXME: probably should be able to handle unsorted case, but how to do without sacrificing efficiency?
-    //       also maybe do a binary instead of linear search
+        //FIXME: probably should be able to handle unsorted case, but how to do without sacrificing efficiency?
+        //       also maybe do a binary instead of linear search
         int v;
         std::list<int>::reverse_iterator it;
 
         for(it = this->nbrs.rbegin(); it != this->nbrs.rend(); it++){
-            if(*it > n) {
+            if(*it > n){
                 return --it;
             }
         }
