@@ -26,6 +26,8 @@
 #include "GraphCreatorFile.h"
 #include <gtest/gtest.h>
 
+#include <fstream>
+
 using namespace std;
 class GraphTest: public testing::Test {
 public:
@@ -37,7 +39,7 @@ public:
         //creator.set_file_name("../data/1dc.128.txt");
         creator.set_file_name("data/1dc.128.txt");
         creator.set_graph_type("DIMACS");
-		g = creator.create_graph();
+        g = creator.create_graph();
     }
 
     virtual void TearDown(){
@@ -116,6 +118,13 @@ TEST_F(GraphTest, testNodeNbrs)
 TEST_F(GraphTest, testGetDegrees)
 {
     vector<int> degree = g->get_degree();
+    
+    ofstream outFile;
+    outFile.open("degrees.txt");
+    for(int i=0; i<degree.size(); i++){
+        outFile << i << " " << degree[i] << endl;
+    }
+
     EXPECT_EQ(31, degree[86]);
 }
 

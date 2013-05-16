@@ -353,29 +353,29 @@ namespace Graph {
     } // is_path
 
 
-    float GraphProperties::edgeDensity(Graph *g){
+    void GraphProperties::edgeDensity(Graph *g, float &ed){
         int V = g->num_nodes;
         int E = g->num_edges;
         
-        return (2.0*E)/(V*(V-1.0));
+        ed = (2.0*E)/(V*(V-1.0));
     }
 
 
-    int GraphProperties::graphSize(Graph *g){
-        return g->num_nodes;
+    void GraphProperties::graphSize(Graph *g, int &size){
+        size = g->num_nodes;
     }
 
 
-    vector<int> GraphProperties::degDist(Graph *g){
-        int i, size=g->degree.size(); 
-        //vector< vector<int> > res(size, 0);
-        vector<int> res(size, 0);
+    void GraphProperties::degDist(Graph *g, vector<int> &dist){
+        int i, size=g->degree.size();
 
+        dist.resize(size);
         for(i=0; i<size; i++){
-            res[g->degree[i]] += 1;
+            dist[i] = 0;
         }
 
-        //TODO: shrink vector
-        return res;
+        for(i=0; i<size; i++){
+            dist[g->degree[i]] += 1;
+        }
     }
 }

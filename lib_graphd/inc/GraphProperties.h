@@ -48,9 +48,9 @@ public:
     // and end involving only vertices v with t[v]=true
     bool is_path(Graph *g, int start, int end);
     
-    float edgeDensity(Graph *g);
-    int graphSize(Graph *g);
-    vector<int> degDist(Graph *g);
+    void edgeDensity(Graph *g, float *ed);
+    void graphSize(Graph *g, int *size);
+    void degDist(Graph *g, vector<int> dist);
     };
 }
 
