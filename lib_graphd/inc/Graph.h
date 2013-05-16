@@ -79,6 +79,7 @@ public:
     vector<int> get_adjncy() const;
     virtual int get_capacity() const;
     vector<int> get_degree() const;
+    const vector<int> &get_degree_ref() const;
     virtual int get_degree(int v) const;
     string get_graph_type() const;
     string get_input_file();

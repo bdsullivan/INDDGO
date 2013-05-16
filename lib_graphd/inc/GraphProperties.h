@@ -47,19 +47,12 @@ public:
     bool is_path(Graph *g, int start, int end, bool *t);             // Determines existence of a path between start
     // and end involving only vertices v with t[v]=true
     bool is_path(Graph *g, int start, int end);
-    /**
-     * \brief lists all trianges in G that v is a member of
-     */
-    void vertex_listing(Graph *g, int v, vector<long int> &t);
 
     /**
-     * \brief Get a list of triangles containing a given edge
+     * \brief Sorts a nodes neighor list by degree
      */
-    void edge_listing(Graph *g, int u, int v, vector<long int> &t, int number_high);
-    /**
-     * \brief Returns an array of all triangles
-     */
-    void all_triangles(Graph *g, vector<long int> &t, int number_high);
+    void sort_nbrs_by_map(vector<int> map, Node *n);
+
     /**
      * \brief Returns an array of all triangles
      */
@@ -68,6 +61,11 @@ public:
      * \brief Returns an array of all triangles
      */
     void all_triangles_edge_listing(Graph *g, vector<long int> &t);
+
+    /**
+     * \brief returns clustering coeffecients
+     */
+    void clustering_coefficients(Graph *g,double &global_cc, double &avg_cc, vector<double> &local_ccs);
     };
 }
 

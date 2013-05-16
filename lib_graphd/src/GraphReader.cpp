@@ -178,6 +178,7 @@ namespace Graph {
            }
 
          */
+        fclose(in);
         return 0;
     } // read_edgelist
 

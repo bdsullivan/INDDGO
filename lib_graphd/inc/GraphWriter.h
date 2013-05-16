@@ -76,6 +76,10 @@ private:
      * \brief Writes a given graph to file in GraphViz format
      */
     int write_graphviz(Graph *g, const string filename);
+    /**
+     * \brief Writes a given graph to file in Adjacency List format
+     */
+    int write_adjlist(Graph *g, const string filename);
     };
 }
 

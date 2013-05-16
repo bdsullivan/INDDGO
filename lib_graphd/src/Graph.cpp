@@ -69,6 +69,10 @@ namespace Graph {
         return degree;
     }
 
+    const vector<int> &Graph::get_degree_ref() const {
+        return degree;
+    }
+
     vector<Node> Graph::get_nodes() const {
         return nodes;
     }

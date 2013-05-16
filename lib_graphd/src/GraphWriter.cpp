@@ -68,6 +68,9 @@ namespace Graph {
         else if("GRAPHVIZ" == t){
             write_graphviz(g, filename);
         }
+        else if("ADJLIST" == t){
+            write_adjlist(g, filename);
+        }
         else {
             cerr << "unknown type: " << type << endl;
         }
@@ -99,6 +102,41 @@ namespace Graph {
                     val = 1;
                 }
                 fprintf(fout, "%d ", val);
+            }
+            fprintf(fout, "\n");
+        }
+
+        fclose(fout);
+
+        return 0;
+    } // write_adjmatrix
+
+    /**
+     * \return 0 on success, nonzero on failure
+     * \param[in] g Pointer to the graph to be written
+     * \param[in] filename full path of the file to be written to
+     */
+    int GraphWriter::write_adjlist(Graph *g, const string filename){
+        FILE *fout = fopen(filename.c_str(), "w");
+        if(!fout){
+            fatal_error("can not open %s for write", filename.c_str());
+        }
+
+        int n = g->get_num_nodes();
+        int i = 0;
+        int j = 0;
+        int val = 0;
+
+        for(i = 0; i < n; i++){
+            const list<int> &nbrs = g->get_node(i)->get_nbrs_ref();
+            fprintf(fout, "%d", i);
+            for(list<int>::const_iterator it = nbrs.begin(); it != nbrs.end(); ++it){
+                if(*it > i){
+                    fprintf(fout, " %d", *it);
+                }
+                else if(*it == i){
+                    fprintf(stderr, "Found self loop on node %d\n", i);
+                }
             }
             fprintf(fout, "\n");
         }

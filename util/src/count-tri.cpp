@@ -26,6 +26,8 @@
 #include "GraphException.h"
 #include "GraphReader.h"
 #include "GraphWriter.h"
+#include <numeric>
+#include <ctime>
 
 using namespace std;
 
@@ -45,6 +47,8 @@ int main(int argc, char **argv){
     int seed = 0;
     int sum;
 
+    clock_t begin, end;
+
     Graph::GraphProperties prop;
     Graph::GraphReader ngr;
 
@@ -55,18 +59,47 @@ int main(int argc, char **argv){
     ngr.read_graph(g, argv[1], "Edge", false);
     printf("Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
+    printf("Simplifying graph\n");
+    begin = clock();
+    prop.make_simple(g);
+    end = clock();
+    printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
+    printf("After simplification: %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
+
     //Now, do our calculations
     vector<long int> triangles(g->get_num_nodes(), 0);
 
+    printf("Calculating triangles using compact-forward method\n");
+    begin = clock();
+    prop.all_triangles_compact_forward(g, triangles);
+    end = clock();
+    sum = std::accumulate(triangles.begin(), triangles.end(), 0);
+    printf("Total triangles (compact-forward): %d\n", sum);
+    printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
+
+    triangles.assign(g->get_num_nodes(), 0);
+    printf("Calculating triangles using edge-listing method\n");
+    begin = clock();
     prop.all_triangles_edge_listing(g, triangles);
+    end = clock();
+    sum = std::accumulate(triangles.begin(), triangles.end(), 0);
+    printf("Total triangles (edge-listing): %d (%d)\n", sum / 3, sum);
+    printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
 
-    sum = 0;
-    for(int i = 0; i < g->get_num_nodes(); i++){
-        sum += triangles[i];
-        printf("vertex: %d: %ld (%ld)\n", i, triangles[i] / 3, triangles[i]);
+    double g_cc, a_cc;
+    vector<double> l_cc;
+    prop.clustering_coefficients(g, g_cc, a_cc, l_cc);
+
+    printf("Local CCs:");
+    int i;
+    for(i = 0; i < g->get_num_nodes(); i++){
+        printf(" %d:%lf",i,l_cc[i]);
     }
+    printf("\n");
 
-    printf("Total triangle: %d (%d)\n", sum / 3, sum);
+    printf("Global cc: %lf\nAvg cc: %lf", g_cc, a_cc);
+
+    delete g;
 
     return 0;
 } // main
