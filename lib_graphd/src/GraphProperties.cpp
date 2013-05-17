@@ -568,7 +568,6 @@ namespace Graph {
         for(i = 0; i < n; i++){
             d_i = g->get_degree(i);
             total_possible_triangles += (d_i * (d_i - 1) / 2);
-            printf("possible triangles: %d (node %d)\n",total_possible_triangles, i);
             if(triangles[i] > 0){
                 local_ccs[i] = 2.0 * triangles[i] / ((double)d_i * (double)(d_i - 1));
             }
