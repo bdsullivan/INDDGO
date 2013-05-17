@@ -60,15 +60,11 @@ endif
 
 graph:
 	test -d $(GRAPH)
-	@($(CD) "$(GRAPH)/src";\
-	$(MAKE) ;\
-	$(CD) ..;)
+	$(MAKE) -C "$(GRAPH)/src";\
 
-tree: deps
+tree: graph deps
 	test -d $(TREE)
-	@($(CD) "$(TREE)";\
-	$(MAKE) ;\
-	$(CD) ..;)
+	$(MAKE) -C $(TREE)
 
 ptree: 
 ifeq ($(HAS_MADNESS), 1)
@@ -79,10 +75,7 @@ ifeq ($(HAS_MADNESS), 1)
 endif
 
 valtree:
-	test -d $(TREE)
-	@($(CD) "$(TREE)";\
-	$(MAKE) td_valgrind ;\
-	$(CD) ..;)
+	$(MAKE) -C $(TREE) td_valgrind ;\
 
 
 #----------------------------------------------------------------
@@ -90,9 +83,7 @@ valtree:
 #
 wis: libs deps
 	test -d $(WIS)
-	@($(CD) "$(WIS)";\
-	$(MAKE) ;\
-	$(CD) ..;)
+	$(MAKE) -C $(WIS)
 
 
 #----------------------------------------------------------------
@@ -101,18 +92,14 @@ wis: libs deps
 
 viz: graph tree 
 	test -d $(VIZ)
-	@($(CD) "$(VIZ)";\
-	$(MAKE) ;\
-	$(CD) ..;)
+	$(MAKE) -C "$(VIZ)"
 
 #----------------------------------------------------------------
 #  Targets for utilities
 #
 util: graph tree
 	test -d $(UTIL)
-	@($(CD) "$(UTIL)";\
-	$(MAKE) ;\
-	$(CD) ..;)
+	$(MAKE) -C "$(UTIL)"
 
 
 

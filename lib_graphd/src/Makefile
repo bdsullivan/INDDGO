@@ -33,8 +33,11 @@ POBJ = $(SRC:.cpp=.o)  smbfactor.o $(PARMETISOBJ)
 endif
 
 .SUFFIXES: .cpp .c
+.PHONY: all libgraphd
 
-all: $(INDDGO_LIB_DIR)/$(LIBNAME)  $(GVIZ)
+libgraphd: $(INDDGO_LIB_DIR)/$(LIBNAME)
+
+all: libgraphd  $(GVIZ)
 
 #This is a problem if they're not using gcc 
 %.o: $(METIS_PROG_DIR)/%.c
@@ -50,7 +53,7 @@ $(INDDGO_LIB_DIR)/$(LIBNAME): $(OBJ) $(POBJ)
 locallib: $(INDDGO_LIB_DIR)/$(LIBNAME)
 	cp $(INDDGO_LIB_DIR)/$(LIBNAME) ../lib/$(LIBNAME)
 
-$(GVIZ): gviz.cpp
+$(GVIZ): gviz.o 
 	$(CXX) -I../inc $(CFLAGS) $< -o $@ $(INCLUDES) -lgraphd $(LIBS) $(LDFLAGS)
 
 clean:
