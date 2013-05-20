@@ -28,12 +28,23 @@
 #include "GraphWriter.h"
 #include <numeric>
 #include <ctime>
+#include <sys/time.h>
+#include <stdint.h>
 
 using namespace std;
 
 void usage(const char *s){
     fprintf(stderr,"Usage: %s filename\n",s);
 }
+
+uint64_t diff_timeval(struct timeval begin, struct timeval end){
+    uint64_t begin_us, end_us;
+
+    begin_us = begin.tv_usec + 100000*begin.tv_sec;
+    end_us = end.tv_usec + 100000*end.tv_sec;
+    return (end_us - begin_us);
+}
+
 
 int main(int argc, char **argv){
     // Check for a cry for help
@@ -48,6 +59,8 @@ int main(int argc, char **argv){
     int sum;
 
     clock_t begin, end;
+    struct timeval t1, t2;
+    uint64_t elapsed;
 
     Graph::GraphProperties prop;
     Graph::GraphReader ngr;
@@ -61,9 +74,12 @@ int main(int argc, char **argv){
 
     printf("Simplifying graph\n");
     begin = clock();
+    gettimeofday(&t1, NULL);
     prop.make_simple(g);
+    gettimeofday(&t2, NULL);
     end = clock();
     printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
+    printf("Time (gt): %lf\n", diff_timeval(t1, t2) / 100000.0);
     printf("After simplification: %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
     //Now, do our calculations
@@ -77,6 +93,7 @@ int main(int argc, char **argv){
     printf("Total triangles (compact-forward): %d\n", sum);
     printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
 
+    /*
     triangles.assign(g->get_num_nodes(), 0);
     printf("Calculating triangles using edge-listing method\n");
     begin = clock();
@@ -85,19 +102,19 @@ int main(int argc, char **argv){
     sum = std::accumulate(triangles.begin(), triangles.end(), 0);
     printf("Total triangles (edge-listing): %d (%d)\n", sum / 3, sum);
     printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
+*/
+   // double g_cc, a_cc;
+  //  vector<double> l_cc;
+  //  prop.clustering_coefficients(g, g_cc, a_cc, l_cc);
 
-    double g_cc, a_cc;
-    vector<double> l_cc;
-    prop.clustering_coefficients(g, g_cc, a_cc, l_cc);
+ //   printf("Local CCs:");
+  //  int i;
+//    for(i = 0; i < g->get_num_nodes(); i++){
+ //     printf(" %d:%lf",i,l_cc[i]);
+//    }
+//   printf("\n");
 
-    printf("Local CCs:");
-    int i;
-    for(i = 0; i < g->get_num_nodes(); i++){
-        printf(" %d:%lf",i,l_cc[i]);
-    }
-    printf("\n");
-
-    printf("Global cc: %lf\nAvg cc: %lf", g_cc, a_cc);
+  //  printf("Global cc: %lf\nAvg cc: %lf", g_cc, a_cc);
 
     delete g;
 
