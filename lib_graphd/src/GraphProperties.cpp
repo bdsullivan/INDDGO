@@ -38,6 +38,7 @@ namespace Graph {
         list<int>::iterator it;
         GraphUtil graph_util;
 
+#pragma omp parallel for schedule(guided) default(none) shared(g)
         for(i = 0; i < g->capacity; i++){
             //loop through the active nodes
             if(g->nodes[i].label != -1){
@@ -414,13 +415,18 @@ namespace Graph {
         // FIXME: this is a terrible hack
         //
         vector<int> revmap(n, -1);
+
+#pragma omp parallel for default(none) shared(revmap, sorted_indices)
         for(i = 0; i < n; i++){
             revmap[sorted_indices[i].first] = n - (i + 1);
         }
+
+#pragma omp parallel for default(none) schedule(dynamic, 16) shared(g, revmap)
         for(i = 0; i < n; i++){
             sort_nbrs_by_map(revmap, g->get_node(i));
         }
 
+#pragma omp parallel for  default(none) schedule(dynamic, 16) shared(t, revmap, sorted_indices, g) private(fakev,nv,v,u,uprime,vprime,nu)
         for(fakev = 1; fakev < n; fakev++){   //3
             v = sorted_indices[fakev].first;
             //fprintf(stderr,"fakev: %d v: %d\n",fakev, v);
@@ -455,8 +461,11 @@ namespace Graph {
                         }
                         else {   //3abc
                             //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
+                            #pragma omp atomic
                             t[v]++;
+                            #pragma omp atomic
                             t[u]++;
+                            #pragma omp atomic
                             t[uprime]++;
                             upit++;
                             vpit++;
@@ -479,12 +488,15 @@ namespace Graph {
         list<int>::iterator lt;
 
         // all the edgelists must be sorted
+#pragma omp parallel for schedule(dynamic, 8) default(none) shared(g)
         for(i = 0; i < g->get_num_nodes(); i++){
             g->get_node(i)->sort_nbr();
         }
 
+#pragma omp parallel for schedule(dynamic, 8) default(none) shared(g,t) private(u, v, it, cit)
         for(u = 0; u < g->get_num_nodes(); u++){
             const list<int> &c_nbrs = g->get_node(u)->get_nbrs_ref();
+//#pragma omp parallel for schedule(dynamic, 8) default(none) shared(g,t) private(u, v, it, cit)
             for(cit = c_nbrs.begin(); cit != c_nbrs.end(); ++cit){
                 v = *cit;
                 if(v > u){
@@ -511,8 +523,11 @@ namespace Graph {
                      */
 
                     for(it = intersection.begin(); it != intersection.end(); it++){
+                        #pragma omp atomic
                         t[*it]++;
+                        #pragma omp atomic
                         t[u]++;
+                        #pragma omp atomic
                         t[v]++;
                     }
                 }
