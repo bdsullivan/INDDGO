@@ -87,10 +87,13 @@ int main(int argc, char **argv){
 
     printf("Calculating triangles using compact-forward method\n");
     begin = clock();
+    gettimeofday(&t1, NULL);
     prop.all_triangles_compact_forward(g, triangles);
+    gettimeofday(&t2, NULL);
     end = clock();
     sum = std::accumulate(triangles.begin(), triangles.end(), 0);
     printf("Total triangles (compact-forward): %d\n", sum);
+    printf("Time (gt): %lf\n", diff_timeval(t1, t2) / 100000.0);
     printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
 
     /*
