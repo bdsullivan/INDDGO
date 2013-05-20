@@ -62,7 +62,7 @@ graph:
 	test -d $(GRAPH)
 	$(MAKE) -C "$(GRAPH)/src";\
 
-tree: graph deps
+tree: deps
 	test -d $(TREE)
 	$(MAKE) -C $(TREE)
 
