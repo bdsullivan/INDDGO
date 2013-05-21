@@ -150,7 +150,6 @@ TEST_F(GraphPropertyTest, testIsPath)
 //MY FEATURE TESTS
 //TODO: still need fit to distribution, need to figure out more on this
 //      always look for power law?
-/*
 TEST_F(GraphPropertyTest, testEdgeDensity){
     float ed, val;
 
@@ -161,19 +160,18 @@ TEST_F(GraphPropertyTest, testEdgeDensity){
 }
 
 
-TEST_F(GraphPropertyTest, testGraphSize){
-    int size;
-    properties.graphSize(mg, size);
-    EXPECT_EQ(128, size); //TODO: need to figure the size for this example
+TEST_F(GraphPropertyTest, testAvgDegree){
+    float ad, val;
+
+    val = (2.0*1471)/128.0;
+
+    properties.avgDegree(mg, ad);
+    EXPECT_EQ(val, ad); 
 }
 
 
 TEST_F(GraphPropertyTest, testDegDist){
-    int i;
     vector<int> dist;
     properties.degDist(mg, dist);
-    for(i=0; i<dist.size(); i++){
-        EXPECT_EQ(exp_deg[i], dist[i]); //TODO: set up exp_deg 
-    }
+    EXPECT_EQ(4, dist[33]);
 }
-*/

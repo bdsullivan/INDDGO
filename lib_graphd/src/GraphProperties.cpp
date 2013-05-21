@@ -361,8 +361,11 @@ namespace Graph {
     }
 
 
-    void GraphProperties::graphSize(Graph *g, int &size){
-        size = g->num_nodes;
+    void GraphProperties::avgDegree(Graph *g, float &ad){
+        int V = g->num_nodes;
+        int E = g->num_edges;
+
+        ad = (2.0*E)/V;
     }
 
 
