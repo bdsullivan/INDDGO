@@ -20,6 +20,11 @@
  */
 
 #include "GraphDecomposition.h"
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <sched.h>
+
+#include <omp.h>
 #include <numeric>
 
 namespace Graph {
@@ -38,7 +43,7 @@ namespace Graph {
         list<int>::iterator it;
         GraphUtil graph_util;
 
-#pragma omp parallel for schedule(guided) default(none) shared(g)
+        #pragma omp parallel for schedule(dynamic, 8) default(none) shared(g)
         for(i = 0; i < g->capacity; i++){
             //loop through the active nodes
             if(g->nodes[i].label != -1){
@@ -378,16 +383,10 @@ namespace Graph {
 
         // we want our list of vertices sorted by degree, with higest degree in element 0
         // this is a goofy way to handle it, but that's life
+        #pragma omp parallel for default(none) shared(g, sorted_indices)
         for(i = 0; i < g->get_num_nodes(); i++){
             sorted_indices[i].first = i;
             sorted_indices[i].second = g->get_degree(i);
-            /*
-               fprintf(stderr, "  nbrs(%d): ", i);
-               for(list<int>::iterator myit=g->get_node(i)->get_nbrs_ptr()->begin(); myit != g->get_node(i)->get_nbrs_ptr()->end(); ++myit){
-                fprintf(stderr, " %d(%d)", *myit, g->get_degree(*myit));
-               }
-               fprintf(stderr,"\n");
-             */
         }
 
         // here we've basically renumbered the array using the
@@ -416,59 +415,74 @@ namespace Graph {
         //
         vector<int> revmap(n, -1);
 
-#pragma omp parallel for default(none) shared(revmap, sorted_indices)
-        for(i = 0; i < n; i++){
-            revmap[sorted_indices[i].first] = n - (i + 1);
-        }
+        #pragma omp parallel default(none) shared(sorted_indices, revmap, g, t) private(fakev,nv,v,u,uprime,vprime,nu)
+        {
+            pid_t tid = syscall(SYS_gettid);
+            cpu_set_t cpuset;
+            printf("OMP thread %d has Linux TID %ld running on CPU: %d\n", omp_get_thread_num(), tid, sched_getcpu());
+            //sched_getaffinity(tid, sizeof(cpu_set_t), &cpuset);
+            //for(int k=0; k<47; k++){
+            //    if(CPU_ISSET(k, &cpuset)){
+            //        printf(" %d",k);
+            //    }
+           // }
+           // printf("\n");
 
-#pragma omp parallel for default(none) schedule(dynamic, 16) shared(g, revmap)
-        for(i = 0; i < n; i++){
-            sort_nbrs_by_map(revmap, g->get_node(i));
-        }
+            #pragma omp for schedule(dynamic, 8)
+            for(i = 0; i < n; i++){
+                revmap[sorted_indices[i].first] = n - (i + 1);
+            }
 
-#pragma omp parallel for  default(none) schedule(dynamic, 16) shared(t, revmap, sorted_indices, g) private(fakev,nv,v,u,uprime,vprime,nu)
-        for(fakev = 1; fakev < n; fakev++){   //3
-            v = sorted_indices[fakev].first;
-            //fprintf(stderr,"fakev: %d v: %d\n",fakev, v);
-            nv = g->get_node(v);
-            const list<int> &nbrs_v = nv->get_nbrs_ref();
-            for(std::list<int>::const_iterator cit = nbrs_v.begin(); cit != nbrs_v.end(); ++cit){ //3a
-                u = *cit;
-                //fprintf(stderr,"    looking at u=%d v=%d\n", u, v);
-                //fprintf(stderr,"      n(u):%d n(v):%d\n",revmap[u],revmap[v]);
-                if(revmap[u] > revmap[v]){ //3a
-                    nu = g->get_node(u);
-                    const list<int> &nbrs_u = nu->get_nbrs_ref();
-                    list<int>::const_iterator upit = nbrs_u.begin(); //3aa
-                    list<int>::const_iterator vpit = nbrs_v.begin(); //3aa
-                    uprime = *upit;
-                    vprime = *vpit;
-                    //fprintf(stderr, "       u':%d v':%d ",uprime, vprime);
-                    //fprintf(stderr, "n(v):%d n(u'):%d n(v'):%d\n", revmap[v], revmap[uprime], revmap[vprime]);
-                    while((upit != nbrs_u.end()) && (vpit != nbrs_v.end() &&
-                                                     (revmap[uprime] < revmap[v]) && (revmap[vprime] < revmap[v]))){ //3ab
+            #pragma omp for  schedule(dynamic, 8)
+            for(i = 0; i < n; i++){
+                sort_nbrs_by_map(revmap, g->get_node(i));
+            }
+
+            #pragma omp for schedule(dynamic, 8)
+//#pragma omp parallel for  default(none) schedule(dynamic, 16) shared(t, revmap, sorted_indices, g) private(fakev,nv,v,u,uprime,vprime,nu)
+            for(fakev = 1; fakev < n; fakev++){ //3
+                v = sorted_indices[fakev].first;
+                //fprintf(stderr,"fakev: %d v: % schedule(dynamic, 8)d\n",fakev, v);
+                nv = g->get_node(v);
+                const list<int> &nbrs_v = nv->get_nbrs_ref();
+                for(std::list<int>::const_iterator cit = nbrs_v.begin(); cit != nbrs_v.end(); ++cit){ //3a
+                    u = *cit;
+                    //fprintf(stderr,"    looking at u=%d v=%d\n", u, v);
+                    //fprintf(stderr,"      n(u):%d n(v):%d\n",revmap[u],revmap[v]);
+                    if(revmap[u] > revmap[v]){ //3a
+                        nu = g->get_node(u);
+                        const list<int> &nbrs_u = nu->get_nbrs_ref();
+                        list<int>::const_iterator upit = nbrs_u.begin(); //3aa
+                        list<int>::const_iterator vpit = nbrs_v.begin(); //3aa
                         uprime = *upit;
                         vprime = *vpit;
                         //fprintf(stderr, "       u':%d v':%d ",uprime, vprime);
                         //fprintf(stderr, "n(v):%d n(u'):%d n(v'):%d\n", revmap[v], revmap[uprime], revmap[vprime]);
-                        if(revmap[uprime] < revmap[vprime]){ //3aba
-                            upit++;
-                            //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing u'\n", v, u, uprime);
-                        }
-                        else if(revmap[uprime] > revmap[vprime]){ //3abb
-                            vpit++;
-                            //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing v'\n", v, u, uprime);
-                        }
-                        else {   //3abc
-                            //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
-                            #pragma omp atomic
-                            t[v]++;
-                            #pragma omp atomic
-                            t[u]++;
-                            #pragma omp atomic
-                            t[uprime]++;
-                            upit++;
-                            vpit++;
+                        while((upit != nbrs_u.end()) && (vpit != nbrs_v.end() &&
+                                                         (revmap[uprime] < revmap[v]) && (revmap[vprime] < revmap[v]))){ //3ab
+                            uprime = *upit;
+                            vprime = *vpit;
+                            //fprintf(stderr, "       u':%d v':%d ",uprime, vprime);
+                            //fprintf(stderr, "n(v):%d n(u'):%d n(v'):%d\n", revmap[v], revmap[uprime], revmap[vprime]);
+                            if(revmap[uprime] < revmap[vprime]){ //3aba
+                                upit++;
+                                //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing u'\n", v, u, uprime);
+                            }
+                            else if(revmap[uprime] > revmap[vprime]){ //3abb
+                                vpit++;
+                                //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing v'\n", v, u, uprime);
+                            }
+                            else { //3abc
+                                //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
+                                #pragma omp atomic
+                                t[v]++;
+                                #pragma omp atomic
+                                t[u]++;
+                                #pragma omp atomic
+                                t[uprime]++;
+                                upit++;
+                                vpit++;
+                            }
                         }
                     }
                 }
@@ -488,12 +502,12 @@ namespace Graph {
         list<int>::iterator lt;
 
         // all the edgelists must be sorted
-#pragma omp parallel for schedule(dynamic, 8) default(none) shared(g)
+        #pragma omp parallel for schedule(dynamic, 8) default(none) shared(g)
         for(i = 0; i < g->get_num_nodes(); i++){
             g->get_node(i)->sort_nbr();
         }
 
-#pragma omp parallel for schedule(dynamic, 8) default(none) shared(g,t) private(u, v, it, cit)
+        #pragma omp parallel for schedule(dynamic, 8) default(none) shared(g,t) private(u, v, it, cit)
         for(u = 0; u < g->get_num_nodes(); u++){
             const list<int> &c_nbrs = g->get_node(u)->get_nbrs_ref();
 //#pragma omp parallel for schedule(dynamic, 8) default(none) shared(g,t) private(u, v, it, cit)
@@ -550,11 +564,11 @@ namespace Graph {
     };
 
     void GraphProperties::sort_nbrs_by_map(vector<int> map, Node *n){
-        list<int> nbrs(n->get_nbrs());
+        list<int> *nbrs(n->get_nbrs_ptr());
 
         //std::sort(nbrs.first(), nbrs.last(), compare_degrees(g->get_degree_ref()));
-        nbrs.sort(compare_inject(map));
-        n->set_nbr(nbrs);
+        nbrs->sort(compare_inject(map));
+        //n->set_nbr(*nbrs);
     }
 
     /**

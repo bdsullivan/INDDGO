@@ -29,7 +29,11 @@
 #include <numeric>
 #include <ctime>
 #include <sys/time.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
 #include <stdint.h>
+#include "orbconfig.h"
+#include "orbtimer.h"
 
 using namespace std;
 
@@ -40,11 +44,10 @@ void usage(const char *s){
 uint64_t diff_timeval(struct timeval begin, struct timeval end){
     uint64_t begin_us, end_us;
 
-    begin_us = begin.tv_usec + 100000*begin.tv_sec;
-    end_us = end.tv_usec + 100000*end.tv_sec;
+    begin_us = begin.tv_usec + 100000 * begin.tv_sec;
+    end_us = end.tv_usec + 100000 * end.tv_sec;
     return (end_us - begin_us);
 }
-
 
 int main(int argc, char **argv){
     // Check for a cry for help
@@ -57,67 +60,74 @@ int main(int argc, char **argv){
     Graph::Graph *g;
     int seed = 0;
     int sum;
+    ORB_t t1, t2, t3, tstart, tend;
 
     clock_t begin, end;
-    struct timeval t1, t2;
     uint64_t elapsed;
 
     Graph::GraphProperties prop;
     Graph::GraphReader ngr;
 
+    printf("calibrating timer\n");
+    ORB_calibrate();
+
+    printf("My TID: %ld running on CPU: %d\n", syscall(SYS_gettid), sched_getcpu());
     // Create the graph object
     g = new Graph::Graph();
-
+    ORB_read(t1);
     // read the graph from the filename, assume it is an edgelist
     ngr.read_graph(g, argv[1], "Edge", false);
+    ORB_read(t2);
+    tstart = t1;
     printf("Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
+    printf("Time(read_graph): %f\n", ORB_seconds(t2, t1));
 
     printf("Simplifying graph\n");
-    begin = clock();
-    gettimeofday(&t1, NULL);
+    ORB_read(t1);
     prop.make_simple(g);
-    gettimeofday(&t2, NULL);
-    end = clock();
-    printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
-    printf("Time (gt): %lf\n", diff_timeval(t1, t2) / 100000.0);
+    ORB_read(t2);
+    printf("Time(make_simple): %f\n", ORB_seconds(t2, t1));
     printf("After simplification: %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
     //Now, do our calculations
     vector<long int> triangles(g->get_num_nodes(), 0);
 
     printf("Calculating triangles using compact-forward method\n");
-    begin = clock();
-    gettimeofday(&t1, NULL);
+    ORB_read(t1);
     prop.all_triangles_compact_forward(g, triangles);
-    gettimeofday(&t2, NULL);
-    end = clock();
+    ORB_read(t2);
+    printf("Time(all_triangles_compact_forward): %f\n", ORB_seconds(t2, t1));
+    printf("Accumulating\n");
+    ORB_read(t1);
     sum = std::accumulate(triangles.begin(), triangles.end(), 0);
+    ORB_read(t2);
+    tend = t2;
     printf("Total triangles (compact-forward): %d\n", sum);
-    printf("Time (gt): %lf\n", diff_timeval(t1, t2) / 100000.0);
-    printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
+    printf("Time(std::accumulate): %f\n", ORB_seconds(t2, t1));
+    printf("TOTAL Time: %f\n", ORB_seconds(tend, tstart));
 
     /*
-    triangles.assign(g->get_num_nodes(), 0);
-    printf("Calculating triangles using edge-listing method\n");
-    begin = clock();
-    prop.all_triangles_edge_listing(g, triangles);
-    end = clock();
-    sum = std::accumulate(triangles.begin(), triangles.end(), 0);
-    printf("Total triangles (edge-listing): %d (%d)\n", sum / 3, sum);
-    printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
-*/
-   // double g_cc, a_cc;
-  //  vector<double> l_cc;
-  //  prop.clustering_coefficients(g, g_cc, a_cc, l_cc);
+       triangles.assign(g->get_num_nodes(), 0);
+       printf("Calculating triangles using edge-listing method\n");
+       begin = clock();
+       prop.all_triangles_edge_listing(g, triangles);
+       end = clock();
+       sum = std::accumulate(triangles.begin(), triangles.end(), 0);
+       printf("Total triangles (edge-listing): %d (%d)\n", sum / 3, sum);
+       printf("Time: %lf\n", double(end - begin) / CLOCKS_PER_SEC);
+     */
+    // double g_cc, a_cc;
+    //  vector<double> l_cc;
+    //  prop.clustering_coefficients(g, g_cc, a_cc, l_cc);
 
- //   printf("Local CCs:");
-  //  int i;
+    //   printf("Local CCs:");
+    //  int i;
 //    for(i = 0; i < g->get_num_nodes(); i++){
- //     printf(" %d:%lf",i,l_cc[i]);
+//     printf(" %d:%lf",i,l_cc[i]);
 //    }
 //   printf("\n");
 
-  //  printf("Global cc: %lf\nAvg cc: %lf", g_cc, a_cc);
+    //  printf("Global cc: %lf\nAvg cc: %lf", g_cc, a_cc);
 
     delete g;
 

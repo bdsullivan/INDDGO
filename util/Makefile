@@ -31,7 +31,7 @@ M2D_OBJ = $(M2D_SRCS:.cpp=.o)
 M2D_EXE = $(INDDGO_BIN)/metis2dimacs
 
 TRI_SRCS =  ./src/count-tri.cpp 
-TRI_OBJ =  $(TRI_SRCS:.cpp=.o)
+TRI_OBJ =  src/orbtimer.o $(TRI_SRCS:.cpp=.o)
 TRI_EXE = $(INDDGO_BIN)/count-tri
 
 all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) 
