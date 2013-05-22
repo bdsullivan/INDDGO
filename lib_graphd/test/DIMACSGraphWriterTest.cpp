@@ -33,7 +33,8 @@ class DIMACSGraphWriterTest: public testing::Test
 public:
 	Graph::GraphCreatorFile creator;
 	Graph::Graph *g;
-	Graph::DIMACSGraphWriter *dim_writer;
+	Graph::GraphWriter writer;
+    string out_file;
 
 	virtual void SetUp()
 	{
@@ -43,8 +44,7 @@ public:
 		creator.set_graph_type("adjmatrix");
 		g = creator.create_graph();
 
-		string out_file("data/1dc.128.out");
-		dim_writer = new Graph::DIMACSGraphWriter(out_file);
+		out_file = string("data/1dc.128.out");
 	}
 
 	virtual void TearDown()
@@ -56,7 +56,7 @@ public:
 
 TEST_F(DIMACSGraphWriterTest, testNumNodes)
 {
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("DIMACS"), false);
 
 	creator.set_file_name("data/1dc.128.out");
 	creator.set_graph_type("DIMACS");
@@ -67,7 +67,7 @@ TEST_F(DIMACSGraphWriterTest, testNumNodes)
 
 TEST_F(DIMACSGraphWriterTest, testGetDegrees)
 {
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("DIMACS"), false);
 
 	creator.set_file_name("data/1dc.128.out");
 	creator.set_graph_type("DIMACS");
@@ -79,7 +79,7 @@ TEST_F(DIMACSGraphWriterTest, testGetDegrees)
 
 TEST_F(DIMACSGraphWriterTest, testGetNode)
 {
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("DIMACS"), false);
 
 	creator.set_file_name("data/1dc.128.out");
 	creator.set_graph_type("DIMACS");
@@ -93,7 +93,7 @@ TEST_F(DIMACSGraphWriterTest, testGetNode)
 
 TEST_F(DIMACSGraphWriterTest, testIsEdge)
 {
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("DIMACS"), false);
 
 	creator.set_file_name("data/1dc.128.out");
 	creator.set_graph_type("DIMACS");
@@ -111,9 +111,7 @@ TEST_F(DIMACSGraphWriterTest, testIsEdge)
 TEST_F(DIMACSGraphWriterTest, testshuffle)
 {
     string out_file("data/1dc.128.out.shuf");
-    dim_writer->set_out_file_name(out_file);
-    dim_writer->shuffle(g, time(NULL));
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("DIMACS"), false, true);
 
 	creator.set_file_name("data/1dc.128.out.shuf");
 	creator.set_graph_type("DIMACS");
