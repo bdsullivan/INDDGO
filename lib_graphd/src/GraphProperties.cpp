@@ -415,11 +415,18 @@ namespace Graph {
         //
         vector<int> revmap(n, -1);
 
-        #pragma omp parallel default(none) shared(sorted_indices, revmap, g, t) private(fakev,nv,v,u,uprime,vprime,nu)
+        vector< vector<long int> > local_t;
+
+        #pragma omp parallel default(none) shared(sorted_indices, revmap, g, t, local_t) private(fakev,nv,v,u,uprime,vprime,nu)
         {
-            pid_t tid = syscall(SYS_gettid);
-            cpu_set_t cpuset;
-            printf("OMP thread %d has Linux TID %ld running on CPU: %d\n", omp_get_thread_num(), tid, sched_getcpu());
+            #pragma omp single
+            {
+                local_t.resize(omp_get_num_threads());
+            }
+            local_t[omp_get_thread_num()].resize(t.size());
+            //pid_t tid = syscall(SYS_gettid);
+            //cpu_set_t cpuset;
+            //printf("OMP thread %d has Linux TID %ld running on CPU: %d\n", omp_get_thread_num(), tid, sched_getcpu());
             //sched_getaffinity(tid, sizeof(cpu_set_t), &cpuset);
             //for(int k=0; k<47; k++){
             //    if(CPU_ISSET(k, &cpuset)){
@@ -433,12 +440,13 @@ namespace Graph {
                 revmap[sorted_indices[i].first] = n - (i + 1);
             }
 
-            #pragma omp for  schedule(dynamic, 8)
+            #pragma omp for  schedule(dynamic, 64)
             for(i = 0; i < n; i++){
                 sort_nbrs_by_map(revmap, g->get_node(i));
             }
 
-            #pragma omp for schedule(dynamic, 8)
+            int omp_tid = omp_get_thread_num();
+            #pragma omp for schedule(dynamic, 4)
 //#pragma omp parallel for  default(none) schedule(dynamic, 16) shared(t, revmap, sorted_indices, g) private(fakev,nv,v,u,uprime,vprime,nu)
             for(fakev = 1; fakev < n; fakev++){ //3
                 v = sorted_indices[fakev].first;
@@ -474,20 +482,23 @@ namespace Graph {
                             }
                             else { //3abc
                                 //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
-                                #pragma omp atomic
-                                t[v]++;
-                                #pragma omp atomic
-                                t[u]++;
-                                #pragma omp atomic
-                                t[uprime]++;
+                                local_t[omp_tid][v]++;
+                                local_t[omp_tid][u]++;
+                                local_t[omp_tid][uprime]++;
                                 upit++;
                                 vpit++;
                             }
                         }
-                    }
+                    } //if revmap
+                }//for vtxs
+            } //for fakev
+            #pragma omp for
+            for(i=0;i<t.size(); i++){
+                for(int j=0;j<omp_get_num_threads();j++){
+                    t[i] += local_t[j][i];
                 }
             }
-        }
+        } //parallel
     } // all_triangles_compact_forward
 
     /*
