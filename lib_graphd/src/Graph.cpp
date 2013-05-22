@@ -51,7 +51,7 @@ namespace Graph {
         for(int i = 0; i < n; i++){
             nodes[i].set_label(i + 1);
         }
-        this->next_label = n + 2;
+        this->next_label = n + 1;
     }
 
     Graph::~Graph(){

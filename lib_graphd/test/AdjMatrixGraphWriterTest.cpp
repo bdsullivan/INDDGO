@@ -31,7 +31,8 @@ class AdjMatrixGraphWriterTest: public testing::Test
 public:
 	Graph::GraphCreatorFile creator;
 	Graph::Graph *g;
-	Graph::AdjMatrixGraphWriter *adj_writer;
+	Graph::GraphWriter writer;
+    string out_file;
 
 	virtual void SetUp()
 	{
@@ -40,8 +41,7 @@ public:
 		creator.set_file_name("data/1dc.128.txt");
 		creator.set_graph_type("DIMACS");
 		g = creator.create_graph();
-		string out_file("data/1dc.128.adj");
-		adj_writer = new Graph::AdjMatrixGraphWriter(out_file);
+        out_file = "data/1dc.128.adj";
 	}
 
 	virtual void TearDown()
@@ -53,7 +53,7 @@ public:
 
 TEST_F(AdjMatrixGraphWriterTest, testWriteGraph)
 {
-	adj_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("ADJMATRIX"), false);
 	creator.set_file_name("data/1dc.128.adj");
 	creator.set_graph_type("adjmatrix");
 	g = creator.create_graph();
@@ -63,7 +63,7 @@ TEST_F(AdjMatrixGraphWriterTest, testWriteGraph)
 
 TEST_F(AdjMatrixGraphWriterTest, testGetDegrees)
 {
-	adj_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("ADJMATRIX"), false);
 	creator.set_file_name("data/1dc.128.adj");
 	creator.set_graph_type("adjmatrix");
 	g = creator.create_graph();
@@ -74,7 +74,7 @@ TEST_F(AdjMatrixGraphWriterTest, testGetDegrees)
 
 TEST_F(AdjMatrixGraphWriterTest, testGetNode)
 {
-	adj_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("ADJMATRIX"), false);
 	creator.set_file_name("data/1dc.128.adj");
 	creator.set_graph_type("adjmatrix");
 	g = creator.create_graph();
@@ -87,7 +87,7 @@ TEST_F(AdjMatrixGraphWriterTest, testGetNode)
 
 TEST_F(AdjMatrixGraphWriterTest, testIsEdge)
 {
-	adj_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("ADJMATRIX"), false);
 	creator.set_file_name("data/1dc.128.adj");
 	creator.set_graph_type("adjmatrix");
 	g = creator.create_graph();

@@ -33,7 +33,8 @@ class MetisGraphWriterTest: public testing::Test
 public:
 	Graph::GraphCreatorFile creator;
 	Graph::Graph *g;
-	Graph::MetisGraphWriter *dim_writer;
+	Graph::GraphWriter writer;
+    string out_file;
 
 	virtual void SetUp()
 	{
@@ -43,8 +44,7 @@ public:
 		creator.set_graph_type("adjmatrix");
 		g = creator.create_graph();
 
-		string out_file("data/1dc.128.met");
-		dim_writer = new Graph::MetisGraphWriter(out_file);
+		out_file = string("data/1dc.128.met");
 	}
 
 	virtual void TearDown()
@@ -56,7 +56,7 @@ public:
 
 TEST_F(MetisGraphWriterTest, testNumNodes)
 {
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("METIS"), false);
 
 	creator.set_file_name("data/1dc.128.met");
 	creator.set_graph_type("Metis");
@@ -67,7 +67,7 @@ TEST_F(MetisGraphWriterTest, testNumNodes)
 
 TEST_F(MetisGraphWriterTest, testGetDegrees)
 {
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("METIS"), false);
 
 	creator.set_file_name("data/1dc.128.met");
 	creator.set_graph_type("Metis");
@@ -79,7 +79,7 @@ TEST_F(MetisGraphWriterTest, testGetDegrees)
 
 TEST_F(MetisGraphWriterTest, testGetNode)
 {
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("METIS"), false);
 
 	creator.set_file_name("data/1dc.128.met");
 	creator.set_graph_type("Metis");
@@ -93,7 +93,7 @@ TEST_F(MetisGraphWriterTest, testGetNode)
 
 TEST_F(MetisGraphWriterTest, testIsEdge)
 {
-	dim_writer->write_graph(g);
+	writer.write_graph(g, out_file, string("METIS"), false);
 
 	creator.set_file_name("data/1dc.128.met");
 	creator.set_graph_type("Metis");
