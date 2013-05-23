@@ -140,7 +140,7 @@ TEST_F(GraphPropertyTest, testEdgeDensity){
 
     val = (2.0 * 1471) / (128 * (128 - 1.0));
 
-    properties.edgeDensity(mg, ed);
+    properties.edge_density(mg, ed);
     EXPECT_EQ(val, ed);
 }
 
@@ -149,12 +149,12 @@ TEST_F(GraphPropertyTest, testAvgDegree){
 
     val = (2.0 * 1471) / 128.0;
 
-    properties.avgDegree(mg, ad);
+    properties.avg_degree(mg, ad);
     EXPECT_EQ(val, ad);
 }
 
 TEST_F(GraphPropertyTest, testDegDist){
     vector<int> dist;
-    properties.degDist(mg, dist);
+    properties.deg_dist(mg, dist);
     EXPECT_EQ(4, dist[33]);
 }
