@@ -353,7 +353,12 @@ namespace Graph {
     } // is_path
 
 
-    void GraphProperties::edgeDensity(Graph *g, float &ed){
+    /**
+     * Calculates the edge density of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] ed Floating point value holding the calculated edge density
+     */
+    void GraphProperties::edge_density(Graph *g, float &ed){
         int V = g->num_nodes;
         int E = g->num_edges;
         
@@ -361,7 +366,12 @@ namespace Graph {
     }
 
 
-    void GraphProperties::avgDegree(Graph *g, float &ad){
+    /**
+     * Calculates the average degree of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] ad Floating point value holding the average degree of the graph
+     */
+    void GraphProperties::avg_degree(Graph *g, float &ad){
         int V = g->num_nodes;
         int E = g->num_edges;
 
@@ -369,7 +379,12 @@ namespace Graph {
     }
 
 
-    void GraphProperties::degDist(Graph *g, vector<int> &dist){
+    /**
+     * Calculates the degree distribution of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] dist Integer vector holding the degree distribution of the graph
+     */
+    void GraphProperties::deg_dist(Graph *g, vector<int> &dist){
         int i, size=g->degree.size();
 
         dist.resize(size);

@@ -48,9 +48,20 @@ public:
     // and end involving only vertices v with t[v]=true
     bool is_path(Graph *g, int start, int end);
     
-    void edgeDensity(Graph *g, float &ed);
-    void avgDegree(Graph *g, float &ad);
-    void degDist(Graph *g, vector<int> &dist);
+    /**
+     * \brief Calculates the edge density of the specified graph
+     */
+    void edge_density(Graph *g, float &ed);
+    
+    /**
+     * \brief Calculates the average degree of the specified graph
+     */
+    void avg_degree(Graph *g, float &ad);
+    
+    /**
+     * \brief Calculates the degree distribution of the specified graph
+     */
+    void deg_dist(Graph *g, vector<int> &dist);
     };
 }
 
