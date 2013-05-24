@@ -848,14 +848,14 @@ void write_degree_distribution(string filename, const vector<int> &dist){
 
     if(!outfile.is_open()){
         cerr << "Error opening " << filename << "for writing\n";
-    } 
-    else{
+    }
+    else {
         int i;
-        for(i=0;i<dist.size();i++){
+        for(i = 0; i < dist.size(); i++){
             outfile << dist[i] << "\n";
         }
     }
 
     outfile.close();
-}
-        
+} // write_degree_distribution
+

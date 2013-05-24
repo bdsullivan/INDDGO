@@ -15,7 +15,7 @@ TD_STATS_OBJ =  $(TD_STATS_SRCS:.cpp=.o)
 TD_STATS_EXE = $(INDDGO_BIN)/td_stats
 
 G_STATS_SRCS =  ./src/graph_stats.cpp 
-G_STATS_OBJ =  $(G_STATS_SRCS:.cpp=.o)
+G_STATS_OBJ =  src/orbtimer.o $(G_STATS_SRCS:.cpp=.o)
 G_STATS_EXE = $(INDDGO_BIN)/graph_stats
 
 E2D_SRCS = ./src/edge2dimacs.cpp
@@ -31,7 +31,7 @@ M2D_OBJ = $(M2D_SRCS:.cpp=.o)
 M2D_EXE = $(INDDGO_BIN)/metis2dimacs
 
 TRI_SRCS =  ./src/count-tri.cpp 
-TRI_OBJ =  $(TRI_SRCS:.cpp=.o)
+TRI_OBJ =  src/orbtimer.o $(TRI_SRCS:.cpp=.o)
 TRI_EXE = $(INDDGO_BIN)/count-tri
 
 SRT_SRCS =  ./src/shortest-paths.cpp 
