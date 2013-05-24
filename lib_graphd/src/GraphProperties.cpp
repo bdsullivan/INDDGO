@@ -662,10 +662,11 @@ namespace Graph {
             nVisited++;
         }
 
-        for(int i = 0; i < n; i++){
+        /* for(int i = 0; i < n; i++){
             printf("%d,  ",dist[i]);
         }
         printf("\n");
+        */
     } //paths_dijkstra_single
 
     /**
@@ -729,11 +730,12 @@ namespace Graph {
 
             //store shortest paths from this vertex to all
             p.push_back(dist);
-            //printf(" with distances: ");
+            /* 
             for(int i = 0; i < n; i++){
                 printf("%d,  ",dist[i]);
             }
             printf("\n");
+            */
         } //end loop over vertices
     } //paths_dijkstra_all
 
