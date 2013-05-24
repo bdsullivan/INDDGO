@@ -77,6 +77,20 @@ public:
      */
     void paths_dijkstra_all(Graph *g, vector< vector<int> > &p);
 
+    /**
+     * \brief Calculates the edge density of the specified graph
+     */
+    void edge_density(Graph *g, float &ed);
+
+    /**
+     * \brief Calculates the average degree of the specified graph
+     */
+    void avg_degree(Graph *g, float &ad);
+
+    /**
+     * \brief Calculates the degree distribution of the specified graph
+     */
+    void deg_dist(Graph *g, vector<int> &dist);
     };
 }
 

@@ -577,7 +577,12 @@ namespace Graph {
         global_cc = (double)num_triangles / (double)total_possible_triangles;
     } // clustering_coefficients
 
-    //==================================================================
+  /**
+   * \param[in] g input graph
+   * \param[in] source node id
+   * \param[out] p path distances from source to all other vertices
+   */
+
     void GraphProperties::paths_dijkstra_single(Graph *g, vector<int> &p, int source){
         int inf = 100000;
         int nVisited = 0;
@@ -663,6 +668,13 @@ namespace Graph {
 	printf("\n");
     } //paths_dijkstra_single
   
+
+  /**
+   *  All pairs shortest paths
+   * \param[in] g input graph
+   * \param[out] p multidimentional list of all pairs shortest paths
+   */
+
  void GraphProperties::paths_dijkstra_all(Graph *g, vector< vector<int> > &p){
         int inf = 100000; //assume this is larger than any weights on the graph
         int nVisited = 0;
@@ -727,4 +739,46 @@ namespace Graph {
         }//end loop over vertices
 	
     } //paths_dijkstra_all
+
+    /**
+     * Calculates the edge density of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] ed Floating point value holding the calculated edge density
+     */
+    void GraphProperties::edge_density(Graph *g, float &ed){
+        int V = g->num_nodes;
+        int E = g->num_edges;
+
+        ed = (2.0 * E) / (V * (V - 1.0));
+    }
+
+    /**
+     * Calculates the average degree of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] ad Floating point value holding the average degree of the graph
+     */
+    void GraphProperties::avg_degree(Graph *g, float &ad){
+        int V = g->num_nodes;
+        int E = g->num_edges;
+
+        ad = (2.0 * E) / V;
+    }
+
+    /**
+     * Calculates the degree distribution of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] dist Integer vector holding the degree distribution of the graph
+     */
+    void GraphProperties::deg_dist(Graph *g, vector<int> &dist){
+        int i, size = g->degree.size();
+
+        dist.resize(size);
+        for(i = 0; i < size; i++){
+            dist[i] = 0;
+        }
+
+        for(i = 0; i < size; i++){
+            dist[g->degree[i]] += 1;
+        }
+    }
 }
