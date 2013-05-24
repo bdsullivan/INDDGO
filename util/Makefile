@@ -34,7 +34,11 @@ TRI_SRCS =  ./src/count-tri.cpp
 TRI_OBJ =  $(TRI_SRCS:.cpp=.o)
 TRI_EXE = $(INDDGO_BIN)/count-tri
 
-all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) 
+SRT_SRCS =  ./src/shortest-paths.cpp 
+SRT_OBJ =  $(SRT_SRCS:.cpp=.o)
+SRT_EXE = $(INDDGO_BIN)/shortest-paths
+
+all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) $(SRT_EXE)
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
@@ -60,8 +64,11 @@ $(M2D_EXE): $(M2D_OBJ)  ../lib/libgraphd.a
 $(TRI_EXE): $(TRI_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
+$(SRT_EXE): $(SRT_OBJ) ../lib/libgraphd.a
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
+
 clean: 
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE) $(E2A_EXE) $(E2A_OBJ)
+	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE) $(SRT_OBJ) $(SRT_EXE) $(E2A_EXE) $(E2A_OBJ)
 
 doc: $(DOXYFILE)
 	doxygen $(DOXYFILE)
