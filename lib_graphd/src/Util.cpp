@@ -841,3 +841,21 @@ void split(const std::string& s, char sep, vector<int>& v){
     }
 }     // split
 
+void write_degree_distribution(string filename, const vector<int> &dist){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    } 
+    else{
+        int i;
+        for(i=0;i<dist.size();i++){
+            outfile << dist[i] << "\n";
+        }
+    }
+
+    outfile.close();
+}
+        

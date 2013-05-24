@@ -68,6 +68,16 @@ public:
     void clustering_coefficients(Graph *g,double &global_cc, double &avg_cc, vector<double> &local_ccs);
 
     /**
+     * \brief returns shortest paths from source to all other nodes
+     */
+    void paths_dijkstra_single(Graph *g, vector<int> &p, int source);
+
+    /**
+     * \brief returns shortest paths from all nodes to all nodes
+     */
+    void paths_dijkstra_all(Graph *g, vector< vector<int> > &p);
+
+    /**
      * \brief Calculates the edge density of the specified graph
      */
     void edge_density(Graph *g, float &ed);
