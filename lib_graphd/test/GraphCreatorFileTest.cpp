@@ -103,7 +103,7 @@ TEST_F(GraphCreatorFileTest, testGetRandomEdgeSubgraph)
 	Graph::VertexWeightedGraph *wmg_sub;
 	creator->set_file_name("data/1dc.128.txt");
 	creator->set_graph_type("DIMACS");
-	wmg = creator->create_weighted_mutable_graph();
+	wmg = creator->create_vertex_weighted_graph();
 	wmg_sub = creator->create_random_edge_subgraph(wmg, 70);
 
 	EXPECT_EQ(1471, wmg->get_num_edges())
@@ -129,7 +129,7 @@ TEST_F(GraphCreatorFileTest, testCreateInducedSubGraph)
 	creator->set_file_name("data/1et.64.txt");
 	creator->set_graph_type("DIMACS");
 
-	wmg = creator->create_weighted_mutable_graph();
+	wmg = creator->create_vertex_weighted_graph();
 
 	list<int> f;
 	list<int>::iterator it;
@@ -179,7 +179,7 @@ TEST_F(GraphCreatorFileTest, testCreateComponent)
 	creator->set_file_name("data/1et.64.txt");
 	creator->set_graph_type("DIMACS");
 
-	wmg = creator->create_weighted_mutable_graph();
+	wmg = creator->create_vertex_weighted_graph();
 
 	list<int> f;
 	list<int>::iterator it;
@@ -228,7 +228,7 @@ TEST_F(GraphCreatorFileTest, testCreateAllComponents)
 
 	creator->set_file_name("data/1et.64.txt");
 	creator->set_graph_type("DIMACS");
-	wmg = creator->create_weighted_mutable_graph();
+	wmg = creator->create_vertex_weighted_graph();
 
 	vector<list<int> *> members;
 	int x = util.find_all_components(wmg, &members);
@@ -272,7 +272,7 @@ TEST_F(GraphCreatorFileTest, testCreateRecAllComponents)
 
 	creator->set_file_name("data/1et.64.txt");
 	creator->set_graph_type("DIMACS");
-	wmg = creator->create_weighted_mutable_graph();
+	wmg = creator->create_vertex_weighted_graph();
 
 	vector<list<int> *> members;
 	int x = util.find_all_components(wmg, &members);

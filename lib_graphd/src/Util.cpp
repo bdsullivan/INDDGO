@@ -22,6 +22,8 @@
 #include "GraphDecomposition.h"
 #include <fstream>
 #include <limits>
+#include <string>
+#include <sstream>
 
 /*BDS - added to get memory highwater mark*/
 int parseLine(char *line){
@@ -101,7 +103,7 @@ bool read_color_file(const char input_file[], double & max_color, double & min_c
             if(strcmp(line.substr(1,3).c_str(),"max") == 0){
                 size_t pos1 = line.find(" ");
                 size_t pos2 = line.find_last_not_of("\t\f\v\n\r ");
-                cout<<"p1max: "<<pos1<<" p2max: "<<pos2<<"\n";
+                cout << "p1max: " << pos1 << " p2max: " << pos2 << "\n";
 
                 max_color = atof(line.substr(pos1 + 1,pos2 + 1).c_str());
                 max_flag = true;
@@ -819,3 +821,23 @@ int_int mylog2(int x){
     }
     return ans;
 }
+
+std::string str_to_up(string s){
+    std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+    return s;
+}
+
+void split(const std::string& s, char sep, vector<int>& v){
+    stringstream ss(s);      //< a stringstream to do our parsing for us
+    int k = -1;    //< just some variable
+    string temp;
+    while(std::getline(ss, temp, sep)){
+        stringstream convert(temp);
+        convert >> k;
+        if(k != -1){
+            v.push_back(k);
+        }
+        k = -1;
+    }
+}     // split
+

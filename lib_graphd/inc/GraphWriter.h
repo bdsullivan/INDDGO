@@ -21,28 +21,65 @@
 
 #ifndef GRAPHWRITER_H_
 #define GRAPHWRITER_H_
-#include "Graph.h"
+
+#include "Node.h"
 #include "Graph.h"
 #include "VertexWeightedGraph.h"
-#include <string>
+#include "Log.h"
+#include "Debug.h"
+#include <stdio.h>
+#include <strings.h>
+#include <stdlib.h>
+#include <iostream>
 #include <algorithm>
-
-using namespace std;
+#include <iterator>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <vector>
 
 namespace Graph {
     class GraphWriter {
-protected:
-    string out_file_name;
-    vector<int> perm;
-
 public:
+
     GraphWriter();
-    GraphWriter(string &filename);
     virtual ~GraphWriter();
-    virtual void write_graph(Graph *g) = 0;
-    virtual void shuffle(Graph *g, int seed = 1);
-    string get_out_file_name() const;
-    void set_out_file_name(string out_file_name);
+    /**
+     * \brief Writes a graph of the specified type
+     */
+    int write_graph(Graph *g, const string filename, const string type, bool write_vertex_weights = false, bool shuffle = false);
+
+    /**
+     * \brief Sets whether to shuffle output graphs (for formats where we support it)
+     */
+    void set_shuffle(bool shuf);
+    /**
+     * \brief Sets the seed for shuffling
+     */
+    void set_shuffle_seed(int seed);
+private:
+    bool shuffle;
+    int shuffle_seed;
+    /**
+     * \brief Writes a given graph to file in the METIS format
+     */
+    int write_metis(Graph *g, const string filename);
+    /**
+     * \brief Writes a given graph to file in the DIMACS format
+     */
+    int write_dimacs(Graph *g, const string filename, bool write_vertex_weights);
+    /**
+     * \brief Writes a given graph to file in our adjacency matrix format
+     */
+    int write_adjmatrix(Graph *g, const string filename);
+    /**
+     * \brief Writes a given graph to file in GraphViz format
+     */
+    int write_graphviz(Graph *g, const string filename);
+    /**
+     * \brief Writes a given graph to file in Adjacency List format
+     */
+    int write_adjlist(Graph *g, const string filename);
     };
 }
 

@@ -30,7 +30,7 @@ class GraphVizGraphWriterTest: public testing::Test {
 public:
 	Graph::GraphCreatorFile creator;
     Graph::Graph *g;
-    Graph::GraphVizGraphWriter *gviz_writer;
+    Graph::GraphWriter writer;
 
     virtual void SetUp(){
  		//SetUp is called before every test
@@ -50,9 +50,8 @@ public:
 
 TEST_F(GraphVizGraphWriterTest, testWriteGraph)
 {
-	string outfile("data/1dc.128.gviz");
-	gviz_writer = new Graph::GraphVizGraphWriter(outfile);
-	gviz_writer->write_graph(g);
+	string out_file("data/1dc.128.gviz");
+	writer.write_graph(g, out_file, string("GRAPHVIZ"), false);
 }
 
 

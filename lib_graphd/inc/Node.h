@@ -36,6 +36,11 @@ public:
     int get_label() const;
     list<int> get_nbrs() const;
     list<int> *get_nbrs_ptr();
+
+    /*
+     * \brief returns a ref to the nbrs of this Node
+     */
+    const list<int> &get_nbrs_ref() const;
     int get_degree() const;
     void set_label(int label);
     void set_nbr(list<int> nbr);
@@ -43,7 +48,13 @@ public:
     void remove_nbr(int u);
     void delete_node();
     void sort_nbr();
+    void reverse_nbr();
     void unique_nbr();
+
+    /**
+     * \brief get the index of the neighbor whose index is the largest below n
+     */
+    std::list<int>::const_reverse_iterator get_largest_neighbor_below(int n);
     Node & operator =(const Node & n);
 
     //Declare friend classes

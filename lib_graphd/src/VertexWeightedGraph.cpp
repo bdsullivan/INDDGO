@@ -21,7 +21,7 @@
 
 #include "VertexWeightedGraph.h"
 #include "GraphProperties.h"
-#include "GraphReaderWriterFactory.h"
+#include "GraphWriter.h"
 #include "GraphCreatorFile.h"
 #include <string.h>
 
@@ -79,12 +79,11 @@ namespace Graph {
      */
     void VertexWeightedGraph::write_largest_component(std::string filetype, std::string filename){
         GraphProperties properties;
-        GraphWriter *writer;
-        GraphReaderWriterFactory factory;
+        GraphWriter gw;
         GraphCreatorFile creator;
 
-        writer = factory.create_writer(filetype);
-        writer->set_out_file_name(filename);
+        //writer = factory.create_writer(filetype);
+        //writer->set_out_file_name(filename);
 
         // Put the input graph in canonical form for the tests
         properties.make_canonical(this);
@@ -106,7 +105,7 @@ namespace Graph {
             }
         }
 
-        writer->write_graph(*maxcomp);
+        gw.write_graph(*maxcomp, filename, filetype, true);
 
         /*cleanup*/
         int s = C.size();
@@ -114,7 +113,6 @@ namespace Graph {
             delete C.front();
             C.pop_front();
         }
-        delete writer;
     } // write_largest_component
 }
 

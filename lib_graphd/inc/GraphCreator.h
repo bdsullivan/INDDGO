@@ -23,7 +23,6 @@
 #define GRAPHCREATOR_H_
 
 #include "Graph.h"
-#include "Graph.h"
 #include "VertexWeightedGraph.h"
 
 using namespace std;
@@ -40,7 +39,7 @@ public:
 
     // Specialized induced subgraph functionality for components. Sets num_connected_components to 1.
     virtual VertexWeightedGraph *create_component(VertexWeightedGraph *g,
-                                                   list<int> *members, bool make_simple);
+                                                  list<int> *members, bool make_simple);
 
     // Recursive and non-recursive functions that create all connected components of the graph,
     // which it places in the given vector

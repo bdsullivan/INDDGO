@@ -51,34 +51,28 @@ int main(int argc, char **argv){
         exit(-1);
     }
 
-    Graph::Graph *g;
-    int seed = 0;
+    Graph::Graph *g = NULL;
+    int seed;
 
-    if(!seed){
-        // Set the seed to a rand int in 0,2^24
-        seed = Graph::rand_int(0,0xffffff);
-    }
+    seed = Graph::rand_int(0,0xffffff);
     // Spin the RNG seed times
     for(int ss = 0; ss < seed; ss++){
         Graph::lcgrand(0);
     }
 
     Graph::GraphCreatorFile *gcf;
-
     Graph::GraphProperties prop;
     Graph::GraphReader ngr;
     Graph::GraphWriter writer;
 
     g = new Graph::Graph();
-
-    ngr.read_graph(g, argv[1], "Edge", false);
-
+    //fprintf(stderr,"mg number of nodes (before): %d\n", mg->get_num_nodes());
+    //fprintf(stderr,"mg before: 0x%x\n", mg);
+    ngr.read_graph(g, argv[1], "MeTiS", false);
     // if we don't get rid of duplicate edges, bad things happen
     // when trying to output the graph
     //prop.make_simple(g);
-
     fprintf(stderr, "edges read in: %d nodes read in: %d\n", g->get_num_edges(), g->get_num_nodes());
-
     writer.write_graph(g, argv[2], "DIMACS");
 
     return 0;

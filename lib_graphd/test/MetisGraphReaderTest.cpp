@@ -33,7 +33,8 @@ class MetisGraphReaderTest: public testing::Test
 public:
 	Graph::GraphCreatorFile creator;
 	Graph::Graph *g;
-	Graph::MetisGraphReader *mr;
+	Graph::GraphReader reader;
+    string in_file;
 
 	virtual void SetUp()
 	{
@@ -43,8 +44,7 @@ public:
 		creator.set_graph_type("adjmatrix");
 		g = creator.create_graph();
 
-		string in_file("data/1dc.128.met");
-		mr = new Graph::MetisGraphReader(in_file);
+	    in_file = ("data/1dc.128.met");
 	}
 
 	virtual void TearDown()
