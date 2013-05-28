@@ -59,14 +59,9 @@ namespace Graph {
                 g->nodes[i].nbrs.remove(i);
                 newsize = g->nodes[i].nbrs.size();
                 if(g->nodes[i].nbrs.size() < origsize){
-                    loops += (int) ((((((((((((((((((origsize
-                                                     - newsize))))))))))))))))));
-                    g->num_edges +=
-                        (int) (((((((((((((((((newsize)))))))))))))))));                         //all but the loop are normal edges
-                    for(j = 0;
-                        j
-                        < (int) ((((((((((((((((((origsize - newsize))))))))))))))))));
-                        j++){
+                    loops += (int) (origsize - newsize);
+                    g->num_edges += (int) (newsize);                         //all but the loop are normal edges
+                    for(j = 0; j < (int) (origsize - newsize); j++){
                         g->nodes[i].nbrs.push_back(i);                         //add it back
                     }
                     g->degree[i] = g->nodes[i].nbrs.size();
@@ -95,7 +90,7 @@ namespace Graph {
         j = 0;
         for(i = 0; i < g->capacity; i++){
             if((g->nodes[i].label != -1)
-               && ( (int) (((((((((((((((g->nodes[i].nbrs.size())))))))))))))))
+               && ( (int) (g->nodes[i].nbrs.size())
                     >= max_deg) ){
                 max_deg = g->nodes[i].nbrs.size();
                 high_degree_vs[j] = i;
@@ -132,9 +127,7 @@ namespace Graph {
         int i, j;
         j = 0;
         for(i = 0; i < g->capacity; i++){
-            if((g->nodes[i].label != -1)
-               && ( (int) ((((((((((((((g->nodes[i].nbrs.size()))))))))))))))
-                    <= min_deg) ){
+            if((g->nodes[i].label != -1) && (( (int) (g->nodes[i].nbrs.size())) <= min_deg) ){
                 min_deg = g->nodes[i].nbrs.size();
                 low_degree_vs[j] = i;
                 print_message(1, "Low[%d]=%d(deg=%d)\n", j, i, min_deg);
@@ -186,7 +179,7 @@ namespace Graph {
         }
 
         print_message(1, "Labeling component of vertex %d with %d\n", v, label);
-        if((int) (((((((((((((components->size()))))))))))))) < g->capacity){
+        if((int) (components->size()) < g->capacity){
             fatal_error("%s:  Component vector does not have enough space.\n",
                         __FUNCTION__);
         }
@@ -243,7 +236,7 @@ namespace Graph {
         }
 
         print_message(1, "Labeling component of vertex %d with %d\n", v, label);
-        if((int) ((((((((((((components->size())))))))))))) < g->capacity){
+        if((int) (components->size()) < g->capacity){
             fatal_error("%s:  Component vector does not have enough space.\n",
                         __FUNCTION__);
         }
@@ -288,7 +281,7 @@ namespace Graph {
     int GraphUtil::label_all_components(Graph *g,
                                         vector<int> *components){
         // Make sure the components vector is the right size
-        if((int) (((((((((((components->size()))))))))))) < g->capacity){
+        if((int) (components->size()) < g->capacity){
             components->resize(g->capacity, -1);
         }
 
@@ -368,7 +361,7 @@ namespace Graph {
     int GraphUtil::rec_label_all_components(Graph *g,
                                             vector<int> *components){
         // Make sure the components vector is the right size
-        if((int) ((((((((((components->size())))))))))) < g->capacity){
+        if((int) (components->size()) < g->capacity){
             components->resize(g->capacity, -1);
         }
 

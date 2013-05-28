@@ -31,6 +31,7 @@ class GraphTest: public testing::Test {
 public:
     Graph::GraphCreatorFile creator;
     Graph::Graph *g;
+    Graph::Graph *g_five;
 
     virtual void SetUp(){
         LOG_INIT("test.log", NULL, 0);
@@ -38,6 +39,7 @@ public:
         creator.set_file_name("data/1dc.128.txt");
         creator.set_graph_type("DIMACS");
 		g = creator.create_graph();
+        g_five = new Graph::Graph(5);
     }
 
     virtual void TearDown(){
@@ -67,6 +69,11 @@ TEST_F(GraphTest, testGetNode)
     n = g->get_node(108);
     list<int> nbrs = n->get_nbrs();
     EXPECT_EQ(24, nbrs.size());
+}
+
+TEST_F(GraphTest, testNextLabel){
+    int n = g_five->get_next_label();
+    EXPECT_EQ(6, n);
 }
 
 TEST_F(GraphTest, testIsEdge)

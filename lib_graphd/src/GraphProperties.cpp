@@ -20,6 +20,7 @@
  */
 
 #include "GraphDecomposition.h"
+#include <numeric>
 
 namespace Graph {
     GraphProperties::GraphProperties(){
@@ -351,4 +352,228 @@ namespace Graph {
         delete[] visited;
         return false;
     } // is_path
+
+    //FIXME: figure out where this should really live
+    struct sort_pair {
+        bool operator()(const pair<int, int> &left, const pair<int, int> &right){
+            return left.second > right.second;
+        }
+    };
+
+    /**
+     * Counts all triangles in g using compact-forward algorithm from Latapy
+     * \param[in] g input graph
+     * \param[out] t output vector of per-vertex triangle counts
+     */
+    void GraphProperties::all_triangles_compact_forward(Graph *g, vector<long int> &t){
+        int i, j;
+        int u, v;
+        int retcode;
+        Node *vn;
+
+        std::list<int>::const_reverse_iterator rit;
+
+        vector<pair <int, int> > sorted_indices(g->get_num_nodes());
+
+        // we want our list of vertices sorted by degree, with higest degree in element 0
+        // this is a goofy way to handle it, but that's life
+        for(i = 0; i < g->get_num_nodes(); i++){
+            sorted_indices[i].first = i;
+            sorted_indices[i].second = g->get_degree(i);
+            /*
+               fprintf(stderr, "  nbrs(%d): ", i);
+               for(list<int>::iterator myit=g->get_node(i)->get_nbrs_ptr()->begin(); myit != g->get_node(i)->get_nbrs_ptr()->end(); ++myit){
+                fprintf(stderr, " %d(%d)", *myit, g->get_degree(*myit));
+               }
+               fprintf(stderr,"\n");
+             */
+        }
+
+        // here we've basically renumbered the array using the
+        // injective function as required by Algorithm 7 in Latapy
+        /*
+           fprintf(stderr, "Before:\n");
+           for(i = 0; i < g->get_num_nodes(); i++){
+            fprintf(stderr, " vertex: %d degree %d\n",i,g->get_degree(i));
+           }
+         */
+        std::sort(sorted_indices.begin(), sorted_indices.end(), sort_pair());
+        /*
+           fprintf(stderr, "After:\n");
+           for(i = 0; i < g->get_num_nodes(); i++){
+            fprintf(stderr, " vertex: %d(%d) degree %d\n",i,sorted_indices[i].first, g->get_degree(sorted_indices[i].first));
+           }
+         */
+
+        Node *nv, *nu;
+        int vp, up;
+        int iu, iv;
+        int fakev;
+        int uprime, vprime;
+        const int n = g->get_num_nodes();
+        // FIXME: this is a terrible hack
+        //
+        vector<int> revmap(n, -1);
+        for(i = 0; i < n; i++){
+            revmap[sorted_indices[i].first] = n - (i + 1);
+        }
+        for(i = 0; i < n; i++){
+            sort_nbrs_by_map(revmap, g->get_node(i));
+        }
+
+        for(fakev = 1; fakev < n; fakev++){   //3
+            v = sorted_indices[fakev].first;
+            //fprintf(stderr,"fakev: %d v: %d\n",fakev, v);
+            nv = g->get_node(v);
+            const list<int> &nbrs_v = nv->get_nbrs_ref();
+            for(std::list<int>::const_iterator cit = nbrs_v.begin(); cit != nbrs_v.end(); ++cit){ //3a
+                u = *cit;
+                //fprintf(stderr,"    looking at u=%d v=%d\n", u, v);
+                //fprintf(stderr,"      n(u):%d n(v):%d\n",revmap[u],revmap[v]);
+                if(revmap[u] > revmap[v]){ //3a
+                    nu = g->get_node(u);
+                    const list<int> &nbrs_u = nu->get_nbrs_ref();
+                    list<int>::const_iterator upit = nbrs_u.begin(); //3aa
+                    list<int>::const_iterator vpit = nbrs_v.begin(); //3aa
+                    uprime = *upit;
+                    vprime = *vpit;
+                    //fprintf(stderr, "       u':%d v':%d ",uprime, vprime);
+                    //fprintf(stderr, "n(v):%d n(u'):%d n(v'):%d\n", revmap[v], revmap[uprime], revmap[vprime]);
+                    while((upit != nbrs_u.end()) && (vpit != nbrs_v.end() &&
+                                                     (revmap[uprime] < revmap[v]) && (revmap[vprime] < revmap[v]))){ //3ab
+                        uprime = *upit;
+                        vprime = *vpit;
+                        //fprintf(stderr, "       u':%d v':%d ",uprime, vprime);
+                        //fprintf(stderr, "n(v):%d n(u'):%d n(v'):%d\n", revmap[v], revmap[uprime], revmap[vprime]);
+                        if(revmap[uprime] < revmap[vprime]){ //3aba
+                            upit++;
+                            //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing u'\n", v, u, uprime);
+                        }
+                        else if(revmap[uprime] > revmap[vprime]){ //3abb
+                            vpit++;
+                            //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing v'\n", v, u, uprime);
+                        }
+                        else {   //3abc
+                            //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
+                            t[v]++;
+                            t[u]++;
+                            t[uprime]++;
+                            upit++;
+                            vpit++;
+                        }
+                    }
+                }
+            }
+        }
+    } // all_triangles_compact_forward
+
+    /*
+     * Counts triangles using the edge-listing algorithm in Latapy
+     * \param[in] g input graph
+     * \param[out] t vector of long ints, length |V|, returns 3x number of triangles for each vertex
+     */
+    void GraphProperties::all_triangles_edge_listing(Graph *g, vector<long int> &t){
+        int i, j, u, v;
+        vector<int>::iterator it;
+        list<int>::const_iterator cit;
+        list<int>::iterator lt;
+
+        // all the edgelists must be sorted
+        for(i = 0; i < g->get_num_nodes(); i++){
+            g->get_node(i)->sort_nbr();
+        }
+
+        for(u = 0; u < g->get_num_nodes(); u++){
+            const list<int> &c_nbrs = g->get_node(u)->get_nbrs_ref();
+            for(cit = c_nbrs.begin(); cit != c_nbrs.end(); ++cit){
+                v = *cit;
+                if(v > u){
+                    const std::list<int> &u_n = g->get_node(u)->get_nbrs_ref();
+                    const std::list<int> &v_n = g->get_node(v)->get_nbrs_ref();
+                    vector<int> intersection (max(u_n.size(), v_n.size()));
+                    //printf("looking at edge: %d-%d\n", u, v);
+                    it = std::set_intersection(u_n.begin(), u_n.end(), v_n.begin(), v_n.end(), intersection.begin());
+                    intersection.resize(it - intersection.begin());
+                    /*
+                       printf("  nbrs_u(%d): ", u);
+                       for(lt = u_n->begin(); lt != u_n->end(); ++lt){
+                        printf(" %d", *lt);
+                       }
+                       //printf("\n  nbrs_v(%d): ", v);
+                       for(lt = v_n->begin(); lt != v_n->end(); ++lt){
+                        printf(" %d", *lt);
+                       }
+                       //printf("\n    Intersection: ");
+                       for(it = intersection.begin(); it != intersection.end(); it++){
+                        printf(" %d", *it);
+                       }
+                       printf("\n");
+                     */
+
+                    for(it = intersection.begin(); it != intersection.end(); it++){
+                        t[*it]++;
+                        t[u]++;
+                        t[v]++;
+                    }
+                }
+            }
+        }
+    } // all_triangles_edge_listing
+
+    /**
+     * Functor to compare degrees and sort by them
+     */
+    struct compare_inject : std::binary_function<size_t, size_t, bool>{
+        compare_inject(const std::vector<int> &inject) : m_inject(inject){
+        }
+
+        bool operator()(size_t left, size_t right) const {
+            return m_inject[left] < m_inject[right];
+        }
+
+        const std::vector<int>& m_inject;
+    };
+
+    void GraphProperties::sort_nbrs_by_map(vector<int> map, Node *n){
+        list<int> nbrs(n->get_nbrs());
+
+        //std::sort(nbrs.first(), nbrs.last(), compare_degrees(g->get_degree_ref()));
+        nbrs.sort(compare_inject(map));
+        n->set_nbr(nbrs);
+    }
+
+    /**
+     * Returns the clustering coefficients of g.  Uses compact-forward under the hood for now
+     * \param[in] g input graph
+     * \param[out] global_cc global clustering coefficient, defined as (3*num_triangles)/num_possible_triangles
+     * \param[out] avg_cc average clustering coefficient, defined as the average of the local clustering coefficients
+     * \param[out] local_ccs local clustering coeffients
+     */
+
+    void GraphProperties::clustering_coefficients(Graph *g, double &global_cc, double &avg_cc, vector<double> &local_ccs){
+        int i, d_i;
+        const int n = g->get_num_nodes();
+        vector<long int> triangles(n, 0);
+        int total_possible_triangles = 0;
+
+        all_triangles_compact_forward(g, triangles);
+
+        global_cc = 0;
+        avg_cc = 0;
+        local_ccs.resize(n, 0);
+
+        const int num_triangles = std::accumulate(triangles.begin(), triangles.end(), 0);
+
+        // Calculate local CCs and running sum for global cc calc later
+        for(i = 0; i < n; i++){
+            d_i = g->get_degree(i);
+            total_possible_triangles += (d_i * (d_i - 1) / 2);
+            if(triangles[i] > 0){
+                local_ccs[i] = 2.0 * triangles[i] / ((double)d_i * (double)(d_i - 1));
+            }
+        }
+
+        avg_cc = std::accumulate(local_ccs.begin(), local_ccs.end(), 0.0) / (double)n;
+        global_cc = (double)num_triangles / (double)total_possible_triangles;
+    } // clustering_coefficients
 }

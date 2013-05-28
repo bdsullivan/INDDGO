@@ -79,7 +79,7 @@ int main(int argc, char **argv){
 
     fprintf(stderr, "edges read in: %d nodes read in: %d\n", g->get_num_edges(), g->get_num_nodes());
 
-    writer.write_graph(g, argv[2], "DIMACS");
+    writer.write_graph(g, argv[2], "ADJLIST");
 
     return 0;
 } // main

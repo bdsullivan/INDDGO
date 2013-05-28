@@ -28,13 +28,12 @@
 #include <algorithm>
 #include <string.h>
 
-
 /* GRAPH_H_ */
 namespace Graph {
     Graph::Graph(){
         this->num_nodes = 0;
         this->num_edges = 0;
-        this->graph_type = "DIMACS";
+        this->graph_type = "Graph";
         this->next_label = 1;
         this->num_connected_components = 1;
         this->simple = true;   //FIXME: check if this is correct behavior
@@ -52,6 +51,7 @@ namespace Graph {
         for(int i = 0; i < n; i++){
             nodes[i].set_label(i + 1);
         }
+        this->next_label = n + 1;
     }
 
     Graph::~Graph(){
@@ -60,12 +60,19 @@ namespace Graph {
     void Graph::set_canonical(bool c){
         canonical = c;
     }
+
     void Graph::set_degree(vector<int> degree){
         this->degree = degree;
     }
+
     vector<int> Graph::get_degree() const {
         return degree;
     }
+
+    const vector<int> &Graph::get_degree_ref() const {
+        return degree;
+    }
+
     vector<Node> Graph::get_nodes() const {
         return nodes;
     }
@@ -98,15 +105,26 @@ namespace Graph {
         this->nodes = nodes;
     }
 
-
     int Graph::get_degree(int v) const {
         return this->degree[v];
     }
 
+    /**
+     * \param[in] n number of elements
+     * */
+    void Graph::resize(int n){
+        nodes.reserve(n);
+        nodes.resize(n);
+        degree.reserve(n);
+        degree.resize(n);
+        num_nodes = n;
+        capacity = n;
+    }
+
     bool Graph::is_edge(int u, int v) const {
         //      Assumes graph is symmetric
-        list<int> nbrs = nodes[u].get_nbrs();
-        list<int>::iterator it;
+        const list<int> &nbrs = nodes[u].get_nbrs_ref();  // passing a ref is much faster than copying a list
+        list<int>::const_iterator it;
         for(it = nbrs.begin(); it != nbrs.end(); ++it){
             if(*it == v){
                 return true;
@@ -137,7 +155,6 @@ namespace Graph {
     int Graph::get_num_components() const {
         return num_connected_components;
     }
-
 
     void Graph::set_num_components(int num_components){
         this->num_connected_components = num_components;
@@ -229,11 +246,10 @@ namespace Graph {
         return simple;
     }
 
-
     void Graph::add_edge_advance(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
             fatal_error(
-                "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
+                "%s:  add_edge_advance() called with vertices %d and %d but there are %d connected nodes\n",
                 __FUNCTION__, u, v, capacity);
         }
 
@@ -297,7 +313,7 @@ namespace Graph {
     bool Graph::remove_edge(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
             fatal_error(
-                "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
+                "%s:  remove_edge() called with vertices %d and %d but there are %d connected nodes\n",
                 __FUNCTION__, u, v, capacity);
         }
         if(nodes[u].label == -1){
@@ -440,18 +456,17 @@ namespace Graph {
 
     void Graph::add_edge(int u, int v){
         if((v < 0) || (u < 0) || (v >= capacity) || (u >= capacity) ){
-            fatal_error(
-                "%s:  remove_vertex() called with vertices %d and %d but there are %d connected nodes\n",
-                __FUNCTION__, u, v, capacity);
+            fatal_error( "%s: called with vertices %d and %d but there are %d connected nodes\n",
+                         __FUNCTION__, u, v, capacity);
         }
 
         if(nodes[u].label == -1){
-            fatal_error("%s:  Tried to use  GD_UNDEFINED vertex %d\n",
+            fatal_error("%s: Tried to use  GD_UNDEFINED vertex %d\n",
                         __FUNCTION__, u);
         }
 
         if(nodes[v].label == -1){
-            fatal_error("%s:  Tried to use GD_UNDEFINED vertex %d\n", __FUNCTION__,
+            fatal_error("%s: Tried to use GD_UNDEFINED vertex %d\n", __FUNCTION__,
                         v);
         }
 
@@ -467,6 +482,31 @@ namespace Graph {
 
         num_edges++;
     } // add_edge
+
+    /**
+     * does some stuff
+     * and other stuff
+     *
+     */
+    int Graph::add_vertices(int n){
+        int old_size = this->num_nodes;
+        this->num_nodes = this->num_nodes + n;
+        this->nodes.resize(this->num_nodes);
+        this->degree.resize(this->num_nodes);
+        this->capacity = this->num_nodes;
+        for(int i = old_size; i < this->num_nodes; i++){
+            this->nodes[i].set_label(this->next_label);
+            this->next_label++;
+        }
+        return this->num_nodes - 1;
+    }
+
+    /**
+     * Convenience function to add a single vertex
+     */
+    int Graph::add_vertex(){
+        return this->add_vertices(1);
+    }
 
     void Graph::resize_adj_vec(int n){
         adj_vec.resize(n, 0);
@@ -497,7 +537,7 @@ namespace Graph {
     }
 
     void Graph::eliminate_vertex(int v, list<int> *forward_neighbors,
-                                        bool remove){
+                                 bool remove){
         if(!this->canonical){
             print_message(0, "%s:  Graph must be in canonical form\n", __FUNCTION__);
         }

@@ -99,6 +99,11 @@ namespace Graph {
         wmg->capacity = n;
         wmg->num_nodes = n;
 
+        //if(wmg->capacity > H->weight.size()){
+        //   FERROR("%s: too much capacity in wmg for H", __FUNCTION__);
+        //  throw GraphException("element is out of bounds\n");
+        //}
+
         for(int i = 0; i < wmg->capacity; i++){
             wmg->weight[i] = H->weight[i];
         }
@@ -284,7 +289,7 @@ namespace Graph {
      * is guaranteed to be simple.
      */
     VertexWeightedGraph *GraphCreator::create_component(VertexWeightedGraph *g,
-                                                         list<int> *members, bool make_simple){
+                                                        list<int> *members, bool make_simple){
         VertexWeightedGraph *wmg;
         wmg = create_induced_subgraph(g, members, make_simple);
         // Set num_connected_components to 1 since g is known - not verified - should it be??

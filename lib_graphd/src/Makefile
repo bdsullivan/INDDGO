@@ -14,10 +14,11 @@ INCLUDES = -I../inc/ -I/usr/local/include $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(
 # libraries
 LIBS = -L/usr/local/lib $(INDDGO_LIB) $(SSPARSE_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB)
 # source
-SRC := Log.cpp GraphReader.cpp DIMACSGraphReader.cpp AdjMatrixGraphReader.cpp EdgelistGraphReader.cpp Node.cpp GraphReaderWriterFactory.cpp \
-	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp VertexWeightedGraph.cpp GraphProperties.cpp\
-	GraphUtil.cpp Debug.cpp GraphEOUtil.cpp GraphDisplay.cpp RndNumGen.cpp Util.cpp AdjMatrixGraphWriter.cpp GraphWriter.cpp\
-	DIMACSGraphWriter.cpp GraphVizGraphWriter.cpp MetisGraphWriter.cpp MetisGraphReader.cpp
+SRC := Log.cpp GraphReader.cpp Node.cpp \
+	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp VertexWeightedGraph.cpp GraphProperties.cpp \
+	GraphUtil.cpp Debug.cpp GraphEOUtil.cpp GraphDisplay.cpp RndNumGen.cpp Util.cpp GraphWriter.cpp \
+	GraphReader.cpp
+
 # source files.
 OBJ = $(SRC:.cpp=.o) 
 POBJ =  
@@ -32,8 +33,11 @@ POBJ = $(SRC:.cpp=.o)  smbfactor.o $(PARMETISOBJ)
 endif
 
 .SUFFIXES: .cpp .c
+.PHONY: all libgraphd
 
-all: $(INDDGO_LIB_DIR)/$(LIBNAME)  $(GVIZ)
+libgraphd: $(INDDGO_LIB_DIR)/$(LIBNAME)
+
+all: libgraphd  $(GVIZ)
 
 #This is a problem if they're not using gcc 
 %.o: $(METIS_PROG_DIR)/%.c
@@ -49,7 +53,7 @@ $(INDDGO_LIB_DIR)/$(LIBNAME): $(OBJ) $(POBJ)
 locallib: $(INDDGO_LIB_DIR)/$(LIBNAME)
 	cp $(INDDGO_LIB_DIR)/$(LIBNAME) ../lib/$(LIBNAME)
 
-$(GVIZ): gviz.cpp
+$(GVIZ): gviz.o 
 	$(CXX) -I../inc $(CFLAGS) $< -o $@ $(INCLUDES) -lgraphd $(LIBS) $(LDFLAGS)
 
 clean:

@@ -117,7 +117,6 @@ static const char EO_NAMES[][30] = {
 // Include header files
 #include "GraphDecomposition.h"
 #include "Graph.h"
-#include "GraphReaderWriterFactory.h"
 #include "Graph.h"
 #include "DIMACSGraphReader.h"
 #include "DIMACSGraphWriter.h"

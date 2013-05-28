@@ -29,13 +29,13 @@ using namespace std;
 // A new one of these is created for each test
 class GraphReaderTest : public testing::Test {
 public:
-    Graph::GraphReader *gr;
+    Graph::GraphReader gr;
+    Graph::Graph g;
 
 
     virtual void SetUp(){
         LOG_INIT("test.log", NULL, 0);
-        gr = new Graph::DIMACSGraphReader ();
-        gr->read_graph("data/1dc.128.txt");
+        gr.read_graph(&g, string("data/1dc.128.txt"), string("DIMACS"), false );
     }
 
     virtual void TearDown(){
@@ -46,12 +46,12 @@ public:
 
 TEST_F(GraphReaderTest, testCapacity)
 {
-    EXPECT_EQ(128, gr->get_capacity());
+    EXPECT_EQ(128, g.get_capacity());
 }
 
 TEST_F(GraphReaderTest, testNumEdges)
 {
-    EXPECT_EQ(1471, gr->get_num_edges());
+    EXPECT_EQ(1471, g.get_num_edges());
 }
 
 
@@ -59,7 +59,7 @@ TEST_F(GraphReaderTest, testNodeNbrs)
 {
     vector<Graph::Node> n;
     int i;
-    n = gr->get_nodes();
+    n = g.get_nodes();
 
     EXPECT_EQ(128, n.size());
 

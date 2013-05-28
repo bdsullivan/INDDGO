@@ -22,6 +22,7 @@
 #include "Node.h"
 #include "GraphException.h"
 #include <algorithm>
+#include <stdio.h>
 namespace Graph {
     Node::Node(){
         this->label = -1;
@@ -37,6 +38,13 @@ namespace Graph {
 
     list<int> *Node::get_nbrs_ptr(){
         return &(this->nbrs);
+    }
+
+    /*
+     * \return r const ref to the node neighbors
+     */
+    const list<int> &Node::get_nbrs_ref() const {
+        return this->nbrs;
     }
 
     void Node::set_label(int label){
@@ -76,8 +84,31 @@ namespace Graph {
         nbrs.sort();
     }
 
+    void Node::reverse_nbr(){
+        nbrs.reverse();
+    }
+
     void Node::unique_nbr(){
         nbrs.unique();
+    }
+
+    /**
+     * Used to save some compares when calculating triangles. **ASSUMES NEIGHBOR LIST IS SORTED**
+     * \param[in] n the index below which to return the largest neighbor
+     * \return x the index of the largest neighbor below n
+     */
+    std::list<int>::const_reverse_iterator Node::get_largest_neighbor_below(int n){
+        //FIXME: probably should be able to handle unsorted case, but how to do without sacrificing efficiency?
+        //       also maybe do a binary instead of linear search
+        int v;
+        std::list<int>::reverse_iterator it;
+
+        for(it = this->nbrs.rbegin(); it != this->nbrs.rend(); it++){
+            if(*it > n){
+                return --it;
+            }
+        }
+        return this->nbrs.rend();
     }
 
     Node & Node::operator=(const Node & n){

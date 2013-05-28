@@ -37,7 +37,7 @@ LFLAGS = -g -O0
 
 #EXECUTABLES = $(LIBGTEST) testDimacsReader testGraphReader testGraphCreatorFile 
 EXECUTABLES = bin/testDimacsReader bin/testGraphReader bin/testGraphCreatorFile \
-bin/testGraphReaderWriterFactory bin/testGraph bin/testWeightedGraph  \
+bin/testGraph bin/testWeightedGraph  \
 bin/testVertexWeightedGraph bin/testAdjMatrixGraphWriter bin/testAdjMatrixGraphReader \
 bin/testDIMACSGraphWriter bin/testGraphVizGraphWriter bin/testGraphProperty bin/testGraphUtil\
 bin/testMetisGraphWriter bin/testMetisGraphReader
@@ -47,7 +47,7 @@ EXECUTABLES = $(EXECUTABLES) testParMetis testGraphEOUtil
 endif
 
 SRC=DIMACSReaderTest.cpp GraphReaderTest.cpp GraphCreatorFileTest.cpp \
-GraphReaderWriterFactoryTest.cpp GraphTest.cpp WeightedGraphTest.cpp MutableGraphTest.cpp\
+GraphTest.cpp WeightedGraphTest.cpp MutableGraphTest.cpp\
 VertexWeightedGraphTest.cpp AdjMatrixGraphWriterTest.cpp AdjMatrixGraphReaderTest.cpp\
 DIMACSGraphWriterTest.cpp GraphVizGraphWriterTest.cpp GraphPropertyTest.cpp\
 GraphUtilTest.cpp GraphEOUtilTest.cpp MetisGraphWriterTest.cpp MetisGraphReaderTest.cpp\
@@ -67,9 +67,6 @@ bin/testGraphReader: GraphReaderTest.o
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
 bin/testGraphCreatorFile: GraphCreatorFileTest.o
-	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
-
-bin/testGraphReaderWriterFactory: GraphReaderWriterFactoryTest.o
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
 bin/testGraph: GraphTest.o
