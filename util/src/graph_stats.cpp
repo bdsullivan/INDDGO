@@ -32,7 +32,14 @@
 #include "Util.h"
 #include "GraphException.h"
 
+#include "orbconfig.h"
+#include "orbtimer.h"
+
 using namespace std;
+
+void print_time(string prefix, ORB_t start, ORB_t end){
+    cout << prefix + ": " << ORB_seconds(end, start) << "\n";
+}
 
 const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths");
 
@@ -91,6 +98,7 @@ int main(int argc, char **argv){
     string intype ("edge");
     std::map<string, bool> req_methods;
     std::map<string, bool> val_methods;
+    ORB_t t1, t2;
 
     create_map(allowed_methods, val_methods);
     parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods);
@@ -102,6 +110,9 @@ int main(int argc, char **argv){
     cout << "Input  type: " << intype << "\n";
     cout << "Output file: " << outfilename << "\n";
     cout << "Methods    :";
+    cout << "Calibrating timers\n";
+    ORB_calibrate();
+
     for(map<string, bool>::iterator it = req_methods.begin(); it != req_methods.end(); ++it){
         cout << " " << it->first;
         if(val_methods[it->first] != true){
@@ -111,7 +122,7 @@ int main(int argc, char **argv){
     cout << "\n";
 
     // let's do some calculations
-    
+
     Graph::Graph g;
     Graph::GraphReader gr;
     Graph::GraphProperties gp;
@@ -130,24 +141,36 @@ int main(int argc, char **argv){
 
     if(req_methods["edge_density"] == true){
         cout << "Calculating edge density\n";
+        ORB_read(t1);
         gp.edge_density(&g, edge_density);
+        ORB_read(t2);
+        print_time("Time(edge_density)", t1, t2);
         outfile << "edge_density " << edge_density << "\n";
     }
     if(req_methods["avg_degree"] == true){
         cout << "Calculating average degree\n";
+        ORB_read(t1);
         gp.avg_degree(&g, avg_degree);
+        ORB_read(t2);
+        print_time("Time(average_degree)", t1, t2);
         outfile << "avg_degree " << avg_degree << "\n";
     }
     if(req_methods["degree_dist"] == true){
         cout << "Calculating degree distribution\n";
+        ORB_read(t1);
         gp.deg_dist(&g, deg_dist);
-        string of = outprefix+".deg_dist";
+        ORB_read(t2);
+        print_time("Time(degree_distribution)", t1, t2);
+        string of = outprefix + ".deg_dist";
         write_degree_distribution(of, deg_dist);
         outfile << "degree_distribution " <<  of << "\n";
     }
-    if(req_methods["global_cc"] == true || req_methods["local_ccs"] == true || req_methods["avg_cc"] == true){
+    if((req_methods["global_cc"] == true) || (req_methods["local_ccs"] == true) || (req_methods["avg_cc"] == true)){
         cout << "Calculating clustering coefficients\n";
+        ORB_read(t1);
         gp.clustering_coefficients(&g, global_cc, avg_cc, local_cc);
+        ORB_read(t2);
+        print_time("Time(clustering_coeffecients)", t1, t2);
         if(req_methods["global_cc"] == true){
             outfile << "global_clustering_coefficient " << global_cc << "\n";
         }
@@ -160,7 +183,11 @@ int main(int argc, char **argv){
 
     if(req_methods["shortest_paths"] == true){
         cout << "Calculating shortest paths\n";
+        ORB_read(t1);
         gp.paths_dijkstra_all(&g, shortest_path_distances);
+        ORB_read(t2);
+        print_time("Time(shortest_paths_dijkstra)", t1, t2);
     }
     outfile.close();
-}
+} // main
+

@@ -15,7 +15,7 @@ TD_STATS_OBJ =  $(TD_STATS_SRCS:.cpp=.o)
 TD_STATS_EXE = $(INDDGO_BIN)/td_stats
 
 G_STATS_SRCS =  ./src/graph_stats.cpp 
-G_STATS_OBJ =  $(G_STATS_SRCS:.cpp=.o)
+G_STATS_OBJ =  src/orbtimer.o $(G_STATS_SRCS:.cpp=.o)
 G_STATS_EXE = $(INDDGO_BIN)/graph_stats
 
 E2D_SRCS = ./src/edge2dimacs.cpp

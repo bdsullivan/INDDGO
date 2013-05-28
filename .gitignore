@@ -8,3 +8,6 @@ bin/serial_wis
 bin/td_stats
 bin/td_viz
 lib_graphd/bin/gviz
+madness/autom4te.cache/
+madness/deploy/include/madness_config.h
+*/doc
