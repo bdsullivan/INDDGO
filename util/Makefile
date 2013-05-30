@@ -38,7 +38,11 @@ SRT_SRCS =  ./src/shortest-paths.cpp
 SRT_OBJ =  $(SRT_SRCS:.cpp=.o)
 SRT_EXE = $(INDDGO_BIN)/shortest-paths
 
-all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) $(SRT_EXE)
+ECC_SRCS = ./src/v_eccentricity.cpp
+ECC_OBJ = $(ECC_SRCS:.cpp=.o)
+ECC_EXE = $(INDDGO_BIN)/v_eccentricity
+
+all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) $(SRT_EXE) $(ECC_EXE)
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
@@ -67,8 +71,11 @@ $(TRI_EXE): $(TRI_OBJ) ../lib/libgraphd.a
 $(SRT_EXE): $(SRT_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
+$(ECC_EXE): $(ECC_OBJ) ../lib/libgraphd.a
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@
+
 clean: 
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE) $(SRT_OBJ) $(SRT_EXE) $(E2A_EXE) $(E2A_OBJ)
+	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE) $(SRT_OBJ) $(SRT_EXE) $(ECC_OBJ) $(ECC_EXE) $(E2A_EXE) $(E2A_OBJ)
 
 doc: $(DOXYFILE)
 	doxygen $(DOXYFILE)
