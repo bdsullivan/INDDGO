@@ -725,7 +725,9 @@ namespace Graph {
         Node *nv;
         vector<int> dist(n, inf);
         vector<int> visited(n, 0);
+        p.resize(n);
 
+#pragma omp parallel for default(none) shared(g, inf, p) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
         //loop over all vertices
         for(int v = 0; v < n; v++){
             //printf("\n***Source is now v %d \n ",v);
@@ -769,13 +771,13 @@ namespace Graph {
             } //end while
 
             //store shortest paths from this vertex to all
-            p.push_back(dist);
+            p[v] = dist;
             /*
                for(int i = 0; i < n; i++){
                 printf("%d,  ",dist[i]);
                }
                printf("\n");
-             */
+            */
         } //end loop over vertices
     } //paths_dijkstra_all
 
