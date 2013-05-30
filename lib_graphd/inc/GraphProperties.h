@@ -78,6 +78,11 @@ public:
     void paths_dijkstra_all(Graph *g, vector< vector<int> > &p);
 
     /**
+     * \brief returns eccentricty for all nodes
+     */
+    void eccentricity(Graph *g, vector<int> &ecc);
+
+    /**
      * \brief Calculates the edge density of the specified graph
      */
     void edge_density(Graph *g, float &ed);

@@ -737,6 +737,38 @@ namespace Graph {
         } //end loop over vertices
     } //paths_dijkstra_all
 
+  /**
+   * Calcuates the eccentricity for each vertex (vertex diameter)
+   * \param[in] g input graph
+   * \param[out] ecc eccentricies for each vertex
+   */
+    void GraphProperties::eccentricity(Graph *g, vector <int> &ecc) {
+   
+        const int n = g->get_num_nodes();
+	vector<int> diameters(n,0);
+        vector< vector<int> > short_paths;
+	int bestMax = 0;     
+
+        //first compute all shortest paths
+        paths_dijkstra_all(g, short_paths);
+
+        //compute diameter of each vertex
+        for(int i=0; i < n; i++) {
+          //encode as function
+          bestMax = 0;
+          for (int j=0; j < (int) short_paths[i].size(); j++) {
+	     if (short_paths[i][j] > bestMax) {
+	       bestMax = short_paths[i][j];
+	     }
+          }
+	  diameters[i] = bestMax;//getmax(short_paths[i]); //eccentricity of vertex i
+	  printf("Diameter of node %d is %d\n", i, diameters[i]);
+	}
+
+	//include the distribution here?
+
+    }//eccentricity
+
     /**
      * Calculates the edge density of graph g
      * \param[in] g Pointer to a graph
