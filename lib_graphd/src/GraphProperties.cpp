@@ -24,7 +24,6 @@
 #include <sys/types.h>
 #include <sched.h>
 
-#include <omp.h>
 #include <numeric>
 
 namespace Graph {
