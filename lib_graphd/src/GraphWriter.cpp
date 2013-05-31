@@ -138,6 +138,7 @@ namespace Graph {
             for(list<int>::const_iterator it = nbrs.begin(); it != nbrs.end(); ++it){
                 os << " " << *it;
             }
+            os << "\n";
             fprintf(fout, "%s", os.str().c_str());
         }
 
