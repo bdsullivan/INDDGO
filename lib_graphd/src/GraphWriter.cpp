@@ -131,12 +131,7 @@ namespace Graph {
             const list<int> &nbrs = g->get_node(i)->get_nbrs_ref();
             fprintf(fout, "%d", i);
             for(list<int>::const_iterator it = nbrs.begin(); it != nbrs.end(); ++it){
-                if(*it > i){
-                    fprintf(fout, " %d", *it);
-                }
-                else if(*it == i){
-                    fprintf(stderr, "Found self loop on node %d\n", i);
-                }
+                fprintf(fout, " %d", *it);
             }
             fprintf(fout, "\n");
         }
