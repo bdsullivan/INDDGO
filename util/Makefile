@@ -19,11 +19,11 @@ G_STATS_OBJ =  src/orbtimer.o $(G_STATS_SRCS:.cpp=.o)
 G_STATS_EXE = $(INDDGO_BIN)/graph_stats
 
 E2D_SRCS = ./src/edge2dimacs.cpp
-E2D_OBJ = $(E2D_SRCS:.cpp=.o)
+E2D_OBJ = src/orbtimer.o $(E2D_SRCS:.cpp=.o)
 E2D_EXE = $(INDDGO_BIN)/edge2dimacs
 
 E2A_SRCS = ./src/edge2adjlist.cpp
-E2A_OBJ = $(E2A_SRCS:.cpp=.o)
+E2A_OBJ = src/orbtimer.o $(E2A_SRCS:.cpp=.o)
 E2A_EXE = $(INDDGO_BIN)/edge2adjlist
 
 M2D_SRCS = ./src/metis2dimacs.cpp
