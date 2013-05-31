@@ -110,9 +110,6 @@ int main(int argc, char **argv){
     cout << "Input  type: " << intype << "\n";
     cout << "Output file: " << outfilename << "\n";
     cout << "Methods    :";
-    cout << "Calibrating timers\n";
-    ORB_calibrate();
-
     for(map<string, bool>::iterator it = req_methods.begin(); it != req_methods.end(); ++it){
         cout << " " << it->first;
         if(val_methods[it->first] != true){
@@ -120,13 +117,18 @@ int main(int argc, char **argv){
         }
     }
     cout << "\n";
+    cout << "Calibrating timers\n";
+    ORB_calibrate();
+
 
     // let's do some calculations
 
     Graph::Graph g;
     Graph::GraphReader gr;
     Graph::GraphProperties gp;
-    gr.read_graph(&g, infile, intype, false);
+    if(gr.read_graph(&g, infile, intype, false) == -1){
+        exit(1);
+    }
     double global_cc, avg_cc;
     vector<double> local_cc;
     float edge_density, avg_degree;
@@ -138,6 +140,11 @@ int main(int argc, char **argv){
         cerr << "Error opening " << outfilename << " for writing, exiting\n";
         exit(1);
     }
+
+    gp.make_simple(&g);
+
+    outfile << "num_nodes " << g.get_num_nodes() << "\n";
+    outfile << "num_edges " << g.get_num_edges() << "\n";
 
     if(req_methods["edge_density"] == true){
         cout << "Calculating edge density\n";
