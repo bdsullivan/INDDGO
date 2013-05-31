@@ -67,6 +67,14 @@ namespace Graph {
                 vg->weight.resize(vg->num_nodes, 1);
             }
         }
+        else if("ADJLIST" == t){
+            retcode = GraphReader::read_adjlist(g, filename);
+            if(read_vertex_weights){
+                VertexWeightedGraph *vg;
+                vg = (VertexWeightedGraph *) g;
+                vg->weight.resize(vg->num_nodes, 1);
+            }
+        }
         else if("METIS" == t){
             retcode = GraphReader::read_metis(g, filename);
             if(read_vertex_weights){
@@ -79,7 +87,7 @@ namespace Graph {
             retcode = GraphReader::read_dimacs(g, filename, read_vertex_weights);
         }
         else {
-            cerr << "Error: type " << type << " not currently supported" << endl;
+            cerr << "Error: type " << type << " not currently supported\n";
             return -1;
         }
 
@@ -89,6 +97,46 @@ namespace Graph {
 
         return retcode;
     } // read_graph
+
+/**
+ * Private function to read in a graph in adjacency list format
+ * \param[in,out] g a graph object
+ * \param[in] filename full path to the file to read in (relative or absolute)
+ * \return code 0 on success, nonzero on failure
+ */
+    int GraphReader::read_adjlist(Graph *g, const string filename){
+        int i, j, m, n, retval;
+        char *retp;
+        int new_vid;
+        int new_nbr;
+
+        string line;
+        ifstream input(filename.c_str());
+        if(!input.is_open()){
+            FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename);
+            fatal_error("%s:  Error opening %s for reading\n", __FUNCTION__,
+                        filename.c_str());
+        }
+
+        while(std::getline(input, line)){
+            std::stringstream ss(line);
+            string token;
+            ss >> token; // the first element
+            if('#' != token[0]){
+                istringstream(token) >> new_vid;
+                if(new_vid > g->get_num_nodes()-1){
+                    g->add_vertices((g->get_num_nodes()-new_vid)+1);
+                }
+                while( ss >> token) {
+                    istringstream(token) >> new_nbr;
+                    if(new_nbr > g->get_num_nodes()-1){
+                        g->add_vertices((new_nbr-g->get_num_nodes())+1);
+                    }
+                    g->add_edge(new_vid, new_nbr);
+                }
+            }
+        }
+    }
 
 /**
  * Private function to read in a graph in edgelist format
