@@ -431,8 +431,8 @@ namespace Graph {
             //    if(CPU_ISSET(k, &cpuset)){
             //        printf(" %d",k);
             //    }
-           // }
-           // printf("\n");
+            // }
+            // printf("\n");
 
             #pragma omp for schedule(dynamic, 8)
             for(i = 0; i < n; i++){
@@ -480,7 +480,7 @@ namespace Graph {
                                 //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing v'\n", v, u, uprime);
                             }
                             else { //3abc
-                                //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
+                                   //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
                                 local_t[omp_tid][v]++;
                                 local_t[omp_tid][u]++;
                                 local_t[omp_tid][uprime]++;
@@ -489,11 +489,11 @@ namespace Graph {
                             }
                         }
                     } //if revmap
-                }//for vtxs
+                } //for vtxs
             } //for fakev
             #pragma omp for
-            for(i=0;i<t.size(); i++){
-                for(int j=0;j<omp_get_num_threads();j++){
+            for(i = 0; i < t.size(); i++){
+                for(int j = 0; j < omp_get_num_threads(); j++){
                     t[i] += local_t[j][i];
                 }
             }
@@ -726,7 +726,7 @@ namespace Graph {
         vector<int> visited(n, 0);
         p.resize(n);
 
-#pragma omp parallel for default(none) shared(g, inf, p) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
+        #pragma omp parallel for default(none) shared(g, inf, p) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
         //loop over all vertices
         for(int v = 0; v < n; v++){
             //printf("\n***Source is now v %d \n ",v);
@@ -776,7 +776,7 @@ namespace Graph {
                 printf("%d,  ",dist[i]);
                }
                printf("\n");
-            */
+             */
         } //end loop over vertices
     } //paths_dijkstra_all
 

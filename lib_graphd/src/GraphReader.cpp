@@ -124,19 +124,19 @@ namespace Graph {
             ss >> token; // the first element
             if('#' != token[0]){
                 istringstream(token) >> new_vid;
-                if(new_vid > g->get_num_nodes()-1){
-                    g->add_vertices((g->get_num_nodes()-new_vid)+1);
+                if(new_vid > g->get_num_nodes() - 1){
+                    g->add_vertices((g->get_num_nodes() - new_vid) + 1);
                 }
-                while( ss >> token) {
+                while( ss >> token){
                     istringstream(token) >> new_nbr;
-                    if(new_nbr > g->get_num_nodes()-1){
-                        g->add_vertices((new_nbr-g->get_num_nodes())+1);
+                    if(new_nbr > g->get_num_nodes() - 1){
+                        g->add_vertices((new_nbr - g->get_num_nodes()) + 1);
                     }
                     g->add_edge(new_vid, new_nbr);
                 }
             }
         }
-    }
+    } // read_adjlist
 
 /**
  * Private function to read in a graph in edgelist format

@@ -120,7 +120,6 @@ int main(int argc, char **argv){
     cout << "Calibrating timers\n";
     ORB_calibrate();
 
-
     // let's do some calculations
 
     Graph::Graph g;
