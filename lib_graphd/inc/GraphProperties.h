@@ -91,6 +91,11 @@ public:
      * \brief Calculates the degree distribution of the specified graph
      */
     void deg_dist(Graph *g, vector<int> &dist);
+
+    /**
+     * \brief Returns the degree assortativity coefficient of a graph
+     */
+    void deg_assortativity(Graph *g, double &coeff);
     };
 }
 

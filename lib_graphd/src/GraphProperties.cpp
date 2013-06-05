@@ -780,4 +780,41 @@ namespace Graph {
             dist[g->degree[i]] += 1;
         }
     }
+
+    /**
+     * Calculates the degree assortativity of a graph g
+     * \param[in] g input graph
+     * \param[out] coeff the degree assortativity coefficient of g
+     */
+    void GraphProperties::deg_assortativity(Graph *g, double &coeff){
+        double n1 = 0.0, n2 = 0.0, de = 0.0;
+        int m = g->get_num_edges();
+        const vector<int> &degrees = g->get_degree_ref();
+        int i;
+        double di, dc;
+        int nbr;
+        std::list<int>::const_iterator cit;
+        Node *node;
+
+        for(i = 0; i < g->get_num_nodes(); i++){
+            node = g->get_node(i);
+            const list<int> &nbrs = node->get_nbrs_ref();
+            for(cit = nbrs.begin(); cit != nbrs.end(); ++cit){
+                if(*cit > i){
+                    di = (double)degrees[i] - 1;
+                    dc = (double)degrees[*cit] - 1;
+
+                    n1 += di * dc;
+                    n2 += di + dc;
+                    de += pow(di,2) + pow(dc,2);
+                }
+            }
+        }
+
+        n1 = n1 / (double)m;
+        de = de / (2.0 * m);
+        n2 = pow(n2 / (2.0 * m), 2);
+
+        coeff = (n1 - n2) / (de - n2);
+    } // deg_assortativity
 }

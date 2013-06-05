@@ -41,7 +41,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << "\n";
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity");
 
 /**
  * Creates a map from a comma-separated string
@@ -105,6 +105,10 @@ int main(int argc, char **argv){
     if(outprefix.length() == 0){
         outprefix = infile;
     }
+
+    // we'd like higher precision when printing values
+    std::cout.precision(10);
+
     cout << "done parsing options\n";
     cout << "Input  file: " << infile << "\n";
     cout << "Input  type: " << intype << "\n";
@@ -128,7 +132,7 @@ int main(int argc, char **argv){
     if(gr.read_graph(&g, infile, intype, false) == -1){
         exit(1);
     }
-    double global_cc, avg_cc;
+    double global_cc, avg_cc, assortativity;
     vector<double> local_cc;
     float edge_density, avg_degree;
     vector<int> deg_dist;
@@ -139,6 +143,8 @@ int main(int argc, char **argv){
         cerr << "Error opening " << outfilename << " for writing, exiting\n";
         exit(1);
     }
+
+    outfile.precision(16);
 
     gp.make_simple(&g);
 
@@ -170,6 +176,14 @@ int main(int argc, char **argv){
         string of = outprefix + ".deg_dist";
         write_degree_distribution(of, deg_dist);
         outfile << "degree_distribution " <<  of << "\n";
+    }
+    if(req_methods["assortativity"] == true){
+        cout << "Calculating degree assortativity\n";
+        ORB_read(t1);
+        gp.deg_assortativity(&g, assortativity);
+        ORB_read(t2);
+        print_time("Time(assortativity)", t1, t2);
+        outfile << "assortativity " <<  assortativity << "\n";
     }
     if((req_methods["global_cc"] == true) || (req_methods["local_ccs"] == true) || (req_methods["avg_cc"] == true)){
         cout << "Calculating clustering coefficients\n";
