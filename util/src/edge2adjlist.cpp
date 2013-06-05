@@ -27,7 +27,14 @@
 #include "GraphReader.h"
 #include "GraphWriter.h"
 
+#include "orbconfig.h"
+#include "orbtimer.h"
+
 using namespace std;
+
+void print_time(string prefix, ORB_t start, ORB_t end){
+    cout << prefix + ": " << ORB_seconds(end, start) << "\n";
+}
 
 void usage(const char *s){
     fprintf(stderr,"Usage: %s [options]\n",s);
@@ -44,6 +51,7 @@ void usage(const char *s){
 }
 
 int main(int argc, char **argv){
+    ORB_t t1, t2;
     // Check for a cry for help
     if((argc == 1) || ((argc == 2) && (strcmp(argv[1],"-h") == 0)) || ((argc == 2) && (strcmp(argv[1],"--help") == 0))
        || ((argc == 2) && (strcmp(argv[1],"--h") == 0) ) ){
@@ -54,6 +62,9 @@ int main(int argc, char **argv){
     Graph::Graph *g;
     int seed = 0;
 
+    cout << "calibrating timers\n";
+
+    ORB_calibrate();
     if(!seed){
         // Set the seed to a rand int in 0,2^24
         seed = Graph::rand_int(0,0xffffff);
@@ -71,7 +82,11 @@ int main(int argc, char **argv){
 
     g = new Graph::Graph();
 
+    cout << "Reading graph\n";
+    ORB_read(t1);
     ngr.read_graph(g, argv[1], "Edge", false);
+    ORB_read(t2);
+    print_time("Time(read_graph)", t1, t2);
 
     // if we don't get rid of duplicate edges, bad things happen
     // when trying to output the graph
@@ -79,7 +94,11 @@ int main(int argc, char **argv){
 
     fprintf(stderr, "edges read in: %d nodes read in: %d\n", g->get_num_edges(), g->get_num_nodes());
 
+    cout << "Writing graph\n";
+    ORB_read(t1);
     writer.write_graph(g, argv[2], "ADJLIST");
+    ORB_read(t2);
+    print_time("Time(write_graph)", t1, t2);
 
     return 0;
 } // main

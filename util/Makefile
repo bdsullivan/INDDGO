@@ -19,11 +19,11 @@ G_STATS_OBJ =  src/orbtimer.o $(G_STATS_SRCS:.cpp=.o)
 G_STATS_EXE = $(INDDGO_BIN)/graph_stats
 
 E2D_SRCS = ./src/edge2dimacs.cpp
-E2D_OBJ = $(E2D_SRCS:.cpp=.o)
+E2D_OBJ = src/orbtimer.o $(E2D_SRCS:.cpp=.o)
 E2D_EXE = $(INDDGO_BIN)/edge2dimacs
 
 E2A_SRCS = ./src/edge2adjlist.cpp
-E2A_OBJ = $(E2A_SRCS:.cpp=.o)
+E2A_OBJ = src/orbtimer.o $(E2A_SRCS:.cpp=.o)
 E2A_EXE = $(INDDGO_BIN)/edge2adjlist
 
 M2D_SRCS = ./src/metis2dimacs.cpp
@@ -43,13 +43,13 @@ all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
-$(PKT_EXE): $(PKT_OBJ) 
+$(PKT_EXE): $(PKT_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(TD_STATS_EXE): $(TD_STATS_OBJ) 
+$(TD_STATS_EXE): $(TD_STATS_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(G_STATS_EXE): $(G_STATS_OBJ) 
+$(G_STATS_EXE): $(G_STATS_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 $(E2D_EXE): $(E2D_OBJ)  ../lib/libgraphd.a

@@ -205,7 +205,7 @@ cleanutil:
 clean_doc:
 	test -d $(SRC_DIR)
 	@( \
-	for f in $(GRAPH) $(PTREE) $(TREE) ; \
+	for f in $(GRAPH) $(PTREE) $(TREE) $(UTIL) ; \
 	do \
 		$(CD) "$$f"; \
 		$(MAKE) clean_doc;\
