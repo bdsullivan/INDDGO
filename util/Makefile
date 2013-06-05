@@ -43,13 +43,13 @@ all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
 
-$(PKT_EXE): $(PKT_OBJ) 
+$(PKT_EXE): $(PKT_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(TD_STATS_EXE): $(TD_STATS_OBJ) 
+$(TD_STATS_EXE): $(TD_STATS_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(G_STATS_EXE): $(G_STATS_OBJ) 
+$(G_STATS_EXE): $(G_STATS_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 $(E2D_EXE): $(E2D_OBJ)  ../lib/libgraphd.a
