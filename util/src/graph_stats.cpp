@@ -219,5 +219,6 @@ int main(int argc, char **argv){
         print_time("Time(shortest_paths_dijkstra)", t1, t2);
     }
     outfile.close();
+    exit(0);
 } // main
 
