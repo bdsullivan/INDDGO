@@ -837,6 +837,7 @@ namespace Graph {
         std::list<int>::const_iterator cit;
         Node *node;
 
+        #pragma omp parallel for schedule(dynamic, 8) default(none) private(i,di,dc,node,cit) reduction(+:n1,n2,de) shared(g,degrees)
         for(i = 0; i < g->get_num_nodes(); i++){
             node = g->get_node(i);
             const list<int> &nbrs = node->get_nbrs_ref();
