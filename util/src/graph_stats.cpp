@@ -129,9 +129,15 @@ int main(int argc, char **argv){
     Graph::Graph g;
     Graph::GraphReader gr;
     Graph::GraphProperties gp;
+
+    cout << "Reading graph\n";
+    ORB_read(t1);
     if(gr.read_graph(&g, infile, intype, false) == -1){
         exit(1);
     }
+    ORB_read(t2);
+    print_time("Time(read_graph)", t1, t2);
+
     double global_cc, avg_cc, assortativity;
     vector<double> local_cc;
     float edge_density, avg_degree;
@@ -146,7 +152,11 @@ int main(int argc, char **argv){
 
     outfile.precision(16);
 
+    cout << "Simplifying graph\n";
+    ORB_read(t1);
     gp.make_simple(&g);
+    ORB_read(t2);
+    print_time("Time(make_simple)", t1, t2);
 
     outfile << "num_nodes " << g.get_num_nodes() << "\n";
     outfile << "num_edges " << g.get_num_edges() << "\n";
