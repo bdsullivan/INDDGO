@@ -768,13 +768,14 @@ namespace Graph {
      * Calculates the effective diameter of graph g
      * \param[in] g Pointer to a graph
      * \param[out] ediam Floating point value holding the calculated effective diameter
+     * \param[in] perc Percentage for distances over total connected pairs, defaults to 0.9
      */
-    void GraphProperties::effective_diameter(Graph *g, float &ediam){
+    void GraphProperties::effective_diameter(Graph *g, float &ediam, float perc){
         int i, j, d, size, temp, diam = 0;
         int n0, numer, tot_con_pairs = 0;
         float gd;
         vector< vector<int> > dist_mat;
-        vector<int> bins (g->num_nodes, 0); //TODO: argument for why this is reasonable
+        vector<int> bins (g->num_nodes, 0);
 
         paths_dijkstra_all(g, dist_mat);
 
@@ -796,7 +797,7 @@ namespace Graph {
         numer = 0;
         gd = 0.0;
         d = 0;
-        while(d <= diam && gd < 0.9){
+        while(d <= diam && gd < perc){
             d++;
             n0 = numer;
             numer += bins[d];

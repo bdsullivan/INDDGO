@@ -85,7 +85,7 @@ public:
     /**
      * \brief Calculates the effective diameter of the specified graph
      */
-    void effective_diameter(Graph *g, float &ediam);
+    void effective_diameter(Graph *g, float &ediam, float perc = 0.9);
 
     /**
      * \brief Calculates the edge density of the specified graph
