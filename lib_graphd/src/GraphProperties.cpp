@@ -623,7 +623,8 @@ namespace Graph {
      */
 
     void GraphProperties::paths_dijkstra_single(Graph *g, vector<int> &p, int source){
-        int inf = 100000;
+        //int inf = 100000;
+        int inf = INT_MAX;
         int nVisited = 0;
         int minD;
         int nvisiting;
@@ -715,7 +716,8 @@ namespace Graph {
      */
 
     void GraphProperties::paths_dijkstra_all(Graph *g, vector< vector<int> > &p){
-        int inf = 100000; //assume this is larger than any weights on the graph
+        //int inf = 100000; //assume this is larger than any weights on the graph
+        int inf = INT_MAX;
         int nVisited = 0;
         int minD = inf;
         const int n = g->get_num_nodes();
@@ -779,6 +781,72 @@ namespace Graph {
              */
         } //end loop over vertices
     } //paths_dijkstra_all
+
+    /**
+     * Calculates the diameter of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] diam Floating point value holding the calculated diamter
+     */
+    void GraphProperties::diameter(Graph *g, int &diam){
+        int i, j, size, temp;
+        vector< vector<int> > dist_mat;
+
+        paths_dijkstra_all(g, dist_mat);
+
+        size = dist_mat.size();
+        diam = dist_mat[0][0];
+        for(i = 0; i < size; i++){
+            for(j = 0; j < i; j++){
+                temp = dist_mat[i][j];
+                if((temp > diam) && (temp < INT_MAX)){
+                    diam = temp;
+                }
+            }
+        }
+    } // diameter
+
+    /**
+     * Calculates the effective diameter of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] ediam Floating point value holding the calculated effective diameter
+     * \param[in] perc Percentage for distances over total connected pairs, defaults to 0.9
+     */
+    void GraphProperties::effective_diameter(Graph *g, float &ediam, float perc){
+        int i, j, d, size, temp, diam = 0;
+        int n0, numer, tot_con_pairs = 0;
+        float gd;
+        vector< vector<int> > dist_mat;
+        vector<int> bins (g->num_nodes, 0);
+
+        paths_dijkstra_all(g, dist_mat);
+
+        size = dist_mat.size();
+        for(i = 0; i < size; i++){
+            for(j = 0; j < i; j++){
+                temp = dist_mat[i][j];
+                if(temp < INT_MAX){
+                    tot_con_pairs++;
+                    if(temp > diam){
+                        diam = temp;
+                    }
+                    bins[temp]++;
+                }
+            }
+        }
+
+        bins.resize(diam + 1);
+        numer = 0;
+        gd = 0.0;
+        d = 0;
+        while(d <= diam && gd < perc){
+            d++;
+            n0 = numer;
+            numer += bins[d];
+            gd = numer / float(tot_con_pairs);
+        }
+
+        ediam = (tot_con_pairs * 0.9 - n0) / float(numer - n0) + d - 1;
+    } // effective_diameter
 
     /**
      * Calculates the edge density of graph g

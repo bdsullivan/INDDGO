@@ -78,6 +78,16 @@ public:
     void paths_dijkstra_all(Graph *g, vector< vector<int> > &p);
 
     /**
+     * \brief Calculates the diameter of the specified graph
+     */
+    void diameter(Graph *g, int &diam);
+
+    /**
+     * \brief Calculates the effective diameter of the specified graph
+     */
+    void effective_diameter(Graph *g, float &ediam, float perc = 0.9);
+
+    /**
      * \brief Calculates the edge density of the specified graph
      */
     void edge_density(Graph *g, float &ed);
