@@ -1,23 +1,23 @@
 /*
-  This file is part of INDDGO.
+   This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+   Copyright (C) 2012, Oak Ridge National Laboratory
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+   This product includes software produced by UT-Battelle, LLC under Contract No.
+   DE-AC05-00OR22725 with the Department of Energy.
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the New BSD 3-clause software license (LICENSE).
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   LICENSE for more details.
 
-*/
+   For more information please contact the INDDGO developers at:
+   inddgo-info@googlegroups.com
+
+ */
 
 #include "Log.h"
 #include "GraphCreatorFile.h"
@@ -26,48 +26,46 @@
 #include <gtest/gtest.h>
 
 using namespace std;
-class AdjMatrixGraphReaderTest: public testing::Test
+class AdjMatrixGraphReaderTest : public testing::Test
 {
 public:
-	Graph::GraphCreatorFile creator;
-	Graph::Graph *g;
+Graph::GraphCreatorFile creator;
+Graph::Graph *g;
 
-	virtual void SetUp()
-	{
-		//SetUp is called before every test
-		LOG_INIT("test.log", NULL, 0);
-		try
-		{
-			creator.set_file_name("data/1dc.128.adj");
-			creator.set_graph_type("AdjMatrix");
-			g = creator.create_graph();
+virtual void SetUp(){
+    //SetUp is called before every test
+    LOG_INIT("test.log", NULL, 0);
+    try
+    {
+        creator.set_file_name("data/1dc.128.adj");
+        creator.set_graph_type("AdjMatrix");
+        g = creator.create_graph();
+    }
+    catch(Graph::GraphException &e)
+    {
+        cout << e.what() << endl;
+    }
+}
 
-		} catch (Graph::GraphException &e)
-		{
-			cout << e.what() << endl;
-		}
-	}
-
-	virtual void TearDown()
-	{
-		//TearDown is called before every test
-		LOG_CLOSE();
-	}
+virtual void TearDown(){
+    //TearDown is called before every test
+    LOG_CLOSE();
+}
 };
 
 TEST_F(AdjMatrixGraphReaderTest, testNumNodes)
 {
-	EXPECT_EQ(128, g->get_num_nodes());
+    EXPECT_EQ(128, g->get_num_nodes());
 }
 
 TEST_F(AdjMatrixGraphReaderTest,testNumEdges)
 {
-	EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(1471, g->get_num_edges());
 }
 
 TEST_F(AdjMatrixGraphReaderTest,testGraphType)
 {
-	string graph_type = g->get_graph_type();
+    string graph_type = g->get_graph_type();
     EXPECT_STRCASEEQ("adjmatrix", graph_type.c_str());
 }
 
@@ -87,14 +85,12 @@ TEST_F(AdjMatrixGraphReaderTest, testIsEdge)
 
     EXPECT_EQ(24, nbrs.size());
     EXPECT_TRUE(g->is_edge(108, 100));
-
 }
 
 TEST_F(AdjMatrixGraphReaderTest, testGetDegree)
 {
     EXPECT_EQ(19, g->get_degree(28));
 }
-
 
 TEST_F(AdjMatrixGraphReaderTest, testNodeNbrs)
 {
@@ -121,7 +117,6 @@ TEST_F(AdjMatrixGraphReaderTest, testNodeNbrs)
     EXPECT_EQ(64, nbrs[6l]);
     EXPECT_EQ(8, nbrs[3l]);
 }
-
 
 TEST_F(AdjMatrixGraphReaderTest,testGetDegrees)
 {

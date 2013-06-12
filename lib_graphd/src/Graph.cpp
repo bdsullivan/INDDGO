@@ -489,6 +489,9 @@ namespace Graph {
      *
      */
     int Graph::add_vertices(int n){
+        if(n < 1){
+            return -1;
+        }
         int old_size = this->num_nodes;
         this->num_nodes = this->num_nodes + n;
         this->nodes.resize(this->num_nodes);

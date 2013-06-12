@@ -135,6 +135,22 @@ TEST_F(GraphPropertyTest, testIsPath)
     EXPECT_GT(mg->get_num_edges(), 0);
 }
 
+TEST_F(GraphPropertyTest, testDiameter){
+    int diam, val;
+
+    properties.diameter(mg, diam);
+    EXPECT_EQ(7, diam);
+}
+
+TEST_F(GraphPropertyTest, testEffectiveDiameter){
+    float ediam, val;
+
+    val = 2.0 + (8128.0 * 0.9 - 5173) / (2188.0);
+
+    properties.effective_diameter(mg, ediam);
+    EXPECT_EQ(val, ediam);
+}
+
 TEST_F(GraphPropertyTest, testEdgeDensity){
     float ed, val;
 

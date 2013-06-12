@@ -82,6 +82,16 @@ public:
      */
     void eccentricity(Graph *g, vector<int> &ecc);
 
+     * \brief Calculates the diameter of the specified graph
+     */
+    void diameter(Graph *g, int &diam);
+
+    /**
+     * \brief Calculates the effective diameter of the specified graph
+     */
+    void effective_diameter(Graph *g, float &ediam, float perc = 0.9);
+
+
     /**
      * \brief Calculates the edge density of the specified graph
      */
@@ -96,6 +106,11 @@ public:
      * \brief Calculates the degree distribution of the specified graph
      */
     void deg_dist(Graph *g, vector<int> &dist);
+
+    /**
+     * \brief Returns the degree assortativity coefficient of a graph
+     */
+    void deg_assortativity(Graph *g, double &coeff);
     };
 }
 
