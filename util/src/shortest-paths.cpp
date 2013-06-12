@@ -52,6 +52,8 @@ int main(int argc, char **argv){
 
     //read the graph from the filename, assume it is an edgelist
     ngr.read_graph(g, argv[1], "Edge", false);
+    //ngr.read_graph(g, argv[1], "ADJMATRIX", false);
+
     printf("Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
     printf("Simplifying graph\n");
