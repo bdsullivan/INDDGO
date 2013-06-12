@@ -663,7 +663,7 @@ namespace Graph {
                     nvisiting = i;
                 }
             }
-          
+
             nVisited++;
         }
 
@@ -671,13 +671,12 @@ namespace Graph {
         p = dist;
 
         /*
-        printf("In single: \n");
-         for(int i = 0; i < n; i++){
+           printf("In single: \n");
+           for(int i = 0; i < n; i++){
             printf("%d,  ",dist[i]);
            }
            printf("\n");
-        */
-
+         */
     } //paths_dijkstra_single
 
     /**
@@ -688,21 +687,19 @@ namespace Graph {
 
     void GraphProperties::paths_dijkstra_all(Graph *g, vector< vector<int> > &pAll){
         int inf = INT_MAX;
-      
+
         int minD = inf;
         const int n = g->get_num_nodes();
-   
+
         pAll.resize(n);
 
         //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
-        #pragma omp parallel for default(none) shared(g, inf, pAll) private(v)
+        #pragma omp parallel for default(none) shared(g, inf, pAll)
         //loop over all vertices
-        for(int v = 0; v< n; v++) {//0; v < n; v++){
-         
-           //reset all distances to INF and mark all vertices as unvisited
+        for(int v = 0; v < n; v++){ //0; v < n; v++){
+            //reset all distances to INF and mark all vertices as unvisited
             fill(pAll[v].begin(),pAll[v].end(),inf);
             paths_dijkstra_single(g, pAll[v], v); //stores shortest paths from this vertex to all in pAll[v]
-
         } //end loop over vertices
 
         //print out results
@@ -713,40 +710,37 @@ namespace Graph {
         //    printf("\n");
         //}
         //printf("\n");
-
     } //paths_dijkstra_all
 
-  /**
-   * Calcuates the eccentricity for each vertex (vertex diameter)
-   * \param[in] g input graph
-   * \param[out] ecc eccentricies for each vertex
-   */
-    void GraphProperties::eccentricity(Graph *g, vector <int> &ecc) {
-
+    /**
+     * Calcuates the eccentricity for each vertex (vertex diameter)
+     * \param[in] g input graph
+     * \param[out] ecc eccentricies for each vertex
+     */
+    void GraphProperties::eccentricity(Graph *g, vector <int> &ecc){
         const int n = g->get_num_nodes();
-	vector<int> diameters(n,0);
+        vector<int> diameters(n,0);
         vector< vector<int> > short_paths;
-	int bestMax = 0;
+        int bestMax = 0;
 
         //first compute all shortest paths
         paths_dijkstra_all(g, short_paths);
 
         //compute diameter of each vertex
-        for(int i=0; i < n; i++) {
-          //encode as function
-          bestMax = 0;
-          for (int j=0; j < (int) short_paths[i].size(); j++) {
-	     if (short_paths[i][j] > bestMax) {
-	       bestMax = short_paths[i][j];
-	     }
-          }
-	  diameters[i] = bestMax;//getmax(short_paths[i]); //eccentricity of vertex i
-	  printf("Diameter of node %d is %d\n", i, diameters[i]);
-	}
+        for(int i = 0; i < n; i++){
+            //encode as function
+            bestMax = 0;
+            for(int j = 0; j < (int) short_paths[i].size(); j++){
+                if(short_paths[i][j] > bestMax){
+                    bestMax = short_paths[i][j];
+                }
+            }
+            diameters[i] = bestMax; //getmax(short_paths[i]); //eccentricity of vertex i
+            printf("Diameter of node %d is %d\n", i, diameters[i]);
+        }
 
-	//include the distribution here?
-
-    }//eccentricity
+        //include the distribution here?
+    } //eccentricity
 
     /**
      * Calculates the diameter of graph g
