@@ -635,31 +635,9 @@ namespace Graph {
         vector<int> visited(n, 0);
         Node *nv;
 
-        /*
-           printf("Initial p is:\n");
-           for(int i = 0; i < n; i++){
-            printf("p[i] = %d ;",p[i]);
-
-            nv = g->get_node(i); //this is the node, not the ID!
-            printf(" Node %d with %d neighbors \n",nv->label, nv->nbrs.size());
-            const list<int> &mynbrs = nv->get_nbrs_ref();
-
-            printf("\tneighbors are ");
-            for(list<int>::const_iterator cit = mynbrs.begin(); cit != mynbrs.end(); ++cit){
-                printf("%d",*cit);
-            }
-            printf("\n");
-           }
-
-         */
-
         //initialize
         dist[source] = 0;
-        nvisiting = 0;
-
-        //for(int i = 0; i < (int) dist.size(); i++){
-        //    cout << dist[i] << " ";
-        //}
+        nvisiting = source;
 
         while(nVisited < n){
             //get list of neighbors
@@ -685,28 +663,21 @@ namespace Graph {
                     nvisiting = i;
                 }
             }
-
-            /*
-               printf("After pass d\n\t");
-               for(int i = 0; i < (int) dist.size(); i++){
-                cout << dist[i] << " ";
-               }
-               printf("\n\t");
-               for(int i = 0; i < (int) visited.size(); i++){
-                cout << visited[i] << " ";
-               }
-               printf("\n");
-               printf("*****Next to visit is %d******\n",source);
-             */
-
+          
             nVisited++;
         }
 
-        /* for(int i = 0; i < n; i++){
+        //make sure to pass back correct values
+        p = dist;
+
+        /*
+        printf("In single: \n");
+         for(int i = 0; i < n; i++){
             printf("%d,  ",dist[i]);
            }
            printf("\n");
-         */
+        */
+
     } //paths_dijkstra_single
 
     /**
@@ -715,71 +686,34 @@ namespace Graph {
      * \param[out] p multidimentional list of all pairs shortest paths
      */
 
-    void GraphProperties::paths_dijkstra_all(Graph *g, vector< vector<int> > &p){
-        //int inf = 100000; //assume this is larger than any weights on the graph
+    void GraphProperties::paths_dijkstra_all(Graph *g, vector< vector<int> > &pAll){
         int inf = INT_MAX;
-        int nVisited = 0;
+      
         int minD = inf;
         const int n = g->get_num_nodes();
-        int nvisiting;
+   
+        pAll.resize(n);
 
-        Node *nv;
-        vector<int> dist(n, inf);
-        vector<int> visited(n, 0);
-        p.resize(n);
-
-        #pragma omp parallel for default(none) shared(g, inf, p) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
+        //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
+        #pragma omp parallel for default(none) shared(g, inf, pAll) private(v)
         //loop over all vertices
-        for(int v = 0; v < n; v++){
-            //printf("\n***Source is now v %d \n ",v);
-            nvisiting = v;
-            nVisited = 0;
+        for(int v = 0; v< n; v++) {//0; v < n; v++){
+         
+           //reset all distances to INF and mark all vertices as unvisited
+            fill(pAll[v].begin(),pAll[v].end(),inf);
+            paths_dijkstra_single(g, pAll[v], v); //stores shortest paths from this vertex to all in pAll[v]
 
-            //reset all distances to INF and mark all vertices as unvisited
-            fill(dist.begin(),dist.end(),inf);
-            fill(visited.begin(),visited.end(),0);
-
-            //initialize
-            dist[nvisiting] = 0;
-
-            //loop until all have been marked visited
-            while(nVisited < n){
-                //get list of neighbors
-                nv = g->get_node(nvisiting);  //"true" name is tmp->label
-                const list<int> &mynbrs = nv->get_nbrs_ref();
-
-                //for each neighbor of the current vertex considered
-                for(list<int>::const_iterator nb = mynbrs.begin(); nb != mynbrs.end(); ++nb){
-                    //consider each neighbor not already visited and "relax" dist
-                    if(!visited[*nb]){
-                        dist[*nb] = min(dist[nvisiting] + 1, dist[*nb]); //weight=1 b/c unweighted graph
-                    }
-                }
-
-                //mark node as visited
-                visited[nvisiting] = 1;
-
-                //find next vertex to move to
-                minD = inf;
-                for(int i = 0; i < n; i++){
-                    if(!visited[i] && (dist[i] < minD)){
-                        minD = dist[i];
-                        nvisiting = i;
-                    }
-                }
-
-                nVisited++;
-            } //end while
-
-            //store shortest paths from this vertex to all
-            p[v] = dist;
-            /*
-               for(int i = 0; i < n; i++){
-                printf("%d,  ",dist[i]);
-               }
-               printf("\n");
-             */
         } //end loop over vertices
+
+        //print out results
+        //for(int i = 0; i < n; i++){
+        //   for (int j = 0; j < n; j++) {
+        //        printf("%d,  ",pAll[i][j]);
+        //   }
+        //    printf("\n");
+        //}
+        //printf("\n");
+
     } //paths_dijkstra_all
 
   /**
@@ -788,11 +722,11 @@ namespace Graph {
    * \param[out] ecc eccentricies for each vertex
    */
     void GraphProperties::eccentricity(Graph *g, vector <int> &ecc) {
-   
+
         const int n = g->get_num_nodes();
 	vector<int> diameters(n,0);
         vector< vector<int> > short_paths;
-	int bestMax = 0;     
+	int bestMax = 0;
 
         //first compute all shortest paths
         paths_dijkstra_all(g, short_paths);
