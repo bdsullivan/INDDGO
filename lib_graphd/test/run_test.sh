@@ -1,10 +1,14 @@
 #!/bin/bash
 
-for i in "testDimacsReader" "testGraphReader" "testGraphCreatorFile"  "testGraph" "testWeightedGraph" "testVertexWeightedGraph" "testAdjMatrixGraphWriter" "testAdjMatrixGraphReader" "testDIMACSGraphWriter" "testMetisGraphWriter" "testMetisGraphReader" "testGraphVizGraphWriter" "testGraphProperty" "testGraphUtil" "testGraphEOUtil" "parmetis.sh"
+for i in "testGraphReader" "testGraphCreatorFile"  "testGraph" "testWeightedGraph" "testVertexWeightedGraph" "testAdjMatrixGraphWriter" "testAdjMatrixGraphReader" "testDIMACSGraphWriter" "testMetisGraphWriter" "testMetisGraphReader" "testGraphVizGraphWriter" "testGraphProperty" "testGraphUtil" "testGraphEOUtil" "parmetis.sh"
 do 
 echo "======== Starting $i ==================="
 #cd bin
-./bin/$i 2>/dev/null
+if [ ! -f bin/${i} ] ; then
+    echo "ERROR:  bin/${i} does not exist - did it get made?"
+else
+    ./bin/$i 2>/dev/null
+fi
 #cd ..
 echo "=========End $i=========================="
 echo " "

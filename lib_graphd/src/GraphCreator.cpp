@@ -78,8 +78,9 @@ namespace Graph {
         GraphProperties prop;
         prop.make_simple(mg);
 
-        GraphUtil util;
-        util.recompute_degrees(mg);
+        // this is not necessary, make_simple already recomputes degrees
+        //GraphUtil util;
+        //util.recompute_degrees(mg);
         //mg->input_file=NULL;
         return mg;
     } // initialize_ktree

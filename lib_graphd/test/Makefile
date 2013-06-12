@@ -31,7 +31,7 @@ CXXFLAGS = $(INCLUDES) -g
 INCLUDES = -I../inc -I. -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
 LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib $(INDDGO_LIB) $(MPILIB_DIR)
 LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest -lgtest_main $(METIS_LIB) 
-LFLAGS = -g -O0
+LFLAGS = $(CFLAGS)
 
 #----changes are below this line----------------------------------------------
 
