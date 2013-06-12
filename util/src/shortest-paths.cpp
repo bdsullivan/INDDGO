@@ -62,7 +62,6 @@ int main(int argc, char **argv){
     end = clock();
     printf("Time: %f\n", double(end - begin) / CLOCKS_PER_SEC);
 
-
     //compute shortest paths from source node
     begin = clock();
     //for each node run it
@@ -82,8 +81,5 @@ int main(int argc, char **argv){
     prop.paths_dijkstra_all(g,allPaths);
     end = clock();
     printf("Alg Time (all): %f\n", double(end - begin) / CLOCKS_PER_SEC);
-
-   
-
 } // main
 
