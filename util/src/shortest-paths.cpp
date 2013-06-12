@@ -52,6 +52,8 @@ int main(int argc, char **argv){
 
     //read the graph from the filename, assume it is an edgelist
     ngr.read_graph(g, argv[1], "Edge", false);
+    //ngr.read_graph(g, argv[1], "ADJMATRIX", false);
+
     printf("Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
     printf("Simplifying graph\n");
@@ -59,6 +61,7 @@ int main(int argc, char **argv){
     prop.make_simple(g);    //remove self loops and duplicate edges
     end = clock();
     printf("Time: %f\n", double(end - begin) / CLOCKS_PER_SEC);
+
 
     //compute shortest paths from source node
     begin = clock();
@@ -79,5 +82,8 @@ int main(int argc, char **argv){
     prop.paths_dijkstra_all(g,allPaths);
     end = clock();
     printf("Alg Time (all): %f\n", double(end - begin) / CLOCKS_PER_SEC);
+
+   
+
 } // main
 
