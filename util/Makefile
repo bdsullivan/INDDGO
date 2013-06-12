@@ -6,6 +6,10 @@ INC_DIR = -I./inc -I$(GRAPH)/inc -I$(TREE)/inc $(METIS_INCLUDES) $(SSPARSE_INCDI
 
 LIBS = -lm $(INDDGO_LIB) -ltreed -lgraphd $(METIS_LIB) $(SSPARSE_LIB) $(ARPACK_LIB) $(GMP_LIB) 
 
+RIG_SRCS = ./src/gen_rig.cpp
+RIG_OBJ = $(RIG_SRCS:.cpp=.o)
+RIG_EXE = $(INDDGO_BIN)/gen_rig
+
 PKT_SRCS =  ./src/gen_pkt.cpp 
 PKT_OBJ =  $(PKT_SRCS:.cpp=.o)
 PKT_EXE = $(INDDGO_BIN)/gen_pkt
@@ -34,10 +38,13 @@ TRI_SRCS =  ./src/count-tri.cpp
 TRI_OBJ =  $(TRI_SRCS:.cpp=.o)
 TRI_EXE = $(INDDGO_BIN)/count-tri
 
-all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) 
+all: $(RIG_EXE) $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) 
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
+
+$(RIG_EXE): $(RIG_OBJ)
+	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@
 
 $(PKT_EXE): $(PKT_OBJ) 
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
@@ -61,7 +68,7 @@ $(TRI_EXE): $(TRI_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 clean: 
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE) $(E2A_EXE) $(E2A_OBJ)
+	-rm -rf $(RIG_OBJ) $(RIG_EXE) $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE) $(E2A_EXE) $(E2A_OBJ)
 
 doc: $(DOXYFILE)
 	doxygen $(DOXYFILE)

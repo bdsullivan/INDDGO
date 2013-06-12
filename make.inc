@@ -1,6 +1,344 @@
-#-----------------------------------------
-# This is a placeholder. Users will need to copy one of 
-# make.inc.serial, make.inc.parallel to make.inc and set
-# required variables (including SRC_DIR) to compile INDDGO.
+#
+# This file is part of INDDGO.
+# Copyright (C) 2012, Oak Ridge National Laboratory 
+#
 
-$(error Default make.inc. Please copy one of make.inc.serial, make.inc.parallel over this file and set necessary environment variables)
+#----------------------------------------------------------------
+# REQUIRED USER-SUPPLIED VARIABLE
+# This should be a full path to the root directory for INDDGO.
+# (i.e. the parent of lib_graphd, libtree_d, madness, wis, etc.)
+#
+SRC_DIR = /home/t2y/INDDGO
+
+#----------------------------------------------------------------
+# REQUIRED USER-SUPPLIED OPTIONS
+# Determine which third-party software is used in the compilation.
+# For any enabled packages, directories need to be set in next section.
+# With default settings, necessary dirs are marked with #FILL IN
+
+#WARNING: If HAS_PARMETIS=1, you must also set HAS_METIS=1 (metis is
+#included in the parmetis install).
+
+# Set to 1 if building on CYGWIN
+# This then defines the variable _GK_ERROR_C_ which
+# cures a compile error when building with gcc and g++ 
+# under cygwin 
+CYGWIN = 0
+
+HAS_ARPACK	= 0
+HAS_SUITESPARSE = 0
+HAS_PARMETIS	= 0
+HAS_METIS	= 0
+HAS_IGRAPH	= 0
+HAS_GMP		= 0
+HAS_GTEST	= 0
+# Set whether serial or parallel version is desired for WIS.
+IS_PARALLEL	= 0
+HAS_MADNESS	= 0
+# madness is included in the INDDGO distribution, but can be set to 0 for serial compilation.
+
+#use this to turn logging on/off
+LOG_ENABLED = 0
+
+#----------------------------------------------------------------
+#  OPTIONAL USER-SUPPLIED DIRECTORY VARIABLES
+# These are the directories to find optional third-party software.
+#
+
+ARPACK = 
+
+# Directory containing SuiteSparse source code - not the directory where it
+# is installed 
+SUITESPARSE = #FILL IN
+
+#NOTE: the build directory is usually platform dependent.
+PARMETIS_SRC_DIR =
+PARMETIS_LIB_DIR =  
+#NOTE: the METIS_SRC_DIR should be the directory containing programs/ and GKLib/ dirs
+#NOTE: when building Metis, we have seen cases where setting IDXTYPEWIDTH=64 in
+#metis.h on a 64-bit system fails, so we recommend leaving IDXTYPEWIDTH=32
+METIS_SRC_DIR  = #FILL IN
+METIS_LIB_DIR = #FILL IN
+
+
+IGRAPH = 
+IGRAPH_INSTALL_DIR = $(IGRAPH)/deploy
+
+GMP    = 
+
+#----------------------------------------------------------------
+#
+# Compilers, Flags and System Tools
+#
+
+CC	= gcc
+CXX     = g++
+# Set the following flag to 1 if you are compiling with a gcc version < 4.4
+OLDGCC	= 0
+
+CFLAGS = -O3
+CPPFLAGS = 
+LDFLAGS = 
+
+ifeq ($(CYGWIN), 1)
+CFLAGS:= $(CFLAGS) -D_GK_ERROR_C_
+CPPFLAGS:= $(CPPFLAGS) -D_GK_ERROR_C_
+endif
+
+ifeq ($(LOG_ENABLED), 1)
+CFLAGS := $(CFLAGS) -D__LOG_ENABLE__ 
+endif
+
+ifeq ($(HAS_MADNESS),1)
+CXX     = mpicxx
+ifeq ($(OLDGCC), 1)
+CFLAGS := $(CFLAGS) -D__MADNESS__ -D_OLDGCC -Wno-strict-aliasing -Wno-deprecated -ffast-math 
+endif
+ifeq ($(OLDGCC), 0)
+CPPFLAGS := $(CPPFLAGS) -std=c++0x 
+CFLAGS := $(CFLAGS) -D__MADNESS__ -std=c++0x -Wno-strict-aliasing -Wno-deprecated -ffast-math -march=native
+endif
+endif
+
+ifeq ($(IS_PARALLEL),1)
+CXX     = mpicxx
+CFLAGS := $(CFLAGS) -D__PARALLEL__ -D__OPENMP__ -fopenmp
+endif
+
+ifeq ($(HAS_PARMETIS),1)
+CXX     = mpicxx
+endif
+
+#FC      = gfortran
+#FFLAGS	= -O3 -m64
+
+CD      = cd
+ECHO    = echo
+LN      = ln
+LNFLAGS = -s
+EXPORT = export
+CONFIGURE = ./configure
+MAKE    = /usr/bin/make
+AUTOGEN = ./autogen.sh
+VALGRIND_COMMAND = valgrind --leak-check=yes --show-reachable=yes -v
+VALGRIND_FLAGS= -g -O0
+RM      = rm
+RMFLAGS = -f
+SHELL   = /bin/sh
+AR = ar 
+ARFLAGS = rv
+RANLIB   = ranlib
+
+#--------------------------------------------------------
+# STOP: Most users should not need to edit below this
+#--------------------------------------------------------
+
+#-------------------------------------
+# INDDGO internal directories
+#
+ifeq ($(SRC_DIR),)
+$(error User must set SRC_DIR in make.inc)
+endif
+GRAPH  	= $(SRC_DIR)/lib_graphd
+TREE   	= $(SRC_DIR)/lib_treed
+PTREE	= $(SRC_DIR)/lib_ptreed
+WIS 	= $(SRC_DIR)/max_wis
+VIZ	= $(SRC_DIR)/viz
+UTIL	= $(SRC_DIR)/util
+INDDGO_LIB_DIR = $(SRC_DIR)/lib
+INDDGO_LIB = -L$(INDDGO_LIB_DIR)
+INDDGO_BIN = $(SRC_DIR)/bin
+SUBDIRS = $(GRAPH) $(TREE) $(PTREE)  $(VIZ) $(WIS) $(UTIL)
+MADNESS	= $(SRC_DIR)/madness
+MADNESS_INSTALL_DIR = $(MADNESS)/deploy
+UTHASH_INCDIR	= -I$(SRC_DIR)/uthash-1.9.3/src
+
+RUN_TEST=./run_test.sh
+
+#-------------------------------------
+#
+# Sanity checking for required third-party directories using HAS_XXX flags.
+#
+ifeq ($(HAS_ARPACK),1)
+ifeq ($(ARPACK), )
+$(error When HAS_ARPACK = 1, you must define the ARPACK directory variable)  
+endif
+endif
+
+
+ifeq ($(HAS_SUITESPARSE),1)
+ifeq ($(SUITESPARSE), )
+$(error When HAS_SUITESPARSE = 1, you must define the SUITESPARSE directory variable)  
+endif
+endif
+
+
+ifeq ($(HAS_PARMETIS),1)
+ifeq ($(HAS_METIS),0)
+$(error When HAS_PARMETIS = 1, HAS_METIS must also be 1)
+endif
+ifeq ($(PARMETIS_LIB_DIR), )
+$(error When HAS_PARMETIS = 1, you must define the PARMETIS_LIB_DIR directory variable)  
+endif
+ifeq ($(PARMETIS_SRC_DIR), )
+$(error When HAS_PARMETIS = 1, you must define the PARMETIS_SRC_DIR directory variable)  
+endif
+endif
+
+ifeq ($(HAS_METIS),1)
+ifeq ($(METIS_LIB_DIR), )
+$(error When HAS_METIS = 1, you must define the METIS_LIB_DIR directory variable)  
+endif
+ifeq ($(METIS_SRC_DIR), )
+$(error When HAS_METIS = 1, you must define the METIS_SRC_DIR directory variable)  
+endif
+endif
+
+ifeq ($(HAS_IGRAPH),1)
+ifeq ($(IGRAPH), )
+$(error When HAS_IGRAPH = 1, you must define the IGRAPH directory variable)  
+endif
+endif
+
+ifeq ($(HAS_GMP),1)
+ifeq ($(GMP), )
+$(error When HAS_GMP = 1, you must define the GMP directory variable)  
+endif
+endif
+
+#------------------------------------------------------------------
+# 
+# Setting auxiliary library variables. 
+# If you have non-default third party builds, you may need to edit this.
+#
+
+MPILIBS =
+MADLIBS = -lMADworld
+
+METIS_INCLUDES=
+ifeq ($(HAS_METIS),1)
+METIS_INCLUDES = -I$(METIS_SRC_DIR)/include -I$(METIS_SRC_DIR)/libmetis -I$(METIS_SRC_DIR)/GKlib -I$(METIS_SRC_DIR)/programs
+endif
+
+PARMETIS_INCDIR= 
+
+ifeq ($(HAS_PARMETIS),1)
+PARMETIS_INCDIR= -I$(PARMETIS_SRC_DIR)/include
+endif
+
+ARPACK_LIB=
+ifeq ($(HAS_ARPACK),1)
+ARPACK_LIB= -larpack_x86_64 -lgfortran
+endif 
+
+
+#-----------------------------------------------------------------
+#
+# Start:
+# ARPACK Specific options. 
+#
+
+PLAT = x86_64
+
+BLASdir      = $(ARPACK)/BLAS
+LAPACKdir    = $(ARPACK)/LAPACK
+UTILdir      = $(ARPACK)/UTIL
+SRCdir       = $(ARPACK)/SRC
+#
+DIRS        = $(BLASdir) $(LAPACKdir) $(UTILdir) $(SRCdir)
+
+#
+# %-------------------------------------------------------------------%
+# | Comment out the previous line and uncomment the following         |
+# | if you already have the BLAS and LAPACK installed on your system. |
+# | NOTE: ARPACK assumes the use of LAPACK version 2 codes.           |
+# %-------------------------------------------------------------------%
+#
+#DIRS         = $(UTILdir) $(SRCdir)
+#
+# %---------------------------------------------------%
+# | The name of the libraries to be created/linked to |
+# %---------------------------------------------------%
+#
+ARPACKLIB  = $(ARPACK)/libarpack_$(PLAT).a
+LAPACKLIB = 
+BLASLIB = 
+#
+ALIBS =  $(ARPACKLIB) $(LAPACKLIB) $(BLASLIB) 
+
+#
+# END:
+# ARPACK specific options.
+#------------------------------------------------------------------
+
+
+#----------------------------------------------------------------
+#
+# Third party dependent flags and library settings. 
+# You should not need to edit these in almost all cases.
+#
+
+ifeq ($(HAS_ARPACK),1)
+CFLAGS := $(CFLAGS) -DHAS_ARPACK
+VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_ARPACK
+ARPACK_LIB := -L $(ARPACK) $(ARPACK_LIB)
+endif
+
+METIS_LIB =
+VALGRIND_FLAGS= 
+ifeq ($(HAS_METIS),1)
+CFLAGS := $(CFLAGS) -DHAS_METIS -D_FILE_OFFSET_BITS=64
+VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_METIS
+METIS_LIB := -L$(METIS_LIB_DIR) -lmetis
+endif
+
+PARMETIS_LIB=
+PARMETISOBJ= 
+ifeq ($(HAS_PARMETIS),1)
+CFLAGS := $(CFLAGS) -DHAS_PARMETIS
+PARMETISOBJ = $(METIS_LIB_DIR)/libmetis.a $(PARMETIS_LIB_DIR)/libparmetis.a
+PARMETIS_LIB := -L$(PARMETIS_LIB_DIR) -lparmetis
+endif
+
+
+GMP_INCDIR=
+GMP_LIB=
+ifeq ($(HAS_GMP),1)
+CFLAGS := $(CFLAGS) -DHAS_GMP
+VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_GMP
+GMP_INCDIR=-I$(GMP)/include
+GMP_LIB= -L$(GMP)/lib -lgmp
+
+endif
+
+
+SSPARSE_INCDIR=
+SSPARSE_LIB=
+ifeq ($(HAS_SUITESPARSE),1)
+AMD    = $(SUITESPARSE)/AMD
+UFCONFIG = $(SUITESPARSE)/SuiteSparse_config
+CFLAGS := $(CFLAGS) -DHAS_SUITESPARSE 
+VALGRIND_FLAGS := $(VALGRINDFLAGS) -DHAS_SUITESPARSE 
+AMD_INCDIR= -I$(AMD)/Include -I$(UFCONFIG)
+AMD_LIB= -L$(AMD)/Lib -lamd
+SSPARSE_INCDIR= -I$(SUITESPARSE)/CHOLMOD/Include -I$(SUITESPARSE)/COLAMD/Include $(AMD_INCDIR)
+SSPARSE_LIB= -L$(SUITESPARSE)/CHOLMOD/Lib -lcholmod -L$(SUITESPARSE)/COLAMD/Lib -lcolamd $(AMD_LIB)
+endif
+
+
+MADNESS_INCDIR= 
+MADNESS_LIB= 
+ifeq ($(HAS_MADNESS),1)
+MADNESS_INCDIR= -I$(MADNESS_INSTALL_DIR)/include
+MADNESS_LIB= -L$(MADNESS_INSTALL_DIR)/lib $(MADLIBS) -lpthread
+SUBDIRS := $(SUBDIRS) $(MADNESS) 
+endif
+
+IGRAPH_LIB=
+IGRAPH_INCDIR=
+ifeq ($(HAS_IGRAPH),1)
+CFLAGS := $(CFLAGS) -DHAS_IGRAPH
+IGRAPH_LIB= -L $(IGRAPH_INSTALL_DIR)/lib -ligraph
+IGRAPH_INCDIR = -I $(IGRAPH_INSTALL_DIR)/include/igraph
+endif
+

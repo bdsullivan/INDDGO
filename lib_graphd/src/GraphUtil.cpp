@@ -735,6 +735,133 @@ namespace Graph {
         return;
     } // find_ecc
 
+
+
+
+
+
+
+
+
+
+
+  //Find the k-core location for each vertex, and return the graph's degeneracy number
+  int GraphUtil::find_kcore(Graph *g, vector<int> *kcore) {
+    /* Assumes:
+       - Vertex labels are 0..|g|-1
+       - g->capacity gives the order of g
+       - g->degree gives a vector indexed by the vertex label
+       - g->nodes                   "
+       - v.get_nbrs gives a list of vertex labels
+     */
+
+    kcore->resize(g->capacity);
+
+    //init vars
+    int k = 0;
+    int max_deg = *max_element(g->degree.begin(), g->degree.end());
+    //vector<int> D[max_deg];
+    list<int> D[max_deg]; //
+    int degree_lookup[g->capacity];
+    //**can also create an L output list for optimal ordering for coloring number
+
+    //populate lists
+    for(int i = 0; i < g->capacity; i++) {
+      degree_lookup[i] = g->degree[i];
+      D[degree_lookup[i]].push_back(i);
+    }
+
+    //for all v in V: find a vertex to remove, handle as needed
+    for(int i = 0; i < g->capacity; i++) {
+      int v;
+      for(int j = 0; j < max_deg; j++) {
+	if(D[j].size() != 0) {
+	  v = D[j].back();
+	  D[j].pop_back();
+	  break;
+	}
+      }
+
+      degree_lookup[v] = -1; //
+      (*kcore)[v] = k = max(k,degree_lookup[v]);
+
+      list<int>::const_iterator it;
+      for(it = g->nodes[v].get_nbrs().begin(); it != g->nodes[v].get_nbrs().end(); it++) {
+	if(degree_lookup[*it] != -1) { //
+	  int it_deg = degree_lookup[*it]--;
+	  D[it_deg].erase(remove(D[it_deg].begin(), D[it_deg].end(), *it), D[it_deg].end());
+	  D[it_deg-1].push_back(*it);
+	}
+      }
+    }
+    return k;
+  }
+
+
+
+
+
+
+
+#include <limits>
+  //Find the k-core location for each vertex, and return the graph's degeneracy number
+  int GraphUtil::find_kcore2(Graph *g, vector<int> *kcore) {
+    /* Assumes:
+       - Vertex labels are 0..|g|-1
+       - g->capacity gives the order of g
+       - g->degree gives a vector indexed by the vertex label
+       - g->nodes                   "
+       - v.get_nbrs gives a list of vertex labels
+    */
+
+    kcore->resize(g->capacity);
+
+    //init vars
+    int k = 0;
+    int degree_lookup[g->capacity];
+    //**can also create an L output list for optimal ordering for coloring number
+
+    //populate list
+    for(int i = 0; i < g->capacity; i++)
+      degree_lookup[i] = g->degree[i];
+
+    //for all v in V: find a vertex to remove, handle as needed
+    for(int i = 0; i < g->capacity; i++) {
+      int v;
+      int deg = std::numeric_limits<int>::max();
+      for(int j = 0; j < g->capacity; j++) {
+        if(degree_lookup[j] > -1 && degree_lookup[j] < deg) {
+	  v = j;
+	  deg = degree_lookup[j];
+        }
+      }
+      
+      degree_lookup[v] = -1; 
+      (*kcore)[v] = k = max(k,degree_lookup[v]);
+
+      list<int>::const_iterator it;
+      for(it = g->nodes[v].get_nbrs().begin(); it != g->nodes[v].get_nbrs().end(); it++) {
+        if(degree_lookup[*it] != -1)
+          degree_lookup[*it]--;
+      }
+    }
+    return k;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     //Calculate the maximum distance between nodes within a subset of vertices
     //given as a list
     int GraphUtil::subset_max_dist(Graph *g,  vector<int> subset){
