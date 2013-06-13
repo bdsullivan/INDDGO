@@ -38,8 +38,6 @@ int main(int argc, char **argv){
         exit(-1);
     }
 
-    //check if too many args?
-
     Graph::Graph *g;
 
     clock_t begin, end;
@@ -53,7 +51,6 @@ int main(int argc, char **argv){
     //read the graph from the filename, assume it is an edgelist
     ngr.read_graph(g, argv[1], "Edge", false);
     //ngr.read_graph(g, argv[1], "ADJLIST", false);
-
     printf("Read %d vertices and %d edges\n", g->get_num_nodes(), g->get_num_edges());
 
     printf("Simplifying graph\n");
@@ -62,24 +59,17 @@ int main(int argc, char **argv){
     end = clock();
     printf("Time: %f\n", double(end - begin) / CLOCKS_PER_SEC);
 
-    //compute shortest paths from source node
-    begin = clock();
-    //for each node run it
-    int source = 0;
-    vector<int> onePaths;
-
-    printf("\nRunning Dijsktra for source %d\n",source);
-    prop.paths_dijkstra_single(g, onePaths, source);
-    end = clock();
-    printf("Alg Time (single): %f\n", double(end - begin) / CLOCKS_PER_SEC);
-
     //compute all pairs shortest paths
     begin = clock();
-    vector< vector<int> > allPaths;
-
-    printf("\nRunning Dijsktra for all pairs \n");
-    prop.paths_dijkstra_all(g,allPaths); //alternate: vector< vector<int> > pt2 =  g->get_shortest_path_dist_ref();
+    vector<int> ecc;
+    prop.eccentricity(g,ecc);
     end = clock();
-    printf("Alg Time (all): %f\n", double(end - begin) / CLOCKS_PER_SEC);
+    printf("Alg Time (eccentricity): %f\n", double(end - begin) / CLOCKS_PER_SEC);
+
+    begin = clock();
+    vector<float> ecc_dist;
+    prop.eccentricity_dist(g,ecc, ecc_dist);
+    end = clock();
+    printf("Alg Time (freq dist eccentricity): %f\n", double(end - begin) / CLOCKS_PER_SEC);
 } // main
 
