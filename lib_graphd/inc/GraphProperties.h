@@ -82,6 +82,7 @@ public:
      */
     void eccentricity(Graph *g, vector<int> &ecc);
 
+    /**
      * \brief Calculates the diameter of the specified graph
      */
     void diameter(Graph *g, int &diam);
@@ -90,7 +91,6 @@ public:
      * \brief Calculates the effective diameter of the specified graph
      */
     void effective_diameter(Graph *g, float &ediam, float perc = 0.9);
-
 
     /**
      * \brief Calculates the edge density of the specified graph
