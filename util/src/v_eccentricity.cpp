@@ -59,13 +59,14 @@ int main(int argc, char **argv){
     end = clock();
     printf("Time: %f\n", double(end - begin) / CLOCKS_PER_SEC);
 
-    //compute all pairs shortest paths
+    //compute eccentricity
     begin = clock();
     vector<int> ecc;
     prop.eccentricity(g,ecc);
     end = clock();
     printf("Alg Time (eccentricity): %f\n", double(end - begin) / CLOCKS_PER_SEC);
 
+    //compute eccentricity distribution
     begin = clock();
     vector<float> ecc_dist;
     prop.eccentricity_dist(g,ecc, ecc_dist);
