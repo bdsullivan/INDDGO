@@ -702,6 +702,9 @@ namespace Graph {
             paths_dijkstra_single(g, pAll[v], v); //stores shortest paths from this vertex to all in pAll[v]
         } //end loop over vertices
 
+        //store the results
+        g->set_shortest_path_dist(pAll);
+
         //print out results
         //for(int i = 0; i < n; i++){
         //   for (int j = 0; j < n; j++) {
@@ -713,34 +716,57 @@ namespace Graph {
     } //paths_dijkstra_all
 
     /**
-     * Calcuates the eccentricity for each vertex (vertex diameter)
+     * Calcuates the eccentricity for each vertex (max dist to any other vertex)
      * \param[in] g input graph
-     * \param[out] ecc eccentricies for each vertex
+     * \param[out] ecc vector of eccentricies
      */
-    void GraphProperties::eccentricity(Graph *g, vector <int> &ecc){
+    void GraphProperties::eccentricity(Graph *g, vector<int> &ecc){
         const int n = g->get_num_nodes();
-        vector<int> diameters(n,0);
-        vector< vector<int> > short_paths;
+        vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();   //computes if not already
         int bestMax = 0;
-
-        //first compute all shortest paths
-        paths_dijkstra_all(g, short_paths);
+        ecc.resize(n);
 
         //compute diameter of each vertex
         for(int i = 0; i < n; i++){
-            //encode as function
             bestMax = 0;
-            for(int j = 0; j < (int) short_paths[i].size(); j++){
+            for(int j = 0; j < n; j++){
                 if(short_paths[i][j] > bestMax){
                     bestMax = short_paths[i][j];
                 }
             }
-            diameters[i] = bestMax; //getmax(short_paths[i]); //eccentricity of vertex i
-            printf("Diameter of node %d is %d\n", i, diameters[i]);
+            ecc[i] = bestMax;       //eccentricity of vertex i
+            //printf("Eccentricity of node %d is %d\n", i, ecc[i]);
+        }
+    } //eccentricity
+
+    /**
+     * Calcuates the frequency of each eccentricity value for all vertices [ref. Takes, Kostes 2013]
+     * \param[in] g input graph
+     * \param[in] ecc vector of eccentricities (empty or pre-computed)
+     * \param[out] freq_ecc vector of eccentricity frequencies
+     */
+    void GraphProperties::eccentricity_dist(Graph *g, vector<int> &ecc, vector<float> &freq_ecc){
+        const int n = g->get_num_nodes();
+        int bestAll = 0;
+
+        if(ecc.empty()){
+            cout << "Empty -- calling function to compute eccentricities" << endl;
+            eccentricity(g,ecc);
         }
 
-        //include the distribution here?
-    } //eccentricity
+        //compute diameter of each vertex
+        for(int i = 0; i < ecc.size(); i++){
+            if(ecc[i] > freq_ecc.size() ){
+                freq_ecc.resize(ecc[i] + 1); //because vector numbering starts at 0
+            }
+            freq_ecc[ecc[i]]++; //add to tally for this diameter size
+        }
+        //printf("Graph diameter is %d\n", freq_ecc.size()-1);
+        for(int i = 0; i <= freq_ecc.size() - 1; i++){
+            freq_ecc[i] = freq_ecc[i] / n;
+            //printf("i=%d and n=%d with freq eccentricity %f\n",i,n,freq_ecc[i]);
+        }
+    } //eccentricity_dist
 
     /**
      * Calculates the diameter of graph g

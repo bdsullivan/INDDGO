@@ -78,9 +78,14 @@ public:
     void paths_dijkstra_all(Graph *g, vector< vector<int> > &p);
 
     /**
-     * \brief returns eccentricty for all nodes
+     * \brief returns eccentricity for all nodes
      */
     void eccentricity(Graph *g, vector<int> &ecc);
+
+    /**
+     * \brief returns frequency distributions of eccentricities
+     */
+    void eccentricity_dist(Graph *g, vector<int> &ecc, vector<float> &freq_ecc);
 
     /**
      * \brief Calculates the diameter of the specified graph
