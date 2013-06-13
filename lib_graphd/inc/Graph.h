@@ -56,6 +56,7 @@ protected:
     vector<int> xadj;
     vector<int> adjncy;
     vector<int> adj_vec;
+    vector< vector<int> > apsp_dist;
 
 public:
     Graph();
@@ -80,6 +81,8 @@ public:
     void set_xadj(vector<int> xadj);
     /** \brief Try to pre-allocate memory for node and degree vectors **/
     void resize(int n);
+    /** \brief set shortest path distances **/
+    void set_shortest_path_dist(vector< vector<int> > apsp_dist);
 
     vector<int> get_adj_vec() const;
     vector<int> *get_adj_vec_ptr();
@@ -128,6 +131,11 @@ public:
     void eliminate_vertex(int v, list<int> *forward_neighbors, bool remove);
     void initialize_params();
     void initialize_params(bool simple, bool canonical, int num_comp);
+
+    /** \brief get shortest path distances; used mostly by other feature calcs **/
+    const vector< vector<int> > &get_shortest_path_dist_ref();
+    /** \brief get shortest path distances from vertex u to all **/
+    const vector<int> &get_u_shortest_path_dist(int u);
 
     friend class GraphUtil;
     friend class GraphProperties;

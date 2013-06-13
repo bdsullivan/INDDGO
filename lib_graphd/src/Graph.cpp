@@ -688,4 +688,38 @@ namespace Graph {
 
         return;
     }
+
+    /**
+     * \param[in] apsp_dist all pairs shortest paths distances
+     **/
+    void Graph::set_shortest_path_dist(vector< vector<int> > apsp_dist){
+        this->apsp_dist = apsp_dist;
+    }
+
+    /**
+     * Checks if distance matrix has been computed (or needs to be recomputed)
+     * if yes, returns the all pairs shortest paths distances
+     * otherwise computes then returns
+     **/
+    const vector< vector<int> > &Graph::get_shortest_path_dist_ref(){
+        if(this->apsp_dist.empty()){
+            cout << "Empty -- calling function to compute shortest paths" << endl;
+            GraphProperties properties;
+            properties.paths_dijkstra_all(this,this->apsp_dist);   //sets this>apsp_dist with values
+            return this->apsp_dist;
+        }
+        return this->apsp_dist;
+    }
+
+    const vector<int> &Graph::get_u_shortest_path_dist(int u){
+        if(this->apsp_dist[u].empty()){
+            cout << "u Empty -- calling function to compute shortest paths" << endl;
+            GraphProperties properties;
+            properties.paths_dijkstra_single(this,this->apsp_dist[u], u);   //sets this>apsp_dist[u] with values
+
+            return this->apsp_dist[u];
+        }
+
+        return this->apsp_dist[u];
+    }
 }
