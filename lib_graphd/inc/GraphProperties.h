@@ -82,7 +82,8 @@ public:
      */
     void eccentricity(Graph *g, vector<int> &ecc);
 
-     * \brief Calculates the diameter of the specified graph
+     /*
+      * \brief Calculates the diameter of the specified graph
      */
     void diameter(Graph *g, int &diam);
 
