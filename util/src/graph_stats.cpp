@@ -139,9 +139,9 @@ int main(int argc, char **argv){
     print_time("Time(read_graph)", t1, t2);
 
     double global_cc, avg_cc, assortativity;
-    vector<double> local_cc;
+    vector<double> local_cc, freq_ecc;
     float edge_density, avg_degree;
-    vector<int> deg_dist;
+    vector<int> deg_dist, ecc;
     vector< vector<int> > shortest_path_distances;
 
     outfile.open(outfilename.c_str());
@@ -218,6 +218,21 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra)", t1, t2);
     }
+    if(req_methods["eccentricity"] == true){
+        cout << "Calculating eccentricities\n";
+        ORB_read(t1);
+        gp.eccentricity(&g, ecc);
+        ORB_read(t2);
+        print_time("Time(eccentricity)",t1,t2);
+    }
+    if(req_methods["eccentricity_dist"] == true){
+        cout << "Calculating distribution of eccentricities\n";
+        ORB_read(t1);
+        gp.eccentricity_dist(&g, ecc, freq_ecc);
+        ORB_read(t2);
+        print_time("Time(eccentricity distribution)",t1,t2);
+    }
+
     outfile.close();
     exit(0);
 } // main
