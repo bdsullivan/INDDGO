@@ -745,7 +745,7 @@ namespace Graph {
      * \param[in] ecc vector of eccentricities (empty or pre-computed)
      * \param[out] freq_ecc vector of eccentricity frequencies
      */
-    void GraphProperties::eccentricity_dist(Graph *g, vector<int> &ecc, vector<float> &freq_ecc){
+    void GraphProperties::eccentricity_dist(Graph *g, vector<int> &ecc, vector<double> &freq_ecc){
         const int n = g->get_num_nodes();
         int bestAll = 0;
 
@@ -774,7 +774,7 @@ namespace Graph {
      * \param[in] g input graph
      * \param[out] norm_hops normalized distribution
      */
-    void GraphProperties::expansion(Graph *g, vector<float> &norm_hops){
+    void GraphProperties::expansion(Graph *g, vector<double> &norm_hops){
         const int n = g->get_num_nodes();
         vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();   //computes if not already
         vector <int> hops(n,0);  //largest possible dist is n-1
@@ -791,7 +791,7 @@ namespace Graph {
         norm_hops[0] = 0.0; //no one is reachable in 0 hops (not counting self)
 
         for(int h = 1; h < n; h++){
-            norm_hops[h] = (float)hops[h] / (n * (n - 1));
+            norm_hops[h] = (double)hops[h] / (n * (n - 1));
             //printf("h = %d and number is %d; norm value is %f\n",h,hops[h],norm_hops[h]);
         }
     } //expansion
