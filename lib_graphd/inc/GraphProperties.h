@@ -85,12 +85,12 @@ public:
     /**
      * \brief returns frequency distributions of eccentricities
      */
-    void eccentricity_dist(Graph *g, vector<int> &ecc, vector<float> &freq_ecc);
+    void eccentricity_dist(Graph *g, vector<int> &ecc, vector<double> &freq_ecc);
 
     /**
      * \brief returns normalized expansion (distance distribution)
      */
-    void expansion(Graph *g, vector<float> &norm_hops);
+    void expansion(Graph *g, vector<double> &norm_hops);
 
     /**
      * \brief Calculates the diameter of the specified graph
