@@ -769,6 +769,34 @@ namespace Graph {
     } //eccentricity_dist
 
     /**
+     * Calcuates the expansion (hop-distance) from each vertex: [see Tangmunarunkit (2002)]
+     * compute #nodes reachable in h hops starting at each vertex, average, normalize
+     * \param[in] g input graph
+     * \param[out] norm_hops normalized distribution
+     */
+    void GraphProperties::expansion(Graph *g, vector<float> &norm_hops){
+        const int n = g->get_num_nodes();
+        vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();   //computes if not already
+        vector <int> hops(n,0);  //largest possible dist is n-1
+        norm_hops.resize(n);
+
+        //for each vertex, find the number of vertices reachable for all hops; add to tally
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                hops[ short_paths[i][j] ]++;
+            }
+        }
+
+        //average (divide by n) and normalize (divide by n-1)
+        norm_hops[0] = 0.0; //no one is reachable in 0 hops (not counting self)
+
+        for(int h = 1; h < n; h++){
+            norm_hops[h] = (float)hops[h] / (n * (n - 1));
+            //printf("h = %d and number is %d; norm value is %f\n",h,hops[h],norm_hops[h]);
+        }
+    } //expansion
+
+    /**
      * Calculates the diameter of graph g
      * \param[in] g Pointer to a graph
      * \param[out] diam Floating point value holding the calculated diamter
