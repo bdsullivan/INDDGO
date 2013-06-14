@@ -97,7 +97,7 @@ int main(int argc, char **argv){
             ktree_p = atoi(argv[i + 1]);
         }
         if(strcmp(argv[i],"-o") == 0){
-            out_format = string(argv[i+1]);
+            out_format = string(argv[i + 1]);
         }
         if(strcmp(argv[i],"-s") == 0){
             seed = atoi(argv[i + 1]);
@@ -106,10 +106,10 @@ int main(int argc, char **argv){
             prefix = argv[i + 1];
         }
         if(strcmp(argv[i],"-fe") == 0){
-            prefix = argv[i+1];
+            prefix = argv[i + 1];
             exact_filename = true;
         }
-        if(strcmp(argv[i],"-m") ==0){
+        if(strcmp(argv[i],"-m") == 0){
             timings = true;
         }
         if(strcmp(argv[i],"-r") == 0){
@@ -117,12 +117,12 @@ int main(int argc, char **argv){
         }
     }
 
-    if(true == exact_filename && t != 1 ){
+    if((true == exact_filename) && (t != 1)){
         cerr << "Error: cannot specify both -t and -fe flags\n";
         exit(1);
     }
 
-    if("adjlist" != out_format && "dimacs" != out_format){
+    if(("adjlist" != out_format) && ("dimacs" != out_format)){
         cerr << "Error: only allowed output formats are: adjlist, dimacs\n";
         exit(1);
     }
@@ -170,7 +170,7 @@ int main(int argc, char **argv){
         //write it to a file
         if(!exact_filename){
             sprintf(filename, "%s.%d.%d.%d_%d.dimacs", prefix, ktree_n,ktree_k,ktree_p, i);
-        } 
+        }
         else {
             strncpy(filename,prefix, 99);
         }
