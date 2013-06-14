@@ -68,7 +68,7 @@ int main(int argc, char **argv){
 
     //compute eccentricity distribution
     begin = clock();
-    vector<float> ecc_dist;
+    vector<double> ecc_dist;
     prop.eccentricity_dist(g,ecc, ecc_dist);
     end = clock();
     printf("Alg Time (freq dist eccentricity): %f\n", double(end - begin) / CLOCKS_PER_SEC);
