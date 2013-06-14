@@ -61,7 +61,7 @@ int main(int argc, char **argv){
 
     //compute normalized expansion
     begin = clock();
-    vector<float> norm_hops;
+    vector<double> norm_hops;
     prop.expansion(g, norm_hops);
     end = clock();
     printf("Alg Time (expansion): %f\n", double(end - begin) / CLOCKS_PER_SEC);
