@@ -56,6 +56,12 @@ void create_map(string list, map<string, bool> &outmap){
     }
 }
 
+void print_usage(char **argv){
+    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods]\n";
+    cerr << "Allowed methods: " << allowed_methods << "\n";
+    cerr << "Input type should be one of: edge, adjlist, adjmatrix, dimacs\n";
+}
+
 /**
  * Parse all of our options
  * \param[in] argc argument count
@@ -67,8 +73,11 @@ void create_map(string list, map<string, bool> &outmap){
  */
 int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods){
     int flags, opt;
-    while((opt = getopt(argc, argv, "i:t:o:m:p:")) != -1){
+    while((opt = getopt(argc, argv, "hi:t:o:m:p:")) != -1){
         switch(opt){
+        case 'h':
+            print_usage(argv);
+            exit(0);
         case 'i':
             infile = optarg;
             break;
