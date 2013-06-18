@@ -83,6 +83,7 @@ public:
 
     int find_kcore(Graph *g, vector<int> *kcore);
     int find_kcore2(Graph *g, vector<int> *kcore);
+    int find_degen(Graph *g, vector<int> *kcore);
 
     //Calculate the maximum distance between nodes within a subset of vertices
     //given as a list
