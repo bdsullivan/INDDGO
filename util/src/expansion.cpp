@@ -59,18 +59,11 @@ int main(int argc, char **argv){
     end = clock();
     printf("Time: %f\n", double(end - begin) / CLOCKS_PER_SEC);
 
-    //compute eccentricity
+    //compute normalized expansion
     begin = clock();
-    vector<int> ecc;
-    prop.eccentricity(g,ecc);
+    vector<double> norm_hops;
+    prop.expansion(g, norm_hops);
     end = clock();
-    printf("Alg Time (eccentricity): %f\n", double(end - begin) / CLOCKS_PER_SEC);
-
-    //compute eccentricity distribution
-    begin = clock();
-    vector<double> ecc_dist;
-    prop.eccentricity_dist(g,ecc, ecc_dist);
-    end = clock();
-    printf("Alg Time (freq dist eccentricity): %f\n", double(end - begin) / CLOCKS_PER_SEC);
+    printf("Alg Time (expansion): %f\n", double(end - begin) / CLOCKS_PER_SEC);
 } // main
 
