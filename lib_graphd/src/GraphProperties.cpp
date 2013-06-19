@@ -726,6 +726,7 @@ namespace Graph {
         int bestMax = 0;
         ecc.resize(n);
 
+        #pragma omp parallel for default(none) shared(short_paths, ecc) private(bestMax)
         //compute diameter of each vertex
         for(int i = 0; i < n; i++){
             bestMax = 0;
@@ -762,6 +763,8 @@ namespace Graph {
             freq_ecc[ecc[i]]++; //add to tally for this diameter size
         }
         //printf("Graph diameter is %d\n", freq_ecc.size()-1);
+
+        #pragma omp parallel for default(none) shared(freq_ecc)
         for(int i = 0; i <= freq_ecc.size() - 1; i++){
             freq_ecc[i] = freq_ecc[i] / n;
             //printf("i=%d and n=%d with freq eccentricity %f\n",i,n,freq_ecc[i]);
@@ -790,6 +793,7 @@ namespace Graph {
         //average (divide by n) and normalize (divide by n-1)
         norm_hops[0] = 0.0; //no one is reachable in 0 hops (not counting self)
 
+        #pragma omp parallel for default(none) shared(norm_hops, hops)
         for(int h = 1; h < n; h++){
             norm_hops[h] = (double)hops[h] / (n * (n - 1));
             //printf("h = %d and number is %d; norm value is %f\n",h,hops[h],norm_hops[h]);
