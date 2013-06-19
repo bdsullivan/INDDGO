@@ -240,7 +240,6 @@ int main(int argc, char **argv){
         print_time("Time(expansion)",t1,t2);
     }
 
-
     outfile.close();
     exit(0);
 } // main
