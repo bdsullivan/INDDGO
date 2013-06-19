@@ -41,7 +41,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << "\n";
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion");
 
 /**
  * Creates a map from a comma-separated string
@@ -148,7 +148,7 @@ int main(int argc, char **argv){
     print_time("Time(read_graph)", t1, t2);
 
     double global_cc, avg_cc, assortativity;
-    vector<double> local_cc, freq_ecc;
+    vector<double> local_cc, freq_ecc, norm_hops;
     float edge_density, avg_degree;
     vector<int> deg_dist, ecc;
     vector< vector<int> > shortest_path_distances;
@@ -240,6 +240,13 @@ int main(int argc, char **argv){
         gp.eccentricity_dist(&g, ecc, freq_ecc);
         ORB_read(t2);
         print_time("Time(eccentricity distribution)",t1,t2);
+    }
+    if(req_methods["expansion"] == true){
+        cout << "Calculating normalized expansion (distance distribution) - no self loops allowed\n";
+        ORB_read(t1);
+        gp.expansion(&g, norm_hops);
+        ORB_read(t2);
+        print_time("Time(expansion)",t1,t2);
     }
 
     outfile.close();
