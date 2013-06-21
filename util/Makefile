@@ -4,7 +4,7 @@ DOXYFILE = ./Doxyfile
 
 INC_DIR = -I./inc -I$(GRAPH)/inc -I$(TREE)/inc $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(UTHASH_INCDIR) $(MADNESS_INCDIR) $(GMP_INCDIR) $(PARMETIS_INCDIR)
 
-LIBS = -lm $(INDDGO_LIB) -ltreed -lgraphd $(METIS_LIB) $(SSPARSE_LIB) $(ARPACK_LIB) $(GMP_LIB) 
+LIBS = -lm $(INDDGO_LIB) -ltreed -lgraphd $(SSPARSE_LIB) $(ARPACK_LIB) $(GMP_LIB) $(PARMETIS_LIB) $(METIS_LIB)
 
 PKT_SRCS =  ./src/gen_pkt.cpp 
 PKT_OBJ =  src/orbtimer.o $(PKT_SRCS:.cpp=.o)
@@ -18,17 +18,9 @@ G_STATS_SRCS =  ./src/graph_stats.cpp
 G_STATS_OBJ =  src/orbtimer.o $(G_STATS_SRCS:.cpp=.o)
 G_STATS_EXE = $(INDDGO_BIN)/graph_stats
 
-E2D_SRCS = ./src/edge2dimacs.cpp
-E2D_OBJ = src/orbtimer.o $(E2D_SRCS:.cpp=.o)
-E2D_EXE = $(INDDGO_BIN)/edge2dimacs
-
-E2A_SRCS = ./src/edge2adjlist.cpp
-E2A_OBJ = src/orbtimer.o $(E2A_SRCS:.cpp=.o)
-E2A_EXE = $(INDDGO_BIN)/edge2adjlist
-
-M2D_SRCS = ./src/metis2dimacs.cpp
-M2D_OBJ = $(M2D_SRCS:.cpp=.o)
-M2D_EXE = $(INDDGO_BIN)/metis2dimacs
+GCONVERT_SRCS = ./src/gconvert.cpp
+GCONVERT_OBJ = src/orbtimer.o $(GCONVERT_SRCS:.cpp=.o)
+GCONVERT_EXE = $(INDDGO_BIN)/gconvert
 
 TRI_SRCS =  ./src/count-tri.cpp 
 TRI_OBJ =  src/orbtimer.o $(TRI_SRCS:.cpp=.o)
@@ -46,7 +38,7 @@ EXP_SRCS = ./src/expansion.cpp
 EXP_OBJ = $(EXP_SRCS:.cpp=.o)
 EXP_EXE = $(INDDGO_BIN)/expansion
 
-all: $(PKT_EXE) $(TD_STATS_EXE) $(E2D_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) $(SRT_EXE) $(ECC_EXE) $(EXP_EXE)
+all: $(PKT_EXE) $(TD_STATS_EXE) $(GCONVERT_EXE) $(E2A_EXE) $(M2D_EXE) $(G_STATS_EXE) $(TRI_EXE) $(SRT_EXE) $(ECC_EXE) $(EXP_EXE)
 
 .cpp.o:
 	$(CXX) $(CPPFLAGS) $(CFLAGS) -c $(INC_DIR)  $< -o $@
@@ -60,13 +52,7 @@ $(TD_STATS_EXE): $(TD_STATS_OBJ) ../lib/libgraphd.a
 $(G_STATS_EXE): $(G_STATS_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
-$(E2D_EXE): $(E2D_OBJ)  ../lib/libgraphd.a
-	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
-
-$(E2A_EXE): $(E2A_OBJ)  ../lib/libgraphd.a
-	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
-
-$(M2D_EXE): $(M2D_OBJ)  ../lib/libgraphd.a
+$(GCONVERT_EXE): $(GCONVERT_OBJ)  ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@ 
 
 $(TRI_EXE): $(TRI_OBJ) ../lib/libgraphd.a
@@ -82,7 +68,7 @@ $(EXP_EXE): $(EXP_OBJ) ../lib/libgraphd.a
 	$(CXX) $(CPPFLAGS) $(CFLAGS) $^ $(INC_DIR) $(LIBS) $(LDFLAGS) -o $@
 
 clean: 
-	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(E2D_OBJ) $(E2D_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE) $(SRT_OBJ) $(SRT_EXE) $(ECC_OBJ) $(ECC_EXE) $(EXP_OBJ) $(EXP_EXE) $(E2A_EXE) $(E2A_OBJ)
+	-rm -rf $(PKT_OBJ) $(PKT_EXE) $(TD_STATS_OBJ) $(TD_STATS_EXE) $(GCONVERT_OBJ) $(GCONVERT_EXE) $(M2D_EXE) $(M2D_OBJ) $(G_STATS_EXE) $(G_STATS_OBJ) $(TRI_OBJ) $(TRI_EXE) $(SRT_OBJ) $(SRT_EXE) $(ECC_OBJ) $(ECC_EXE) $(EXP_OBJ) $(EXP_EXE) $(E2A_EXE) $(E2A_OBJ)
 
 doc: $(DOXYFILE)
 	doxygen $(DOXYFILE)

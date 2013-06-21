@@ -37,27 +37,30 @@ void print_time(string prefix, ORB_t start, ORB_t end){
 }
 
 void usage(const char *s){
-    fprintf(stderr,"Usage: %s [options]\n",s);
-    fprintf(stderr,
-            "\t -t [#] sets number of graphs to generate (t)\n"
-            "\t -n [#] Sets the number of vertices (n)\n"
-            "\t -k [#] sets value for tree-width (k)\n"
-            "\t -p [#] sets percent of edges to keep from complete k-tree (p)\n"
-            "\t -s seed : uses the given RNG seed\n"
-            "\t -fn [name] sets the prefix for the filenames written out\n"
-            "\t -r : randomizes the vertex labels before writing to file.\n"
-            "\t -scotch : writes a .scotch file in Scotch graph format as well\n"
-            );
+    fprintf(stderr,"Usage: %s intype outtype infile outfile\n",s);
 }
 
 int main(int argc, char **argv){
     ORB_t t1, t2;
+
+    char *intype, *outtype, *infile, *outfile;
+
     // Check for a cry for help
     if((argc == 1) || ((argc == 2) && (strcmp(argv[1],"-h") == 0)) || ((argc == 2) && (strcmp(argv[1],"--help") == 0))
        || ((argc == 2) && (strcmp(argv[1],"--h") == 0) ) ){
         usage(argv[0]);
-        exit(-1);
+        exit(0);
     }
+
+    if(argc != 5){
+        usage(argv[0]);
+        exit(1);
+    }
+
+    intype = argv[1];
+    outtype = argv[2];
+    infile = argv[3];
+    outfile = argv[4];
 
     Graph::Graph *g;
     int seed = 0;
@@ -82,9 +85,11 @@ int main(int argc, char **argv){
 
     g = new Graph::Graph();
 
-    cout << "Reading graph\n";
+    cout << "Input type : " << intype << endl;
+    cout << "Output type: " << outtype << endl;
+    cout << "Reading graph" << endl;
     ORB_read(t1);
-    ngr.read_graph(g, argv[1], "Edge", false);
+    ngr.read_graph(g, infile, intype, false);
     ORB_read(t2);
     print_time("Time(read_graph)", t1, t2);
 
@@ -96,7 +101,7 @@ int main(int argc, char **argv){
 
     cout << "Writing graph\n";
     ORB_read(t1);
-    writer.write_graph(g, argv[2], "ADJLIST");
+    writer.write_graph(g, outfile, outtype);
     ORB_read(t2);
     print_time("Time(write_graph)", t1, t2);
 
