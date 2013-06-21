@@ -113,7 +113,7 @@ namespace Graph {
         string line;
         ifstream input(filename.c_str());
         if(!input.is_open()){
-            FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename);
+            FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename.c_str());
             fatal_error("%s:  Error opening %s for reading\n", __FUNCTION__,
                         filename.c_str());
         }
@@ -153,7 +153,7 @@ namespace Graph {
         m = n = 0;
 
         if((in = fopen(filename.c_str(), "r")) == NULL){
-            FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename);
+            FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename.c_str());
             fatal_error("%s:  Error opening %s for reading\n", __FUNCTION__,
                         filename.c_str());
         }
@@ -246,7 +246,7 @@ namespace Graph {
         m = n = 0;
 
         if((in = fopen(filename.c_str(), "r")) == NULL){
-            FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename);
+            FERROR("%s:  Error opening %s for reading\n", __FUNCTION__, filename.c_str());
             fatal_error("%s:  Error opening %s for reading\n", __FUNCTION__,
                         filename.c_str());
         }
