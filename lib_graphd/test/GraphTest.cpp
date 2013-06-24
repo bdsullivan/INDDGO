@@ -1,23 +1,23 @@
 /*
-  This file is part of INDDGO.
+   This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+   Copyright (C) 2012, Oak Ridge National Laboratory
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+   This product includes software produced by UT-Battelle, LLC under Contract No.
+   DE-AC05-00OR22725 with the Department of Energy.
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the New BSD 3-clause software license (LICENSE).
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   LICENSE for more details.
 
-*/
+   For more information please contact the INDDGO developers at:
+   inddgo-info@googlegroups.com
+
+ */
 
 #include "Log.h"
 #include "Node.h"
@@ -26,27 +26,28 @@
 #include "GraphCreatorFile.h"
 #include <gtest/gtest.h>
 
+#include <fstream>
+
 using namespace std;
-class GraphTest: public testing::Test {
+class GraphTest : public testing::Test {
 public:
-    Graph::GraphCreatorFile creator;
-    Graph::Graph *g;
-    Graph::Graph *g_five;
+Graph::GraphCreatorFile creator;
+Graph::Graph *g;
+Graph::Graph *g_five;
 
-    virtual void SetUp(){
-        LOG_INIT("test.log", NULL, 0);
-        //creator.set_file_name("../data/1dc.128.txt");
-        creator.set_file_name("data/1dc.128.txt");
-        creator.set_graph_type("DIMACS");
-		g = creator.create_graph();
-        g_five = new Graph::Graph(5);
-    }
+virtual void SetUp(){
+    LOG_INIT("test.log", NULL, 0);
+    //creator.set_file_name("../data/1dc.128.txt");
+    creator.set_file_name("data/1dc.128.txt");
+    creator.set_graph_type("DIMACS");
+    g = creator.create_graph();
+    g_five = new Graph::Graph(5);
+}
 
-    virtual void TearDown(){
-        LOG_CLOSE();
-    }
+virtual void TearDown(){
+    LOG_CLOSE();
+}
 };
-
 
 TEST_F(GraphTest, testNumNodes)
 {
@@ -84,14 +85,12 @@ TEST_F(GraphTest, testIsEdge)
 
     EXPECT_EQ(24, nbrs.size());
     EXPECT_TRUE(g->is_edge(108, 100));
-
 }
 
 TEST_F(GraphTest, testGetDegree)
 {
     EXPECT_EQ(19, g->get_degree(28));
 }
-
 
 TEST_F(GraphTest, testNodeNbrs)
 {
@@ -104,7 +103,7 @@ TEST_F(GraphTest, testNodeNbrs)
     list<int> nbrlist = n[35].get_nbrs();
     vector<int> nbrs(nbrlist.begin(), nbrlist.end());
     EXPECT_EQ(75, nbrs[20]);
-    
+
     nbrlist = n[127].get_nbrs();
     nbrs.clear();
     nbrs.insert(nbrs.end(), nbrlist.begin(), nbrlist.end());
@@ -119,10 +118,16 @@ TEST_F(GraphTest, testNodeNbrs)
     EXPECT_EQ(8, nbrs[3l]);
 }
 
-
 TEST_F(GraphTest, testGetDegrees)
 {
     vector<int> degree = g->get_degree();
+
+    ofstream outFile;
+    outFile.open("degrees.txt");
+    for(int i = 0; i < degree.size(); i++){
+        outFile << i << " " << degree[i] << endl;
+    }
+
     EXPECT_EQ(31, degree[86]);
 }
 
@@ -147,14 +152,14 @@ TEST_F(GraphTest, testComplement)
 {
     int d = g->get_degree(86);
     int n = g->get_num_nodes();
-    int comp = n*(n-1)/2;
+    int comp = n * (n - 1) / 2;
     EXPECT_EQ(31, d);
     EXPECT_TRUE(g->is_edge(108, 100));
     EXPECT_EQ(128, g->get_num_nodes());
     EXPECT_EQ(1471, g->get_num_edges());
 
     g->complement();
-    
+
     EXPECT_EQ(128, g->get_num_nodes());
     EXPECT_EQ(comp - 1471, g->get_num_edges());
 
@@ -165,149 +170,142 @@ TEST_F(GraphTest, testComplement)
 
 TEST_F(GraphTest, testAddEdge)
 {
-	EXPECT_FALSE(g->is_edge(80, 12));
-	EXPECT_EQ(1471, g->get_num_edges());
-	EXPECT_EQ(22, g->get_degree(80));
-	EXPECT_EQ(19, g->get_degree(12));
-	g->add_edge(80, 12);
-	EXPECT_TRUE(g->is_edge(80, 12));
-	EXPECT_TRUE(g->is_edge(12, 80));
-	EXPECT_EQ(1472, g->get_num_edges());
-	EXPECT_EQ(23, g->get_degree(80));
-	EXPECT_EQ(20, g->get_degree(12));
+    EXPECT_FALSE(g->is_edge(80, 12));
+    EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(22, g->get_degree(80));
+    EXPECT_EQ(19, g->get_degree(12));
+    g->add_edge(80, 12);
+    EXPECT_TRUE(g->is_edge(80, 12));
+    EXPECT_TRUE(g->is_edge(12, 80));
+    EXPECT_EQ(1472, g->get_num_edges());
+    EXPECT_EQ(23, g->get_degree(80));
+    EXPECT_EQ(20, g->get_degree(12));
 }
 
 TEST_F(GraphTest, testAddEdgeAdvance)
 {
-	EXPECT_FALSE(g->is_edge(80, 12));
-	EXPECT_EQ(1471, g->get_num_edges());
-	EXPECT_EQ(22, g->get_degree(80));
-	EXPECT_EQ(19, g->get_degree(12));
-	g->add_edge_advance(80, 12);
-	EXPECT_TRUE(g->is_edge(80, 12));
-	EXPECT_TRUE(g->is_edge(12, 80));
-	EXPECT_EQ(1472, g->get_num_edges());
-	EXPECT_EQ(23, g->get_degree(80));
-	EXPECT_EQ(20, g->get_degree(12));
+    EXPECT_FALSE(g->is_edge(80, 12));
+    EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(22, g->get_degree(80));
+    EXPECT_EQ(19, g->get_degree(12));
+    g->add_edge_advance(80, 12);
+    EXPECT_TRUE(g->is_edge(80, 12));
+    EXPECT_TRUE(g->is_edge(12, 80));
+    EXPECT_EQ(1472, g->get_num_edges());
+    EXPECT_EQ(23, g->get_degree(80));
+    EXPECT_EQ(20, g->get_degree(12));
 }
 
 TEST_F(GraphTest, testRemoveEdge)
 {
-	EXPECT_TRUE(g->is_edge(108, 100));
-	EXPECT_EQ(1471, g->get_num_edges());
-	EXPECT_EQ(24, g->get_degree(108));
-	EXPECT_EQ(24, g->get_degree(100));
+    EXPECT_TRUE(g->is_edge(108, 100));
+    EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(24, g->get_degree(108));
+    EXPECT_EQ(24, g->get_degree(100));
 
-	g->remove_edge(108, 100);
+    g->remove_edge(108, 100);
 
-	EXPECT_FALSE(g->is_edge(108, 100));
-	EXPECT_FALSE(g->is_edge(100, 108));
-	EXPECT_EQ(1470, g->get_num_edges());
-	EXPECT_EQ(23, g->get_degree(100));
-	EXPECT_EQ(23, g->get_degree(108));
+    EXPECT_FALSE(g->is_edge(108, 100));
+    EXPECT_FALSE(g->is_edge(100, 108));
+    EXPECT_EQ(1470, g->get_num_edges());
+    EXPECT_EQ(23, g->get_degree(100));
+    EXPECT_EQ(23, g->get_degree(108));
 }
 
 TEST_F(GraphTest, testRemoveVertex)
 {
-	EXPECT_TRUE(g->is_edge(108, 100));
-	EXPECT_EQ(1471, g->get_num_edges());
-	EXPECT_EQ(24, g->get_degree(108));
-	EXPECT_EQ(24, g->get_degree(100));
+    EXPECT_TRUE(g->is_edge(108, 100));
+    EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(24, g->get_degree(108));
+    EXPECT_EQ(24, g->get_degree(100));
 
-	g->remove_vertex(108);
+    g->remove_vertex(108);
 
-	EXPECT_FALSE(g->is_edge(108, 100));
-	EXPECT_FALSE(g->is_edge(100, 108));
-	EXPECT_EQ(1447, g->get_num_edges());
-	EXPECT_EQ(23, g->get_degree(100));
-	EXPECT_EQ(0, g->get_degree(108));
+    EXPECT_FALSE(g->is_edge(108, 100));
+    EXPECT_FALSE(g->is_edge(100, 108));
+    EXPECT_EQ(1447, g->get_num_edges());
+    EXPECT_EQ(23, g->get_degree(100));
+    EXPECT_EQ(0, g->get_degree(108));
 }
 
 TEST_F(GraphTest, testContractEdge)
 {
-	EXPECT_TRUE(g->is_edge(108, 100));
-	EXPECT_EQ(1471, g->get_num_edges());
-	EXPECT_EQ(24, g->get_degree(108));
-	EXPECT_EQ(24, g->get_degree(100));
+    EXPECT_TRUE(g->is_edge(108, 100));
+    EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(24, g->get_degree(108));
+    EXPECT_EQ(24, g->get_degree(100));
 
-	Graph::Node *na;
-	na = g->get_node(108);
-	list<int> nbrs_a = na->get_nbrs();
-	vector<int> nbrsvec_a(nbrs_a.begin(), nbrs_a.end());
+    Graph::Node *na;
+    na = g->get_node(108);
+    list<int> nbrs_a = na->get_nbrs();
+    vector<int> nbrsvec_a(nbrs_a.begin(), nbrs_a.end());
 
-	Graph::Node *nb;
-	nb = g->get_node(100);
-	list<int> nbrs_b = nb->get_nbrs();
-	vector<int> nbrsvec_b(nbrs_b.begin(), nbrs_b.end());
+    Graph::Node *nb;
+    nb = g->get_node(100);
+    list<int> nbrs_b = nb->get_nbrs();
+    vector<int> nbrsvec_b(nbrs_b.begin(), nbrs_b.end());
 
-	int common_nbrs = 0;
-	int final_degree = 0;
-	int new_edges = 0;
+    int common_nbrs = 0;
+    int final_degree = 0;
+    int new_edges = 0;
 
-	for (int ia = 0; ia < nbrsvec_a.size(); ia++)
-	{
-		for (int ib = 0; ib < nbrsvec_b.size(); ib++)
-		{
-			if (nbrsvec_a[ia] == nbrsvec_b[ib])
-			{
-				common_nbrs++;
-			}
-		}
-	}
+    for(int ia = 0; ia < nbrsvec_a.size(); ia++){
+        for(int ib = 0; ib < nbrsvec_b.size(); ib++){
+            if(nbrsvec_a[ia] == nbrsvec_b[ib]){
+                common_nbrs++;
+            }
+        }
+    }
 
-	final_degree = g->get_degree(108) + g->get_degree(100) - common_nbrs - 2;
-	new_edges = g->get_num_edges() - common_nbrs - 1;
+    final_degree = g->get_degree(108) + g->get_degree(100) - common_nbrs - 2;
+    new_edges = g->get_num_edges() - common_nbrs - 1;
 
-	int x = g->contract_edge(108, 100);
+    int x = g->contract_edge(108, 100);
 
-	EXPECT_FALSE(g->is_edge(108, 100));
-	EXPECT_FALSE(g->is_edge(100, 108));
-	EXPECT_EQ(0, g->get_degree(100));
-	EXPECT_EQ(new_edges, g->get_num_edges());
-	EXPECT_EQ(final_degree, g->get_degree(108));
+    EXPECT_FALSE(g->is_edge(108, 100));
+    EXPECT_FALSE(g->is_edge(100, 108));
+    EXPECT_EQ(0, g->get_degree(100));
+    EXPECT_EQ(new_edges, g->get_num_edges());
+    EXPECT_EQ(final_degree, g->get_degree(108));
 }
 
 TEST_F(GraphTest, testEliminateVertex)
 {
-	EXPECT_TRUE(g->is_edge(108, 100));
-	EXPECT_EQ(1471, g->get_num_edges());
-	EXPECT_EQ(24, g->get_degree(108));
-	EXPECT_EQ(24, g->get_degree(100));
+    EXPECT_TRUE(g->is_edge(108, 100));
+    EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(24, g->get_degree(108));
+    EXPECT_EQ(24, g->get_degree(100));
 
-	Graph::Node *na;
-	na = g->get_node(108);
-	list<int> nbrs_a = na->get_nbrs();
-	vector<int> nbrsvec_a(nbrs_a.begin(), nbrs_a.end());
+    Graph::Node *na;
+    na = g->get_node(108);
+    list<int> nbrs_a = na->get_nbrs();
+    vector<int> nbrsvec_a(nbrs_a.begin(), nbrs_a.end());
 
-	Graph::Node *nb;
-	nb = g->get_node(100);
-	list<int> nbrs_b = nb->get_nbrs();
-	vector<int> nbrsvec_b(nbrs_b.begin(), nbrs_b.end());
+    Graph::Node *nb;
+    nb = g->get_node(100);
+    list<int> nbrs_b = nb->get_nbrs();
+    vector<int> nbrsvec_b(nbrs_b.begin(), nbrs_b.end());
 
-	int common_nbrs = 0;
-	int final_degree = 0;
-	int new_edges = 0;
+    int common_nbrs = 0;
+    int final_degree = 0;
+    int new_edges = 0;
 
-	for (int ia = 0; ia < nbrsvec_a.size(); ia++)
-	{
-		for (int ib = 0; ib < nbrsvec_b.size(); ib++)
-		{
-			if (nbrsvec_a[ia] == nbrsvec_b[ib])
-			{
-				common_nbrs++;
-			}
-		}
-	}
+    for(int ia = 0; ia < nbrsvec_a.size(); ia++){
+        for(int ib = 0; ib < nbrsvec_b.size(); ib++){
+            if(nbrsvec_a[ia] == nbrsvec_b[ib]){
+                common_nbrs++;
+            }
+        }
+    }
 
-	new_edges = g->get_degree(108) - common_nbrs - 1;
-	new_edges = new_edges + g->get_degree(100) - 1;
+    new_edges = g->get_degree(108) - common_nbrs - 1;
+    new_edges = new_edges + g->get_degree(100) - 1;
 
+    g->eliminate_vertex(108, NULL, true);
 
-	g->eliminate_vertex(108, NULL, true);
-
-	EXPECT_FALSE(g->is_edge(108, 100));
-	EXPECT_FALSE(g->is_edge(100, 108));
-	EXPECT_EQ(1597, g->get_num_edges());
-	EXPECT_EQ(new_edges, g->get_degree(100));
-	EXPECT_EQ(0, g->get_degree(108));
+    EXPECT_FALSE(g->is_edge(108, 100));
+    EXPECT_FALSE(g->is_edge(100, 108));
+    EXPECT_EQ(1597, g->get_num_edges());
+    EXPECT_EQ(new_edges, g->get_degree(100));
+    EXPECT_EQ(0, g->get_degree(108));
 }

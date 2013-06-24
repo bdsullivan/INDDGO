@@ -25,6 +25,9 @@
 #include "GraphException.h"
 #include "GraphWriter.h"
 
+#include "orbconfig.h"
+#include "orbtimer.h"
+
 using namespace std;
 
 void usage(const char *s){
@@ -35,10 +38,17 @@ void usage(const char *s){
             "\t -k [#] sets value for tree-width (k)\n"
             "\t -p [#] sets percent of edges to keep from complete k-tree (p)\n"
             "\t -s seed : uses the given RNG seed\n"
+            "\t -m : print more precise timings to stdout\n"
             "\t -fn [name] sets the prefix for the filenames written out\n"
+            "\t -fe [name] sets the exact filename written out (can only be used with one output graph)\n"
+            "\t -o [type] sets output file type - valid values are: dimacs (default), adjlist, adjlist\n"
             "\t -r : randomizes the vertex labels before writing to file.\n"
             "\t -scotch : writes a .scotch file in Scotch graph format as well\n"
             );
+}
+
+void print_time(string prefix, ORB_t start, ORB_t end){
+    cout << prefix + ": " << ORB_seconds(end, start) << "\n";
 }
 
 int main(int argc, char **argv){
@@ -51,6 +61,7 @@ int main(int argc, char **argv){
         exit(-1);
     }
 
+    ORB_t t1, t2, t3;
     int i;
     int t = 1;
     int ktree_n = -1, ktree_k = -1, ktree_p = -1;
@@ -59,8 +70,11 @@ int main(int argc, char **argv){
     time_t start, stop;
     char filename[100];
     char *prefix = (char *)"pkt";
+    string out_format = "DIMACS";
 
     bool random = false;
+    bool timings = false;
+    bool exact_filename = false;
     char lfname[100];
     char efname[100];
     sprintf(lfname, "genpkt.log");
@@ -82,15 +96,35 @@ int main(int argc, char **argv){
         if(strcmp(argv[i],"-p") == 0){
             ktree_p = atoi(argv[i + 1]);
         }
+        if(strcmp(argv[i],"-o") == 0){
+            out_format = string(argv[i + 1]);
+        }
         if(strcmp(argv[i],"-s") == 0){
             seed = atoi(argv[i + 1]);
         }
         if(strcmp(argv[i],"-fn") == 0){
             prefix = argv[i + 1];
         }
+        if(strcmp(argv[i],"-fe") == 0){
+            prefix = argv[i + 1];
+            exact_filename = true;
+        }
+        if(strcmp(argv[i],"-m") == 0){
+            timings = true;
+        }
         if(strcmp(argv[i],"-r") == 0){
             random = true;
         }
+    }
+
+    if((true == exact_filename) && (t != 1)){
+        cerr << "Error: cannot specify both -t and -fe flags\n";
+        exit(1);
+    }
+
+    if(("adjlist" != out_format) && ("dimacs" != out_format)){
+        cerr << "Error: only allowed output formats are: adjlist, dimacs\n";
+        exit(1);
     }
 
     if(!seed){
@@ -112,20 +146,35 @@ int main(int argc, char **argv){
     Graph::GraphProperties prop;
     Graph::GraphWriter writer;
 
+    ORB_calibrate();
+
     DEBUG("Graph generation loop\n");
     DEBUG("n : %d k: %d\n", ktree_n, ktree_p);
     for(i = 0; i < t; i++){
         // Create the Ktree
         //H = new Graph::Graph(ktree_n, ktree_k);
+        cout << "Generating k-tree\n";
         H = creator.initialize_ktree(ktree_n, ktree_k);
         // Generate an n-node Graph G that is a partial k-tree derived from the k-tree
         start = clock();
+        cout << "Deriving partial k-tree\n";
+        ORB_read(t1);
         G = creator.create_random_edge_subgraph(H, ktree_p);
+        ORB_read(t2);
         stop = clock();
+        if(timings){
+            print_time("Generation time", t1, t2);
+        }
         fprintf(stderr,"Generated random partial k-tree (%d,%d) in %f sec.\n",
                 ktree_n, ktree_k, ((double)(stop - start)) / CLOCKS_PER_SEC);
         //write it to a file
-        sprintf(filename, "%s.%d.%d.%d_%d.dimacs", prefix, ktree_n,ktree_k,ktree_p, i);
+        if(!exact_filename){
+            sprintf(filename, "%s.%d.%d.%d_%d.dimacs", prefix, ktree_n,ktree_k,ktree_p, i);
+        }
+        else {
+            strncpy(filename,prefix, 99);
+        }
+
         print_message(0,"Writing file %s\n",filename);
 
         //writer->set_out_file_name(filename);
@@ -135,13 +184,21 @@ int main(int argc, char **argv){
             writer.set_shuffle_seed(seed);
         }
 
-        writer.write_graph(G,filename, "DIMACS");
+        ORB_read(t2);
+        writer.write_graph(G,filename, out_format);
+        ORB_read(t3);
+        if(timings){
+            print_time("Output time", t2, t3);
+            print_time("Total time", t1, t3);
+            cout << "Output edges: " << G->get_num_edges() << "\nOutput vertices: " << G->get_num_nodes();
+            cout << "\nOutput format: " << out_format << "\nOutput filename: " << filename << "\n";
+        }
 
         delete G;
         delete H;
     }
 
     LOG_CLOSE();
-    return 0;
+    exit(0);
 } // main
 

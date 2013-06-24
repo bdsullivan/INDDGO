@@ -92,6 +92,7 @@ const char *eo_name(int eo_id);
 std::string str_to_up(std::string s);
 void split(const std::string& s, char sep, vector<int>& v);      // used in metisgraph reader
 
+void write_degree_distribution(string filename, const vector<int> &dist);
 int_int mylog2(int x);
 
 #endif /* UTIL_H_ */
