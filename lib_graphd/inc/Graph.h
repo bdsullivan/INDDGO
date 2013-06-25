@@ -35,6 +35,8 @@
 
 using namespace std;
 
+#define INDDGO_INFINITY INT_MAX
+
 namespace Graph {
     class Graph : public GraphInterface
     {
