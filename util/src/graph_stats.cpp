@@ -41,7 +41,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << "\n";
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path");
 
 /**
  * Creates a map from a comma-separated string
@@ -151,6 +151,8 @@ int main(int argc, char **argv){
     vector<double> local_cc, freq_ecc, norm_hops;
     float edge_density, avg_degree;
     vector<int> deg_dist, ecc;
+    double avg_path_length;
+
     vector< vector<int> > shortest_path_distances;
 
     outfile.open(outfilename.c_str());
@@ -247,6 +249,14 @@ int main(int argc, char **argv){
         gp.expansion(&g, norm_hops);
         ORB_read(t2);
         print_time("Time(expansion)",t1,t2);
+    }
+    if(req_methods["avg_shortest_path"] == true){
+        cout << "Calculating average shortest path length\n";
+        ORB_read(t1);
+        gp.avg_path_length(&g, avg_path_length);
+        ORB_read(t2);
+        print_time("Time(avg_path_length)", t1, t2);
+        outfile << "avg_path_length " << avg_path_length << endl;
     }
 
     outfile.close();
