@@ -1,23 +1,23 @@
 /*
-  This file is part of INDDGO.
+   This file is part of INDDGO.
 
-  Copyright (C) 2012, Oak Ridge National Laboratory 
+   Copyright (C) 2012, Oak Ridge National Laboratory
 
-  This product includes software produced by UT-Battelle, LLC under Contract No. 
-  DE-AC05-00OR22725 with the Department of Energy. 
+   This product includes software produced by UT-Battelle, LLC under Contract No.
+   DE-AC05-00OR22725 with the Department of Energy.
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the New BSD 3-clause software license (LICENSE). 
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  LICENSE for more details.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the New BSD 3-clause software license (LICENSE).
 
-  For more information please contact the INDDGO developers at: 
-  inddgo-info@googlegroups.com
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   LICENSE for more details.
 
-*/
+   For more information please contact the INDDGO developers at:
+   inddgo-info@googlegroups.com
+
+ */
 
 #include "DIMACSGraphReader.h"
 #include "GraphReader.h"
@@ -29,20 +29,18 @@ using namespace std;
 // A new one of these is created for each test
 class GraphReaderTest : public testing::Test {
 public:
-    Graph::GraphReader gr;
-    Graph::Graph g;
+Graph::GraphReader gr;
+Graph::Graph g;
 
+virtual void SetUp(){
+    LOG_INIT("test.log", NULL, 0);
+    gr.read_graph(&g, string("data/1dc.128.txt"), string("DIMACS"), false );
+}
 
-    virtual void SetUp(){
-        LOG_INIT("test.log", NULL, 0);
-        gr.read_graph(&g, string("data/1dc.128.txt"), string("DIMACS"), false );
-    }
-
-    virtual void TearDown(){
-        LOG_CLOSE();
-    }
+virtual void TearDown(){
+    LOG_CLOSE();
+}
 };
-
 
 TEST_F(GraphReaderTest, testCapacity)
 {
@@ -53,7 +51,6 @@ TEST_F(GraphReaderTest, testNumEdges)
 {
     EXPECT_EQ(1471, g.get_num_edges());
 }
-
 
 TEST_F(GraphReaderTest, testNodeNbrs)
 {
@@ -67,7 +64,6 @@ TEST_F(GraphReaderTest, testNodeNbrs)
     vector<int> nbrs(nbrlist.begin(), nbrlist.end());
     EXPECT_EQ(75, nbrs[20]);
 
-    
     nbrlist = n[127].get_nbrs();
     nbrs.clear();
     nbrs.insert(nbrs.end(), nbrlist.begin(), nbrlist.end());
@@ -79,5 +75,4 @@ TEST_F(GraphReaderTest, testNodeNbrs)
     EXPECT_EQ(1, nbrs[0]);
     EXPECT_EQ(64, nbrs[6l]);
     EXPECT_EQ(8, nbrs[3l]);
-
 }

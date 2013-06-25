@@ -20,6 +20,10 @@
  */
 
 #include "GraphDecomposition.h"
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <sched.h>
+
 #include <numeric>
 
 namespace Graph {
@@ -38,6 +42,7 @@ namespace Graph {
         list<int>::iterator it;
         GraphUtil graph_util;
 
+        #pragma omp parallel for schedule(dynamic, 8) default(none) shared(g)
         for(i = 0; i < g->capacity; i++){
             //loop through the active nodes
             if(g->nodes[i].label != -1){
@@ -377,16 +382,10 @@ namespace Graph {
 
         // we want our list of vertices sorted by degree, with higest degree in element 0
         // this is a goofy way to handle it, but that's life
+        #pragma omp parallel for default(none) shared(g, sorted_indices)
         for(i = 0; i < g->get_num_nodes(); i++){
             sorted_indices[i].first = i;
             sorted_indices[i].second = g->get_degree(i);
-            /*
-               fprintf(stderr, "  nbrs(%d): ", i);
-               for(list<int>::iterator myit=g->get_node(i)->get_nbrs_ptr()->begin(); myit != g->get_node(i)->get_nbrs_ptr()->end(); ++myit){
-                fprintf(stderr, " %d(%d)", *myit, g->get_degree(*myit));
-               }
-               fprintf(stderr,"\n");
-             */
         }
 
         // here we've basically renumbered the array using the
@@ -414,57 +413,91 @@ namespace Graph {
         // FIXME: this is a terrible hack
         //
         vector<int> revmap(n, -1);
-        for(i = 0; i < n; i++){
-            revmap[sorted_indices[i].first] = n - (i + 1);
-        }
-        for(i = 0; i < n; i++){
-            sort_nbrs_by_map(revmap, g->get_node(i));
-        }
 
-        for(fakev = 1; fakev < n; fakev++){   //3
-            v = sorted_indices[fakev].first;
-            //fprintf(stderr,"fakev: %d v: %d\n",fakev, v);
-            nv = g->get_node(v);
-            const list<int> &nbrs_v = nv->get_nbrs_ref();
-            for(std::list<int>::const_iterator cit = nbrs_v.begin(); cit != nbrs_v.end(); ++cit){ //3a
-                u = *cit;
-                //fprintf(stderr,"    looking at u=%d v=%d\n", u, v);
-                //fprintf(stderr,"      n(u):%d n(v):%d\n",revmap[u],revmap[v]);
-                if(revmap[u] > revmap[v]){ //3a
-                    nu = g->get_node(u);
-                    const list<int> &nbrs_u = nu->get_nbrs_ref();
-                    list<int>::const_iterator upit = nbrs_u.begin(); //3aa
-                    list<int>::const_iterator vpit = nbrs_v.begin(); //3aa
-                    uprime = *upit;
-                    vprime = *vpit;
-                    //fprintf(stderr, "       u':%d v':%d ",uprime, vprime);
-                    //fprintf(stderr, "n(v):%d n(u'):%d n(v'):%d\n", revmap[v], revmap[uprime], revmap[vprime]);
-                    while((upit != nbrs_u.end()) && (vpit != nbrs_v.end() &&
-                                                     (revmap[uprime] < revmap[v]) && (revmap[vprime] < revmap[v]))){ //3ab
+        vector< vector<long int> > local_t;
+
+        #pragma omp parallel default(none) shared(sorted_indices, revmap, g, t, local_t) private(fakev,nv,v,u,uprime,vprime,nu)
+        {
+            #pragma omp single
+            {
+                local_t.resize(omp_get_num_threads());
+            }
+            local_t[omp_get_thread_num()].resize(t.size());
+            //pid_t tid = syscall(SYS_gettid);
+            //cpu_set_t cpuset;
+            //printf("OMP thread %d has Linux TID %ld running on CPU: %d\n", omp_get_thread_num(), tid, sched_getcpu());
+            //sched_getaffinity(tid, sizeof(cpu_set_t), &cpuset);
+            //for(int k=0; k<47; k++){
+            //    if(CPU_ISSET(k, &cpuset)){
+            //        printf(" %d",k);
+            //    }
+            // }
+            // printf("\n");
+
+            #pragma omp for schedule(dynamic, 8)
+            for(i = 0; i < n; i++){
+                revmap[sorted_indices[i].first] = n - (i + 1);
+            }
+
+            #pragma omp for  schedule(dynamic, 64)
+            for(i = 0; i < n; i++){
+                sort_nbrs_by_map(revmap, g->get_node(i));
+            }
+
+            int omp_tid = omp_get_thread_num();
+            #pragma omp for schedule(dynamic, 4)
+//#pragma omp parallel for  default(none) schedule(dynamic, 16) shared(t, revmap, sorted_indices, g) private(fakev,nv,v,u,uprime,vprime,nu)
+            for(fakev = 1; fakev < n; fakev++){ //3
+                v = sorted_indices[fakev].first;
+                //fprintf(stderr,"fakev: %d v: % schedule(dynamic, 8)d\n",fakev, v);
+                nv = g->get_node(v);
+                const list<int> &nbrs_v = nv->get_nbrs_ref();
+                for(std::list<int>::const_iterator cit = nbrs_v.begin(); cit != nbrs_v.end(); ++cit){ //3a
+                    u = *cit;
+                    //fprintf(stderr,"    looking at u=%d v=%d\n", u, v);
+                    //fprintf(stderr,"      n(u):%d n(v):%d\n",revmap[u],revmap[v]);
+                    if(revmap[u] > revmap[v]){ //3a
+                        nu = g->get_node(u);
+                        const list<int> &nbrs_u = nu->get_nbrs_ref();
+                        list<int>::const_iterator upit = nbrs_u.begin(); //3aa
+                        list<int>::const_iterator vpit = nbrs_v.begin(); //3aa
                         uprime = *upit;
                         vprime = *vpit;
                         //fprintf(stderr, "       u':%d v':%d ",uprime, vprime);
                         //fprintf(stderr, "n(v):%d n(u'):%d n(v'):%d\n", revmap[v], revmap[uprime], revmap[vprime]);
-                        if(revmap[uprime] < revmap[vprime]){ //3aba
-                            upit++;
-                            //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing u'\n", v, u, uprime);
+                        while((upit != nbrs_u.end()) && (vpit != nbrs_v.end() &&
+                                                         (revmap[uprime] < revmap[v]) && (revmap[vprime] < revmap[v]))){ //3ab
+                            uprime = *upit;
+                            vprime = *vpit;
+                            //fprintf(stderr, "       u':%d v':%d ",uprime, vprime);
+                            //fprintf(stderr, "n(v):%d n(u'):%d n(v'):%d\n", revmap[v], revmap[uprime], revmap[vprime]);
+                            if(revmap[uprime] < revmap[vprime]){ //3aba
+                                upit++;
+                                //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing u'\n", v, u, uprime);
+                            }
+                            else if(revmap[uprime] > revmap[vprime]){ //3abb
+                                vpit++;
+                                //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing v'\n", v, u, uprime);
+                            }
+                            else { //3abc
+                                   //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
+                                local_t[omp_tid][v]++;
+                                local_t[omp_tid][u]++;
+                                local_t[omp_tid][uprime]++;
+                                upit++;
+                                vpit++;
+                            }
                         }
-                        else if(revmap[uprime] > revmap[vprime]){ //3abb
-                            vpit++;
-                            //fprintf(stderr, "        Failed triangle: (%d,%d,%d) incrementing v'\n", v, u, uprime);
-                        }
-                        else {   //3abc
-                            //fprintf(stderr, "Found triangle: (%d,%d,%d)\n", v, u, uprime);
-                            t[v]++;
-                            t[u]++;
-                            t[uprime]++;
-                            upit++;
-                            vpit++;
-                        }
-                    }
+                    } //if revmap
+                } //for vtxs
+            } //for fakev
+            #pragma omp for
+            for(i = 0; i < t.size(); i++){
+                for(int j = 0; j < omp_get_num_threads(); j++){
+                    t[i] += local_t[j][i];
                 }
             }
-        }
+        } //parallel
     } // all_triangles_compact_forward
 
     /*
@@ -479,12 +512,15 @@ namespace Graph {
         list<int>::iterator lt;
 
         // all the edgelists must be sorted
+        #pragma omp parallel for schedule(dynamic, 8) default(none) shared(g)
         for(i = 0; i < g->get_num_nodes(); i++){
             g->get_node(i)->sort_nbr();
         }
 
+        #pragma omp parallel for schedule(dynamic, 8) default(none) shared(g,t) private(u, v, it, cit)
         for(u = 0; u < g->get_num_nodes(); u++){
             const list<int> &c_nbrs = g->get_node(u)->get_nbrs_ref();
+//#pragma omp parallel for schedule(dynamic, 8) default(none) shared(g,t) private(u, v, it, cit)
             for(cit = c_nbrs.begin(); cit != c_nbrs.end(); ++cit){
                 v = *cit;
                 if(v > u){
@@ -511,8 +547,11 @@ namespace Graph {
                      */
 
                     for(it = intersection.begin(); it != intersection.end(); it++){
+                        #pragma omp atomic
                         t[*it]++;
+                        #pragma omp atomic
                         t[u]++;
+                        #pragma omp atomic
                         t[v]++;
                     }
                 }
@@ -535,11 +574,11 @@ namespace Graph {
     };
 
     void GraphProperties::sort_nbrs_by_map(vector<int> map, Node *n){
-        list<int> nbrs(n->get_nbrs());
+        list<int> *nbrs(n->get_nbrs_ptr());
 
         //std::sort(nbrs.first(), nbrs.last(), compare_degrees(g->get_degree_ref()));
-        nbrs.sort(compare_inject(map));
-        n->set_nbr(nbrs);
+        nbrs->sort(compare_inject(map));
+        //n->set_nbr(*nbrs);
     }
 
     /**
@@ -576,4 +615,334 @@ namespace Graph {
         avg_cc = std::accumulate(local_ccs.begin(), local_ccs.end(), 0.0) / (double)n;
         global_cc = (double)num_triangles / (double)total_possible_triangles;
     } // clustering_coefficients
+
+    /**
+     * \param[in] g input graph
+     * \param[in] source node id
+     * \param[out] p path distances from source to all other vertices
+     */
+
+    void GraphProperties::paths_dijkstra_single(Graph *g, vector<int> &p, int source){
+        //int inf = 100000;
+        int inf = INT_MAX;
+        int nVisited = 0;
+        int minD;
+        int nvisiting;
+        const int n = g->get_num_nodes(); //number of nodes in graph
+
+        //initialize empty set of vertices
+        vector<int> dist(n, inf);
+        vector<int> visited(n, 0);
+        Node *nv;
+
+        //initialize
+        dist[source] = 0;
+        nvisiting = source;
+
+        while(nVisited < n){
+            //get list of neighbors
+            nv = g->get_node(nvisiting);  //"true" name is tmp->label
+            const list<int> &mynbrs = nv->get_nbrs_ref();
+
+            //for each neighbor of the current vertex considered
+            for(list<int>::const_iterator nb = mynbrs.begin(); nb != mynbrs.end(); ++nb){
+                //consider each neighbor not already visited and "relax" dist
+                if(!visited[*nb]){
+                    dist[*nb] = min(dist[nvisiting] + 1, dist[*nb]); //weight=1 b/c unweighted graph
+                }
+            }
+
+            //mark node as visited
+            visited[nvisiting] = 1;
+
+            //find next move
+            minD = inf;
+            for(int i = 0; i < n; i++){
+                if(!visited[i] && (dist[i] < minD)){
+                    minD = dist[i];
+                    nvisiting = i;
+                }
+            }
+
+            nVisited++;
+        }
+
+        //make sure to pass back correct values
+        p = dist;
+
+        /*
+           printf("In single: \n");
+           for(int i = 0; i < n; i++){
+            printf("%d,  ",dist[i]);
+           }
+           printf("\n");
+         */
+    } //paths_dijkstra_single
+
+    /**
+     *  All pairs shortest paths
+     * \param[in] g input graph
+     * \param[out] p multidimentional list of all pairs shortest paths
+     */
+
+    void GraphProperties::paths_dijkstra_all(Graph *g, vector< vector<int> > &pAll){
+        int inf = INT_MAX;
+
+        int minD = inf;
+        const int n = g->get_num_nodes();
+
+        pAll.resize(n);
+
+        //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
+        #pragma omp parallel for default(none) shared(g, inf, pAll)
+        //loop over all vertices
+        for(int v = 0; v < n; v++){ //0; v < n; v++){
+            //reset all distances to INF and mark all vertices as unvisited
+            fill(pAll[v].begin(),pAll[v].end(),inf);
+            paths_dijkstra_single(g, pAll[v], v); //stores shortest paths from this vertex to all in pAll[v]
+        } //end loop over vertices
+
+        //store the results
+        g->set_shortest_path_dist(pAll);
+
+        //print out results
+        //for(int i = 0; i < n; i++){
+        //   for (int j = 0; j < n; j++) {
+        //        printf("%d,  ",pAll[i][j]);
+        //   }
+        //    printf("\n");
+        //}
+        //printf("\n");
+    } //paths_dijkstra_all
+
+    /**
+     * Calcuates the eccentricity for each vertex (max dist to any other vertex)
+     * \param[in] g input graph
+     * \param[out] ecc vector of eccentricies
+     */
+    void GraphProperties::eccentricity(Graph *g, vector<int> &ecc){
+        const int n = g->get_num_nodes();
+        vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();   //computes if not already
+        int bestMax = 0;
+        ecc.resize(n);
+
+        #pragma omp parallel for default(none) shared(short_paths, ecc) private(bestMax)
+        //compute diameter of each vertex
+        for(int i = 0; i < n; i++){
+            bestMax = 0;
+            for(int j = 0; j < n; j++){
+                if(short_paths[i][j] > bestMax){
+                    bestMax = short_paths[i][j];
+                }
+            }
+            ecc[i] = bestMax;       //eccentricity of vertex i
+            //printf("Eccentricity of node %d is %d\n", i, ecc[i]);
+        }
+    } //eccentricity
+
+    /**
+     * Calcuates the frequency of each eccentricity value for all vertices [ref. Takes, Kostes 2013]
+     * \param[in] g input graph
+     * \param[in] ecc vector of eccentricities (empty or pre-computed)
+     * \param[out] freq_ecc vector of eccentricity frequencies
+     */
+    void GraphProperties::eccentricity_dist(Graph *g, vector<int> &ecc, vector<double> &freq_ecc){
+        const int n = g->get_num_nodes();
+        int bestAll = 0;
+
+        if(ecc.empty()){
+            cout << "Empty -- calling function to compute eccentricities" << endl;
+            eccentricity(g,ecc);
+        }
+
+        //compute diameter of each vertex
+        for(int i = 0; i < ecc.size(); i++){
+            if(ecc[i] > freq_ecc.size() ){
+                freq_ecc.resize(ecc[i] + 1); //because vector numbering starts at 0
+            }
+            freq_ecc[ecc[i]]++; //add to tally for this diameter size
+        }
+        //printf("Graph diameter is %d\n", freq_ecc.size()-1);
+
+        #pragma omp parallel for default(none) shared(freq_ecc)
+        for(int i = 0; i <= freq_ecc.size() - 1; i++){
+            freq_ecc[i] = freq_ecc[i] / n;
+            //printf("i=%d and n=%d with freq eccentricity %f\n",i,n,freq_ecc[i]);
+        }
+    } //eccentricity_dist
+
+    /**
+     * Calcuates the expansion (hop-distance) from each vertex: [see Tangmunarunkit (2002)]
+     * compute #nodes reachable in h hops starting at each vertex, average, normalize
+     * \param[in] g input graph
+     * \param[out] norm_hops normalized distribution
+     */
+    void GraphProperties::expansion(Graph *g, vector<double> &norm_hops){
+        const int n = g->get_num_nodes();
+        vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();   //computes if not already
+        vector <int> hops(n,0);  //largest possible dist is n-1
+        norm_hops.resize(n);
+
+        //for each vertex, find the number of vertices reachable for all hops; add to tally
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                hops[ short_paths[i][j] ]++;
+            }
+        }
+
+        //average (divide by n) and normalize (divide by n-1)
+        norm_hops[0] = 0.0; //no one is reachable in 0 hops (not counting self)
+
+        #pragma omp parallel for default(none) shared(norm_hops, hops)
+        for(int h = 1; h < n; h++){
+            norm_hops[h] = (double)hops[h] / (n * (n - 1));
+            //printf("h = %d and number is %d; norm value is %f\n",h,hops[h],norm_hops[h]);
+        }
+    } //expansion
+
+    /**
+     * Calculates the diameter of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] diam Floating point value holding the calculated diamter
+     */
+    void GraphProperties::diameter(Graph *g, int &diam){
+        int i, j, size, temp;
+        vector< vector<int> > dist_mat;
+
+        paths_dijkstra_all(g, dist_mat);
+
+        size = dist_mat.size();
+        diam = dist_mat[0][0];
+        for(i = 0; i < size; i++){
+            for(j = 0; j < i; j++){
+                temp = dist_mat[i][j];
+                if((temp > diam) && (temp < INT_MAX)){
+                    diam = temp;
+                }
+            }
+        }
+    } // diameter
+
+    /**
+     * Calculates the effective diameter of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] ediam Floating point value holding the calculated effective diameter
+     * \param[in] perc Percentage for distances over total connected pairs, defaults to 0.9
+     */
+    void GraphProperties::effective_diameter(Graph *g, float &ediam, float perc){
+        int i, j, d, size, temp, diam = 0;
+        int n0, numer, tot_con_pairs = 0;
+        float gd;
+        vector< vector<int> > dist_mat;
+        vector<int> bins (g->num_nodes, 0);
+
+        paths_dijkstra_all(g, dist_mat);
+
+        size = dist_mat.size();
+        for(i = 0; i < size; i++){
+            for(j = 0; j < i; j++){
+                temp = dist_mat[i][j];
+                if(temp < INT_MAX){
+                    tot_con_pairs++;
+                    if(temp > diam){
+                        diam = temp;
+                    }
+                    bins[temp]++;
+                }
+            }
+        }
+
+        bins.resize(diam + 1);
+        numer = 0;
+        gd = 0.0;
+        d = 0;
+        while(d <= diam && gd < perc){
+            d++;
+            n0 = numer;
+            numer += bins[d];
+            gd = numer / float(tot_con_pairs);
+        }
+
+        ediam = (tot_con_pairs * 0.9 - n0) / float(numer - n0) + d - 1;
+    } // effective_diameter
+
+    /**
+     * Calculates the edge density of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] ed Floating point value holding the calculated edge density
+     */
+    void GraphProperties::edge_density(Graph *g, float &ed){
+        int V = g->num_nodes;
+        int E = g->num_edges;
+
+        ed = (2.0 * E) / (V * (V - 1.0));
+    }
+
+    /**
+     * Calculates the average degree of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] ad Floating point value holding the average degree of the graph
+     */
+    void GraphProperties::avg_degree(Graph *g, float &ad){
+        int V = g->num_nodes;
+        int E = g->num_edges;
+
+        ad = (2.0 * E) / V;
+    }
+
+    /**
+     * Calculates the degree distribution of graph g
+     * \param[in] g Pointer to a graph
+     * \param[out] dist Integer vector holding the degree distribution of the graph
+     */
+    void GraphProperties::deg_dist(Graph *g, vector<int> &dist){
+        int i, size = g->degree.size();
+
+        dist.resize(size);
+        for(i = 0; i < size; i++){
+            dist[i] = 0;
+        }
+
+        for(i = 0; i < size; i++){
+            dist[g->degree[i]] += 1;
+        }
+    }
+
+    /**
+     * Calculates the degree assortativity of a graph g
+     * \param[in] g input graph
+     * \param[out] coeff the degree assortativity coefficient of g
+     */
+    void GraphProperties::deg_assortativity(Graph *g, double &coeff){
+        double n1 = 0.0, n2 = 0.0, de = 0.0;
+        int m = g->get_num_edges();
+        const vector<int> &degrees = g->get_degree_ref();
+        int i;
+        double di, dc;
+        int nbr;
+        std::list<int>::const_iterator cit;
+        Node *node;
+
+        #pragma omp parallel for schedule(dynamic, 8) default(none) private(i,di,dc,node,cit) reduction(+:n1,n2,de) shared(g,degrees)
+        for(i = 0; i < g->get_num_nodes(); i++){
+            node = g->get_node(i);
+            const list<int> &nbrs = node->get_nbrs_ref();
+            for(cit = nbrs.begin(); cit != nbrs.end(); ++cit){
+                if(*cit > i){
+                    di = (double)degrees[i] - 1;
+                    dc = (double)degrees[*cit] - 1;
+
+                    n1 += di * dc;
+                    n2 += di + dc;
+                    de += pow(di,2) + pow(dc,2);
+                }
+            }
+        }
+
+        n1 = n1 / (double)m;
+        de = de / (2.0 * m);
+        n2 = pow(n2 / (2.0 * m), 2);
+
+        coeff = (n1 - n2) / (de - n2);
+    } // deg_assortativity
 }

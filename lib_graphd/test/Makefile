@@ -31,12 +31,18 @@ CXXFLAGS = $(INCLUDES) -g
 INCLUDES = -I../inc -I. -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
 LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib $(INDDGO_LIB) $(MPILIB_DIR)
 LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest -lgtest_main $(METIS_LIB) 
-LFLAGS = -g -O0
+LFLAGS = $(CFLAGS)
 
 #----changes are below this line----------------------------------------------
 
 #EXECUTABLES = $(LIBGTEST) testDimacsReader testGraphReader testGraphCreatorFile 
-EXECUTABLES = bin/testDimacsReader bin/testGraphReader bin/testGraphCreatorFile \
+#EXECUTABLES = bin/testDimacsReader bin/testGraphReader bin/testGraphCreatorFile \
+bin/testGraph bin/testWeightedGraph  \
+bin/testVertexWeightedGraph bin/testAdjMatrixGraphWriter bin/testAdjMatrixGraphReader \
+bin/testDIMACSGraphWriter bin/testGraphVizGraphWriter bin/testGraphProperty bin/testGraphUtil\
+bin/testMetisGraphWriter bin/testMetisGraphReader
+
+EXECUTABLES = bin/testGraphReader bin/testGraphCreatorFile \
 bin/testGraph bin/testWeightedGraph  \
 bin/testVertexWeightedGraph bin/testAdjMatrixGraphWriter bin/testAdjMatrixGraphReader \
 bin/testDIMACSGraphWriter bin/testGraphVizGraphWriter bin/testGraphProperty bin/testGraphUtil\
@@ -55,7 +61,10 @@ ParmetisTest.cpp
 
 ifeq ($(HAS_GTEST), 1)
 
-all: ${EXECUTABLES}
+all: bin ${EXECUTABLES} $(INDDGO_LIB_DIR)/libgraphd.a
+
+bin:
+	mkdir -p bin
 
 .cpp.o:
 	$(CXX) $(INCLUDES) $(CFLAGS) -O0 -c $<
