@@ -686,7 +686,7 @@ namespace Graph {
      */
 
     void GraphProperties::paths_dijkstra_all(Graph *g, vector< vector<int> > &pAll){
-        int inf = INT_MAX;
+        int inf = INDDGO_INFINITY;
 
         int minD = inf;
         const int n = g->get_num_nodes();
@@ -889,6 +889,30 @@ namespace Graph {
 
         ad = (2.0 * E) / V;
     }
+
+    void GraphProperties::avg_path_length(Graph *g, double &pl){
+        const int n = g->get_num_nodes();
+        const vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();
+        double sum = 0;
+        double intermediate = 0.0;
+        int i, j;
+
+        #pragma omp parallel for schedule(dynamic, 16) default(none) private(j) reduction(+:sum) 
+        for(i=0; i<n;i++){
+            for(j=0;j<n;j++){
+                if(INDDGO_INFINITY != short_paths[i][j]){
+                    sum += short_paths[i][j];
+                }
+            }
+        }
+
+        sum = sum /  (double)(n*(n-1));
+        pl = sum;
+    }
+
+                
+
+
 
     /**
      * Calculates the degree distribution of graph g

@@ -113,6 +113,11 @@ public:
     void avg_degree(Graph *g, float &ad);
 
     /**
+     * \brief Calculates the average shortest path length of the specified graph
+     */
+    void avg_path_length(Graph *g, double &pl);
+
+    /**
      * \brief Calculates the degree distribution of the specified graph
      */
     void deg_dist(Graph *g, vector<int> &dist);
