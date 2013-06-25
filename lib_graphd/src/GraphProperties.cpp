@@ -897,22 +897,18 @@ namespace Graph {
         double intermediate = 0.0;
         int i, j;
 
-        #pragma omp parallel for schedule(dynamic, 16) default(none) private(j) reduction(+:sum) 
-        for(i=0; i<n;i++){
-            for(j=0;j<n;j++){
+        #pragma omp parallel for schedule(dynamic, 16) default(none) private(j) reduction(+:sum)
+        for(i = 0; i < n; i++){
+            for(j = 0; j < n; j++){
                 if(INDDGO_INFINITY != short_paths[i][j]){
                     sum += short_paths[i][j];
                 }
             }
         }
 
-        sum = sum /  (double)(n*(n-1));
+        sum = sum /  (double)(n * (n - 1));
         pl = sum;
-    }
-
-                
-
-
+    } // avg_path_length
 
     /**
      * Calculates the degree distribution of graph g
