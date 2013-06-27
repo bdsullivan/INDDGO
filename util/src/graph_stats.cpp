@@ -38,7 +38,7 @@
 using namespace std;
 
 void print_time(string prefix, ORB_t start, ORB_t end){
-    cout << prefix + ": " << ORB_seconds(end, start) << "\n";
+    cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
 const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path");
@@ -57,9 +57,9 @@ void create_map(string list, map<string, bool> &outmap){
 }
 
 void print_usage(char **argv){
-    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods]\n";
-    cerr << "Allowed methods: " << allowed_methods << "\n";
-    cerr << "Input type should be one of: edge, adjlist, adjmatrix, dimacs\n";
+    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods]" << endl;
+    cerr << "Allowed methods: " << allowed_methods << endl;
+    cerr << "Input type should be one of: edge, adjlist, adjmatrix, dimacs" << endl;
 }
 
 /**
@@ -118,10 +118,10 @@ int main(int argc, char **argv){
     // we'd like higher precision when printing values
     std::cout.precision(10);
 
-    cout << "done parsing options\n";
-    cout << "Input  file: " << infile << "\n";
-    cout << "Input  type: " << intype << "\n";
-    cout << "Output file: " << outfilename << "\n";
+    cout << "done parsing options" << endl;
+    cout << "Input  file: " << infile << endl;
+    cout << "Input  type: " << intype << endl;
+    cout << "Output file: " << outfilename << endl;
     cout << "Methods    :";
     for(map<string, bool>::iterator it = req_methods.begin(); it != req_methods.end(); ++it){
         cout << " " << it->first;
@@ -129,8 +129,8 @@ int main(int argc, char **argv){
             cerr << "Error: " << it->first << " is not a valid method! " << endl;
         }
     }
-    cout << "\n";
-    cout << "Calibrating timers\n";
+    cout << endl;
+    cout << "Calibrating timers" << endl;
     ORB_calibrate();
 
     // let's do some calculations
@@ -139,7 +139,7 @@ int main(int argc, char **argv){
     Graph::GraphReader gr;
     Graph::GraphProperties gp;
 
-    cout << "Reading graph\n";
+    cout << "Reading graph" << endl;
     ORB_read(t1);
     if(gr.read_graph(&g, infile, intype, false) == -1){
         exit(1);
@@ -157,13 +157,13 @@ int main(int argc, char **argv){
 
     outfile.open(outfilename.c_str());
     if(!outfile.is_open()){
-        cerr << "Error opening " << outfilename << " for writing, exiting\n";
+        cerr << "Error opening " << outfilename << " for writing, exiting" << endl;
         exit(1);
     }
 
     outfile.precision(16);
 
-    cout << "Simplifying graph\n";
+    cout << "Simplifying graph" << endl;
     ORB_read(t1);
     gp.make_simple(&g);
     ORB_read(t2);
@@ -174,85 +174,85 @@ int main(int argc, char **argv){
     outfile << "num_edges " << g.get_num_edges() << endl;
 
     if(req_methods["edge_density"] == true){
-        cout << "Calculating edge density\n";
+        cout << "Calculating edge density" << endl;
         ORB_read(t1);
         gp.edge_density(&g, edge_density);
         ORB_read(t2);
         print_time("Time(edge_density)", t1, t2);
-        outfile << "edge_density " << edge_density << "\n";
+        outfile << "edge_density " << edge_density << endl;
     }
     if(req_methods["avg_degree"] == true){
-        cout << "Calculating average degree\n";
+        cout << "Calculating average degree" << endl;
         ORB_read(t1);
         gp.avg_degree(&g, avg_degree);
         ORB_read(t2);
         print_time("Time(average_degree)", t1, t2);
-        outfile << "avg_degree " << avg_degree << "\n";
+        outfile << "avg_degree " << avg_degree << endl;
     }
     if(req_methods["degree_dist"] == true){
-        cout << "Calculating degree distribution\n";
+        cout << "Calculating degree distribution" << endl;
         ORB_read(t1);
         gp.deg_dist(&g, deg_dist);
         ORB_read(t2);
         print_time("Time(degree_distribution)", t1, t2);
         string of = outprefix + ".deg_dist";
         write_degree_distribution(of, deg_dist);
-        outfile << "degree_distribution " <<  of << "\n";
+        outfile << "degree_distribution " <<  of << endl;
     }
     if(req_methods["assortativity"] == true){
-        cout << "Calculating degree assortativity\n";
+        cout << "Calculating degree assortativity" << endl;
         ORB_read(t1);
         gp.deg_assortativity(&g, assortativity);
         ORB_read(t2);
         print_time("Time(assortativity)", t1, t2);
-        outfile << "assortativity " <<  assortativity << "\n";
+        outfile << "assortativity " <<  assortativity << endl;
     }
     if((req_methods["global_cc"] == true) || (req_methods["local_ccs"] == true) || (req_methods["avg_cc"] == true)){
-        cout << "Calculating clustering coefficients\n";
+        cout << "Calculating clustering coefficients" << endl;
         ORB_read(t1);
         gp.clustering_coefficients(&g, global_cc, avg_cc, local_cc);
         ORB_read(t2);
         print_time("Time(clustering_coeffecients)", t1, t2);
         if(req_methods["global_cc"] == true){
-            outfile << "global_clustering_coefficient " << global_cc << "\n";
+            outfile << "global_clustering_coefficient " << global_cc << endl;
         }
         if(req_methods["avg_cc"] == true){
-            outfile << "average_clustering_coefficient " << avg_cc << "\n";
+            outfile << "average_clustering_coefficient " << avg_cc << endl;
         }
         if(req_methods["local_ccs"] == true){
         }
     }
 
     if(req_methods["shortest_paths"] == true){
-        cout << "Calculating shortest paths\n";
+        cout << "Calculating shortest paths" << endl;
         ORB_read(t1);
         gp.paths_dijkstra_all(&g, shortest_path_distances);
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra)", t1, t2);
     }
     if(req_methods["eccentricity"] == true){
-        cout << "Calculating eccentricities\n";
+        cout << "Calculating eccentricities" << endl;
         ORB_read(t1);
         gp.eccentricity(&g, ecc);
         ORB_read(t2);
         print_time("Time(eccentricity)",t1,t2);
     }
     if(req_methods["eccentricity_dist"] == true){
-        cout << "Calculating distribution of eccentricities\n";
+        cout << "Calculating distribution of eccentricities" << endl;
         ORB_read(t1);
         gp.eccentricity_dist(&g, ecc, freq_ecc);
         ORB_read(t2);
         print_time("Time(eccentricity distribution)",t1,t2);
     }
     if(req_methods["expansion"] == true){
-        cout << "Calculating normalized expansion (distance distribution) - no self loops allowed\n";
+        cout << "Calculating normalized expansion (distance distribution) - no self loops allowed" << endl;
         ORB_read(t1);
         gp.expansion(&g, norm_hops);
         ORB_read(t2);
         print_time("Time(expansion)",t1,t2);
     }
     if(req_methods["avg_shortest_path"] == true){
-        cout << "Calculating average shortest path length\n";
+        cout << "Calculating average shortest path length" << endl;
         ORB_read(t1);
         gp.avg_path_length(&g, avg_path_length);
         ORB_read(t2);
