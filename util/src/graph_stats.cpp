@@ -169,8 +169,9 @@ int main(int argc, char **argv){
     ORB_read(t2);
     print_time("Time(make_simple)", t1, t2);
 
-    outfile << "num_nodes " << g.get_num_nodes() << "\n";
-    outfile << "num_edges " << g.get_num_edges() << "\n";
+    outfile << "filename" << infile << endl;
+    outfile << "num_nodes " << g.get_num_nodes() << endl;
+    outfile << "num_edges " << g.get_num_edges() << endl;
 
     if(req_methods["edge_density"] == true){
         cout << "Calculating edge density\n";
