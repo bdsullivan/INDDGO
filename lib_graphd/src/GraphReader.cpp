@@ -136,6 +136,7 @@ namespace Graph {
                 }
             }
         }
+        return 0;
     } // read_adjlist
 
 /**
