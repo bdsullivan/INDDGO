@@ -77,7 +77,7 @@ CXX     = g++
 OLDGCC	= 0
 
 CFLAGS = -O3
-CPPFLAGS = 
+CPPFLAGS = -g
 LDFLAGS = 
 
 ifeq ($(CYGWIN), 1)

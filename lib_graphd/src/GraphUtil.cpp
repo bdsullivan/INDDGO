@@ -740,34 +740,43 @@ namespace Graph {
   //Implementation of Batagelj and Zaversnik (2003)
   int GraphUtil::find_degen(Graph *g, vector<int> *kcore) {
     int n = g->num_nodes;
+    kcore->resize(n);
     int k = 0;
     int last_deg = 0;
-    int max_deg = *max_element(g->degree.begin(), g->degree.end());
-    vector<int> D[max_deg+1];
-    vector<int> deg_lookup = g->degree;
-    int depth[n];
-    kcore->resize(n);
-    //can also create an L output list for coloring number optimal ordering
 
-    for(int i = 0; i < n; i++) {
-      depth[i] = D[deg_lookup[i]].size();
-      D[deg_lookup[i]].push_back(i);
+    vector<int> deg_lookup(n);// = g->degree;
+    int max_deg = 0;
+    for(int i = 0; i < deg_lookup.size(); i++) { 
+      deg_lookup[i] = g->degree[i];
+      if(deg_lookup[i] > max_deg)
+	max_deg = deg_lookup[i];
     }
-
+    vector<int> D[max_deg+1];    
+    int depth[n];
+    //can also create an L output list for coloring number optimal ordering
+    
     for(int i = 0; i < n; i++) {
-      int v;
-      for(int j = last_deg; j < max_deg; j++) {
+      deg_lookup[i] = g->degree[i];
+      D[deg_lookup[i]].push_back(i);
+      depth[i] = D[deg_lookup[i]].size()-1;
+    }
+    
+ 
+    for(int i = 0; i < n; i++) {
+      int v;      
+      for(int j = last_deg; j <= max_deg; j++) {
 	if(D[j].size() != 0) {
-	  v = D[j].back();
-	  D[j].pop_back();
-	  break;
+	    v = D[j].back();
+	    D[j].pop_back();
+	    break;
 	}
       }
-
+      
       (*kcore)[v] = k = max(k,deg_lookup[v]);
       last_deg = max(0, deg_lookup[v]-1);
       deg_lookup[v] = -1;
-
+	
+      
       //shift each of v's neighbors down one degree
       list<int> * nbrs = g->nodes[v].get_nbrs_ptr();
       list<int>::const_iterator it;
@@ -784,7 +793,7 @@ namespace Graph {
     }
     return k;
   } // find_degen
-
+  
 
 #include <limits>
   //Find the k-core location for each vertex, and return the graph's degeneracy number
