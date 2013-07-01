@@ -740,11 +740,11 @@ namespace Graph {
   //Implementation of Batagelj and Zaversnik (2003)
   int GraphUtil::find_degen(Graph *g, vector<int> *kcore) {
     int n = g->num_nodes;
-    kcore->resize(n);
     int k = 0;
     int last_deg = 0;
+    kcore->resize(n);
 
-    vector<int> deg_lookup(n);// = g->degree;
+    vector<int> deg_lookup(n);
     int max_deg = 0;
     for(int i = 0; i < deg_lookup.size(); i++) { 
       deg_lookup[i] = g->degree[i];
@@ -760,8 +760,7 @@ namespace Graph {
       D[deg_lookup[i]].push_back(i);
       depth[i] = D[deg_lookup[i]].size()-1;
     }
-    
- 
+     
     for(int i = 0; i < n; i++) {
       int v;      
       for(int j = last_deg; j <= max_deg; j++) {
@@ -774,8 +773,7 @@ namespace Graph {
       
       (*kcore)[v] = k = max(k,deg_lookup[v]);
       last_deg = max(0, deg_lookup[v]-1);
-      deg_lookup[v] = -1;
-	
+      deg_lookup[v] = -1;	
       
       //shift each of v's neighbors down one degree
       list<int> * nbrs = g->nodes[v].get_nbrs_ptr();
