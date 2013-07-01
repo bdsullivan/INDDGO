@@ -66,6 +66,61 @@ public:
      * \brief returns clustering coeffecients
      */
     void clustering_coefficients(Graph *g,double &global_cc, double &avg_cc, vector<double> &local_ccs);
+
+    /**
+     * \brief returns shortest paths from source to all other nodes
+     */
+    void paths_dijkstra_single(Graph *g, vector<int> &p, int source);
+
+    /**
+     * \brief returns shortest paths from all nodes to all nodes
+     */
+    void paths_dijkstra_all(Graph *g, vector< vector<int> > &p);
+
+    /**
+     * \brief returns eccentricity for all nodes
+     */
+    void eccentricity(Graph *g, vector<int> &ecc);
+
+    /**
+     * \brief returns frequency distributions of eccentricities
+     */
+    void eccentricity_dist(Graph *g, vector<int> &ecc, vector<double> &freq_ecc);
+
+    /**
+     * \brief returns normalized expansion (distance distribution)
+     */
+    void expansion(Graph *g, vector<double> &norm_hops);
+
+    /**
+     * \brief Calculates the diameter of the specified graph
+     */
+    void diameter(Graph *g, int &diam);
+
+    /**
+     * \brief Calculates the effective diameter of the specified graph
+     */
+    void effective_diameter(Graph *g, float &ediam, float perc = 0.9);
+
+    /**
+     * \brief Calculates the edge density of the specified graph
+     */
+    void edge_density(Graph *g, float &ed);
+
+    /**
+     * \brief Calculates the average degree of the specified graph
+     */
+    void avg_degree(Graph *g, float &ad);
+
+    /**
+     * \brief Calculates the degree distribution of the specified graph
+     */
+    void deg_dist(Graph *g, vector<int> &dist);
+
+    /**
+     * \brief Returns the degree assortativity coefficient of a graph
+     */
+    void deg_assortativity(Graph *g, double &coeff);
     };
 }
 

@@ -59,6 +59,8 @@ private:
     int read_edgelist(Graph *g, const string filename);
     /** \brief read a DIMACS file */
     int read_dimacs(Graph *g, const string filename, bool read_vertex_weights);
+    /** \brief read an adjacency list */
+    int read_adjlist(Graph *g, const string filename);
     /** \brief read an adjacency matrix */
     int read_adjmatrix(Graph *g, const string filename);
     /** \brief read a METIS file */
