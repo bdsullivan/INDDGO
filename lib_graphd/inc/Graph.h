@@ -29,6 +29,10 @@
   #define omp_get_thread_num() 0
 #endif
 
+#ifdef HAS_PETSC
+#include <petscksp.h>
+#endif
+
 #include "GraphInterface.h"
 #include "Node.h"
 #include <string>
@@ -57,6 +61,10 @@ protected:
     vector<int> adjncy;
     vector<int> adj_vec;
     vector< vector<int> > apsp_dist;
+
+#ifdef HAS_PETSC
+    Mat PetscMat;
+#endif
 
 public:
     Graph();

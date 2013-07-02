@@ -35,13 +35,17 @@
 #include "orbconfig.h"
 #include "orbtimer.h"
 
+#ifdef HAS_SLEPC
+#include <slepceps.h>
+#endif
+
 using namespace std;
 
 void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << "\n";
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,eigen_spectrum");
 
 /**
  * Creates a map from a comma-separated string
@@ -133,6 +137,15 @@ int main(int argc, char **argv){
     cout << "Calibrating timers\n";
     ORB_calibrate();
 
+    //If petsc/slepc are present, initalize those.
+    //If MPI support is added in the future, init MPI before Petsc. Petsc will do it's own MPI
+    //init if MPI isn't already inited.
+    #ifdef HAS_SLEPC
+    SlepcInitialize(&argc,&argv,PETSC_NULL,PETSC_NULL);
+    #elif HAVE_PETSC
+    PetscInitialize(&argc,&argv,PETSC_NULL,PETSC_NULL);
+    #endif
+
     // let's do some calculations
 
     Graph::Graph g;
@@ -148,10 +161,11 @@ int main(int argc, char **argv){
     print_time("Time(read_graph)", t1, t2);
 
     double global_cc, avg_cc, assortativity;
-    vector<double> local_cc, freq_ecc;
+    vector<double> local_cc, freq_ecc, eigen_spectrum;
     float edge_density, avg_degree;
     vector<int> deg_dist, ecc;
     vector< vector<int> > shortest_path_distances;
+    int spectrum_spread;
 
     outfile.open(outfilename.c_str());
     if(!outfile.is_open()){
@@ -241,8 +255,28 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(eccentricity distribution)",t1,t2);
     }
+    if(req_methods["eigen_spectrum"] == true){
+        spectrum_spread = 3;
+        cout << "Calculating adjacency matrix eign spectrum\n";
+        ORB_read(t1);
+        gp.eigen_spectrum(&g, eigen_spectrum, spectrum_spread);
+        ORB_read(t2);
+        print_time("Time(eign spectrum)",t1,t2);
+        //outfile << "eigen_spectrum" << eigen_spectrum << "\n";
+        outfile << "eigen_spectrum ";
+        for(int idx=0; idx < eigen_spectrum.size(); idx++){
+          outfile << eigen_spectrum[idx];
+        }
+        outfile << "\n";
+    }
 
     outfile.close();
+
+    #ifdef HAS_SLEPC
+    SlepcFinalize();
+    #elif HAVE_PETSC
+    PetscFinalize();
+    #endif
     exit(0);
 } // main
 
