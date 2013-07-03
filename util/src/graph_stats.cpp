@@ -261,11 +261,11 @@ int main(int argc, char **argv){
         #endif
         if(spectrum_spread == 0) spectrum_spread = 3;
 
-        cout << "Calculating adjacency matrix eign spectrum\n";
+        cout << "Calculating adjacency matrix eigen spectrum\n";
         ORB_read(t1);
         gp.eigen_spectrum(&g, eigen_spectrum, spectrum_spread);
         ORB_read(t2);
-        print_time("Time(eign spectrum)",t1,t2);
+        print_time("Time(eigen spectrum)",t1,t2);
         outfile << "eigen_spectrum ";
         for(int idx=0; idx < eigen_spectrum.size(); idx++){
           outfile << eigen_spectrum[idx];
