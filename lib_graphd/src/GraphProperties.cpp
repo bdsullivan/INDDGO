@@ -945,7 +945,7 @@ namespace Graph {
         coeff = (n1 - n2) / (de - n2);
     } // deg_assortativity
 
-  void GraphProperties::eigen_spectrum(Graph *g, vector<double> eigen_values, int spread) {
+  void GraphProperties::eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread) {
 #ifndef HAS_SLEPC
     fatal_error("Called SLEPC eigen solvers without HAS_SLEPC.\n");
 #else
@@ -955,14 +955,15 @@ namespace Graph {
     PetscInt nconv;
     PetscScalar kr,ki;
     EPSCreate(PETSC_COMM_WORLD, &eps);
+    EPSSetType(eps, EPSPOWER);
     EPSSetOperators(eps,g->PetscMat,PETSC_NULL);
     EPSSetLeftVectorsWanted(eps,PETSC_TRUE);
     EPSSetFromOptions(eps);
     EPSSetDimensions(eps,spread*2,spread*8,spread*8);
     EPSSolve(eps);
     EPSGetConverged(eps,&nconv);
-    //memset(eigen_values,'\0',spread*sizeof(double));
     EPSGetConverged(eps,&nconv);
+    eigen_values.resize(nconv);
     for(int idx=0; idx < nconv; idx++) {
       EPSGetEigenvalue(eps,idx,&kr,&ki);
       eigen_values[idx] = kr;

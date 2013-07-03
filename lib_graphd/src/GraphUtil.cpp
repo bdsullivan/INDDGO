@@ -512,7 +512,6 @@ namespace Graph {
         ierror=MatSetUp(g->PetscMat);CHKERRABORT(PETSC_COMM_WORLD,ierror);
         int row, col, size;
         const PetscScalar one_val = 1;
-
         for(int node=0; node < g->num_nodes; node++){
             start = g->xadj[node];
             end = g->xadj[node+1];
@@ -529,7 +528,6 @@ namespace Graph {
 
         ierror=MatAssemblyBegin(g->PetscMat,MAT_FINAL_ASSEMBLY);CHKERRABORT(PETSC_COMM_WORLD,ierror);
         ierror=MatAssemblyEnd(g->PetscMat,MAT_FINAL_ASSEMBLY);CHKERRABORT(PETSC_COMM_WORLD,ierror);
-
     }
 
     void GraphUtil::free_PetscMat(Graph *g) {

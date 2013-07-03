@@ -124,7 +124,7 @@ public:
     /**
      * \brief Calculates the eign spectrum. By default it does the top 5 and bottom 5.
      */
-    void eigen_spectrum(Graph *g, vector<double> eigen_values, int spread = 5);
+    void eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread = 5);
     };
 }
 

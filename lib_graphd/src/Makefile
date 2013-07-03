@@ -12,7 +12,7 @@ GVIZ=../bin/gviz
 # include directories
 INCLUDES = -I../inc/ -I/usr/local/include $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR) $(PETSC_INCDIR) $(SLEPC_INCDIR)
 # libraries
-LIBS = -L/usr/local/lib $(INDDGO_LIB) $(SSPARSE_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB) $(PETSC_LIB) $(SLEPC_LIB)
+LIBS = -L/usr/local/lib $(INDDGO_LIB) $(SSPARSE_LIB) -lm $(METIS_LIB) $(PARMETIS_LIB) $(SLEPC_LIB) $(PETSC_LIB)
 # source
 SRC := Log.cpp GraphReader.cpp Node.cpp \
 	GraphCreator.cpp GraphCreatorFile.cpp Graph.cpp VertexWeightedGraph.cpp GraphProperties.cpp \

@@ -61,7 +61,7 @@ void create_map(string list, map<string, bool> &outmap){
 }
 
 void print_usage(char **argv){
-    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods]\n";
+    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods] [-s eigen spectrum size]\n";
     cerr << "Allowed methods: " << allowed_methods << "\n";
     cerr << "Input type should be one of: edge, adjlist, adjmatrix, dimacs\n";
 }
@@ -75,9 +75,10 @@ void print_usage(char **argv){
  * \param[out] outfilename file to write output to
  * \param[out] methods list of methods we want to run.  Valid values currently: edge_density,avg_degree,degree_dist,global_cc, avg_cc, local_ccs
  */
-int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods){
+
+int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods, int *spectrum_spread){
     int flags, opt;
-    while((opt = getopt(argc, argv, "hi:t:o:m:p:")) != -1){
+    while((opt = getopt(argc, argv, "hi:t:o:m:p:s:")) != -1){
         switch(opt){
         case 'h':
             print_usage(argv);
@@ -97,6 +98,10 @@ int parse_options(int argc, char **argv, string& infile, string& intype, string&
         case 'm':
             create_map(optarg, methods);
             break;
+        case 's':
+          cout << "optarg=" << optarg << endl;
+            *spectrum_spread = atoi(optarg);
+            break;
         }
     }
 
@@ -112,9 +117,9 @@ int main(int argc, char **argv){
     std::map<string, bool> req_methods;
     std::map<string, bool> val_methods;
     ORB_t t1, t2;
-
+    int spectrum_spread=0;
     create_map(allowed_methods, val_methods);
-    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods);
+    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, &spectrum_spread);
     if(outprefix.length() == 0){
         outprefix = infile;
     }
@@ -137,15 +142,6 @@ int main(int argc, char **argv){
     cout << "Calibrating timers\n";
     ORB_calibrate();
 
-    //If petsc/slepc are present, initalize those.
-    //If MPI support is added in the future, init MPI before Petsc. Petsc will do it's own MPI
-    //init if MPI isn't already inited.
-    #ifdef HAS_SLEPC
-    SlepcInitialize(&argc,&argv,PETSC_NULL,PETSC_NULL);
-    #elif HAVE_PETSC
-    PetscInitialize(&argc,&argv,PETSC_NULL,PETSC_NULL);
-    #endif
-
     // let's do some calculations
 
     Graph::Graph g;
@@ -165,7 +161,6 @@ int main(int argc, char **argv){
     float edge_density, avg_degree;
     vector<int> deg_dist, ecc;
     vector< vector<int> > shortest_path_distances;
-    int spectrum_spread;
 
     outfile.open(outfilename.c_str());
     if(!outfile.is_open()){
@@ -256,13 +251,21 @@ int main(int argc, char **argv){
         print_time("Time(eccentricity distribution)",t1,t2);
     }
     if(req_methods["eigen_spectrum"] == true){
-        spectrum_spread = 3;
+    //If petsc/slepc are present, initalize those.
+    //If MPI support is added in the future, init MPI before Petsc. Petsc will do it's own MPI
+    //init if MPI isn't already inited.
+        #ifdef HAS_SLEPC
+        SlepcInitializeNoArguments();
+        #elif HAVE_PETSC
+        PetscInitializeNoArguments();
+        #endif
+        if(spectrum_spread == 0) spectrum_spread = 3;
+
         cout << "Calculating adjacency matrix eign spectrum\n";
         ORB_read(t1);
         gp.eigen_spectrum(&g, eigen_spectrum, spectrum_spread);
         ORB_read(t2);
         print_time("Time(eign spectrum)",t1,t2);
-        //outfile << "eigen_spectrum" << eigen_spectrum << "\n";
         outfile << "eigen_spectrum ";
         for(int idx=0; idx < eigen_spectrum.size(); idx++){
           outfile << eigen_spectrum[idx];
