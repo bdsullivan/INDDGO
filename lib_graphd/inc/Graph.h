@@ -31,11 +31,13 @@
 
 #include "GraphInterface.h"
 #include "Node.h"
+#include "GraphException.h"
+#include "Log.h"
 #include <string>
 
 using namespace std;
 
-#define INDDGO_INFINITY INT_MAX
+#define INDDGO_INFINITY INT_MAX - 16
 
 namespace Graph {
     class Graph : public GraphInterface
@@ -138,6 +140,14 @@ public:
     const vector< vector<int> > &get_shortest_path_dist_ref();
     /** \brief get shortest path distances from vertex u to all **/
     const vector<int> &get_u_shortest_path_dist(int u);
+
+    inline Node *get_node_inline(int i){
+        if(i > capacity){
+            FERROR("%s: element is out of bounds", __FUNCTION__);
+            throw GraphException("element is out of bounds\n");
+        }
+        return &nodes[i];
+    }
 
     friend class GraphUtil;
     friend class GraphProperties;

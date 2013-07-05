@@ -41,7 +41,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_heap");
 
 /**
  * Creates a map from a comma-separated string
@@ -222,7 +222,13 @@ int main(int argc, char **argv){
         if(req_methods["local_ccs"] == true){
         }
     }
-
+    if(req_methods["shortest_paths_heap"] == true){
+        cout << "Calculating shortest paths (heap)" << endl;
+        ORB_read(t1);
+        gp.paths_dijkstra_heap_all(&g, shortest_path_distances);
+        ORB_read(t2);
+        print_time("Time(shortest_paths_dijkstra_heap)", t1, t2);
+    }
     if(req_methods["shortest_paths"] == true){
         cout << "Calculating shortest paths" << endl;
         ORB_read(t1);
