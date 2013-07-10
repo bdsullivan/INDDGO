@@ -22,6 +22,7 @@
 #ifndef GRAPHPROPERTIES_H_
 #define GRAPHPROPERTIES_H_
 #include "GraphDecomposition.h"
+#include <boost/math/special_functions/zeta.hpp>
 
 using namespace std;
 
@@ -121,6 +122,11 @@ public:
      * \brief Calculates the degree distribution of the specified graph
      */
     void deg_dist(Graph *g, vector<int> &dist);
+
+    /**
+     * \brief Fits the degree distribution of the specified graph to a power law distribution
+     */
+    void powerlaw(Graph *g, double start, double inc, double end, int &xmin, double &alpha, double &KS ){
 
     /**
      * \brief Returns the degree assortativity coefficient of a graph
