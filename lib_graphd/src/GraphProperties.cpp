@@ -927,14 +927,14 @@ namespace Graph {
     /**
      * Fits the degree distribution of g to a power law distribution
      * \param[in] g Pointer to a graph
-     * \param[in] start Lower bound for exponent, defaults to 1.5
-     * \param[in] inc Determines granularity of the exponent search range, defaults to 0.01
-     * \param[in] end Upper bound for exponent, defaults to 3.5
      * \param[out] xmin Integer value holding the degree at which the data begins behaving like a power law
      * \param[out] alpha Double holding the most likely value for the exponent
      * \param[out] KS Double holding the Kolmogorov-Smirnov statistic
+     * \param[in] start Lower bound for exponent, defaults to 1.5
+     * \param[in] inc Determines granularity of the exponent search range, defaults to 0.01
+     * \param[in] end Upper bound for exponent, defaults to 3.5
      */
-    void GraphProperties::powerlaw(Graph *g, double start, double inc, double end, int &xmin, double &alpha, double &KS ){
+    void GraphProperties::powerlaw(Graph *g, int &xmin, double &alpha, double &KS, double start, double inc, double end){
         int xm, i, k, n, I; 
         int prev, pprev; 
         int size = 1 + (int)(end - start)/inc;
@@ -946,7 +946,7 @@ namespace Graph {
         vector<int> x;
         deg_dist(g, x);
 
-        //Holds the possible \alpha values from start to end with a delta of increment
+        //Holds the possible \alpha values from start to end with a delta of inc
         vector< double > vec( size );
         //Holds the zeta of the \alpha values, since it is used a lot, no need to keep calculating
         vector< double > zvec( size );
@@ -954,7 +954,7 @@ namespace Graph {
         for (i = 0; i < size; i++ ){
             vec[i] = f;
             zvec[i] = boost::math::zeta<double>(f);
-            f += increment;
+            f += inc;
         }
 
         sort(x.begin(), x.end());
@@ -987,7 +987,6 @@ namespace Graph {
 
                 L = -exp * slogz - n * log( zvec[k] - znorm ); 
 
-                //TODO: try to make these more compact or unneeded
                 if(MLE != -1){
                     if(L > MLE){
                         MLE = L; I = k;
