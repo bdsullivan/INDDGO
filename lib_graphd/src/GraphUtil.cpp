@@ -498,6 +498,42 @@ namespace Graph {
         g->adjncy.clear();
     }
 
+    void GraphUtil::populate_PetscMat(Graph *g){
+        if(g->adjncy.size() == 0) {
+            populate_CRS(g);
+        }
+        int start, end;
+
+        //Matrix is g->PetscMat
+        PetscErrorCode ierror;
+        ierror=MatCreate(PETSC_COMM_WORLD,&(g->PetscMat));CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror=MatSetSizes(g->PetscMat,PETSC_DECIDE,PETSC_DECIDE,g->num_nodes,g->num_nodes);CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror=MatSetFromOptions(g->PetscMat);CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror=MatSetUp(g->PetscMat);CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        int row, col, size;
+        const PetscScalar one_val = 1;
+        for(int node=0; node < g->num_nodes; node++){
+            start = g->xadj[node];
+            end = g->xadj[node+1];
+            size = 1 + end - start;
+            row = node;
+            PetscScalar ones[size];
+            PetscInt columns[size];
+            for(int idx=0; idx < size; idx++) {
+                ones[idx]=1.0;
+                columns[idx]=g->adjncy[start+idx];
+            }
+            ierror=MatSetValues(g->PetscMat, 1, &row, size, columns, ones, INSERT_VALUES);CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        }
+
+        ierror=MatAssemblyBegin(g->PetscMat,MAT_FINAL_ASSEMBLY);CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror=MatAssemblyEnd(g->PetscMat,MAT_FINAL_ASSEMBLY);CHKERRABORT(PETSC_COMM_WORLD,ierror);
+    }
+
+    void GraphUtil::free_PetscMat(Graph *g) {
+      PetscErrorCode ierror=MatDestroy(&(g->PetscMat));CHKERRABORT(PETSC_COMM_WORLD,ierror);
+    }
+
     /**
      * Non-recursive function that fills the members vector with the
      * lists of nodes belonging to the components.  The members vector
