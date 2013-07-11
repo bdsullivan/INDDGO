@@ -123,6 +123,12 @@ public:
     void deg_dist(Graph *g, vector<int> &dist);
 
     /**
+     * \brief Fits the degree distribution of the specified graph to a power law distribution
+     */
+    //void powerlaw(Graph *g, double start = 1.5, double inc = 0.01, double end = 3.5, int &xmin, double &alpha, double &KS );
+    void powerlaw(Graph *g, int &xmin, double &alpha, double &KS, double start = 1.5, double inc = 0.01, double end = 3.5);
+
+    /**
      * \brief Returns the degree assortativity coefficient of a graph
      */
     void deg_assortativity(Graph *g, double &coeff);
