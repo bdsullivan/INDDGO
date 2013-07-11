@@ -935,23 +935,22 @@ namespace Graph {
      * \param[in] end Upper bound for exponent, defaults to 3.5
      */
     void GraphProperties::powerlaw(Graph *g, int &xmin, double &alpha, double &KS, double start, double inc, double end){
-        int xm, i, k, n, I; 
-        int prev, pprev; 
-        int size = 1 + (int)(end - start)/inc;
+        int xm, i, k, n, I;
+        int prev, pprev;
+        int size = 1 + (int)(end - start) / inc;
         double slogz, L, MLE;
-        double znorm, denom; 
+        double znorm, denom;
         double f, fn, D, tD;
-        double exp; 
+        double exp;
 
-        vector<int> x;
-        deg_dist(g, x);
+        vector<int> x(g->degree);
 
         //Holds the possible \alpha values from start to end with a delta of inc
         vector< double > vec( size );
         //Holds the zeta of the \alpha values, since it is used a lot, no need to keep calculating
         vector< double > zvec( size );
         f = start;
-        for (i = 0; i < size; i++ ){
+        for(i = 0; i < size; i++ ){
             vec[i] = f;
             zvec[i] = boost::math::zeta<double>(f);
             f += inc;
@@ -961,7 +960,7 @@ namespace Graph {
 
         KS = -1;
         prev = 0;
-        for ( xm = 0; xm < x.size(); xm++ ){
+        for( xm = 0; xm < x.size(); xm++ ){
             if(x[xm] == prev){
                 continue;
             }
@@ -969,30 +968,33 @@ namespace Graph {
             n = x.size() - xm;
 
             slogz = 0;
-            for(i=xm; i<x.size(); i++){
-                slogz += log(x[i]); 
+            for(i = xm; i < x.size(); i++){
+                slogz += log(x[i]);
             }
 
             //MLE loop: for each possible \alpha value in the specified grid with the current test xmin
             //          calculate the log-likelihood, normalizing the Hurwitz zeta to the Riemann zeta
             MLE = -1;
             I = 0;
-            for ( k = 0; k < vec.size(); k++ ){
+            for( k = 0; k < vec.size(); k++ ){
                 exp = vec[k];
 
                 znorm = 0;
-                for(i=1; i<x[xm]; i++){
+                for(i = 1; i < x[xm]; i++){
                     znorm += pow(i, -exp);
                 }
 
-                L = -exp * slogz - n * log( zvec[k] - znorm ); 
+                L = -exp * slogz - n * log( zvec[k] - znorm );
 
                 if(MLE != -1){
                     if(L > MLE){
-                        MLE = L; I = k;
+                        MLE = L;
+                        I = k;
                     }
-                } else {
-                    MLE = L; I = k;
+                }
+                else {
+                    MLE = L;
+                    I = k;
                 }
             }
 
@@ -1000,7 +1002,7 @@ namespace Graph {
             exp = vec[I];
 
             znorm = 0;
-            for(i=1; i<x[xm]; i++){
+            for(i = 1; i < x[xm]; i++){
                 znorm += pow(i, -exp);
             }
             denom = zvec[I] - znorm;
@@ -1008,16 +1010,16 @@ namespace Graph {
             pprev = 0;
             fn = f = 0;
             D = 0;
-            for(i=xm; i<x.size(); i++){
+            for(i = xm; i < x.size(); i++){
                 if(x[i] == pprev){
                     continue;
                 }
 
                 //CDF (f) and EDF (fn)
-                for(k=i; k<x.size() && x[k]<=x[i]; k++){
-                    fn += (1.0)/n;
+                for(k = i; k < x.size() && x[k] <= x[i]; k++){
+                    fn += (1.0) / n;
                 }
-                f += pow(x[i], -exp)/denom; 
+                f += pow(x[i], -exp) / denom;
 
                 tD = abs(fn - f);
                 if(tD > D){
@@ -1027,17 +1029,22 @@ namespace Graph {
                 pprev = x[i];
             }
 
-            if(KS > -1){ 
+            if(KS > -1){
                 if(D < KS){
-                    KS = D; xmin = x[xm]; alpha = exp;
+                    KS = D;
+                    xmin = x[xm];
+                    alpha = exp;
                 }
-            } else {
-                KS = D; xmin = x[xm]; alpha = exp;
+            }
+            else {
+                KS = D;
+                xmin = x[xm];
+                alpha = exp;
             }
 
             prev = x[xm];
         }
-    }
+    } // powerlaw
 
     /**
      * Calculates the degree assortativity of a graph g
