@@ -35,7 +35,7 @@ HAS_MADNESS	= 1
 # madness is included in the INDDGO distribution, and is required to be compiled for successful parallel execution of WIS.
 
 #use this to turn logging on/off
-LOG_ENABLED = 1
+LOG_ENABLED = 0
 
 #----------------------------------------------------------------
 #  OPTIONAL USER-SUPPLIED DIRECTORY VARIABLES
