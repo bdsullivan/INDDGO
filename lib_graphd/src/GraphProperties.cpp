@@ -618,6 +618,61 @@ namespace Graph {
         global_cc = (double)num_triangles / (double)total_possible_triangles;
     } // clustering_coefficients
 
+    #ifdef HAS_BOOST
+    /**
+     * We assume that edge weights are all 1
+     *
+     * \param[in] g input graph
+     * \param[in] source node id
+     * \param[out] p path distances from source to all other vertices
+     */
+    void GraphProperties::paths_dijkstra_boost_single(Graph *g, vector<int> &dists, int source){
+        BoostUndirected *bg = g->boost_graph;
+        std::vector<vertex_descriptor> p(boost::num_vertices(*bg));
+        dists.resize(g->get_num_nodes());
+        //std::vector<int> d(boost::num_vertices(*bg));
+        vertex_descriptor s = vertex(source, *bg);
+        boost::dijkstra_shortest_paths(*bg, s, boost::predecessor_map(&p[0]).distance_map(&dists[0]));
+
+    }
+    /**
+     *  All pairs shortest paths
+     * \param[in] g input graph
+     * \param[out] p multidimentional list of all pairs shortest paths
+     */
+
+    void GraphProperties::paths_dijkstra_boost_all(Graph *g, vector< vector<int> > &pAll){
+        int inf = INDDGO_INFINITY;
+
+        int minD = inf;
+        const int n = g->get_num_nodes();
+
+        pAll.resize(n);
+
+        //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
+        #pragma omp parallel for schedule(dynamic, 8)  default(none) shared(g, inf, pAll)
+        //loop over all vertices
+        for(int v = 0; v < n; v++){ //0; v < n; v++){
+            //reset all distances to INF and mark all vertices as unvisited
+            fill(pAll[v].begin(),pAll[v].end(),inf);
+            paths_dijkstra_boost_single(g, pAll[v], v); //stores shortest paths from this vertex to all in pAll[v]
+        } //end loop over vertices
+
+        //store the results
+        g->set_shortest_path_dist(pAll);
+        //
+        //print out results
+        //for(int i = 0; i < n; i++){
+        //   for (int j = 0; j < n; j++) {
+        //        printf("%d,  ",pAll[i][j]);
+        //   }
+        //   printf("\n");
+        //}
+        //printf("\n");
+    }
+
+    #endif
+
     /**
      * We assume that edge weights are all 1
      *
@@ -653,6 +708,7 @@ namespace Graph {
         list<int>::const_iterator lcit;
         Node *u;
         int d;
+        fprintf(stderr, "Entering for loop, k=0->%d\n",n);
         for(k = 0; k < n; k++){
             hn = iheap_take(&heap);
             i = (long)(hn->value);
@@ -660,11 +716,13 @@ namespace Graph {
             // trying this for speed
             u = &(g->nodes[i]);
             dists[i] = d;
+            fprintf(stderr, "d is: %d\n",d);
 
             const list<int> &nbrs = u->get_nbrs_ref();
             for(lcit = nbrs.begin(); lcit != nbrs.end(); ++lcit){
                 hn = heapnodes[*lcit];
                 if(d + 1 < hn->key){
+                    fprintf(stderr,"running decrease on node %d\n",k);
                     iheap_decrease(&heap, hn, d + 1);
                 }
             }
@@ -804,7 +862,8 @@ namespace Graph {
         //    printf("\n");
         //}
         //printf("\n");
-    } //paths_dijkstra_all
+    } //paths_dijkstra_heap_all
+
     /**
      * Calcuates the eccentricity for each vertex (max dist to any other vertex)
      * \param[in] g input graph

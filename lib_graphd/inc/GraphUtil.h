@@ -64,6 +64,15 @@ public:
     void populate_CRS(Graph *g);
     void free_CRS(Graph *g);
 
+    #ifdef HAS_BOOST
+    /**
+     * \brief Populate the boost version of the graph
+     */
+    void populate_boost(Graph *g);
+    #endif
+
+
+
     //uses V as a vertex separator of G. Returns the number of components in G\V, and fills in members with their vertex lists..
     int vertex_separator(Graph *g, list<int> *V,
                          vector<list<int> *> *members);

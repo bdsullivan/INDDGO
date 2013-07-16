@@ -41,7 +41,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_heap");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_heap,shortest_paths_boost");
 
 /**
  * Creates a map from a comma-separated string
@@ -138,6 +138,7 @@ int main(int argc, char **argv){
     Graph::Graph g;
     Graph::GraphReader gr;
     Graph::GraphProperties gp;
+    Graph::GraphUtil gu;
 
     cout << "Reading graph" << endl;
     ORB_read(t1);
@@ -235,6 +236,18 @@ int main(int argc, char **argv){
         gp.paths_dijkstra_all(&g, shortest_path_distances);
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra)", t1, t2);
+    }
+    if(req_methods["shortest_paths_boost"] == true){
+        cout << "Creating BOOST representation of g" << endl;
+        ORB_read(t1);
+        gu.populate_boost(&g);
+        ORB_read(t2);
+        print_time("Time(populate_boost)", t1, t2);
+        cout << "Calculating shortest paths (boost)" << endl;
+        ORB_read(t1);
+        gp.paths_dijkstra_boost_all(&g, shortest_path_distances);
+        ORB_read(t2);
+        print_time("Time(shortest_paths_dijkstra_boost)", t1, t2);
     }
     if(req_methods["eccentricity"] == true){
         cout << "Calculating eccentricities" << endl;
