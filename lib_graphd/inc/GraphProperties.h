@@ -90,19 +90,9 @@ public:
     #endif
 
     /**
-     * \brief returns shortest paths from source to all other nodes
-     */
-    void paths_dijkstra_heap_single(Graph *g, vector<int> &dists, int source);
-
-    /**
      * \brief returns shortest paths from all nodes to all nodes
      */
     void paths_dijkstra_all(Graph *g, vector< vector<int> > &p);
-
-    /**
-     * \brief returns shortest paths from all nodes to all nodes
-     */
-    void paths_dijkstra_heap_all(Graph *g, vector< vector<int> > &p);
 
     /**
      * \brief returns eccentricity for all nodes

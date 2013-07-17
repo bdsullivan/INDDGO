@@ -665,74 +665,6 @@ namespace Graph {
     #endif // ifdef HAS_BOOST
 
     /**
-     * We assume that edge weights are all 1
-     *
-     * \param[in] g input graph
-     * \param[in] source node id
-     * \param[out] p path distances from source to all other vertices
-     */
-    void GraphProperties::paths_dijkstra_heap_single(Graph *g, vector<int> &dists, int source){
-        struct iheap heap;
-        struct iheap_node *hn;
-        const int n = g->get_num_nodes();
-        struct iheap_node **heapnodes;
-        int j, k;
-        long i;
-
-        dists.resize(n,INDDGO_INFINITY);
-        dists[source] = 0;
-
-        fprintf(stderr, "Running paths_dijkstra_heap_single on with source node %d\n", source);
-        fprintf(stderr, "INDDGO_INFINITY is %d\n",INDDGO_INFINITY);
-        iheap_init(&heap);
-
-        heapnodes = (struct iheap_node **)malloc(n * sizeof(iheap_node *));
-
-        for(i = 0; i < n; i++){  // insert all of our nodes into the heap
-            heapnodes[i] = (struct iheap_node *)malloc(sizeof(struct iheap_node));
-            hn = heapnodes[i];
-            iheap_node_init_ref(&hn, dists[i], (void *)(i));
-            iheap_insert(&heap, hn);
-            //iheap_node_init(hn, dist[n], g->get_node(i));
-        }
-
-        // now, keep finding the vertex with the smallest dist[]
-        // and recompute paths to update all shortest paths
-        list<int>::const_iterator lcit;
-        Node *u;
-        int d;
-        fprintf(stderr, "Entering for loop, k=0->%d\n",n);
-        for(k = 0; k < n; k++){
-            //if(k == source){
-            //    continue;
-            //}
-            hn = iheap_take(&heap);
-            i = (long)(hn->value);
-            fprintf(stderr, "  Iteration %d  ", k);
-            fprintf(stderr, "  Got i: %lu\n",i);
-            d = hn->key;
-            // trying this for speed
-            u = &(g->nodes[i]);
-            dists[i] = d;
-            fprintf(stderr, "  d is: %d\n",d);
-
-            const list<int> &nbrs = u->get_nbrs_ref();
-            for(lcit = nbrs.begin(); lcit != nbrs.end(); ++lcit){
-                fprintf(stderr,"    Looking at edge (%d,%d)\n", i, *lcit);
-                hn = heapnodes[*lcit];
-                if(d + 1 < hn->key){
-                    fprintf(stderr,"    running decrease on node %d, new key should be %d\n",hn->value, d + 1);
-                    iheap_decrease(&heap, hn, d + 1);
-                }
-            }
-        }
-        fprintf(stderr,"Distances: \n");
-        for(k = 0; k < n; k++){
-            fprintf(stderr, "%d: %d\n",k, dists[k]);
-        }
-    } // paths_dijkstra_heap_single
-
-    /**
      * \param[in] g input graph
      * \param[in] source node id
      * \param[out] p path distances from source to all other vertices
@@ -830,42 +762,6 @@ namespace Graph {
         //}
         //printf("\n");
     } //paths_dijkstra_all
-
-    /**
-     *  All pairs shortest paths using heaps
-     * \param[in] g input graph
-     * \param[out] p multidimentional list of all pairs shortest paths
-     */
-
-    void GraphProperties::paths_dijkstra_heap_all(Graph *g, vector< vector<int> > &pAll){
-        int inf = INDDGO_INFINITY;
-
-        int minD = inf;
-        const int n = g->get_num_nodes();
-
-        pAll.resize(n);
-
-        //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
-        #pragma omp parallel for schedule(dynamic, 8)  default(none) shared(g, inf, pAll)
-        //loop over all vertices
-        for(int v = 0; v < n; v++){ //0; v < n; v++){
-            //reset all distances to INF and mark all vertices as unvisited
-            fill(pAll[v].begin(),pAll[v].end(),inf);
-            paths_dijkstra_heap_single(g, pAll[v], v); //stores shortest paths from this vertex to all in pAll[v]
-        } //end loop over vertices
-
-        //store the results
-        g->set_shortest_path_dist(pAll);
-
-        //print out results
-        //for(int i = 0; i < n; i++){
-        //   for (int j = 0; j < n; j++) {
-        //        printf("%d,  ",pAll[i][j]);
-        //   }
-        //    printf("\n");
-        //}
-        //printf("\n");
-    } //paths_dijkstra_heap_all
 
     /**
      * Calcuates the eccentricity for each vertex (max dist to any other vertex)
