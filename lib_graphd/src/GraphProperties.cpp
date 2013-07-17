@@ -633,8 +633,8 @@ namespace Graph {
         //std::vector<int> d(boost::num_vertices(*bg));
         vertex_descriptor s = vertex(source, *bg);
         boost::dijkstra_shortest_paths(*bg, s, boost::predecessor_map(&p[0]).distance_map(&dists[0]));
-
     }
+
     /**
      *  All pairs shortest paths
      * \param[in] g input graph
@@ -660,18 +660,9 @@ namespace Graph {
 
         //store the results
         g->set_shortest_path_dist(pAll);
-        //
-        //print out results
-        //for(int i = 0; i < n; i++){
-        //   for (int j = 0; j < n; j++) {
-        //        printf("%d,  ",pAll[i][j]);
-        //   }
-        //   printf("\n");
-        //}
-        //printf("\n");
-    }
+    } // paths_dijkstra_boost_all
 
-    #endif
+    #endif // ifdef HAS_BOOST
 
     /**
      * We assume that edge weights are all 1
@@ -691,6 +682,8 @@ namespace Graph {
         dists.resize(n,INDDGO_INFINITY);
         dists[source] = 0;
 
+        fprintf(stderr, "Running paths_dijkstra_heap_single on with source node %d\n", source);
+        fprintf(stderr, "INDDGO_INFINITY is %d\n",INDDGO_INFINITY);
         iheap_init(&heap);
 
         heapnodes = (struct iheap_node **)malloc(n * sizeof(iheap_node *));
@@ -698,7 +691,7 @@ namespace Graph {
         for(i = 0; i < n; i++){  // insert all of our nodes into the heap
             heapnodes[i] = (struct iheap_node *)malloc(sizeof(struct iheap_node));
             hn = heapnodes[i];
-            iheap_node_init(hn, dists[i], (void *)(i));
+            iheap_node_init_ref(&hn, dists[i], (void *)(i));
             iheap_insert(&heap, hn);
             //iheap_node_init(hn, dist[n], g->get_node(i));
         }
@@ -710,22 +703,32 @@ namespace Graph {
         int d;
         fprintf(stderr, "Entering for loop, k=0->%d\n",n);
         for(k = 0; k < n; k++){
+            //if(k == source){
+            //    continue;
+            //}
             hn = iheap_take(&heap);
             i = (long)(hn->value);
+            fprintf(stderr, "  Iteration %d  ", k);
+            fprintf(stderr, "  Got i: %lu\n",i);
             d = hn->key;
             // trying this for speed
             u = &(g->nodes[i]);
             dists[i] = d;
-            fprintf(stderr, "d is: %d\n",d);
+            fprintf(stderr, "  d is: %d\n",d);
 
             const list<int> &nbrs = u->get_nbrs_ref();
             for(lcit = nbrs.begin(); lcit != nbrs.end(); ++lcit){
+                fprintf(stderr,"    Looking at edge (%d,%d)\n", i, *lcit);
                 hn = heapnodes[*lcit];
                 if(d + 1 < hn->key){
-                    fprintf(stderr,"running decrease on node %d\n",k);
+                    fprintf(stderr,"    running decrease on node %d, new key should be %d\n",hn->value, d + 1);
                     iheap_decrease(&heap, hn, d + 1);
                 }
             }
+        }
+        fprintf(stderr,"Distances: \n");
+        for(k = 0; k < n; k++){
+            fprintf(stderr, "%d: %d\n",k, dists[k]);
         }
     } // paths_dijkstra_heap_single
 

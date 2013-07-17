@@ -71,8 +71,6 @@ public:
     void populate_boost(Graph *g);
     #endif
 
-
-
     //uses V as a vertex separator of G. Returns the number of components in G\V, and fills in members with their vertex lists..
     int vertex_separator(Graph *g, list<int> *V,
                          vector<list<int> *> *members);

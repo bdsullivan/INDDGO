@@ -23,12 +23,12 @@
 #include "GraphDecomposition.h"
 
 #ifdef HAS_BOOST
-    #include <iostream>
-    #include <deque>
-    #include <iterator>
+  #include <iostream>
+  #include <deque>
+  #include <iterator>
 
-    #include "boost/graph/adjacency_list.hpp"
-    #include "boost/graph/topological_sort.hpp"
+  #include "boost/graph/adjacency_list.hpp"
+  #include "boost/graph/topological_sort.hpp"
 #endif
 
 namespace Graph {
@@ -509,31 +509,30 @@ namespace Graph {
     }
 
     #ifdef HAS_BOOST
-        /**
-         * Populates the boost_graph member of g
-         * \param[in] g the input graph
-         */
-        void GraphUtil::populate_boost(Graph *g){
-            const int n = g->get_num_nodes();
-            int v;
-            boost::graph_traits < BoostUndirected >::vertex_descriptor a, b;
-            list<int>::const_iterator it;
-            g->boost_graph = new BoostUndirected(n);
-            BoostUndirected *bg = g->boost_graph;
-            for(v=0;v<n;v++){
-                const list<int> &nbrs = g->get_node(v)->get_nbrs_ref();
-                for(it=nbrs.begin(); it!=nbrs.end(); ++it){
-                    if(v<*it){
-                        a = boost::vertex(v, *bg);
-                        b = boost::vertex(*it, *bg);
-                        boost::add_edge(a, b, 1, *bg);
-                    }
+    /**
+     * Populates the boost_graph member of g
+     * \param[in] g the input graph
+     */
+    void GraphUtil::populate_boost(Graph *g){
+        const int n = g->get_num_nodes();
+        int v;
+        boost::graph_traits < BoostUndirected >::vertex_descriptor a, b;
+        list<int>::const_iterator it;
+        g->boost_graph = new BoostUndirected(n);
+        BoostUndirected *bg = g->boost_graph;
+        for(v = 0; v < n; v++){
+            const list<int> &nbrs = g->get_node(v)->get_nbrs_ref();
+            for(it = nbrs.begin(); it != nbrs.end(); ++it){
+                if(v < *it){
+                    a = boost::vertex(v, *bg);
+                    b = boost::vertex(*it, *bg);
+                    boost::add_edge(a, b, 1, *bg);
                 }
             }
         }
+    } // populate_boost
 
     #endif //HAS_BOOST
-
 
     /**
      * Non-recursive function that fills the members vector with the

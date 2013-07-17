@@ -36,13 +36,13 @@
 #include <string>
 
 #ifdef HAS_BOOST
-    #include <iostream>
-    #include <deque>
-    #include <iterator>
+  #include <iostream>
+  #include <deque>
+  #include <iterator>
 
-    #include "boost/graph/adjacency_list.hpp"
-    #include "boost/graph/topological_sort.hpp"
-    #include <boost/graph/dijkstra_shortest_paths.hpp>
+  #include "boost/graph/adjacency_list.hpp"
+  #include "boost/graph/topological_sort.hpp"
+  #include <boost/graph/dijkstra_shortest_paths.hpp>
 #endif
 
 using namespace std;
@@ -50,10 +50,10 @@ using namespace std;
 #define INDDGO_INFINITY INT_MAX - 16
 
 #ifdef HAS_BOOST
-    typedef boost::property<boost::edge_weight_t, int> EdgeWeightProperty; 
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, EdgeWeightProperty> BoostUndirected;
-    typedef boost::graph_traits < BoostUndirected >::vertex_descriptor vertex_descriptor;
-    typedef boost::graph_traits < BoostUndirected >::edge_descriptor edge_descriptor;
+typedef boost::property<boost::edge_weight_t, int> EdgeWeightProperty;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, EdgeWeightProperty> BoostUndirected;
+typedef boost::graph_traits < BoostUndirected >::vertex_descriptor vertex_descriptor;
+typedef boost::graph_traits < BoostUndirected >::edge_descriptor edge_descriptor;
 #endif //HAS_BOOST
 
 namespace Graph {
@@ -80,9 +80,8 @@ protected:
     vector< vector<int> > apsp_dist;
 
     #ifdef HAS_BOOST
-        BoostUndirected *boost_graph;
+    BoostUndirected *boost_graph;
     #endif //HAS_BOOST
-
 
 public:
     Graph();
