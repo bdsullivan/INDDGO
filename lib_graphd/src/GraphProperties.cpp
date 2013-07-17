@@ -24,7 +24,6 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sched.h>
-#include "binomial-heap/iheap.h"
 
 #include <numeric>
 #ifdef HAS_SLEPC
@@ -1017,6 +1016,7 @@ namespace Graph {
         coeff = (n1 - n2) / (de - n2);
     } // deg_assortativity
 
+    #ifdef HAS_PETSC
     /**
      * Built in self tester for the eigen solver. Looks at Ax - yx and looks for the
      * largest magnitude of error.
@@ -1095,4 +1095,6 @@ namespace Graph {
 
         #endif // ifndef HAS_SLEPC
     } // eigen_spectrum
+
+    #endif // ifdef HAS_PETSC
 }

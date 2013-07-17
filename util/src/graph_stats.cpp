@@ -240,6 +240,8 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra)", t1, t2);
     }
+
+    #ifdef HAS_BOOST
     if(req_methods["shortest_paths_boost"] == true){
         cout << "Creating BOOST representation of g" << endl;
         ORB_read(t1);
@@ -252,6 +254,7 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra_boost)", t1, t2);
     }
+    #endif
     if(req_methods["eccentricity"] == true){
         cout << "Calculating eccentricities" << endl;
         ORB_read(t1);
@@ -281,6 +284,7 @@ int main(int argc, char **argv){
         print_time("Time(avg_path_length)", t1, t2);
         outfile << "avg_path_length " << avg_path_length << endl;
     }
+    #ifdef HAS_PETSC
     if(req_methods["eigen_spectrum"] == true){
         //If petsc/slepc are present, initalize those.
         //If MPI support is added in the future, init MPI before Petsc. Petsc will do it's own MPI
@@ -305,6 +309,7 @@ int main(int argc, char **argv){
         }
         outfile << "\n";
     }
+    #endif // ifdef HAS_PETSC
 
     outfile.close();
 
