@@ -27,6 +27,9 @@
 #include "binomial-heap/iheap.h"
 
 #include <numeric>
+#ifdef HAS_SLEPC
+  #include <slepceps.h>
+#endif
 
 namespace Graph {
     GraphProperties::GraphProperties(){
@@ -1013,4 +1016,83 @@ namespace Graph {
 
         coeff = (n1 - n2) / (de - n2);
     } // deg_assortativity
+
+    /**
+     * Built in self tester for the eigen solver. Looks at Ax - yx and looks for the
+     * largest magnitude of error.
+     */
+    void check_eigen_values(Mat A, Vec eigen_vec, PetscScalar eigen_val){
+        Vec xr, xi, xr2, result1, result2;
+        MatGetVecs(A, PETSC_NULL, &xr2);
+        MatGetVecs(A, PETSC_NULL, &result1);
+        MatGetVecs(A, PETSC_NULL, &result2);
+
+        cout << "Eigen vector is:\n";
+        VecView(eigen_vec,PETSC_VIEWER_STDOUT_SELF);
+        cout << "Eigen value is: " << eigen_val << endl;
+
+        MatMult(A,eigen_vec,result1);
+        VecSet(xr2,eigen_val);
+        VecPointwiseMult(result2,xr2,eigen_vec);
+        cout << "Ax = " << endl;
+        VecView(result1,PETSC_VIEWER_STDOUT_SELF);
+        cout << "yx = " << endl;
+        VecView(result1,PETSC_VIEWER_STDOUT_SELF);
+        PetscScalar *a;
+        PetscScalar *b;
+        VecGetArray(result1, &a);
+        VecGetArray(result2, &b);
+        PetscInt size;
+        VecGetLocalSize(result1, &size);
+        double max = 0.0,current;
+        for(int idx = 0; idx < size; idx++){
+            current = fabs(a[idx] - b[idx]);
+            max = current > max ? current : max;
+        }
+        cout << "Magnitude of greatest error is: " << max << endl;
+        VecRestoreArray(result1, &a);
+        VecRestoreArray(result2, &b);
+    } // check_eigen_values
+
+    /**
+     * looks for eigen values in the adjacency matrix
+     * \param[in] g input graph
+     * \param[out] eigen_values vector of eigen values found
+     * \param[in] spread the number of values wanted, spread high values and spred low values, so eigen_values can be upto 2*spread in size
+     */
+    void GraphProperties::eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread){
+        #ifndef HAS_SLEPC
+        fatal_error("Called SLEPC eigen solvers without HAS_SLEPC.\n");
+        #else
+        GraphUtil graph_util;
+        graph_util.populate_PetscMat(g);
+        EPS eps;
+        PetscInt nconv;
+        PetscScalar kr,ki;
+        EPSCreate(PETSC_COMM_WORLD, &eps);
+        EPSSetType(eps, EPSPOWER);
+        EPSSetOperators(eps,g->PetscMat,PETSC_NULL);
+        EPSSetLeftVectorsWanted(eps,PETSC_TRUE);
+        EPSSetFromOptions(eps);
+        EPSSetDimensions(eps,spread * 2,spread * 8,spread * 8);
+        EPSSolve(eps);
+        EPSGetConverged(eps,&nconv);
+        EPSGetConverged(eps,&nconv);
+        eigen_values.resize(nconv);
+        for(int idx = 0; idx < nconv; idx++){
+            EPSGetEigenvalue(eps,idx,&kr,&ki);
+            eigen_values[idx] = kr;
+            #ifdef EIGENSOLVER_SELFTEST
+            //built in self tester. Don't use in production runs.
+            Vec xr, xi;
+            MatGetVecs(g->PetscMat, PETSC_NULL, &xr);
+            MatGetVecs(g->PetscMat, PETSC_NULL, &xi);
+            EPSGetEigenpair(eps,idx,&kr,&ki, xr, xi);
+            check_eigen_values(g->PetscMat, xr, kr);
+            #endif
+        }
+        EPSDestroy(&eps);
+
+        #endif // ifndef HAS_SLEPC
+    } // eigen_spectrum
 }

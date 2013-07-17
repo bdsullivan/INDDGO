@@ -29,6 +29,9 @@ HAS_GTEST	= 0
 # Set to 1 if you have boost installed on your system
 # Many linux systems have it installed by default
 HAS_BOOST = 0
+#Slepc is needed if you want eigen values
+HAS_PETSC	= 1
+HAS_SLEPC	= 1
 # Set whether serial or parallel version is desired for WIS.
 IS_PARALLEL	= 1
 HAS_MADNESS	= 1
@@ -45,18 +48,21 @@ LOG_ENABLED = 1
 ARPACK = 
 
 #directory containing SuiteSparse installation. This includes AMD and SuiteSparse_config/UFconfig.
-SUITESPARSE = #FILL IN
+SUITESPARSE = 
 
 #NOTE: the build directory is usually platform dependent.
-PARMETIS_SRC_DIR = #FILL IN
-PARMETIS_LIB_DIR =  #FILL IN
+PARMETIS_SRC_DIR = 
+PARMETIS_LIB_DIR =  
 METIS_SRC_DIR  = $(PARMETIS_SRC_DIR)/metis
-METIS_LIB_DIR = #FILL IN 
+METIS_LIB_DIR = $(PARMETIS_SRC_DIR)/metis/build/Linux-x86_64/libmetis/
 
 IGRAPH = 
 IGRAPH_INSTALL_DIR = $(IGRAPH)/deploy
 
 GMP    = 
+
+PETSC_DIR = 
+SLEPC_DIR = 
 
 #----------------------------------------------------------------
 #
@@ -87,7 +93,7 @@ CFLAGS := $(CFLAGS) -D__MADNESS__ -D_OLDGCC -Wno-strict-aliasing -Wno-deprecated
 endif
 ifeq ($(OLDGCC), 0)
 CPPFLAGS := $(CPPFLAGS) -std=c++0x 
-CFLAGS := $(CFLAGS) -D__MADNESS__ -std=c++0x -Wno-strict-aliasing -Wno-deprecated -ffast-math -march=native
+CFLAGS := $(CFLAGS) -D__MADNESS__ -std=c++0x -Wno-strict-aliasing -Wno-deprecated -ffast-math
 endif
 endif
 
@@ -180,6 +186,21 @@ $(error When HAS_METIS = 1, you must define the METIS_LIB_DIR directory variable
 endif
 ifeq ($(METIS_SRC_DIR), )
 $(error When HAS_METIS = 1, you must define the METIS_SRC_DIR directory variable)  
+endif
+endif
+
+ifeq ($(HAS_SLEPC),1)
+ifeq ($(HAS_PETSC),0)
+$(error When HAS_SLEPC = 1, HAS_PETSC must also be 1)
+endif
+ifeq ($(SLEPC_DIR), )
+$(error When HAS_SLEPC = 1, you must define the SLEPC_DIR directory variable)
+endif
+endif
+
+ifeq ($(HAS_METIS),1)
+ifeq ($(PETSC_DIR), )
+$(error When HAS_PETSC = 1, you must define the PETSC_DIR directory variable)
 endif
 endif
 
@@ -330,3 +351,18 @@ IGRAPH_LIB= -L $(IGRAPH_INSTALL_DIR)/lib -ligraph
 IGRAPH_INCDIR = -I $(IGRAPH_INSTALL_DIR)/include/igraph
 endif
 
+PETSC_INCDIR=
+PETSC_LIB=
+ifeq ($(HAS_PETSC),1)
+CFLAGS := $(CFLAGS) -DHAS_PETSC
+PETSC_INCDIR = -I $(PETSC_DIR)/include
+PETSC_LIB = -L $(PETSC_DIR)/lib -lpetsc -llapack -lblas -lX11
+endif
+
+SLEPC_INCDIR=
+SLEPC_LIB=
+ifeq ($(HAS_SLEPC),1)
+CFLAGS := $(CFLAGS) -DHAS_SLEPC
+SLEPC_INCDIR = -I $(SLEPC_DIR)/include
+SLEPC_LIB = -L $(SLEPC_DIR)/lib -lslepc
+endif

@@ -29,6 +29,10 @@
   #define omp_get_thread_num() 0
 #endif
 
+#ifdef HAS_PETSC
+  #include <petscksp.h>
+#endif
+
 #include "GraphInterface.h"
 #include "Node.h"
 #include "GraphException.h"
@@ -82,6 +86,10 @@ protected:
     #ifdef HAS_BOOST
     BoostUndirected *boost_graph;
     #endif //HAS_BOOST
+
+    #ifdef HAS_PETSC
+    Mat PetscMat;
+    #endif
 
 public:
     Graph();

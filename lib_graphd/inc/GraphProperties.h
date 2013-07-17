@@ -143,6 +143,10 @@ public:
      * \brief Returns the degree assortativity coefficient of a graph
      */
     void deg_assortativity(Graph *g, double &coeff);
+    /**
+     * \brief Calculates the eign spectrum. By default it does the top 5 and bottom 5.
+     */
+    void eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread = 5);
     };
 }
 

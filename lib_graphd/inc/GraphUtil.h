@@ -95,6 +95,8 @@ public:
     //Calculate the maximum distance between nodes within a subset of vertices
     //given as a list
     int subset_max_dist(Graph *g, vector<int> subset);
+    void populate_PetscMat(Graph *g);
+    void free_PetscMat(Graph *g);
     };
 
     void create_largestcomponent_graph(char *graph_file, VertexWeightedGraph *&G);
