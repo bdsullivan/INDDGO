@@ -88,8 +88,9 @@ public:
     //Find the eccentricity of each vertex and store it in ecc.
     void find_ecc(Graph *g, vector<int> *ecc);
 
-    //Find the k-core number of each vertex and store it in kcore.
-    //Return degeneracy.
+    /**
+     * \brief Find the k-core number of each vertex and store it in kcore.
+     */
     int find_kcore(Graph *g, vector<int> *kcore);
 
     //Calculate the maximum distance between nodes within a subset of vertices

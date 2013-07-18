@@ -45,7 +45,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum,k_cores,degeneracy");
 
 /**
  * Creates a map from a comma-separated string
@@ -162,6 +162,8 @@ int main(int argc, char **argv){
     vector<double> local_cc, freq_ecc, norm_hops, eigen_spectrum;
     float edge_density, avg_degree;
     vector<int> deg_dist, ecc;
+    int degeneracy;
+    vector<int> k_cores;
     double avg_path_length;
 
     vector< vector<int> > shortest_path_distances;
@@ -218,6 +220,19 @@ int main(int argc, char **argv){
         print_time("Time(assortativity)", t1, t2);
         outfile << "assortativity " <<  assortativity << endl;
     }
+    if((req_methods["degeneracy"] == true) || (req_methods["k_cores"] == true)){
+        cout << "Calculating k_cores and degeneracy" << endl;
+        ORB_read(t1);
+        degeneracy = gu.find_kcore(&g, &k_cores);
+        ORB_read(t2);
+        print_time("Time(find_kcore)", t1, t2);
+        outfile << "degeneracy " << degeneracy << endl;
+        if(req_methods["k_cores"] == true){
+            string of = outprefix + ".kcores";
+            write_kcores(of, k_cores);
+        }
+    }
+
     if((req_methods["global_cc"] == true) || (req_methods["local_ccs"] == true) || (req_methods["avg_cc"] == true)){
         cout << "Calculating clustering coefficients" << endl;
         ORB_read(t1);
