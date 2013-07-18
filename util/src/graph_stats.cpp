@@ -269,7 +269,10 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra_boost)", t1, t2);
     }
+    #else
+        cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost" << endl;
     #endif
+
     if(req_methods["eccentricity"] == true){
         cout << "Calculating eccentricities" << endl;
         ORB_read(t1);
