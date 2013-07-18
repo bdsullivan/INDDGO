@@ -535,6 +535,11 @@ namespace Graph {
     #endif //HAS_BOOST
 
     #ifdef HAS_PETSC
+    /**
+     * Populates the PetscMat member of graph g. This function will also call populate_CRS() if it hasn't been already.
+     * Durring cleanup a free_CRS() also needs to be done.
+     * \param[in] g the input graph
+     */
     void GraphUtil::populate_PetscMat(Graph *g){
         if(g->adjncy.size() == 0){
             populate_CRS(g);
@@ -574,6 +579,11 @@ namespace Graph {
         CHKERRABORT(PETSC_COMM_WORLD,ierror);
     } // populate_PetscMat
 
+    /**
+     * Frees the PetscMat member of g. This function will not cleanup CRS, even if populate_PetscMat() filled it.
+     * You will have to also call free_CRS();
+     * \param[in] g the input graph
+     */
     void GraphUtil::free_PetscMat(Graph *g){
         PetscErrorCode ierror = MatDestroy(&(g->PetscMat));
         CHKERRABORT(PETSC_COMM_WORLD,ierror);
