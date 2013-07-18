@@ -36,9 +36,11 @@ HAS_SLEPC	= 1
 IS_PARALLEL	= 1
 HAS_MADNESS	= 1
 # madness is included in the INDDGO distribution, and is required to be compiled for successful parallel execution of WIS.
+MAC_OSX	     	= 0
+#some compiler flags cause problems on MacOSX. Set this to 1 if you're having problems compiling on OSX.
 
 #use this to turn logging on/off
-LOG_ENABLED = 1
+LOG_ENABLED = 0
 
 #----------------------------------------------------------------
 #  OPTIONAL USER-SUPPLIED DIRECTORY VARIABLES
@@ -89,12 +91,16 @@ endif
 ifeq ($(HAS_MADNESS),1)
 CXX     = mpicxx
 ifeq ($(OLDGCC), 1)
-CFLAGS := $(CFLAGS) -D__MADNESS__ -D_OLDGCC -Wno-strict-aliasing -Wno-deprecated -ffast-math 
+CFLAGS := $(CFLAGS) -D__MADNESS__ -D_OLDGCC -Wno-strict-aliasing -Wno-deprecated -ffast-math
 endif
 ifeq ($(OLDGCC), 0)
 CPPFLAGS := $(CPPFLAGS) -std=c++0x 
 CFLAGS := $(CFLAGS) -D__MADNESS__ -std=c++0x -Wno-strict-aliasing -Wno-deprecated -ffast-math
 endif
+endif
+
+ifneq ($(MAC_OSX),1)
+CFLAGS := $(CFLAGS) -march=native
 endif
 
 ifeq ($(IS_PARALLEL),1)

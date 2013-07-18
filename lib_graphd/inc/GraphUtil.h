@@ -96,7 +96,13 @@ public:
     //Calculate the maximum distance between nodes within a subset of vertices
     //given as a list
     int subset_max_dist(Graph *g, vector<int> subset);
+    /**
+     * \brief Populate adjency matrix as a Petsc Matrix
+     */
     void populate_PetscMat(Graph *g);
+    /**
+     * \brief Releases PetscMat.
+     */
     void free_PetscMat(Graph *g);
     };
 
