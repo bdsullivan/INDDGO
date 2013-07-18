@@ -20,13 +20,14 @@
  */
 
 #include "GraphDecomposition.h"
+#include "Log.h"
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <sched.h>
 
 #include <numeric>
 #ifdef HAS_SLEPC
-#include <slepceps.h>
+  #include <slepceps.h>
 #endif
 
 namespace Graph {
@@ -619,6 +620,52 @@ namespace Graph {
         global_cc = (double)num_triangles / (double)total_possible_triangles;
     } // clustering_coefficients
 
+    #ifdef HAS_BOOST
+    /**
+     * We assume that edge weights are all 1
+     *
+     * \param[in] g input graph
+     * \param[in] source node id
+     * \param[out] p path distances from source to all other vertices
+     */
+    void GraphProperties::paths_dijkstra_boost_single(Graph *g, vector<int> &dists, int source){
+        BoostUndirected *bg = g->boost_graph;
+        std::vector<vertex_descriptor> p(boost::num_vertices(*bg));
+        dists.resize(g->get_num_nodes());
+        //std::vector<int> d(boost::num_vertices(*bg));
+        vertex_descriptor s = vertex(source, *bg);
+        boost::dijkstra_shortest_paths(*bg, s, boost::predecessor_map(&p[0]).distance_map(&dists[0]));
+    }
+
+    /**
+     *  All pairs shortest paths
+     * \param[in] g input graph
+     * \param[out] p multidimentional list of all pairs shortest paths
+     */
+
+    void GraphProperties::paths_dijkstra_boost_all(Graph *g, vector< vector<int> > &pAll){
+        int inf = INDDGO_INFINITY;
+
+        int minD = inf;
+        const int n = g->get_num_nodes();
+
+        pAll.resize(n);
+
+        //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
+        #pragma omp parallel for schedule(dynamic, 8)  default(none) shared(g, inf, pAll)
+        //loop over all vertices
+        for(int v = 0; v < n; v++){ //0; v < n; v++){
+            //reset all distances to INF and mark all vertices as unvisited
+            fill(pAll[v].begin(),pAll[v].end(),inf);
+            paths_dijkstra_boost_single(g, pAll[v], v); //stores shortest paths from this vertex to all in pAll[v]
+        } //end loop over vertices
+
+        //store the results
+        g->set_shortest_path_dist(pAll);
+    } // paths_dijkstra_boost_all
+
+    #endif // ifdef HAS_BOOST
+
     /**
      * \param[in] g input graph
      * \param[in] source node id
@@ -697,7 +744,7 @@ namespace Graph {
         pAll.resize(n);
 
         //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
-        #pragma omp parallel for default(none) shared(g, inf, pAll)
+        #pragma omp parallel for schedule(dynamic, 8)  default(none) shared(g, inf, pAll)
         //loop over all vertices
         for(int v = 0; v < n; v++){ //0; v < n; v++){
             //reset all distances to INF and mark all vertices as unvisited
@@ -969,83 +1016,85 @@ namespace Graph {
         coeff = (n1 - n2) / (de - n2);
     } // deg_assortativity
 
+    #ifdef HAS_PETSC
+    /**
+     * Built in self tester for the eigen solver. Looks at Ax - yx and looks for the
+     * largest magnitude of error.
+     */
+    void check_eigen_values(Mat A, Vec eigen_vec, PetscScalar eigen_val){
+        Vec xr, xi, xr2, result1, result2;
+        MatGetVecs(A, PETSC_NULL, &xr2);
+        MatGetVecs(A, PETSC_NULL, &result1);
+        MatGetVecs(A, PETSC_NULL, &result2);
 
-  /**
-   * Built in self tester for the eigen solver. Looks at Ax - yx and looks for the
-   * largest magnitude of error.
-   */
-  void check_eigen_values(Mat A, Vec eigen_vec, PetscScalar eigen_val) {
-      Vec xr, xi, xr2, result1, result2;
-      MatGetVecs(A, PETSC_NULL, &xr2);
-      MatGetVecs(A, PETSC_NULL, &result1);
-      MatGetVecs(A, PETSC_NULL, &result2);
+        cout << "Eigen vector is:\n";
+        VecView(eigen_vec,PETSC_VIEWER_STDOUT_SELF);
+        cout << "Eigen value is: " << eigen_val << endl;
 
-      cout << "Eigen vector is:\n";
-      VecView(eigen_vec,PETSC_VIEWER_STDOUT_SELF);
-      cout << "Eigen value is: " << eigen_val << endl;
+        MatMult(A,eigen_vec,result1);
+        VecSet(xr2,eigen_val);
+        VecPointwiseMult(result2,xr2,eigen_vec);
+        cout << "Ax = " << endl;
+        VecView(result1,PETSC_VIEWER_STDOUT_SELF);
+        cout << "yx = " << endl;
+        VecView(result1,PETSC_VIEWER_STDOUT_SELF);
+        PetscScalar *a;
+        PetscScalar *b;
+        VecGetArray(result1, &a);
+        VecGetArray(result2, &b);
+        PetscInt size;
+        VecGetLocalSize(result1, &size);
+        double max = 0.0,current;
+        for(int idx = 0; idx < size; idx++){
+            current = fabs(a[idx] - b[idx]);
+            max = current > max ? current : max;
+        }
+        cout << "Magnitude of greatest error is: " << max << endl;
+        VecRestoreArray(result1, &a);
+        VecRestoreArray(result2, &b);
+    } // check_eigen_values
 
-      MatMult(A,eigen_vec,result1);
-      VecSet(xr2,eigen_val);
-      VecPointwiseMult(result2,xr2,eigen_vec);
-      cout << "Ax = " << endl;
-      VecView(result1,PETSC_VIEWER_STDOUT_SELF);
-      cout << "yx = " << endl;
-      VecView(result1,PETSC_VIEWER_STDOUT_SELF);
-      PetscScalar *a;
-      PetscScalar *b;
-      VecGetArray(result1, &a);
-      VecGetArray(result2, &b);
-      PetscInt size;
-      VecGetLocalSize(result1, &size);
-      double max = 0.0,current;
-      for(int idx=0; idx < size; idx++) {
-        current = fabs(a[idx] - b[idx]);
-        max = current > max ? current : max;
-      }
-      cout << "Magnitude of greatest error is: " << max << endl;
-      VecRestoreArray(result1, &a);
-      VecRestoreArray(result2, &b);
-  }
+    /**
+     * looks for eigen values in the adjacency matrix
+     * \param[in] g input graph
+     * \param[out] eigen_values vector of eigen values found
+     * \param[in] spread the number of values wanted, spread high values and spred low values, so eigen_values can be upto 2*spread in size
+     */
+    void GraphProperties::eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread){
+        #ifndef HAS_SLEPC
+        fatal_error("Called SLEPC eigen solvers without HAS_SLEPC.\n");
+        #else
+        GraphUtil graph_util;
+        graph_util.populate_PetscMat(g);
+        EPS eps;
+        PetscInt nconv;
+        PetscScalar kr,ki;
+        EPSCreate(PETSC_COMM_WORLD, &eps);
+        EPSSetType(eps, EPSPOWER);
+        EPSSetOperators(eps,g->PetscMat,PETSC_NULL);
+        EPSSetLeftVectorsWanted(eps,PETSC_TRUE);
+        EPSSetFromOptions(eps);
+        EPSSetDimensions(eps,spread * 2,spread * 8,spread * 8);
+        EPSSolve(eps);
+        EPSGetConverged(eps,&nconv);
+        EPSGetConverged(eps,&nconv);
+        eigen_values.resize(nconv);
+        for(int idx = 0; idx < nconv; idx++){
+            EPSGetEigenvalue(eps,idx,&kr,&ki);
+            eigen_values[idx] = kr;
+            #ifdef EIGENSOLVER_SELFTEST
+            //built in self tester. Don't use in production runs.
+            Vec xr, xi;
+            MatGetVecs(g->PetscMat, PETSC_NULL, &xr);
+            MatGetVecs(g->PetscMat, PETSC_NULL, &xi);
+            EPSGetEigenpair(eps,idx,&kr,&ki, xr, xi);
+            check_eigen_values(g->PetscMat, xr, kr);
+            #endif
+        }
+        EPSDestroy(&eps);
 
-  /**
-   * looks for eigen values in the adjacency matrix
-   * \param[in] g input graph
-   * \param[out] eigen_values vector of eigen values found
-   * \param[in] spread the number of values wanted, spread high values and spred low values, so eigen_values can be upto 2*spread in size
-   */
-  void GraphProperties::eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread) {
-#ifndef HAS_SLEPC
-    fatal_error("Called SLEPC eigen solvers without HAS_SLEPC.\n");
-#else
-    GraphUtil graph_util;
-    graph_util.populate_PetscMat(g);
-    EPS eps;
-    PetscInt nconv;
-    PetscScalar kr,ki;
-    EPSCreate(PETSC_COMM_WORLD, &eps);
-    EPSSetType(eps, EPSPOWER);
-    EPSSetOperators(eps,g->PetscMat,PETSC_NULL);
-    EPSSetLeftVectorsWanted(eps,PETSC_TRUE);
-    EPSSetFromOptions(eps);
-    EPSSetDimensions(eps,spread*2,spread*8,spread*8);
-    EPSSolve(eps);
-    EPSGetConverged(eps,&nconv);
-    EPSGetConverged(eps,&nconv);
-    eigen_values.resize(nconv);
-    for(int idx=0; idx < nconv; idx++) {
-      EPSGetEigenvalue(eps,idx,&kr,&ki);
-      eigen_values[idx] = kr;
-#ifdef EIGENSOLVER_SELFTEST
-      //built in self tester. Don't use in production runs.
-      Vec xr, xi;
-      MatGetVecs(g->PetscMat, PETSC_NULL, &xr);
-      MatGetVecs(g->PetscMat, PETSC_NULL, &xi);
-      EPSGetEigenpair(eps,idx,&kr,&ki, xr, xi);
-      check_eigen_values(g->PetscMat, xr, kr);
-#endif
-    }
-    EPSDestroy(&eps);
-    
-#endif
-  }
+        #endif // ifndef HAS_SLEPC
+    } // eigen_spectrum
+
+    #endif // ifdef HAS_PETSC
 }

@@ -64,6 +64,13 @@ public:
     void populate_CRS(Graph *g);
     void free_CRS(Graph *g);
 
+    #ifdef HAS_BOOST
+    /**
+     * \brief Populate the boost version of the graph
+     */
+    void populate_boost(Graph *g);
+    #endif
+
     //uses V as a vertex separator of G. Returns the number of components in G\V, and fills in members with their vertex lists..
     int vertex_separator(Graph *g, list<int> *V,
                          vector<list<int> *> *members);
@@ -88,9 +95,8 @@ public:
     //Calculate the maximum distance between nodes within a subset of vertices
     //given as a list
     int subset_max_dist(Graph *g, vector<int> subset);
-    void populate_PetscMat(Graph* g);
-    void free_PetscMat(Graph* g);
-
+    void populate_PetscMat(Graph *g);
+    void free_PetscMat(Graph *g);
     };
 
     void create_largestcomponent_graph(char *graph_file, VertexWeightedGraph *&G);

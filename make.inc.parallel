@@ -26,6 +26,9 @@ HAS_METIS	= 1
 HAS_IGRAPH	= 0
 HAS_GMP		= 0
 HAS_GTEST	= 0
+# Set to 1 if you have boost installed on your system
+# Many linux systems have it installed by default
+HAS_BOOST = 0
 #Slepc is needed if you want eigen values
 HAS_PETSC	= 1
 HAS_SLEPC	= 1
@@ -76,6 +79,10 @@ OLDGCC	= 0
 CFLAGS = -O3
 CPPFLAGS =
 LDFLAGS = 
+
+ifeq ($(HAS_BOOST),1)
+CFLAGS := $(CFLAGS) -DHAS_BOOST
+endif
 
 ifeq ($(LOG_ENABLED), 1)
 CFLAGS := $(CFLAGS) -D__LOG_ENABLE__ 

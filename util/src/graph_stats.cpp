@@ -36,7 +36,7 @@
 #include "orbtimer.h"
 
 #ifdef HAS_SLEPC
-#include <slepceps.h>
+  #include <slepceps.h>
 #endif
 
 using namespace std;
@@ -45,7 +45,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,eigen_spectrum");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum");
 
 /**
  * Creates a map from a comma-separated string
@@ -99,7 +99,7 @@ int parse_options(int argc, char **argv, string& infile, string& intype, string&
             create_map(optarg, methods);
             break;
         case 's':
-          cout << "optarg=" << optarg << endl;
+            cout << "optarg=" << optarg << endl;
             *spectrum_spread = atoi(optarg);
             break;
         }
@@ -117,7 +117,7 @@ int main(int argc, char **argv){
     std::map<string, bool> req_methods;
     std::map<string, bool> val_methods;
     ORB_t t1, t2;
-    int spectrum_spread=0;
+    int spectrum_spread = 0;
     create_map(allowed_methods, val_methods);
     parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, &spectrum_spread);
     if(outprefix.length() == 0){
@@ -147,6 +147,7 @@ int main(int argc, char **argv){
     Graph::Graph g;
     Graph::GraphReader gr;
     Graph::GraphProperties gp;
+    Graph::GraphUtil gu;
 
     cout << "Reading graph" << endl;
     ORB_read(t1);
@@ -232,7 +233,6 @@ int main(int argc, char **argv){
         if(req_methods["local_ccs"] == true){
         }
     }
-
     if(req_methods["shortest_paths"] == true){
         cout << "Calculating shortest paths" << endl;
         ORB_read(t1);
@@ -240,6 +240,21 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra)", t1, t2);
     }
+
+    #ifdef HAS_BOOST
+    if(req_methods["shortest_paths_boost"] == true){
+        cout << "Creating BOOST representation of g" << endl;
+        ORB_read(t1);
+        gu.populate_boost(&g);
+        ORB_read(t2);
+        print_time("Time(populate_boost)", t1, t2);
+        cout << "Calculating shortest paths (boost)" << endl;
+        ORB_read(t1);
+        gp.paths_dijkstra_boost_all(&g, shortest_path_distances);
+        ORB_read(t2);
+        print_time("Time(shortest_paths_dijkstra_boost)", t1, t2);
+    }
+    #endif
     if(req_methods["eccentricity"] == true){
         cout << "Calculating eccentricities" << endl;
         ORB_read(t1);
@@ -269,16 +284,19 @@ int main(int argc, char **argv){
         print_time("Time(avg_path_length)", t1, t2);
         outfile << "avg_path_length " << avg_path_length << endl;
     }
+    #ifdef HAS_PETSC
     if(req_methods["eigen_spectrum"] == true){
-    //If petsc/slepc are present, initalize those.
-    //If MPI support is added in the future, init MPI before Petsc. Petsc will do it's own MPI
-    //init if MPI isn't already inited.
+        //If petsc/slepc are present, initalize those.
+        //If MPI support is added in the future, init MPI before Petsc. Petsc will do it's own MPI
+        //init if MPI isn't already inited.
         #ifdef HAS_SLEPC
         SlepcInitializeNoArguments();
         #elif HAVE_PETSC
         PetscInitializeNoArguments();
         #endif
-        if(spectrum_spread == 0) spectrum_spread = 3;
+        if(spectrum_spread == 0){
+            spectrum_spread = 3;
+        }
 
         cout << "Calculating adjacency matrix eigen spectrum\n";
         ORB_read(t1);
@@ -286,11 +304,12 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(eigen spectrum)",t1,t2);
         outfile << "eigen_spectrum ";
-        for(int idx=0; idx < eigen_spectrum.size(); idx++){
-          outfile << eigen_spectrum[idx];
+        for(int idx = 0; idx < eigen_spectrum.size(); idx++){
+            outfile << eigen_spectrum[idx];
         }
         outfile << "\n";
     }
+    #endif // ifdef HAS_PETSC
 
     outfile.close();
 
