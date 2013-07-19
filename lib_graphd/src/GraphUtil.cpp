@@ -19,7 +19,17 @@
 
  */
 
+#include "GraphUtil.h"
 #include "GraphDecomposition.h"
+
+#ifdef HAS_BOOST
+  #include <iostream>
+  #include <deque>
+  #include <iterator>
+
+  #include "boost/graph/adjacency_list.hpp"
+  #include "boost/graph/topological_sort.hpp"
+#endif
 
 namespace Graph {
     GraphUtil::GraphUtil(){
@@ -498,6 +508,89 @@ namespace Graph {
         g->adjncy.clear();
     }
 
+    #ifdef HAS_BOOST
+    /**
+     * Populates the boost_graph member of g
+     * \param[in] g the input graph
+     */
+    void GraphUtil::populate_boost(Graph *g){
+        const int n = g->get_num_nodes();
+        int v;
+        boost::graph_traits < BoostUndirected >::vertex_descriptor a, b;
+        list<int>::const_iterator it;
+        g->boost_graph = new BoostUndirected(n);
+        BoostUndirected *bg = g->boost_graph;
+        for(v = 0; v < n; v++){
+            const list<int> &nbrs = g->get_node(v)->get_nbrs_ref();
+            for(it = nbrs.begin(); it != nbrs.end(); ++it){
+                if(v < *it){
+                    a = boost::vertex(v, *bg);
+                    b = boost::vertex(*it, *bg);
+                    boost::add_edge(a, b, 1, *bg);
+                }
+            }
+        }
+    } // populate_boost
+
+    #endif //HAS_BOOST
+
+    #ifdef HAS_PETSC
+    /**
+     * Populates the PetscMat member of graph g. This function will also call populate_CRS() if it hasn't been already.
+     * Durring cleanup a free_CRS() also needs to be done.
+     * \param[in] g the input graph
+     */
+    void GraphUtil::populate_PetscMat(Graph *g){
+        if(g->adjncy.size() == 0){
+            populate_CRS(g);
+        }
+        int start, end;
+
+        //Matrix is g->PetscMat
+        PetscErrorCode ierror;
+        ierror = MatCreate(PETSC_COMM_WORLD,&(g->PetscMat));
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetSizes(g->PetscMat,PETSC_DECIDE,PETSC_DECIDE,g->num_nodes,g->num_nodes);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetFromOptions(g->PetscMat);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetUp(g->PetscMat);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        int row, col, size;
+        const PetscScalar one_val = 1;
+        for(int node = 0; node < g->num_nodes; node++){
+            start = g->xadj[node];
+            end = g->xadj[node + 1];
+            size = 1 + end - start;
+            row = node;
+            PetscScalar ones[size];
+            PetscInt columns[size];
+            for(int idx = 0; idx < size; idx++){
+                ones[idx] = 1.0;
+                columns[idx] = g->adjncy[start + idx];
+            }
+            ierror = MatSetValues(g->PetscMat, 1, &row, size, columns, ones, INSERT_VALUES);
+            CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        }
+
+        ierror = MatAssemblyBegin(g->PetscMat,MAT_FINAL_ASSEMBLY);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatAssemblyEnd(g->PetscMat,MAT_FINAL_ASSEMBLY);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+    } // populate_PetscMat
+
+    /**
+     * Frees the PetscMat member of g. This function will not cleanup CRS, even if populate_PetscMat() filled it.
+     * You will have to also call free_CRS();
+     * \param[in] g the input graph
+     */
+    void GraphUtil::free_PetscMat(Graph *g){
+        PetscErrorCode ierror = MatDestroy(&(g->PetscMat));
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+    }
+
+    #endif // ifdef HAS_PETSC
+
     /**
      * Non-recursive function that fills the members vector with the
      * lists of nodes belonging to the components.  The members vector
@@ -769,6 +862,9 @@ namespace Graph {
      * Return value is degeneracy (maximum non-empty k-core).
      * Uses algorithm of Batagelj and Zaversnik (2003)
      * Implemented by Timothy Goodrich and Matthew Farrell (2013)
+     * \param[in] g input graph
+     * \param[in] kcore pointer to vector to store kcores in
+     * \reutrn the degneracy of the graph
      */
     int GraphUtil::find_kcore(Graph *g, vector<int> *kcore){
         int n = g->num_nodes;
@@ -823,7 +919,7 @@ namespace Graph {
             }
         }
         return k;
-    } // find_degen
+    } // find_kcore
 }
 using namespace std;
 /**

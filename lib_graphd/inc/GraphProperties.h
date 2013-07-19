@@ -23,6 +23,11 @@
 #define GRAPHPROPERTIES_H_
 #include "GraphDecomposition.h"
 
+#ifdef HAS_BOOST
+  #include "boost/graph/adjacency_list.hpp"
+  #include "boost/graph/topological_sort.hpp"
+#endif
+
 using namespace std;
 
 namespace Graph {
@@ -71,6 +76,18 @@ public:
      * \brief returns shortest paths from source to all other nodes
      */
     void paths_dijkstra_single(Graph *g, vector<int> &p, int source);
+
+    #ifdef HAS_BOOST
+    /**
+     * \brief returns shortest paths from source to all other nodes
+     */
+    void paths_dijkstra_boost_single(Graph *g, vector<int> &dists, int source);
+
+    /**
+     * \brief returns shortest paths from all nodes to all nodes
+     */
+    void paths_dijkstra_boost_all(Graph *g, vector< vector<int> > &p);
+    #endif
 
     /**
      * \brief returns shortest paths from all nodes to all nodes
@@ -136,6 +153,11 @@ public:
      * \brief Returns the delta hyperbolicity of a graph
      */
     void delta_hyperbolicity(Graph *g, double &max_delta, vector<vector<double> > &delta);
+
+    /**
+     * \brief Calculates the eign spectrum. By default it does the top 5 and bottom 5.
+     */
+    void eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread = 5);
     };
 }
 

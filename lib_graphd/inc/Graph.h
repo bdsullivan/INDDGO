@@ -27,15 +27,39 @@
 #else
   #define omp_get_num_threads() 0
   #define omp_get_thread_num() 0
+  #define omp_get_max_threads() 1
+#endif
+
+#ifdef HAS_PETSC
+  #include <petscksp.h>
 #endif
 
 #include "GraphInterface.h"
 #include "Node.h"
+#include "GraphException.h"
+#include "Log.h"
 #include <string>
+
+#ifdef HAS_BOOST
+  #include <iostream>
+  #include <deque>
+  #include <iterator>
+
+  #include "boost/graph/adjacency_list.hpp"
+  #include "boost/graph/topological_sort.hpp"
+  #include <boost/graph/dijkstra_shortest_paths.hpp>
+#endif
 
 using namespace std;
 
-#define INDDGO_INFINITY INT_MAX
+#define INDDGO_INFINITY INT_MAX - 16
+
+#ifdef HAS_BOOST
+typedef boost::property<boost::edge_weight_t, int> EdgeWeightProperty;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, EdgeWeightProperty> BoostUndirected;
+typedef boost::graph_traits < BoostUndirected >::vertex_descriptor vertex_descriptor;
+typedef boost::graph_traits < BoostUndirected >::edge_descriptor edge_descriptor;
+#endif //HAS_BOOST
 
 namespace Graph {
     class Graph : public GraphInterface
@@ -59,6 +83,14 @@ protected:
     vector<int> adjncy;
     vector<int> adj_vec;
     vector< vector<int> > apsp_dist;
+
+    #ifdef HAS_BOOST
+    BoostUndirected *boost_graph;
+    #endif //HAS_BOOST
+
+    #ifdef HAS_PETSC
+    Mat PetscMat;
+    #endif
 
 public:
     Graph();
@@ -138,6 +170,14 @@ public:
     const vector< vector<int> > &get_shortest_path_dist_ref();
     /** \brief get shortest path distances from vertex u to all **/
     const vector<int> &get_u_shortest_path_dist(int u);
+
+    inline Node *get_node_inline(int i){
+        if(i > capacity){
+            FERROR("%s: element is out of bounds", __FUNCTION__);
+            throw GraphException("element is out of bounds\n");
+        }
+        return &nodes[i];
+    }
 
     friend class GraphUtil;
     friend class GraphProperties;

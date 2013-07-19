@@ -35,13 +35,17 @@
 #include "orbconfig.h"
 #include "orbtimer.h"
 
+#ifdef HAS_SLEPC
+  #include <slepceps.h>
+#endif
+
 using namespace std;
 
 void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum,k_cores,degeneracy");
 
 /**
  * Creates a map from a comma-separated string
@@ -57,7 +61,7 @@ void create_map(string list, map<string, bool> &outmap){
 }
 
 void print_usage(char **argv){
-    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods]" << endl;
+    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods] [-s eigen spectrum size]" << endl;
     cerr << "Allowed methods: " << allowed_methods << endl;
     cerr << "Input type should be one of: edge, adjlist, adjmatrix, dimacs" << endl;
 }
@@ -71,9 +75,10 @@ void print_usage(char **argv){
  * \param[out] outfilename file to write output to
  * \param[out] methods list of methods we want to run.  Valid values currently: edge_density,avg_degree,degree_dist,global_cc, avg_cc, local_ccs
  */
-int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods){
+
+int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods, int *spectrum_spread){
     int flags, opt;
-    while((opt = getopt(argc, argv, "hi:t:o:m:p:")) != -1){
+    while((opt = getopt(argc, argv, "hi:t:o:m:p:s:")) != -1){
         switch(opt){
         case 'h':
             print_usage(argv);
@@ -93,6 +98,10 @@ int parse_options(int argc, char **argv, string& infile, string& intype, string&
         case 'm':
             create_map(optarg, methods);
             break;
+        case 's':
+            cout << "optarg=" << optarg << endl;
+            *spectrum_spread = atoi(optarg);
+            break;
         }
     }
 
@@ -108,9 +117,9 @@ int main(int argc, char **argv){
     std::map<string, bool> req_methods;
     std::map<string, bool> val_methods;
     ORB_t t1, t2;
-
+    int spectrum_spread = 0;
     create_map(allowed_methods, val_methods);
-    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods);
+    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, &spectrum_spread);
     if(outprefix.length() == 0){
         outprefix = infile;
     }
@@ -138,6 +147,7 @@ int main(int argc, char **argv){
     Graph::Graph g;
     Graph::GraphReader gr;
     Graph::GraphProperties gp;
+    Graph::GraphUtil gu;
 
     cout << "Reading graph" << endl;
     ORB_read(t1);
@@ -148,9 +158,12 @@ int main(int argc, char **argv){
     print_time("Time(read_graph)", t1, t2);
 
     double global_cc, avg_cc, assortativity;
-    vector<double> local_cc, freq_ecc, norm_hops;
+
+    vector<double> local_cc, freq_ecc, norm_hops, eigen_spectrum;
     float edge_density, avg_degree;
     vector<int> deg_dist, ecc;
+    int degeneracy;
+    vector<int> k_cores;
     double avg_path_length;
 
     vector< vector<int> > shortest_path_distances;
@@ -207,6 +220,19 @@ int main(int argc, char **argv){
         print_time("Time(assortativity)", t1, t2);
         outfile << "assortativity " <<  assortativity << endl;
     }
+    if((req_methods["degeneracy"] == true) || (req_methods["k_cores"] == true)){
+        cout << "Calculating k_cores and degeneracy" << endl;
+        ORB_read(t1);
+        degeneracy = gu.find_kcore(&g, &k_cores);
+        ORB_read(t2);
+        print_time("Time(find_kcore)", t1, t2);
+        outfile << "degeneracy " << degeneracy << endl;
+        if(req_methods["k_cores"] == true){
+            string of = outprefix + ".kcores";
+            write_kcores(of, k_cores);
+        }
+    }
+
     if((req_methods["global_cc"] == true) || (req_methods["local_ccs"] == true) || (req_methods["avg_cc"] == true)){
         cout << "Calculating clustering coefficients" << endl;
         ORB_read(t1);
@@ -222,7 +248,6 @@ int main(int argc, char **argv){
         if(req_methods["local_ccs"] == true){
         }
     }
-
     if(req_methods["shortest_paths"] == true){
         cout << "Calculating shortest paths" << endl;
         ORB_read(t1);
@@ -230,6 +255,24 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra)", t1, t2);
     }
+
+    #ifdef HAS_BOOST
+    if(req_methods["shortest_paths_boost"] == true){
+        cout << "Creating BOOST representation of g" << endl;
+        ORB_read(t1);
+        gu.populate_boost(&g);
+        ORB_read(t2);
+        print_time("Time(populate_boost)", t1, t2);
+        cout << "Calculating shortest paths (boost)" << endl;
+        ORB_read(t1);
+        gp.paths_dijkstra_boost_all(&g, shortest_path_distances);
+        ORB_read(t2);
+        print_time("Time(shortest_paths_dijkstra_boost)", t1, t2);
+    }
+    #else
+        cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost" << endl;
+    #endif
+
     if(req_methods["eccentricity"] == true){
         cout << "Calculating eccentricities" << endl;
         ORB_read(t1);
@@ -259,8 +302,40 @@ int main(int argc, char **argv){
         print_time("Time(avg_path_length)", t1, t2);
         outfile << "avg_path_length " << avg_path_length << endl;
     }
+    #ifdef HAS_PETSC
+    if(req_methods["eigen_spectrum"] == true){
+        //If petsc/slepc are present, initalize those.
+        //If MPI support is added in the future, init MPI before Petsc. Petsc will do it's own MPI
+        //init if MPI isn't already inited.
+        #ifdef HAS_SLEPC
+        SlepcInitializeNoArguments();
+        #elif HAVE_PETSC
+        PetscInitializeNoArguments();
+        #endif
+        if(spectrum_spread == 0){
+            spectrum_spread = 3;
+        }
+
+        cout << "Calculating adjacency matrix eigen spectrum\n";
+        ORB_read(t1);
+        gp.eigen_spectrum(&g, eigen_spectrum, spectrum_spread);
+        ORB_read(t2);
+        print_time("Time(eigen spectrum)",t1,t2);
+        outfile << "eigen_spectrum ";
+        for(int idx = 0; idx < eigen_spectrum.size(); idx++){
+            outfile << eigen_spectrum[idx];
+        }
+        outfile << "\n";
+    }
+    #endif // ifdef HAS_PETSC
 
     outfile.close();
+
+    #ifdef HAS_SLEPC
+    SlepcFinalize();
+    #elif HAVE_PETSC
+    PetscFinalize();
+    #endif
     exit(0);
 } // main
 
