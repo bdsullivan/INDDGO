@@ -39,6 +39,7 @@ namespace Graph {
         this->simple = true;   //FIXME: check if this is correct behavior
         this->canonical = true;
         this->key = 0;
+        this->boost_graph = NULL;
     }
 
     Graph::Graph(int n){
@@ -52,9 +53,14 @@ namespace Graph {
             nodes[i].set_label(i + 1);
         }
         this->next_label = n + 1;
+        this->boost_graph = NULL;
     }
 
     Graph::~Graph(){
+        #ifdef HAS_BOOST
+        delete boost_graph;
+        boost_graph = NULL;
+        #endif
     }
 
     void Graph::set_canonical(bool c){

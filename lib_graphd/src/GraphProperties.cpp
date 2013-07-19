@@ -25,6 +25,10 @@
 #include <sys/types.h>
 #include <sched.h>
 
+#include <algorithm>
+#include <vector>
+#include <cmath>
+
 #include <numeric>
 #ifdef HAS_SLEPC
   #include <slepceps.h>
@@ -836,11 +840,10 @@ namespace Graph {
             eccentricity(g,ecc);
         }
 
+        freq_ecc.resize(*(std::max_element(ecc.begin(), ecc.end())) + 1);
+
         //compute diameter of each vertex
         for(int i = 0; i < ecc.size(); i++){
-            if(ecc[i] > freq_ecc.size() ){
-                freq_ecc.resize(ecc[i] + 1); //because vector numbering starts at 0
-            }
             freq_ecc[ecc[i]]++; //add to tally for this diameter size
         }
         //printf("Graph diameter is %d\n", freq_ecc.size()-1);
