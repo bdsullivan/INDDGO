@@ -26,6 +26,7 @@
 #ifdef HAS_BOOST
   #include "boost/graph/adjacency_list.hpp"
   #include "boost/graph/topological_sort.hpp"
+  #include "boost/graph/betweenness_centrality.hpp"
 #endif
 
 using namespace std;
@@ -87,6 +88,12 @@ public:
      * \brief returns shortest paths from all nodes to all nodes
      */
     void paths_dijkstra_boost_all(Graph *g, vector< vector<int> > &p);
+
+    /**
+     * \brief calculations betweenness centrality for all vertices
+     */
+    void betweenness_centrality(Graph *g, vector<double> &bc);
+
     #endif
 
     /**

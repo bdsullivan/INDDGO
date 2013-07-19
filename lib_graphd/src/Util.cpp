@@ -910,4 +910,5 @@ void write_betweenness(string filename, const vector<double> &bc){
     }
 
     outfile.close();
-} 
+} // write_betweenness
+

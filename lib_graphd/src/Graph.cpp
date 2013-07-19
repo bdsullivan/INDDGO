@@ -707,7 +707,7 @@ namespace Graph {
      * return a const ref to the betweenness centrality vector
      */
     const vector<double> &Graph::get_betweenness_ref(){
-    //FIXME:  should this check to see if it's not-empty?
+        //FIXME:  should this check to see if it's not-empty?
         return this->betweenness;
     }
 

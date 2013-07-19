@@ -102,7 +102,6 @@ void write_degree_distribution(string filename, const vector<int> &dist);
  */
 void write_kcores(string filename, const vector<int> &kcores);
 
-
 /**
  * \brief write a betweenness centrality list out to a file
  */

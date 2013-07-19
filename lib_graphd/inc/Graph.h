@@ -55,7 +55,8 @@ using namespace std;
 
 #ifdef HAS_BOOST
 typedef boost::property<boost::edge_weight_t, int> EdgeWeightProperty;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, EdgeWeightProperty> BoostUndirected;
+typedef boost::property <boost::vertex_centrality_t, double > CentralityMap;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, CentralityMap, EdgeWeightProperty> BoostUndirected;
 typedef boost::graph_traits < BoostUndirected >::vertex_descriptor vertex_descriptor;
 typedef boost::graph_traits < BoostUndirected >::edge_descriptor edge_descriptor;
 #endif //HAS_BOOST

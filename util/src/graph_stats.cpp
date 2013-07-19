@@ -165,6 +165,7 @@ int main(int argc, char **argv){
     int degeneracy;
     vector<int> k_cores;
     double avg_path_length;
+    vector<double> betweenness;
 
     vector< vector<int> > shortest_path_distances;
 
@@ -258,7 +259,7 @@ int main(int argc, char **argv){
     }
 
     #ifdef HAS_BOOST
-    if((req_methods["shortest_paths_boost"] == true) or (req_methods["betweenness"] == true)){
+    if((req_methods["shortest_paths_boost"] == true)){
         cout << "Creating BOOST representation of g" << endl;
         ORB_read(t1);
         gu.populate_boost(&g);
@@ -269,15 +270,25 @@ int main(int argc, char **argv){
         gp.paths_dijkstra_boost_all(&g, shortest_path_distances);
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra_boost)", t1, t2);
-        if(req_methods["betweenness"]) {
-            string of = outprefix + ".betweenness";
-            outfile << "betweenness_file " << of << endl;
-            write_betweenness(of, g.get_betweenness_ref());
-        }
     }
-    #else
-        cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost or betweenness" << endl;
-    #endif
+    if(req_methods["betweenness"]){
+        /* cout << "Creating BOOST representation of g" << endl;
+           ORB_read(t1);
+           gu.populate_boost(&g);
+           ORB_read(t2);
+           print_time("Time(populate_boost)", t1, t2);
+         */cout << "Calculating betweeneess centrality" << endl;
+        ORB_read(t1);
+        gp.betweenness_centrality(&g, betweenness);
+        ORB_read(t2);
+        print_time("Time(betweenness_centrality",t1,t2);
+        string of = outprefix + ".betweenness";
+        outfile << "betweenness_file " << of << endl;
+        write_betweenness(of, g.get_betweenness_ref());
+    }
+    #else // ifdef HAS_BOOST
+    cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost or betweenness" << endl;
+    #endif // ifdef HAS_BOOST
 
     if(req_methods["eccentricity"] == true){
         cout << "Calculating eccentricities" << endl;
