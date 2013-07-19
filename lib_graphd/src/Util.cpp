@@ -887,3 +887,28 @@ void write_kcores(string filename, const vector<int> &kcores){
     outfile.close();
 } // write_k_cores
 
+/**
+ * Write a betweenness centrality vecotr out to file.
+ *
+ * \param[in] filename filename to write output to
+ * \param[in] bc a vector<uint64_t>, indexed on vertex number
+ */
+void write_betweenness(string filename, const vector<double> &bc){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        outfile.precision(10);
+        int i;
+        for(i = 0; i < bc.size(); i++){
+            outfile << fixed << i << " " << bc[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_betweenness
+

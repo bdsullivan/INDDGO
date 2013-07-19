@@ -697,6 +697,21 @@ namespace Graph {
     }
 
     /**
+     * \param[in] bc betweenness centrality measures for all vertices
+     */
+    void Graph::set_betweenness(vector<double> bc){
+        this->betweenness = bc;
+    }
+
+    /**
+     * return a const ref to the betweenness centrality vector
+     */
+    const vector<double> &Graph::get_betweenness_ref(){
+        //FIXME:  should this check to see if it's not-empty?
+        return this->betweenness;
+    }
+
+    /**
      * Checks if distance matrix has been computed (or needs to be recomputed)
      * if yes, returns the all pairs shortest paths distances
      * otherwise computes then returns
