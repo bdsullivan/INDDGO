@@ -841,6 +841,11 @@ void split(const std::string& s, char sep, vector<int>& v){
     }
 }     // split
 
+/**
+ * Write a degree distribution out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] dist a vector<int>, indexed on degree
+ */
 void write_degree_distribution(string filename, const vector<int> &dist){
     ofstream outfile;
 
@@ -858,4 +863,27 @@ void write_degree_distribution(string filename, const vector<int> &dist){
 
     outfile.close();
 } // write_degree_distribution
+
+/**
+ * Write a kcore list out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] kcores a vector<int>, indexed on vertex number
+ */
+void write_kcores(string filename, const vector<int> &kcores){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        int i;
+        for(i = 0; i < kcores.size(); i++){
+            outfile << i << " " << kcores[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_k_cores
 
