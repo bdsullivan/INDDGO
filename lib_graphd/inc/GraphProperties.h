@@ -81,7 +81,7 @@ public:
     /**
      * \brief returns shortest paths from source to all other nodes
      */
-    void paths_dijkstra_boost_single(Graph *g, vector<int> &dists, int source);
+    void paths_dijkstra_boost_single(Graph *g, vector<int> &dists, vector<vertex_descriptor> &preds, int source);
 
     /**
      * \brief returns shortest paths from all nodes to all nodes

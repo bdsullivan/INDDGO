@@ -85,6 +85,7 @@ protected:
 
     #ifdef HAS_BOOST
     BoostUndirected *boost_graph;
+    vector<double> betweenness;
     #endif //HAS_BOOST
 
     #ifdef HAS_PETSC
@@ -116,6 +117,8 @@ public:
     void resize(int n);
     /** \brief set shortest path distances **/
     void set_shortest_path_dist(vector< vector<int> > apsp_dist);
+    /** \brief set betweenness centrality vector **/
+    void set_betweenness(vector<double> bc);
 
     vector<int> get_adj_vec() const;
     vector<int> *get_adj_vec_ptr();
@@ -134,6 +137,9 @@ public:
     int get_num_edges_in_subgraph(list<int> *vertices);
     int get_num_nodes() const;
     vector<int> get_xadj() const;
+
+    /** \brief get a const ref to the betweenness vector **/
+    const vector<double> &get_betweenness_ref();
 
     virtual bool is_edge(int i, int j) const;
     bool is_canonical() const;

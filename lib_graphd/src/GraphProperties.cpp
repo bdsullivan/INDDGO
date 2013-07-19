@@ -628,13 +628,17 @@ namespace Graph {
      * \param[in] source node id
      * \param[out] p path distances from source to all other vertices
      */
-    void GraphProperties::paths_dijkstra_boost_single(Graph *g, vector<int> &dists, int source){
+    void GraphProperties::paths_dijkstra_boost_single(Graph *g, vector<int> &dists, vector<vertex_descriptor> &preds, int source){
         BoostUndirected *bg = g->boost_graph;
-        std::vector<vertex_descriptor> p(boost::num_vertices(*bg));
+        //std::vector<vertex_descriptor> p(boost::num_vertices(*bg));
         dists.resize(g->get_num_nodes());
         //std::vector<int> d(boost::num_vertices(*bg));
         vertex_descriptor s = vertex(source, *bg);
-        boost::dijkstra_shortest_paths(*bg, s, boost::predecessor_map(&p[0]).distance_map(&dists[0]));
+        boost::dijkstra_shortest_paths(*bg, s, boost::predecessor_map(&preds[0]).distance_map(&dists[0]));
+        int i;
+        //for(i=0;i<preds.size();i++){
+        //    cout << "node " << i << " pred " << preds[i] << "\n";
+        //}
     }
 
     /**
@@ -645,23 +649,52 @@ namespace Graph {
 
     void GraphProperties::paths_dijkstra_boost_all(Graph *g, vector< vector<int> > &pAll){
         int inf = INDDGO_INFINITY;
-
         int minD = inf;
+
         const int n = g->get_num_nodes();
+
+        std::vector<uint64_t> betweenness_counts(n, 0);
+        std::vector<double> betweenness(n, 0.0);
+
 
         pAll.resize(n);
 
         //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
-        #pragma omp parallel for schedule(dynamic, 8)  default(none) shared(g, inf, pAll)
-        //loop over all vertices
-        for(int v = 0; v < n; v++){ //0; v < n; v++){
-            //reset all distances to INF and mark all vertices as unvisited
-            fill(pAll[v].begin(),pAll[v].end(),inf);
-            paths_dijkstra_boost_single(g, pAll[v], v); //stores shortest paths from this vertex to all in pAll[v]
-        } //end loop over vertices
+        #pragma omp parallel default(none) shared(g, inf, betweenness_counts, pAll)
+        {
+            std::vector<vertex_descriptor> p(boost::num_vertices(*(g->boost_graph)));
+            int i;
+            #pragma omp for schedule(dynamic, 8)
+            //loop over all vertices
+            for(int v = 0; v < n; v++){ //0; v < n; v++){
+                //reset all distances to INF and mark all vertices as unvisited
+                fill(pAll[v].begin(),pAll[v].end(),inf);
+                paths_dijkstra_boost_single(g, pAll[v], p, v); //stores shortest paths from this vertex to all in pAll[v]
+                #pragma omp critical //since we can't reduce over an array *grumble*
+                {
+                    printf("for source node %d pred is ", v);
+                    for(i=0;i<n;i++){
+                        printf(" %d",p[i]);
+                        if(betweenness_counts[p[i]] != v){  // predecessor is equal to source node, means i is the source node, or is not reachable
+                            betweenness_counts[p[i]]++;
+                        }
+                    }
+                    printf("\n");
+                }
+                    
+            } //end loop over vertices
 
+        }
         //store the results
         g->set_shortest_path_dist(pAll);
+        double num_paths = n*(n-1)/2;
+        cout << "Number of paths: " << num_paths << endl;
+        for(int i=0; i<betweenness_counts.size(); i++){
+            cout << i << "in paths: " << betweenness_counts[i] << endl;
+            betweenness[i] = (double) betweenness_counts[i] / (double) num_paths;
+        }
+
+        g->set_betweenness(betweenness);
     } // paths_dijkstra_boost_all
 
     #endif // ifdef HAS_BOOST

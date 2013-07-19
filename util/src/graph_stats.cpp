@@ -45,7 +45,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum,k_cores,degeneracy");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum,k_cores,degeneracy,betweenness");
 
 /**
  * Creates a map from a comma-separated string
@@ -229,6 +229,7 @@ int main(int argc, char **argv){
         outfile << "degeneracy " << degeneracy << endl;
         if(req_methods["k_cores"] == true){
             string of = outprefix + ".kcores";
+            outfile << "kcore file " << of << endl;
             write_kcores(of, k_cores);
         }
     }
@@ -257,7 +258,7 @@ int main(int argc, char **argv){
     }
 
     #ifdef HAS_BOOST
-    if(req_methods["shortest_paths_boost"] == true){
+    if((req_methods["shortest_paths_boost"] == true) or (req_methods["betweenness"] == true)){
         cout << "Creating BOOST representation of g" << endl;
         ORB_read(t1);
         gu.populate_boost(&g);
@@ -268,9 +269,14 @@ int main(int argc, char **argv){
         gp.paths_dijkstra_boost_all(&g, shortest_path_distances);
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra_boost)", t1, t2);
+        if(req_methods["betweenness"]) {
+            string of = outprefix + ".betweenness";
+            outfile << "betweenness_file " << of << endl;
+            write_betweenness(of, g.get_betweenness_ref());
+        }
     }
     #else
-        cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost" << endl;
+        cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost or betweenness" << endl;
     #endif
 
     if(req_methods["eccentricity"] == true){
