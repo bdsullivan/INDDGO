@@ -46,6 +46,9 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+
+#include <boost/math/special_functions/zeta.hpp>
+
 #include <set>
 #include <map>
 #include <limits.h>

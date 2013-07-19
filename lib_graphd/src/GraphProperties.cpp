@@ -891,16 +891,14 @@ namespace Graph {
      */
     void GraphProperties::diameter(Graph *g, int &diam){
         int i, j, size, temp;
-        vector< vector<int> > dist_mat;
-
-        paths_dijkstra_all(g, dist_mat);
+        vector< vector<int> > dist_mat = g->get_shortest_path_dist_ref();   //computes if not already
 
         size = dist_mat.size();
         diam = dist_mat[0][0];
         for(i = 0; i < size; i++){
             for(j = 0; j < i; j++){
                 temp = dist_mat[i][j];
-                if((temp > diam) && (temp < INT_MAX)){
+                if((temp > diam) && (temp < INDDGO_INFINITY)){
                     diam = temp;
                 }
             }
@@ -917,16 +915,14 @@ namespace Graph {
         int i, j, d, size, temp, diam = 0;
         int n0, numer, tot_con_pairs = 0;
         float gd;
-        vector< vector<int> > dist_mat;
+        vector< vector<int> > dist_mat = g->get_shortest_path_dist_ref();   //computes if not already
         vector<int> bins (g->num_nodes, 0);
-
-        paths_dijkstra_all(g, dist_mat);
 
         size = dist_mat.size();
         for(i = 0; i < size; i++){
             for(j = 0; j < i; j++){
                 temp = dist_mat[i][j];
-                if(temp < INT_MAX){
+                if(temp < INDDGO_INFINITY){
                     tot_con_pairs++;
                     if(temp > diam){
                         diam = temp;
@@ -1011,6 +1007,128 @@ namespace Graph {
             dist[g->degree[i]] += 1;
         }
     }
+
+    /**
+     * Fits the degree distribution of g to a power law distribution
+     * \param[in] g Pointer to a graph
+     * \param[out] xmin Integer value holding the degree at which the data begins behaving like a power law
+     * \param[out] alpha Double holding the most likely value for the exponent
+     * \param[out] KS Double holding the Kolmogorov-Smirnov statistic
+     * \param[in] start Lower bound for exponent, defaults to 1.5
+     * \param[in] inc Determines granularity of the exponent search range, defaults to 0.01
+     * \param[in] end Upper bound for exponent, defaults to 3.5
+     */
+    void GraphProperties::powerlaw(Graph *g, int &xmin, double &alpha, double &KS, double start, double inc, double end){
+        int xm, i, k, n, I;
+        int prev, pprev;
+        int size = 1 + (int)(end - start) / inc;
+        double slogz, L, MLE;
+        double znorm, denom;
+        double f, fn, D, tD;
+        double exp;
+
+        vector<int> x(g->degree);
+
+        //Holds the possible \alpha values from start to end with a delta of inc
+        vector< double > vec( size );
+        //Holds the zeta of the \alpha values, since it is used a lot, no need to keep calculating
+        vector< double > zvec( size );
+        f = start;
+        for(i = 0; i < size; i++ ){
+            vec[i] = f;
+            zvec[i] = boost::math::zeta<double>(f);
+            f += inc;
+        }
+
+        sort(x.begin(), x.end());
+
+        KS = -1;
+        prev = 0;
+        for( xm = 0; xm < x.size(); xm++ ){
+            if(x[xm] == prev){
+                continue;
+            }
+
+            n = x.size() - xm;
+
+            slogz = 0;
+            for(i = xm; i < x.size(); i++){
+                slogz += log(x[i]);
+            }
+
+            //MLE loop: for each possible \alpha value in the specified grid with the current test xmin
+            //          calculate the log-likelihood, normalizing the Hurwitz zeta to the Riemann zeta
+            MLE = -1;
+            I = 0;
+            for( k = 0; k < vec.size(); k++ ){
+                exp = vec[k];
+
+                znorm = 0;
+                for(i = 1; i < x[xm]; i++){
+                    znorm += pow(i, -exp);
+                }
+
+                L = -exp * slogz - n * log( zvec[k] - znorm );
+
+                if(MLE != -1){
+                    if(L > MLE){
+                        MLE = L;
+                        I = k;
+                    }
+                }
+                else {
+                    MLE = L;
+                    I = k;
+                }
+            }
+
+            //compute KS statistic
+            exp = vec[I];
+
+            znorm = 0;
+            for(i = 1; i < x[xm]; i++){
+                znorm += pow(i, -exp);
+            }
+            denom = zvec[I] - znorm;
+
+            pprev = 0;
+            fn = f = 0;
+            D = 0;
+            for(i = xm; i < x.size(); i++){
+                if(x[i] == pprev){
+                    continue;
+                }
+
+                //CDF (f) and EDF (fn)
+                for(k = i; k < x.size() && x[k] <= x[i]; k++){
+                    fn += (1.0) / n;
+                }
+                f += pow(x[i], -exp) / denom;
+
+                tD = abs(fn - f);
+                if(tD > D){
+                    D = tD;
+                }
+
+                pprev = x[i];
+            }
+
+            if(KS > -1){
+                if(D < KS){
+                    KS = D;
+                    xmin = x[xm];
+                    alpha = exp;
+                }
+            }
+            else {
+                KS = D;
+                xmin = x[xm];
+                alpha = exp;
+            }
+
+            prev = x[xm];
+        }
+    } // powerlaw
 
     /**
      * Calculates the degree assortativity of a graph g

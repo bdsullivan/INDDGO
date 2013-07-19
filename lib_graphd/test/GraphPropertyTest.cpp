@@ -19,6 +19,8 @@
 
  */
 
+#include <cmath>
+
 #include "Log.h"
 #include "GraphCreatorFile.h"
 #include "Graph.h"
@@ -171,6 +173,16 @@ TEST_F(GraphPropertyTest, testAvgDegree){
 
 TEST_F(GraphPropertyTest, testDegDist){
     vector<int> dist;
+
     properties.deg_dist(mg, dist);
     EXPECT_EQ(4, dist[33]);
+}
+
+TEST_F(GraphPropertyTest, testPowerLaw){
+    int xmin;
+    double alpha, KS;
+    properties.powerlaw(mg, xmin, alpha, KS);
+    EXPECT_EQ(18, xmin);
+    EXPECT_LT(abs(3.5 - alpha), 0.1);
+    EXPECT_LT(abs(0.470626 - KS), 0.000001);
 }
