@@ -84,9 +84,10 @@ protected:
     vector<int> adj_vec;
     vector< vector<int> > apsp_dist;
 
+    // Currently this is only calculated if you have Boost.
+    vector<double> betweenness;
     #ifdef HAS_BOOST
     BoostUndirected *boost_graph;
-    vector<double> betweenness;
     #endif //HAS_BOOST
 
     #ifdef HAS_PETSC
