@@ -45,7 +45,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum,k_cores,degeneracy,powerlaw,delta_hyperbolicity");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum,k_cores,degeneracy,betweenness,powerlaw,delta_hyperbolicity");
 
 /**
  * Creates a map from a comma-separated string
@@ -168,6 +168,7 @@ int main(int argc, char **argv){
     int xmin;
     double alpha, KS, max_delta;
     vector<vector<double> > delta;
+    vector<double> betweenness;
 
     vector< vector<int> > shortest_path_distances;
 
@@ -232,6 +233,7 @@ int main(int argc, char **argv){
         outfile << "degeneracy " << degeneracy << endl;
         if(req_methods["k_cores"] == true){
             string of = outprefix + ".kcores";
+            outfile << "kcore file " << of << endl;
             write_kcores(of, k_cores);
         }
     }
@@ -260,7 +262,7 @@ int main(int argc, char **argv){
     }
 
     #ifdef HAS_BOOST
-    if(req_methods["shortest_paths_boost"] == true){
+    if((req_methods["shortest_paths_boost"] == true)){
         cout << "Creating BOOST representation of g" << endl;
         ORB_read(t1);
         gu.populate_boost(&g);
@@ -272,9 +274,24 @@ int main(int argc, char **argv){
         ORB_read(t2);
         print_time("Time(shortest_paths_dijkstra_boost)", t1, t2);
     }
-    #else
-    cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost" << endl;
-    #endif
+    if(req_methods["betweenness"]){
+        /* cout << "Creating BOOST representation of g" << endl;
+           ORB_read(t1);
+           gu.populate_boost(&g);
+           ORB_read(t2);
+           print_time("Time(populate_boost)", t1, t2);
+         */cout << "Calculating betweeneess centrality" << endl;
+        ORB_read(t1);
+        gp.betweenness_centrality(&g, betweenness);
+        ORB_read(t2);
+        print_time("Time(betweenness_centrality",t1,t2);
+        string of = outprefix + ".betweenness";
+        outfile << "betweenness_file " << of << endl;
+        write_betweenness(of, g.get_betweenness_ref());
+    }
+    #else // ifdef HAS_BOOST
+    cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost or betweenness" << endl;
+    #endif // ifdef HAS_BOOST
 
     if(req_methods["eccentricity"] == true){
         cout << "Calculating eccentricities" << endl;
@@ -305,6 +322,7 @@ int main(int argc, char **argv){
         print_time("Time(avg_path_length)", t1, t2);
         outfile << "avg_path_length " << avg_path_length << endl;
     }
+
     #ifdef HAS_PETSC
     if(req_methods["eigen_spectrum"] == true){
         //If petsc/slepc are present, initalize those.
@@ -331,6 +349,7 @@ int main(int argc, char **argv){
         outfile << "\n";
     }
     #endif // ifdef HAS_PETSC
+
     if(req_methods["powerlaw"] == true){
         cout << "Calculating power law parameters" << endl;
         ORB_read(t1);

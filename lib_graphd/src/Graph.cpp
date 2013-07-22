@@ -39,6 +39,7 @@ namespace Graph {
         this->simple = true;   //FIXME: check if this is correct behavior
         this->canonical = true;
         this->key = 0;
+        this->boost_graph = NULL;
     }
 
     Graph::Graph(int n){
@@ -52,9 +53,14 @@ namespace Graph {
             nodes[i].set_label(i + 1);
         }
         this->next_label = n + 1;
+        this->boost_graph = NULL;
     }
 
     Graph::~Graph(){
+        #ifdef HAS_BOOST
+        delete boost_graph;
+        boost_graph = NULL;
+        #endif
     }
 
     void Graph::set_canonical(bool c){
@@ -694,6 +700,21 @@ namespace Graph {
      **/
     void Graph::set_shortest_path_dist(vector< vector<int> > apsp_dist){
         this->apsp_dist = apsp_dist;
+    }
+
+    /**
+     * \param[in] bc betweenness centrality measures for all vertices
+     */
+    void Graph::set_betweenness(vector<double> bc){
+        this->betweenness = bc;
+    }
+
+    /**
+     * return a const ref to the betweenness centrality vector
+     */
+    const vector<double> &Graph::get_betweenness_ref(){
+        //FIXME:  should this check to see if it's not-empty?
+        return this->betweenness;
     }
 
     /**
