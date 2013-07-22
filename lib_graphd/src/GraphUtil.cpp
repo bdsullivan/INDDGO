@@ -783,7 +783,8 @@ namespace Graph {
       if(deg_lookup[i] > max_deg)
 	max_deg = deg_lookup[i];
     }
-    vector<int> D[max_deg+1];    
+    vector<vector<int> > D;
+    D.resize(max_deg+1);    
     int depth[n];
     //can also create an L output list for coloring number optimal ordering
     

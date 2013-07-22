@@ -20,7 +20,8 @@
  */
 
 #include "GraphDecomposition.h"
-#include <sys/syscall.h>
+//No longer used 7/22/13
+//#include <sys/syscall.h>
 #include <sys/types.h>
 #include <sched.h>
 
