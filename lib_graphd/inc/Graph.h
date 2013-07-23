@@ -25,10 +25,10 @@
 #ifdef _OPENMP
   #include <omp.h>
 #else
-    #ifndef HAS_METIS
-      #define omp_get_num_threads() 1
-      #define omp_get_thread_num() 0
-    #endif
+  #ifndef HAS_METIS
+    #define omp_get_num_threads() 1
+    #define omp_get_thread_num() 0
+  #endif
 #endif
 
 #ifdef HAS_PETSC
