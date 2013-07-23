@@ -54,7 +54,9 @@ namespace Graph {
         this->simple = true;   //FIXME: check if this is correct behavior
         this->canonical = true;
         this->key = 0;
+        #ifdef HAS_BOOST
         this->boost_graph = NULL;
+        #endif
     }
 
     Graph::Graph(int n){
@@ -68,7 +70,9 @@ namespace Graph {
             nodes[i].set_label(i + 1);
         }
         this->next_label = n + 1;
+        #ifdef HAS_BOOST
         this->boost_graph = NULL;
+        #endif
     }
 
     Graph::~Graph(){
