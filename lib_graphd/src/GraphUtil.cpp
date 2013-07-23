@@ -862,9 +862,6 @@ namespace Graph {
      * Return value is degeneracy (maximum non-empty k-core).
      * Uses algorithm of Batagelj and Zaversnik (2003)
      * Implemented by Timothy Goodrich and Matthew Farrell (2013)
-     * \param[in] g input graph
-     * \param[in] kcore pointer to vector to store kcores in
-     * \reutrn the degneracy of the graph
      */
     int GraphUtil::find_kcore(Graph *g, vector<int> *kcore){
         int n = g->num_nodes;
@@ -880,7 +877,8 @@ namespace Graph {
                 max_deg = deg_lookup[i];
             }
         }
-        vector<int> D[max_deg + 1];
+        vector<vector<int> > D;
+        D.resize(max_deg + 1);
         int depth[n];
         //can also create an L output list for coloring number optimal ordering
 
@@ -919,7 +917,7 @@ namespace Graph {
             }
         }
         return k;
-    } // find_kcore
+    } // find_degen
 }
 using namespace std;
 /**

@@ -21,7 +21,6 @@
 
 #include "GraphDecomposition.h"
 #include "Log.h"
-#include <sys/syscall.h>
 #include <sys/types.h>
 #include <sched.h>
 
