@@ -707,8 +707,7 @@ namespace Graph {
      */
 
     void GraphProperties::paths_dijkstra_single(Graph *g, vector<int> &p, int source){
-        //int inf = 100000;
-        int inf = INT_MAX;
+        int inf = INDDGO_INFINITY;
         int nVisited = 0;
         int minD;
         int nvisiting;
@@ -897,6 +896,7 @@ namespace Graph {
         for(i = 0; i < size; i++){
             for(j = 0; j < i; j++){
                 temp = dist_mat[i][j];
+
                 if((temp > diam) && (temp < INDDGO_INFINITY)){
                     diam = temp;
                 }
@@ -1166,6 +1166,361 @@ namespace Graph {
 
         coeff = (n1 - n2) / (de - n2);
     } // deg_assortativity
+
+    /**
+     * Calculates the delta hyperbolicity of a graph g and returns the hyperbolicity distribution
+     * \param[in] g Pointer to a graph
+     * \param[out] mex_delta Double value holding the maximum delta value encountered
+     * \param[out] delta Vector of vectors of doubles holding the delta hyperbolicity distribution
+     */
+    void GraphProperties::delta_hyperbolicity(Graph *g, double &max_delta, vector<vector<double> > &delta){
+        vector< vector<int> > dist_mat = g->get_shortest_path_dist_ref();
+        int size = dist_mat.size();
+        int mat_size = dist_mat.size();
+        int counter = 0;
+        int row = 0;
+        int diam;
+
+        if(g->num_nodes < 4){
+            cerr << "Graph is too small for hyperbolicity, returning zero\n";
+            vector<double> delta_vec(1, 0);
+            delta.push_back(delta_vec);
+            return;
+        }
+
+        if(!is_connected(g)){
+            cerr << "Graph passed to calc_gromov has multiple components\n";
+
+            //Find the largest connected component
+            int temp = 0;
+            size = 0;
+            for(int i = 0; i < mat_size; i++){
+                temp = 0;
+                for(int j = 0; j < mat_size; j++){
+                    if(dist_mat[i][j] != INDDGO_INFINITY){
+                        temp++;
+                    }
+                }
+                //temp++; //count the vertex currently being tested
+                if(temp > size){
+                    size = temp;
+                    row = i;
+                }
+            }
+        }
+
+        //build vertex set of largest connected component and find its diameter
+        int temp_diam = 0;
+        vector<int> vert_vec(size);
+        for(int j = 0; j < mat_size; j++){
+            if(dist_mat[row][j] != INDDGO_INFINITY){
+                vert_vec[counter] = j;
+                counter++;
+                if(dist_mat[row][j] > temp_diam){
+                    temp_diam = dist_mat[row][j];
+                }
+            }
+            else if(j == row){
+                vert_vec[counter] = j;
+                counter++;
+            }
+        }
+        diam = temp_diam;
+
+        max_delta = 0;
+
+        for(int i = 0; i < diam; i++){
+            vector<double> zero_dist(2 * diam + 1,0);
+            delta.push_back(zero_dist);
+        }
+
+        int num_threads = omp_get_max_threads();
+
+        ////////////////////////////////////////////////////////////
+        //These are the shared variables between threads.  Each thread has access to a certain pointer.
+        //The pointer should then point to a copy of the variable for the thread's private (local) use.
+        //Shared max_delta and shared_delta are updated by each thread, must be careful to avoid contention.
+        ////////////////////////////////////////////////////////////
+
+        int size_of_array = 64 / sizeof(double *);  //64 is cacheline size, needs to be updated on different machines for performance
+        int type_size = sizeof(double *);
+        if(type_size < sizeof(vector< vector<double> > *)){
+            type_size = sizeof(vector< vector<double> > *);
+        }
+
+        counter = 1;
+        while(num_threads * type_size > size_of_array){
+            ++counter;
+            size_of_array = counter * 64 / sizeof(double *);
+        }
+
+        ////////////////////////////////////////////////////////////
+        //Pointers to shared data arrays that have copy of the delta information for each thread,
+        //ie, if there are 8 threads, there will be an 8 (pointers to) arrays each accessed by only one thread,
+        //At the end of the parallel section of code, the 8 arrays will be combined into a single array
+        ///////////////////////////////////////////////////////////
+
+        double **shared_max_delta;
+        shared_max_delta = new double * [size_of_array];
+
+        vector< vector<double> > **shared_delta;
+        shared_delta = new vector< vector<double> > * [size_of_array];
+
+        #if defined (TASK_PROFILE) || defined(TASK_PROFILE_OVERHEAD)
+        int num_tasks1[1024][1024];
+        int num_tasks2[1024][1024];
+        int num_tasks1_switch[1024][1024];
+        int num_tasks2_switch[1024][1024];
+        int total_threads = 0;
+        double task_time[1024][512];
+        double time_starts = 0.0;
+        double time_stops = 0.0;
+        #endif
+
+        //OMP parallel region, this current implementation generates tasks at two of the four levels of the nested for loop,
+        //    these tasks are then passed to threads which execute them and update their private copy of the results array
+        //After the tasks have all been generated and executed the results are collated
+        #pragma omp parallel shared(delta, max_delta, shared_max_delta, diam, shared_delta, dist_mat, vert_vec, size)
+        {
+            double max_delta_loc = 0;
+
+            vector<double> zero_dist(2 * diam + 1,0);
+            zero_dist.reserve(256 / sizeof(double));
+
+            vector< vector<double> > delta_loc(diam,zero_dist);
+
+            int thread_id = omp_get_thread_num();
+
+            #ifdef TASK_PROFILE
+            num_tasks1[thread_id][0] = 0;
+            num_tasks2[thread_id][0] = 0;
+            num_tasks1_switch[thread_id][0] = 0;
+            num_tasks2_switch[thread_id][0] = 0;
+            int total_threads = 0;
+            #endif
+            #ifdef TASK_PROFILE_OVERHEAD
+            task_time[thread_id][0] = 0.0;
+            #endif
+
+            shared_max_delta[thread_id] = &max_delta_loc;
+
+            shared_delta[thread_id] = &delta_loc;
+
+            //size_t size = vert_vec.size();
+
+            #pragma omp single
+            {
+                #ifdef TASK_PROFILE_OVERHEAD
+                time_starts = omp_get_wtime();
+                #endif
+
+                for(int i = 0; i < size; ++i){
+                    #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
+                    #pragma omp task shared(shared_delta, shared_max_delta, dist_mat, vert_vec, size, num_tasks1, num_tasks2, task_time)
+                    #else
+                    #pragma omp task shared(shared_delta, shared_max_delta, dist_mat, vert_vec, size)
+                    #endif
+                    {
+                        #ifdef TASK_PROFILE
+                        int thread_id = omp_get_thread_num();
+                        num_tasks1[thread_id][0]++;
+                        #endif
+                        #ifdef TASK_PROFILE_OVERHEAD
+                        double tt1 = omp_get_wtime();
+                        #endif
+
+                        for(int j = i + 1; j < size; ++j){
+                            #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
+                            #pragma omp task shared(shared_delta, shared_max_delta, dist_mat, vert_vec, size, num_tasks1, num_tasks2, task_time)
+                            #else
+                            #pragma omp task shared(shared_delta, shared_max_delta, dist_mat, vert_vec, size)
+                            #endif
+                            {
+                                int thread_num = omp_get_thread_num();
+
+                                #ifdef TASK_PROFILE
+                                num_tasks2[thread_num][0]++;
+                                #endif
+                                #ifdef TASK_PROFILE_OVERHEAD
+                                double ttt1 = omp_get_wtime();
+                                #endif
+
+                                vector<vector<double> > &loc_delta = *shared_delta[thread_num];
+
+                                double &max_delta_loc = *shared_max_delta[thread_num];
+
+                                for(int k = j + 1; k < size; ++k){
+                                    for(int l = k + 1; l < size; ++l){
+                                        const int ui = vert_vec[i];
+
+                                        const int vi = vert_vec[j];
+                                        const int uv = (dist_mat)[ui][vi];
+
+                                        const int xi = vert_vec[k];
+                                        const int ux = (dist_mat)[ui][xi];
+                                        const int vx = (dist_mat)[vi][xi];
+
+                                        const int yi = vert_vec[l];
+                                        const int uy = (dist_mat)[ui][yi];
+                                        const int vy = (dist_mat)[vi][yi];
+                                        const int xy = (dist_mat)[xi][yi];
+
+                                        const int s1 = uv + xy;
+                                        const int s2 = ux + vy;
+                                        const int s3 = uy + vx;
+
+                                        double currDelta = 0;
+                                        unsigned long maxPair = 1;
+
+                                        //find max pair distance
+                                        maxPair = uv;
+
+                                        if(xy > maxPair){
+                                            maxPair = xy;
+                                        }
+
+                                        if(ux > maxPair){
+                                            maxPair = ux;
+                                        }
+
+                                        if(vy > maxPair){
+                                            maxPair = vy;
+                                        }
+
+                                        if(uy > maxPair){
+                                            maxPair = uy;
+                                        }
+
+                                        if(vx > maxPair){
+                                            maxPair = vx;
+                                        }
+
+                                        //Delta calculations
+
+                                        if((s1 >= s2) && (s3 >= s2) ){
+                                            currDelta = abs(s1 - s3) / 2.0; //works since s1 and s2 are positive
+                                        }
+                                        else if((s2 >= s1) && (s3 >= s1) ){
+                                            currDelta = abs(s2 - s3) / 2.0;
+                                        }
+                                        else {
+                                            currDelta = abs(s1 - s2) / 2.0;
+                                        }
+
+                                        ++(loc_delta)[maxPair - 1][2 * currDelta + 1];
+
+                                        if(currDelta > max_delta_loc){
+                                            max_delta_loc = currDelta;
+                                        }
+
+                                        ++(loc_delta)[maxPair - 1][0];
+                                    }
+                                }
+
+                                #ifdef TASK_PROFILE_OVERHEAD
+                                double ttt2 = omp_get_wtime();
+                                task_time[thread_num][0] += (ttt2 - ttt1);
+                                #endif
+                                #ifdef TASK_PROFILE
+                                int thread_id_end = omp_get_thread_num();
+                                if(thread_id != thread_id_end){
+                                    num_tasks2_switch[thread_id_end][0]++;
+                                }
+                                #endif
+                            } // end task
+                        }
+
+                        #ifdef TASK_PROFILE_OVERHEAD
+                        //double tt2 = omp_get_wtime();
+                        //task_time[thread_id][0]+= (tt2 - tt1);
+                        #endif
+                        #ifdef TASK_PROFILE
+                        int thread_id_end = omp_get_thread_num();
+                        if(thread_id != thread_id_end){
+                            num_tasks1_switch[thread_id_end][0]++;
+                        }
+                        #endif
+                    } // end task
+                }
+            } // end single
+
+            #ifdef TASK_PROFILE_OVERHEAD
+            #pragma omp single nowait
+            {
+                time_stops = omp_get_wtime();
+            }
+            #endif
+
+            double t1 = time(NULL);
+
+            #pragma omp critical (collate_delta)
+            {
+                int thread_num = omp_get_thread_num();
+                vector<vector<double> > *delta_point = shared_delta[thread_num];
+                vector<vector<double> > &loc_delta = *delta_point;
+
+                int i_size = loc_delta.size();
+                for(int i = 0; i < i_size; ++i){
+                    int j_size = loc_delta[i].size();
+                    for(int j = 0; j < j_size; ++j){
+                        delta[i][j] += loc_delta[i][j];
+                    }
+                }
+
+                if(max_delta_loc > max_delta){
+                    max_delta = max_delta_loc;
+                }
+            }
+
+            double t2 = time(NULL);
+
+            #pragma omp single
+            {
+                cout << "Critical Region time: " << t2 - t1 << "\n";
+            }
+        } //END OF FIRST PRAGMA
+
+        //take care of pointer!
+        delete [] shared_delta;
+        delete [] shared_max_delta;
+
+        //Needs removed before parallel code is implemented
+        for(int i = 0; i < diam; ++i){
+            delta[i].erase(delta[i].begin() + 2 * max_delta + 2, delta[i].end());
+        }
+
+        #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
+
+        #pragma omp parallel shared(total_threads)
+        {
+            #pragma omp master
+            {
+                total_threads = omp_get_num_threads();
+            }
+        }
+
+        cout << endl << endl << "******Tasks Statistics: (num_task, num_tasks, migrated_tasks, switched_task, task_time)" << endl;
+
+        for(int i = 0; i < total_threads; i++){
+            cout << i
+        #endif
+        #ifdef TASK_PROFILE
+            << "," << num_tasks1[i][0] << "," << num_tasks2[i][0] << "," << num_tasks1_switch[i][0] << "," << num_tasks2_switch[i][0]
+            #endif
+            #ifdef TASK_PROFILE_OVERHEAD
+            << "," << task_time[i][0]
+            #endif
+            #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
+            << endl;
+    } // delta_hyperbolicity
+
+    cout << endl;
+
+        #endif
+        #ifdef TASK_PROFILE_OVERHEAD
+        cout << "Time in task region = " << time_stops - time_starts << endl;
+        #endif
+    } // delta_hyperbolicity
 
     #ifdef HAS_PETSC
     /**

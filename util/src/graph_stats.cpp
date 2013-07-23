@@ -45,7 +45,7 @@ void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << endl;
 }
 
-const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum,k_cores,degeneracy,betweenness");
+const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion,avg_shortest_path,shortest_paths_boost,eigen_spectrum,k_cores,degeneracy,betweenness,powerlaw,delta_hyperbolicity");
 
 /**
  * Creates a map from a comma-separated string
@@ -165,6 +165,9 @@ int main(int argc, char **argv){
     int degeneracy;
     vector<int> k_cores;
     double avg_path_length;
+    int xmin;
+    double alpha, KS, max_delta;
+    vector<vector<double> > delta;
     vector<double> betweenness;
 
     vector< vector<int> > shortest_path_distances;
@@ -319,6 +322,7 @@ int main(int argc, char **argv){
         print_time("Time(avg_path_length)", t1, t2);
         outfile << "avg_path_length " << avg_path_length << endl;
     }
+
     #ifdef HAS_PETSC
     if(req_methods["eigen_spectrum"] == true){
         //If petsc/slepc are present, initalize those.
@@ -345,6 +349,31 @@ int main(int argc, char **argv){
         outfile << "\n";
     }
     #endif // ifdef HAS_PETSC
+
+    if(req_methods["powerlaw"] == true){
+        cout << "Calculating power law parameters" << endl;
+        ORB_read(t1);
+        gp.powerlaw(&g, xmin, alpha, KS);
+        ORB_read(t2);
+
+        print_time("Time(powerlaw)", t1, t2);
+        outfile << "powerlaw " << xmin << " " << alpha << " " << KS << endl;
+    }
+    if(req_methods["delta_hyperbolicity"] == true){
+        cout << "Calculating delta hyperbolicity" << endl;
+        ORB_read(t1);
+        gp.delta_hyperbolicity(&g, max_delta, delta);
+        ORB_read(t2);
+
+        print_time("Time(delta_hyperbolicity)", t1, t2);
+        outfile << "delta_hyperbolicity " << max_delta << endl;
+        for(int idx = 0; idx < delta.size(); idx++){
+            for(int jdx = 0; jdx < delta[i].size(); jdx++){
+                outfile << delta[i][j] << " ";
+            }
+            outfile << endl;
+        }
+    }
 
     outfile.close();
 

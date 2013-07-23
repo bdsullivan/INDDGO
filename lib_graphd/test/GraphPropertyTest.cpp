@@ -186,3 +186,21 @@ TEST_F(GraphPropertyTest, testPowerLaw){
     EXPECT_LT(abs(3.5 - alpha), 0.1);
     EXPECT_LT(abs(0.470626 - KS), 0.000001);
 }
+
+TEST_F(GraphPropertyTest, testDeltaHyperbolicity){
+    double max_delta;
+    vector<vector<double> > delta;
+
+    properties.delta_hyperbolicity(mg, max_delta, delta);
+    EXPECT_LT(abs(2.0 - max_delta), 0.1);
+    EXPECT_LT(abs(204.0 - delta[3][5]), 0.1);
+
+    creator.set_file_name("data/1et.64.txt");
+    creator.set_graph_type("DIMACS");
+    mg = creator.create_mutable_graph();
+
+    delta.clear();
+    properties.delta_hyperbolicity(mg, max_delta, delta);
+    EXPECT_LT(abs(1.0 - max_delta), 0.1);
+    EXPECT_LT(abs(126.0 - delta[1][3]), 0.1);
+}
