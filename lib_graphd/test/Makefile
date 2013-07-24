@@ -29,7 +29,7 @@ include ../../make.inc
 CXXFLAGS = $(INCLUDES) -g
 
 INCLUDES = -I../inc -I. -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
-LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib $(INDDGO_LIB) $(MPILIB_DIR)
+LIBDIR= -L. -L.. -L$(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib $(INDDGO_LIB) $(MPILIB_DIR)
 LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest -lgtest_main $(METIS_LIB) 
 LFLAGS = $(CFLAGS)
 
@@ -67,7 +67,7 @@ bin:
 	mkdir -p bin
 
 .cpp.o:
-	$(CXX) $(INCLUDES) $(CFLAGS) -O0 -c $<
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -O0 -c $<
 
 bin/testDimacsReader: DIMACSReaderTest.o 
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
