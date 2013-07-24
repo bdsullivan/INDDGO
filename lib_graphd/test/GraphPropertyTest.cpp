@@ -19,6 +19,8 @@
 
  */
 
+#define GTEST_HAS_TR1_TUPLE 0
+
 #include <cmath>
 
 #include "Log.h"
@@ -203,4 +205,15 @@ TEST_F(GraphPropertyTest, testDeltaHyperbolicity){
     properties.delta_hyperbolicity(mg, max_delta, delta);
     EXPECT_LT(abs(1.0 - max_delta), 0.1);
     EXPECT_LT(abs(126.0 - delta[1][3]), 0.1);
+}
+
+TEST_F(GraphPropertyTest, testClustering){
+    double global_cc;
+    double avg_cc;
+    vector<double> local_ccs;
+
+    properties.clustering_coefficients(mg, global_cc, avg_cc, local_ccs);
+    EXPECT_NEAR(0.56209150326797386, local_ccs[32], 0.0000001);
+    EXPECT_NEAR(0.491997272348, avg_cc, 0.00000001);
+    EXPECT_NEAR(0.460570029725, global_cc, 0.0000001);
 }
