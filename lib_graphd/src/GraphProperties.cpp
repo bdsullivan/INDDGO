@@ -1129,6 +1129,7 @@ namespace Graph {
             prev = x[xm];
         }
     } // powerlaw
+
     #endif // ifdef HAS_BOOST
 
     /**

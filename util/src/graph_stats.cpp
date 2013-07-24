@@ -350,6 +350,7 @@ int main(int argc, char **argv){
     }
     #endif // ifdef HAS_PETSC
 
+    #ifdef HAS_BOOST
     if(req_methods["powerlaw"] == true){
         cout << "Calculating power law parameters" << endl;
         ORB_read(t1);
@@ -359,6 +360,9 @@ int main(int argc, char **argv){
         print_time("Time(powerlaw)", t1, t2);
         outfile << "powerlaw " << xmin << " " << alpha << " " << KS << endl;
     }
+    #else
+    cerr << "Error: BOOST support was not compiled, cannot run shortest_paths_boost or betweenness" << endl;
+    #endif //HAS_BOOST
     if(req_methods["delta_hyperbolicity"] == true){
         cout << "Calculating delta hyperbolicity" << endl;
         ORB_read(t1);
