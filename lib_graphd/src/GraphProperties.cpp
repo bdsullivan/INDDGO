@@ -1007,6 +1007,7 @@ namespace Graph {
         }
     }
 
+    #ifdef HAS_BOOST
     /**
      * Fits the degree distribution of g to a power law distribution
      * \param[in] g Pointer to a graph
@@ -1128,6 +1129,7 @@ namespace Graph {
             prev = x[xm];
         }
     } // powerlaw
+    #endif // ifdef HAS_BOOST
 
     /**
      * Calculates the degree assortativity of a graph g
