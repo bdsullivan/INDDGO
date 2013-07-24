@@ -368,8 +368,8 @@ int main(int argc, char **argv){
         print_time("Time(delta_hyperbolicity)", t1, t2);
         outfile << "delta_hyperbolicity " << max_delta << endl;
         for(int idx = 0; idx < delta.size(); idx++){
-            for(int jdx = 0; jdx < delta[i].size(); jdx++){
-                outfile << delta[i][j] << " ";
+            for(int jdx = 0; jdx < delta[idx].size(); jdx++){
+                outfile << delta[idx][jdx] << " ";
             }
             outfile << endl;
         }

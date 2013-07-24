@@ -24,6 +24,9 @@
 #include "GraphDecomposition.h"
 
 #ifdef HAS_BOOST
+  #ifdef HAS_GTEST
+    #define GTEST_HAS_TR1_TUPLE 0
+  #endif
   #include "boost/graph/adjacency_list.hpp"
   #include "boost/graph/topological_sort.hpp"
   #include "boost/graph/betweenness_centrality.hpp"

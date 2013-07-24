@@ -29,7 +29,7 @@ include ../../make.inc
 CXXFLAGS = $(INCLUDES) -g
 
 INCLUDES = -I../inc -I. -I.. $(METIS_INCLUDES) $(SSPARSE_INCDIR) $(PARMETIS_INCDIR)
-LIBDIR= -L. -L.. $(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib $(INDDGO_LIB) $(MPILIB_DIR)
+LIBDIR= -L. -L.. -L$(METIS_LIB_DIR) $(SSPARSE_LIB) -L../lib $(INDDGO_LIB) $(MPILIB_DIR)
 LIB=  $(MPILIBS) -lpthread -lgraphd -lgtest -lgtest_main $(METIS_LIB) 
 LFLAGS = $(CFLAGS)
 
@@ -67,58 +67,58 @@ bin:
 	mkdir -p bin
 
 .cpp.o:
-	$(CXX) $(INCLUDES) $(CFLAGS) -O0 -c $<
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -O0 -c $<
 
-bin/testDimacsReader: DIMACSReaderTest.o 
+bin/testDimacsReader: DIMACSReaderTest.o  $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testGraphReader: GraphReaderTest.o
+bin/testGraphReader: GraphReaderTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testGraphCreatorFile: GraphCreatorFileTest.o
+bin/testGraphCreatorFile: GraphCreatorFileTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testGraph: GraphTest.o
+bin/testGraph: GraphTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testWeightedGraph: WeightedGraphTest.o
+bin/testWeightedGraph: WeightedGraphTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testMutableGraph: MutableGraphTest.o
+bin/testMutableGraph: MutableGraphTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testVertexWeightedGraph: VertexWeightedGraphTest.o
+bin/testVertexWeightedGraph: VertexWeightedGraphTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testAdjMatrixGraphWriter: AdjMatrixGraphWriterTest.o
+bin/testAdjMatrixGraphWriter: AdjMatrixGraphWriterTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testAdjMatrixGraphReader: AdjMatrixGraphReaderTest.o
+bin/testAdjMatrixGraphReader: AdjMatrixGraphReaderTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testDIMACSGraphWriter: DIMACSGraphWriterTest.o
+bin/testDIMACSGraphWriter: DIMACSGraphWriterTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testGraphVizGraphWriter: GraphVizGraphWriterTest.o
+bin/testGraphVizGraphWriter: GraphVizGraphWriterTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testGraphProperty: GraphPropertyTest.o
+bin/testGraphProperty: GraphPropertyTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testGraphUtil: GraphUtilTest.o
+bin/testGraphUtil: GraphUtilTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testMetisGraphWriter: MetisGraphWriterTest.o
+bin/testMetisGraphWriter: MetisGraphWriterTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testMetisGraphReader: MetisGraphReaderTest.o
+bin/testMetisGraphReader: MetisGraphReaderTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
 ifeq ($(HAS_PARMETIS), 1)
-bin/testGraphEOUtil: GraphEOUtilTest.o
+bin/testGraphEOUtil: GraphEOUtilTest.o $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $< $(PARMETISOBJ) ${INCLUDES} $(LIBDIR) $(LIB)
 
-bin/testParMetis: ParmetisTest.o 
+bin/testParMetis: ParmetisTest.o  $(INDDGO_LIB_DIR)/libgraphd.a
 	${CXX} ${LFLAGS} -o $@   $^ $(PARMETISOBJ) ${INCLUDES} $(LIBDIR) $(LIB)
 endif
 

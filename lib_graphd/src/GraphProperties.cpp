@@ -21,7 +21,6 @@
 
 #include "GraphDecomposition.h"
 #include "Log.h"
-#include <sys/syscall.h>
 #include <sys/types.h>
 #include <sched.h>
 
@@ -1513,8 +1512,9 @@ namespace Graph {
             #endif
             #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
             << endl;
-        }
-        cout << endl;
+    } // delta_hyperbolicity
+
+    cout << endl;
 
         #endif
         #ifdef TASK_PROFILE_OVERHEAD

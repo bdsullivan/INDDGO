@@ -47,7 +47,12 @@
 #include <vector>
 #include <algorithm>
 
-#include <boost/math/special_functions/zeta.hpp>
+#ifdef HAS_BOOST
+  #ifdef HAS_GTEST
+    #define GTEST_HAS_TR1_TUPLE 0
+  #endif
+  #include <boost/math/special_functions/zeta.hpp>
+#endif
 
 #include <set>
 #include <map>
