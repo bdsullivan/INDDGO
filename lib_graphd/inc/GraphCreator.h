@@ -33,6 +33,9 @@ namespace Graph {
 public:
     virtual VertexWeightedGraph *create_random_edge_subgraph(VertexWeightedGraph *wmg, int percent_edges);
     virtual VertexWeightedGraph *initialize_ktree(int n, int tw);
+    virtual Graph *initialize_rig(int n, int seed, list<double> *probs);
+    virtual Graph *initialize_rmat(int l, int m, double *probs, int seed, bool self_loop);
+
     // Creates the induced subgraph on the given list of vertices (by position in adj_list).
     // Does not check connectedness. Caller must allocate space for the graph G.
     virtual VertexWeightedGraph *create_induced_subgraph(VertexWeightedGraph *wmg, list<int> *members, bool make_simple);

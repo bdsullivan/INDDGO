@@ -27,6 +27,7 @@
 
 // A collection of random seeds from Mathematica for the LCG -
 
+static int zrng_count = 300;
 static long long zrng[] =
 {
     1585898122, 977263903, 1405617513, 992686252, 18121536, 2063068841, 754752318,
@@ -86,10 +87,21 @@ static int initialized = 0;
 #endif
 
 namespace Graph {
+    void init_lcgrand(int stream, int seed) {
+        if(stream < 0 || stream > zrng_count) {
+            fatal_error("lcgrand: Stream was %d, must be in range 0-%d", stream, zrng_count-1);
+        }
+        zrng[stream] = seed;
+    }
+
     double lcgrand(int stream){
         ///
         /// A run of the mill LCG. Returns a uniformly distributed double in (0,1).
         ///
+
+	if(stream < 0 || stream > zrng_count) {
+            fatal_error("lcgrand: Stream was %d, must be in range 0-%d", stream, zrng_count-1);
+        }
 
         long long zi;
         #if TD_ADD_ENTROPY

@@ -23,6 +23,7 @@
 #define RNDNUMGEN_H_
 
 namespace Graph {
+    void init_lcgrand(int stream, int seed);
     double lcgrand(int stream);
     void random_permutation(int *perm, int n);
     int rand_int(int min, int max);
