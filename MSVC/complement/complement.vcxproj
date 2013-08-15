@@ -11,35 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\lib_graphd\src\Debug.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\Graph.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\GraphCreator.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\GraphCreatorFile.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\GraphDisplay.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\GraphEOUtil.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\GraphProperties.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\GraphReader.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\GraphUtil.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\GraphWriter.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\Log.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\Node.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\RndNumGen.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\Util.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\VertexWeightedGraph.cpp" />
+    <ClCompile Include="..\..\util\src\complement.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{BFE092BE-DF45-44F1-B013-A98820441A40}</ProjectGuid>
+    <ProjectGuid>{5C254779-B077-4F58-8105-FC27A27074F6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>metis502</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -66,12 +52,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../uthash-1.9.5/src/;../../lib_graphd/inc/;../../lib_treed/inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAS_GMP;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../mpir-2.5.2;../../max_wis/inc;../../../uthash-1.9.5/src/;../../lib_graphd/inc/;../../lib_treed/inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../$(Configuration);../../../mpir-2.5.2/build.vc10/Win32/$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lib_graphd.lib;lib_treed.lib;mpir.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,13 +71,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../..uthash-1.9.5/src/;../../lib_graphd/inc/;../../lib_treed/inc/;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../mpir-2.5.2;../../max_wis/inc;../../../uthash-1.9.7/;../../lib_graphd/inc/;../../lib_treed/inc/;../../util/inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>../$(Configuration);../../../mpir-2.5.2/build.vc10/Win32/$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lib_graphd.lib;lib_treed.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
