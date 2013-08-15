@@ -23,7 +23,10 @@
 #include "Log.h"
 #include "Debug.h"
 #include "Util.h"
+// CSG - why is this included again here?
+#if !WIN32 && !WIN64
 #include <strings.h>
+#endif
 #include <stdlib.h>
 #include <iostream>
 #include <algorithm>
@@ -32,6 +35,14 @@
 #include <string>
 #include <sstream>
 #include <vector>
+
+// CSG - to handle strncasecmp 
+#if defined(WIN32) || defined(_WIN64) 
+  #define snprintf _snprintf 
+  #define vsnprintf _vsnprintf 
+  #define strcasecmp _stricmp 
+  #define strncasecmp _strnicmp 
+#endif
 
 namespace Graph {
     GraphReader::GraphReader(){
@@ -105,8 +116,8 @@ namespace Graph {
  * \return code 0 on success, nonzero on failure
  */
     int GraphReader::read_adjlist(Graph *g, const string filename){
-        int i, j, m, n, retval;
-        char *retp;
+        //int i, j, m, n, retval;
+        //char *retp;
         int new_vid;
         int new_nbr;
 
@@ -136,6 +147,8 @@ namespace Graph {
                 }
             }
         }
+		// CSG - adding return value of 0
+		return 0;
     } // read_adjlist
 
 /**

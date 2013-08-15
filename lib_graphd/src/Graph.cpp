@@ -28,21 +28,6 @@
 #include <algorithm>
 #include <string.h>
 
-#ifndef _OPENMP
-    #ifdef HAS_METIS
-        void omp_set_num_threads(int num_threads) { return; }
-        int omp_get_num_threads(void) { return 1; }
-        int omp_get_max_threads(void) { return 1; }
-        int omp_get_thread_num(void) { return 0; }
-        int omp_get_num_procs(void) { return 1; }
-        int omp_in_parallel(void) { return 0; }
-        void omp_set_dynamic(int num_threads) { return; }
-        int omp_get_dynamic(void) { return 0; }
-        void omp_set_nested(int nested) { return; }
-        int omp_get_nested(void) { return 0; }
-    #endif
-#endif
-
 /* GRAPH_H_ */
 namespace Graph {
     Graph::Graph(){
@@ -221,37 +206,51 @@ namespace Graph {
         return (cnt >> 1);
     } // get_num_edges_in_subgraph
 
+	// CSG rewriting this 20130723 - old routine was extremely slow.
+	// Have only tested by creating complement graph of DIMACS file and
+	// outputting normalized DIMACS of complement graph. Have not tested
+	// whether or not all the graph internals are valid, but seems ok.
+	// It does everything the old routine did.
     void Graph::complement(){
-        Node *n;
+		list<int> *nbr_list_ptr;
+        int num_edges = 0 ;
+		int *el_vec;
+		el_vec=new int[this->capacity];
+		memset(el_vec,-1,this->capacity*sizeof(int));
 
-        list<int> elements;
-        list<int> newnbrs;
-        list<int> nbrs;
-        list<int>::iterator it;
-        int edge = 0;
+        for(int i = 0; i < this->capacity; i++)
+		{
+			// The only parts of el_vec we care about for node index i is position
+			// i and the position of i's nbrs
+			// So stick a value of i in these positions and just check for that -
+			// we will constantly overwrite this vec (adj_vec style), but
+			// that won't matter and we save time by not having to memset el_vec over and
+			// over, etc.
+			
+			// eliminate self-loop
+			el_vec[i]=i;
+			// Get ptr to node i's nbr list
+			nbr_list_ptr = this->nodes[i].get_nbrs_ptr();
+			for(list<int>::iterator ii=nbr_list_ptr->begin();ii!=nbr_list_ptr->end();++ii)
+				el_vec[*ii]=i;
+			
+			int num_nbrs=0;
+			this->nodes[i].nbrs.clear();
+			for(int j=0; j< this->capacity; j++)
+				if(el_vec[j]!=i)
+				{
+					// want to avoid calling size()!
+					num_nbrs++;
+					this->nodes[i].nbrs.push_back(j);
+				}
 
-        for(int i = 0; i < this->capacity; i++){
-            elements.push_back(i);
+            this->degree[i] = num_nbrs; 
+            num_edges += this->degree[i];
         }
 
-        for(int i = 0; i < this->capacity; i++){
-            n = this->get_node(i);
-            nbrs = n->get_nbrs();
-            newnbrs = elements;
-            nbrs.sort();
-
-            newnbrs.remove(i);
-            for(it = nbrs.begin(); it != nbrs.end(); ++it){
-                newnbrs.remove(*it);
-            }
-
-            this->degree[i] = newnbrs.size();
-            edge += this->degree[i];
-            n->set_nbr(newnbrs);
-        }
-
-        this->set_num_edges(edge / 2);
-    } // complement
+        this->set_num_edges(num_edges / 2);
+		delete [] el_vec;
+    }
 
     bool Graph::is_canonical() const {
         return canonical;
