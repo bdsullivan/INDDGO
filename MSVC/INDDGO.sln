@@ -11,10 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "serial_wis", "serial_wis\se
 		{E88CD5F0-B70E-4504-B83B-393FC3FC12BD} = {E88CD5F0-B70E-4504-B83B-393FC3FC12BD}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complement", "complement\complement.vcxproj", "{5C254779-B077-4F58-8105-FC27A27074F6}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gen_pkt", "gen_pkt\gen_pkt.vcxproj", "{7445D331-FCBB-4477-B3F4-576B3A435505}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -33,14 +29,6 @@ Global
 		{F0033BB8-C99B-4696-9350-F6B97850C220}.Debug|Win32.Build.0 = Debug|Win32
 		{F0033BB8-C99B-4696-9350-F6B97850C220}.Release|Win32.ActiveCfg = Release|Win32
 		{F0033BB8-C99B-4696-9350-F6B97850C220}.Release|Win32.Build.0 = Release|Win32
-		{5C254779-B077-4F58-8105-FC27A27074F6}.Debug|Win32.ActiveCfg = Debug|Win32
-		{5C254779-B077-4F58-8105-FC27A27074F6}.Debug|Win32.Build.0 = Debug|Win32
-		{5C254779-B077-4F58-8105-FC27A27074F6}.Release|Win32.ActiveCfg = Release|Win32
-		{5C254779-B077-4F58-8105-FC27A27074F6}.Release|Win32.Build.0 = Release|Win32
-		{7445D331-FCBB-4477-B3F4-576B3A435505}.Debug|Win32.ActiveCfg = Debug|Win32
-		{7445D331-FCBB-4477-B3F4-576B3A435505}.Debug|Win32.Build.0 = Debug|Win32
-		{7445D331-FCBB-4477-B3F4-576B3A435505}.Release|Win32.ActiveCfg = Release|Win32
-		{7445D331-FCBB-4477-B3F4-576B3A435505}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

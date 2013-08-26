@@ -204,6 +204,8 @@ namespace Graph {
         int capacity = g->get_capacity();
         int num_nodes = g->get_num_nodes();
         int num_edges = g->get_num_edges();
+        //vector<Node> nodes = g->get_nodes();
+        Node *n;
 
         for(int i = 0; i < capacity; i++){
             perm.push_back(i);

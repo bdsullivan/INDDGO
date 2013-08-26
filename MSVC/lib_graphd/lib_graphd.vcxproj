@@ -11,7 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\lib_graphd\src\AdjMatrixGraphReader.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\AdjMatrixGraphWriter.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\Debug.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\DIMACSGraphReader.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\DIMACSGraphWriter.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\Graph.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\GraphCreator.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\GraphCreatorFile.cpp" />
@@ -19,13 +23,19 @@
     <ClCompile Include="..\..\lib_graphd\src\GraphEOUtil.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\GraphProperties.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\GraphReader.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphReaderWriterFactory.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\GraphUtil.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\GraphVizGraphWriter.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\GraphWriter.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\Log.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\MetisGraphReader.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\MetisGraphWriter.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\MutableGraph.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\Node.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\RndNumGen.cpp" />
     <ClCompile Include="..\..\lib_graphd\src\Util.cpp" />
-    <ClCompile Include="..\..\lib_graphd\src\VertexWeightedGraph.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\WeightedGraph.cpp" />
+    <ClCompile Include="..\..\lib_graphd\src\WeightedMutableGraph.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BFE092BE-DF45-44F1-B013-A98820441A40}</ProjectGuid>
