@@ -76,9 +76,9 @@ void print_usage(char **argv){
  * \param[out] methods list of methods we want to run.  Valid values currently: edge_density,avg_degree,degree_dist,global_cc, avg_cc, local_ccs
  */
 
-int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods, int *spectrum_spread){
+int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods, int *spectrum_spread, int *file_append){
     int flags, opt;
-    while((opt = getopt(argc, argv, "hi:t:o:m:p:s:")) != -1){
+    while((opt = getopt(argc, argv, "hi:t:o:m:p:s:a")) != -1){
         switch(opt){
         case 'h':
             print_usage(argv);
@@ -99,9 +99,11 @@ int parse_options(int argc, char **argv, string& infile, string& intype, string&
             create_map(optarg, methods);
             break;
         case 's':
-            cout << "optarg=" << optarg << endl;
             *spectrum_spread = atoi(optarg);
             break;
+	case 'a':
+            *file_append = 1;
+	    break;
         }
     }
 
@@ -118,8 +120,9 @@ int main(int argc, char **argv){
     std::map<string, bool> val_methods;
     ORB_t t1, t2;
     int spectrum_spread = 0;
+    int file_append = 0;
     create_map(allowed_methods, val_methods);
-    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, &spectrum_spread);
+    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, &spectrum_spread, &file_append);
     if(outprefix.length() == 0){
         outprefix = infile;
     }
@@ -131,6 +134,12 @@ int main(int argc, char **argv){
     cout << "Input  file: " << infile << endl;
     cout << "Input  type: " << intype << endl;
     cout << "Output file: " << outfilename << endl;
+    cout << "Appending  : ";
+    if(file_append == 0) {
+      cout << "false" << endl;
+    } else {
+      cout << "true" << endl;
+    }
     cout << "Methods    :";
     for(map<string, bool>::iterator it = req_methods.begin(); it != req_methods.end(); ++it){
         cout << " " << it->first;
@@ -172,7 +181,11 @@ int main(int argc, char **argv){
 
     vector< vector<int> > shortest_path_distances;
 
-    outfile.open(outfilename.c_str());
+    if(file_append == 0) {
+      outfile.open(outfilename.c_str());
+    } else {
+      outfile.open(outfilename.c_str(), ios_base::out|ios_base::app);
+    }
     if(!outfile.is_open()){
         cerr << "Error opening " << outfilename << " for writing, exiting" << endl;
         exit(1);
@@ -186,9 +199,11 @@ int main(int argc, char **argv){
     ORB_read(t2);
     print_time("Time(make_simple)", t1, t2);
 
-    outfile << "filename" << infile << endl;
-    outfile << "num_nodes " << g.get_num_nodes() << endl;
-    outfile << "num_edges " << g.get_num_edges() << endl;
+    if(outfile.tellp() == 0) {
+      outfile << "filename" << infile << endl;
+      outfile << "num_nodes " << g.get_num_nodes() << endl;
+      outfile << "num_edges " << g.get_num_edges() << endl;
+    }
 
     if(req_methods["edge_density"] == true){
         cout << "Calculating edge density" << endl;
