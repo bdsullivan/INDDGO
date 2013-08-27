@@ -136,7 +136,7 @@ int main(int argc, char **argv){
     cout << "Output file: " << outfilename << endl;
     cout << "Appending  : ";
     if(file_append == 0) {
-      cout << "fasle" << endl;
+      cout << "false" << endl;
     } else {
       cout << "true" << endl;
     }
