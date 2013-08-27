@@ -99,7 +99,6 @@ int parse_options(int argc, char **argv, string& infile, string& intype, string&
             create_map(optarg, methods);
             break;
         case 's':
-	  //cout << "optarg=" << optarg << endl;
             *spectrum_spread = atoi(optarg);
             break;
 	case 'a':
