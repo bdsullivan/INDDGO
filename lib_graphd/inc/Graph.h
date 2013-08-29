@@ -141,6 +141,7 @@ public:
     int get_num_edges() const;
     int get_num_edges_in_subgraph(list<int> *vertices);
     int get_num_nodes() const;
+    int get_num_connected_components() const;
     vector<int> get_xadj() const;
 
     /** \brief get a const ref to the betweenness vector **/

@@ -107,6 +107,10 @@ void write_kcores(string filename, const vector<int> &kcores);
  */
 void write_betweenness(string filename, const vector<double> &bc);
 
+/**
+ * \brief write a delta hyperbolicity distribution out to a file
+ */
+void write_delta_hyperbolicity(string filename, const vector< vector<double> > &delta);
 int_int mylog2(int x);
 
 #endif /* UTIL_H_ */

@@ -104,6 +104,11 @@ public:
      * \brief Releases PetscMat.
      */
     void free_PetscMat(Graph *g);
+
+    /**
+     * \brief returns a new graph that is the largest component of g
+     */
+    Graph *get_largest_component_graph(Graph *g);
     };
 
     void create_largestcomponent_graph(char *graph_file, VertexWeightedGraph *&G);

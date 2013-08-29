@@ -637,7 +637,7 @@ namespace Graph {
         dists.resize(g->get_num_nodes());
         //std::vector<int> d(boost::num_vertices(*bg));
         vertex_descriptor s = vertex(source, *bg);
-        boost::dijkstra_shortest_paths(*bg, s, boost::predecessor_map(&preds[0]).distance_map(&dists[0]));
+        boost::dijkstra_shortest_paths(*bg, s, boost::predecessor_map(&preds[0]).distance_map(&dists[0]).distance_inf(INDDGO_INFINITY));
         int i;
         //for(i=0;i<preds.size();i++){
         //    cout << "node " << i << " pred " << preds[i] << "\n";
@@ -864,11 +864,15 @@ namespace Graph {
         vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();   //computes if not already
         vector <int> hops(n,0);  //largest possible dist is n-1
         norm_hops.resize(n);
+        int k;
 
         //for each vertex, find the number of vertices reachable for all hops; add to tally
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
-                hops[ short_paths[i][j] ]++;
+                k = short_paths[i][j];
+                if(k != INDDGO_INFINITY){
+                    hops[k]++;
+                }
             }
         }
 
@@ -975,17 +979,21 @@ namespace Graph {
         double sum = 0;
         double intermediate = 0.0;
         int i, j;
+        int inf_path = 0;
 
-        #pragma omp parallel for schedule(dynamic, 16) default(none) private(j) reduction(+:sum)
+        #pragma omp parallel for schedule(dynamic, 16) default(none) private(j) reduction(+:sum,inf_path)
         for(i = 0; i < n; i++){
             for(j = 0; j < n; j++){
                 if(INDDGO_INFINITY != short_paths[i][j]){
                     sum += short_paths[i][j];
                 }
+                else {
+                    inf_path++;
+                }
             }
         }
 
-        sum = sum /  (double)(n * (n - 1));
+        sum = sum /  (double)((n * (n - 1)) - inf_path);
         pl = sum;
     } // avg_path_length
 

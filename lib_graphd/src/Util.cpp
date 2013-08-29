@@ -912,3 +912,30 @@ void write_betweenness(string filename, const vector<double> &bc){
     outfile.close();
 } // write_betweenness
 
+/**
+ * Write a delta hyperbolicity vector out to file.
+ *
+ * \param[in] filename filename to write output to
+ * \param[in] bc a vector<uint64_t>, indexed on vertex number
+ */
+void write_delta_hyperbolicity(string filename, const vector< vector<double> > &delta){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        outfile.precision(10);
+        for(int idx = 0; idx < delta.size(); idx++){
+            for(int jdx = 0; jdx < delta[idx].size(); jdx++){
+                outfile << delta[idx][jdx] << " ";
+            }
+            outfile << endl;
+        }
+    }
+
+    outfile.close();
+} // write_betweenness
+

@@ -918,6 +918,43 @@ namespace Graph {
         }
         return k;
     } // find_degen
+
+    /**
+     * \input g input graph
+     * \output new graph consisting of largest component, or NULL if the input graph is connected
+     * NOTE: this function *will* canonicalize your graph!!!
+     **/
+    Graph *GraphUtil::get_largest_component_graph(Graph *g){
+        GraphProperties properties;
+        GraphCreatorFile creator;
+        Graph *largecomp;
+        list<int> *maxlist = NULL;
+        size_t maxlen = 0;
+
+        if(!properties.is_connected(g)){
+            properties.make_canonical(g);
+            vector<list<int> *> members;
+            vector<list<int> *>::iterator vlit;
+            find_all_components(g, &members);
+            // traverse the list and find the one with the most members
+            for(vlit = members.begin(); vlit != members.end(); ++vlit){
+                cout << "Got list with size: " << ((*vlit)->size()) << endl;
+                if(((*vlit)->size()) >= maxlen){
+                    maxlen = (*vlit)->size();
+                    cout << "New list with maxlen > " << maxlen << endl;
+                    maxlist = *vlit;
+                    cout << maxlist << endl;
+                }
+            }
+
+            // found the max component, let's create the graph
+            largecomp = creator.create_component((Graph *)g, maxlist, true);
+            return largecomp;
+        }
+        else {
+            return NULL;
+        }
+    } // get_largest_component_graph
 }
 using namespace std;
 /**
