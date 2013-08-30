@@ -512,8 +512,8 @@ namespace Graph {
                     } //if revmap
                 } //for vtxs
             } //for fakev
-            #pragma omp for
 			int tsize=(int)t.size();
+            #pragma omp for
             for(i = 0; i < tsize; i++){
                 for(int j = 0; j < omp_get_num_threads(); j++){
                     t[i] += local_t[j][i];
@@ -788,8 +788,8 @@ namespace Graph {
         }
         //printf("Graph diameter is %d\n", freq_ecc.size()-1);
 
-        #pragma omp parallel for default(none) shared(freq_ecc)
 		int freq_ecc_size=freq_ecc.size();
+        #pragma omp parallel for default(none) shared(freq_ecc, freq_ecc_size)
         for(int i = 0; i <= freq_ecc_size - 1; i++){
             freq_ecc[i] = freq_ecc[i] / n;
             //printf("i=%d and n=%d with freq eccentricity %f\n",i,n,freq_ecc[i]);
