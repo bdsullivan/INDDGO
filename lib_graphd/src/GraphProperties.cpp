@@ -23,7 +23,32 @@
 //No longer used 7/22/13
 //#include <sys/syscall.h>
 #include <sys/types.h>
+#if !WIN32
 #include <sched.h>
+#endif
+
+#ifdef _OPENMP
+  #include <omp.h>
+#else
+	// CSG changing from #ifdef
+    #if !HAS_METIS
+
+	// CSG moving here from Graph.cpp...
+void omp_set_num_threads(int num_threads) { return; }
+int omp_get_num_threads() { return 1; }
+int omp_get_max_threads(void) { return 1; }
+int omp_get_thread_num(void) { return 0; }
+int omp_get_num_procs(void) { return 1; }
+int omp_in_parallel(void) { return 0; }
+void omp_set_dynamic(int num_threads) { return; }
+int omp_get_dynamic(void) { return 0; }
+void omp_set_nested(int nested) { return; }
+int omp_get_nested(void) { return 0; }
+//      #define omp_get_num_threads() 1
+//      #define omp_get_thread_num() 0
+    #endif
+#endif
+
 
 #include <numeric>
 
@@ -372,10 +397,8 @@ namespace Graph {
      * \param[out] t output vector of per-vertex triangle counts
      */
     void GraphProperties::all_triangles_compact_forward(Graph *g, vector<long int> &t){
-        int i, j;
+        int i;
         int u, v;
-        int retcode;
-        Node *vn;
 
         std::list<int>::const_reverse_iterator rit;
 
@@ -406,8 +429,6 @@ namespace Graph {
          */
 
         Node *nv, *nu;
-        int vp, up;
-        int iu, iv;
         int fakev;
         int uprime, vprime;
         const int n = g->get_num_nodes();
@@ -493,7 +514,8 @@ namespace Graph {
                 } //for vtxs
             } //for fakev
             #pragma omp for
-            for(i = 0; i < t.size(); i++){
+			int tsize=(int)t.size();
+            for(i = 0; i < tsize; i++){
                 for(int j = 0; j < omp_get_num_threads(); j++){
                     t[i] += local_t[j][i];
                 }
@@ -507,7 +529,7 @@ namespace Graph {
      * \param[out] t vector of long ints, length |V|, returns 3x number of triangles for each vertex
      */
     void GraphProperties::all_triangles_edge_listing(Graph *g, vector<long int> &t){
-        int i, j, u, v;
+        int i, u, v;
         vector<int>::iterator it;
         list<int>::const_iterator cit;
         list<int>::iterator lt;
@@ -757,7 +779,9 @@ namespace Graph {
         }
 
         //compute diameter of each vertex
-        for(int i = 0; i < ecc.size(); i++){
+		int eccsize=ecc.size();
+		// This could be slow with resizing
+        for(int i = 0; i < eccsize ; i++){
             if(ecc[i] > freq_ecc.size() ){
                 freq_ecc.resize(ecc[i] + 1); //because vector numbering starts at 0
             }
@@ -766,7 +790,8 @@ namespace Graph {
         //printf("Graph diameter is %d\n", freq_ecc.size()-1);
 
         #pragma omp parallel for default(none) shared(freq_ecc)
-        for(int i = 0; i <= freq_ecc.size() - 1; i++){
+		int freq_ecc_size=freq_ecc.size();
+        for(int i = 0; i <= freq_ecc_size - 1; i++){
             freq_ecc[i] = freq_ecc[i] / n;
             //printf("i=%d and n=%d with freq eccentricity %f\n",i,n,freq_ecc[i]);
         }
@@ -920,7 +945,6 @@ namespace Graph {
         const vector<int> &degrees = g->get_degree_ref();
         int i;
         double di, dc;
-        int nbr;
         std::list<int>::const_iterator cit;
         Node *node;
 
