@@ -19,6 +19,14 @@
 
  */
 
+/*This fixes any issues with MSVC always having HAS_METIS defined*/
+#ifdef _MSC_VER
+  #if !HAS_METIS 
+    #undef HAS_METIS 
+  #endif
+#endif 
+
+
 #ifndef GRAPH_H_
 #define GRAPH_H_
 

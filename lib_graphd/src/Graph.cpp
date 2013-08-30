@@ -28,9 +28,9 @@
 #include <algorithm>
 #include <string.h>
 
+
 #ifndef _OPENMP
     #ifdef HAS_METIS
-//Note: the above still evaluates to true if HAS_METIS is defined to 0 in MSVC
         void omp_set_num_threads(int num_threads) { return; }
         int omp_get_num_threads() { return 1; }
         int omp_get_max_threads(void) { return 1; }
