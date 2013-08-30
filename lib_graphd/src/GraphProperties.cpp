@@ -30,10 +30,9 @@
 #ifdef _OPENMP
   #include <omp.h>
 #else
-	// CSG changing from #ifdef
-    #if !HAS_METIS
-
-	// CSG moving here from Graph.cpp...
+#ifdef HAS_METIS
+// CSG moving here from Graph.cpp... MSVC will complain
+// about multiple definitions with the #define omp_X as well
 void omp_set_num_threads(int num_threads) { return; }
 int omp_get_num_threads() { return 1; }
 int omp_get_max_threads(void) { return 1; }
@@ -46,7 +45,7 @@ void omp_set_nested(int nested) { return; }
 int omp_get_nested(void) { return 0; }
 //      #define omp_get_num_threads() 1
 //      #define omp_get_thread_num() 0
-    #endif
+#endif
 #endif
 
 
