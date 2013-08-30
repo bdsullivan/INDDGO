@@ -27,28 +27,6 @@
 #include <sched.h>
 #endif
 
-#ifdef _OPENMP
-  #include <omp.h>
-#else
-#ifdef HAS_METIS
-// CSG moving here from Graph.cpp... MSVC will complain
-// about multiple definitions with the #define omp_X as well
-void omp_set_num_threads(int num_threads) { return; }
-int omp_get_num_threads() { return 1; }
-int omp_get_max_threads(void) { return 1; }
-int omp_get_thread_num(void) { return 0; }
-int omp_get_num_procs(void) { return 1; }
-int omp_in_parallel(void) { return 0; }
-void omp_set_dynamic(int num_threads) { return; }
-int omp_get_dynamic(void) { return 0; }
-void omp_set_nested(int nested) { return; }
-int omp_get_nested(void) { return 0; }
-//      #define omp_get_num_threads() 1
-//      #define omp_get_thread_num() 0
-#endif
-#endif
-
-
 #include <numeric>
 
 namespace Graph {
@@ -512,8 +490,8 @@ namespace Graph {
                     } //if revmap
                 } //for vtxs
             } //for fakev
-            #pragma omp for
 			int tsize=(int)t.size();
+            #pragma omp for
             for(i = 0; i < tsize; i++){
                 for(int j = 0; j < omp_get_num_threads(); j++){
                     t[i] += local_t[j][i];
@@ -788,8 +766,8 @@ namespace Graph {
         }
         //printf("Graph diameter is %d\n", freq_ecc.size()-1);
 
-        #pragma omp parallel for default(none) shared(freq_ecc)
 		int freq_ecc_size=freq_ecc.size();
+        #pragma omp parallel for default(none) shared(freq_ecc, freq_ecc_size)
         for(int i = 0; i <= freq_ecc_size - 1; i++){
             freq_ecc[i] = freq_ecc[i] / n;
             //printf("i=%d and n=%d with freq eccentricity %f\n",i,n,freq_ecc[i]);
