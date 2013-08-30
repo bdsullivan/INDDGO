@@ -19,30 +19,25 @@
 
  */
 
+/*This fixes any issues with MSVC always having HAS_METIS defined*/
+#ifdef _MSC_VER
+  #if !HAS_METIS 
+    #undef HAS_METIS 
+  #endif
+#endif 
+
+
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
-//#ifdef _OPENMP
-//  #include <omp.h>
-//#else
-//	// CSG changing from #ifdef
-//    #if !HAS_METIS
-//
-//	// CSG moving here from Graph.cpp...
-//void omp_set_num_threads(int num_threads) { return; }
-//int omp_get_num_threads() { return 1; }
-//int omp_get_max_threads(void) { return 1; }
-//int omp_get_thread_num(void) { return 0; }
-//int omp_get_num_procs(void) { return 1; }
-//int omp_in_parallel(void) { return 0; }
-//void omp_set_dynamic(int num_threads) { return; }
-//int omp_get_dynamic(void) { return 0; }
-//void omp_set_nested(int nested) { return; }
-//int omp_get_nested(void) { return 0; }
-////      #define omp_get_num_threads() 1
-////      #define omp_get_thread_num() 0
-//    #endif
-//#endif
+#ifdef _OPENMP
+  #include <omp.h>
+#else
+  #ifndef HAS_METIS
+    #define omp_get_num_threads() 1
+    #define omp_get_thread_num() 0
+  #endif
+#endif
 
 #if WIN32
 #define strncasecmp strncmp
