@@ -36,7 +36,11 @@ int parseLine(char *line){
     return i;
 }
 
-int getHWmem(){ //Note: this value is in KB!
+int getHWmem(){ 
+#if WIN32
+	return -1;
+#endif
+	//Note: this value is in KB!
     FILE *file = fopen("/proc/self/status", "r");
     if(file == NULL){
         fprintf(stderr, "Error opening processor status file!\n");
