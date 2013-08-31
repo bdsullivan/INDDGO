@@ -62,12 +62,13 @@ namespace Graph {
                 double r = lcgrand(0);
                 if(r < q1) {
                 } else if(r < q2) {
-                    x += pow(2,j);
+					// pow(2,j)?? 1<<j might be slightly faster...
+                    x += (int)pow((double)2,j);
                 } else if(r < q3) {
-                    y += pow(2,j);
+                    y += (int)pow((double)2,j);
                 } else {
-                    x += pow(2,j);
-                    y += pow(2,j);
+                    x += (int)pow((double)2,j);
+                    y += (int)pow((double)2,j);
                 }
             }
 
@@ -83,7 +84,7 @@ namespace Graph {
             }
 	}
 
-        Graph *g = new Graph(pow(2,l));
+        Graph *g = new Graph((int)pow((double)2,l));
         set< pair<unsigned long, unsigned long> >::const_iterator it;
         for(it = edges.begin(); it != edges.end(); it++) {
             g->add_edge(it->first,it->second);
@@ -106,14 +107,16 @@ namespace Graph {
         for(it = probs->begin(); it != probs->end(); it++) {
             //compute which actors have a given attribute
             vector<int> connect;
-            for(unsigned long i = 0; i < n; i++) {
+            for(int i = 0; i < n; i++) {
                 if(lcgrand(0) < *it) {
                     connect.push_back(i);
                 }
             }
             //attach these actors to the graph
-            for(int i = 0; i < connect.size(); i++) {
-                for(int j = i + 1; j < connect.size(); j++) {
+			// CSG - if you call size over and over here this will be sloooow!
+			int conn_size=connect.size();
+            for(int i = 0; i < conn_size; i++) {
+                for(int j = i + 1; j < conn_size; j++) {
                     edges.insert(make_pair(connect[i],connect[j]));
                 }
             }
