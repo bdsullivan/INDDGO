@@ -169,11 +169,18 @@ void usage(char *str)
 
 int main(int   argc,char *argv[])
 {
-	if(argc!=3)
+	if(argc<3)
 		usage(argv[0]);
 	char *DIMACS_file=argv[1];
 	// set time limit
 	int max_secs=atoi(argv[2]);
+	int num_threads=-1;
+	if(argc>=4)
+	{
+		for(int i=3;i<argc;i++)
+			if(strcmp(argv[i],"-n")==0)
+				num_threads=atoi(argv[i+1]);
+	}
 
 	// Load the graph from DIMACS_file
 	Graph::VertexWeightedGraph *G;
@@ -207,6 +214,10 @@ int main(int   argc,char *argv[])
 	status = CPXreadcopyprob (env, mip, mps_file, NULL);
 	check_CPX_status("CPXreadcopyprob",status);
 	CPXsetdblparam(env, CPX_PARAM_TILIM, max_secs);
+
+	if(num_threads!=-1)
+		// Set # of threads
+		CPXsetintparam(env,CPX_PARAM_THREADS,num_threads);
 
 	int num_cols=CPXgetnumcols(env,mip);
 	int num_rows=CPXgetnumrows(env,mip);
