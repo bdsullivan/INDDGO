@@ -794,26 +794,14 @@ int TDTree::replace_by_join_tree(int old_node, int max_id)
 }
 
 
-<<<<<<< HEAD
-/** 
-* Constructs a tree decomposition of the graph in the current TDTree using
-* Bodlaender-Koster's algorithm 2 from Treewidth Computations I, Upper Bounds.   
-* The graph G is assumed to have 
-* a single connected component since tree decompositions
-* of disconnected components can be joined together in
-* an arbitrary way.
-*/
-=======
-
 
 /** Constructs a tree decomposition of this->G using
- * Dourisboure & Gavoille's bfs based algorithm
+ * Dourisboure & Gavoille's bfs algorithm
  * The graph G is assumed to have a single connected
- * component since tree decompositions of
- * disconnected components can be joined together in
- * an arbitrary way.
+ * component since tree decompositions of disconnected
+ * components can be joined together in an arbitrary way.
  */
-void TDTree::construct_dg(int root)
+void TDTree::construct_bfs(int root=1)
 {
 	// First make sure this->G has one connected component
 	if(this->G->get_num_components()!=1)
@@ -822,70 +810,48 @@ void TDTree::construct_dg(int root)
                     "  This graph has %d connected components\n",__FUNCTION__,
                     this->G->get_num_components());
 	}
+    // Make sure root > 0
+    if(root < 1)
+    {
+		fatal_error("%s: must have root > 0",__FUNCTION__);
+    }
 
 	// We change the graph G, so we should use a copy. Note that this is potentially
 	// expensive for large graphs
-	// H will be modified to give the tree structure, G modified to make label = tree node index
-	Graph::WeightedMutableGraph H=*(this->G);
+	// H will be modified to give the tree structure
+    // G modified to make label = tree node index
+	Graph::VertexWeightedGraph H=*(this->G);
 
-	/// stuff for debugging, testing
 	Graph::GraphUtil util;
-	int step = 0;
-	char debugfilename[100];
-
-	// more declarations, initializations
 	bool *allowed;
 	allowed = new bool[H.get_capacity()];
-	memset(allowed,true,H.get_capacity());
-	int num_levs = 0;
-	int *reached;
-	reached = &num_levs;
+    std::fill(allowed, allowed+H.get_capacity(),true);
+	int temp=0;
+    int num_levs=0;
 
-    int *levels = util.bfs_dist1(&H,root-1,allowed,reached); // set 2nd arg to desired root
-    int tempnumlevs = 0;  
-    for(int j = 0; j < H.get_capacity();j++)
-    {
-        if(levels[j]>tempnumlevs) tempnumlevs = levels[j];
-    }
-    tempnumlevs++;
-    num_levs = tempnumlevs;
-
-    //making list for each level
+    int *levels = util.bfs_dist(&H,root-1,allowed,&temp,&num_levs);
+    delete [] allowed;
+    temp = 0;
+    num_levs +=1;
+	print_message(1, "Number of levels in BFS_DIST sorting = %d\n", num_levs);
     vector< list < int > > levelbags(num_levs); // each level has a list of points
-    vector<int> sizebags(num_levs,0); // number of vertices at each level
-    vector<int> bagsperlevel(num_levs,0); // number of bags at each level
     for(int j = 0; j < H.get_capacity(); j++)
     {
         levelbags[levels[j]].push_back(j);
-        sizebags[levels[j]]+=1;
     }
 
-    list<int>::iterator it;
-
-    // initial step
-    int level = num_levs-1;
-    int temp =0;
-    int numbags = 0;
-
-    list<TDTreeNode*> treenodelist; 
+    list<TDTreeNode*> treenodelist;
     list<int> newbag;
-
-    list<list<int> >::iterator baglistiter;
-    list<TDTreeNode*>::iterator nodelistiter;
-    list<int>::iterator level_it;
-    list<int>::iterator nbr_it;
-    list<int>::iterator nbr_it2;
-
+    list<int>::iterator it, level_it, nbr_it, nbr_it2;
     bool inbag = false;
-    Graph::Node *n;
-    Graph::Node *n2;
-    list<int> nbrs;
-    list<int> nbrs2;
+    Graph::Node *n, *n2;
+    list<int> nbrs, nbrs2;
     int bagsize = 0;
-    vector<Graph::Node> nodes;
 
-
-    for(level = num_levs-1; level >=0;level--)
+    // split lists containing all pts on single level, into multiple sets per level
+    // call these containers "prebags", make one TreeNode per prebag
+    // and add the TreeNode to the TreeNode list (which we later use to make the TreeNode vector)
+    for(int level = num_levs-1; level >=0;level--)
     {
         while(!levelbags[level].empty())
         {
@@ -894,71 +860,58 @@ void TDTree::construct_dg(int root)
             levelbags[level].pop_front();
             newbag.clear();
             newbag.push_back(temp);
-            numbags++;
             bagsize=1;
-    
-            //go through rest of levelbags[level], looking for more elements for newbag
+
             if(!levelbags[level].empty())
             {
-                // go through the current bag's elements,
-                // during loop we may add to the bag, increasing the value of end().
                 for(it = newbag.begin();it!= newbag.end();it++)
                 {
                     n = H.get_node(*it);
                     nbrs = n->get_nbrs();
     
-                    // this loop goes through the remaining elements in the levelbags[level] list
-                    for(level_it =  levelbags[level].begin();level_it!=levelbags[level].end();)
+                    for(level_it = levelbags[level].begin();level_it!=levelbags[level].end();)
                     {
                         // it points to an element of newbag
                         // level_it points to the level list, i.e. candidates for newbag
-    
-                        nbr_it = nbrs.begin();
-    
-                        while ((nbr_it != nbrs.end()) && (!inbag))// stop searching if match is found
+                        for(nbr_it =nbrs.begin();(nbr_it != nbrs.end()) && (!inbag);nbr_it++)// stop searching if match is found
                         {
                             if (*nbr_it == *level_it)
                             {
                                 inbag = true;
                             }
+                            // also add nodes that connect through a node on the next level
                             else if (level < num_levs-1 )
                             {
                                 n2 = H.get_node(*level_it);
                                 nbrs2 = n2->get_nbrs();
-                                nbr_it2 = nbrs2.begin();
-                                while( (nbr_it2 != nbrs2.end() ) && (!inbag) )
+                                for(nbr_it2 = nbrs2.begin(); (nbr_it2 != nbrs2.end() ) && (!inbag);nbr_it2++ )
                                 {
-                                    if (*nbr_it == *nbr_it2)
+                                    if (*nbr_it == *nbr_it2 && (levels[*nbr_it] > (level) ) )
+                                    //if (*nbr_it == *nbr_it2 && (H.get_node(*nbr_it)->get_label() > (level) ) )
                                     {
-                                        if( H.get_node(*nbr_it)->get_label() > (level) )
-                                        {
-                                            inbag = true;
-                                        }
+                                        inbag = true;
                                     }
-                                    ++nbr_it2;
                                 }
                             }
-                            ++nbr_it;
                         }
-    
+
+                        // move *level_it from level bag, to newbag
                         if(inbag)
                         {
-                            // remove level_it from level bag, add to newbag
                             newbag.push_back(*level_it);
                             level_it = levelbags[level].erase(level_it);
                             bagsize++;
                         }
                         else
                         {
-                            // leave level_it, move on to next candidate
                             ++level_it;
                         }
                         inbag = false;
                     }
                 }
             }
-    
-            //fuse bag contents, in H, to get tree
+
+            //collapse bag contents in H, to get tree
             if( bagsize > 1 ) 
             { 
                 it=newbag.begin();
@@ -966,55 +919,60 @@ void TDTree::construct_dg(int root)
                 nbr_it++;
                 for(;nbr_it!=newbag.end();nbr_it++)
                 {
+                    //id of bag will be lowest vertex label in prebag
                     if(*nbr_it < *it)
                     {
-                        temp = H.fuse_vertices(*nbr_it,*it);
+                        temp = H.fuse_vertices(*nbr_it,*it, false);
                     }
                     else if(*it <= *nbr_it)
                     {
-                        temp = H.fuse_vertices(*it,*nbr_it);
+                        temp = H.fuse_vertices(*it,*nbr_it, false);
                     }
                 }
             }
-    
-            // make nodes here
-            // assign bag, and id fields
+
+            // make nodes here, assign bag, and id fields
+            // using "prebag" here to refer to list of points in tree node at intermediate stage of D&G bfs algorithm
             TDTreeNode *next_tree_node;
             next_tree_node = new TDTreeNode;
-            next_tree_node->id = temp; //id of bag is lowest vertex label in prebag
+            next_tree_node->id = temp; //id of bag is min vertex label in prebag
             next_tree_node->bag = newbag; //copy bag over
-    
+
             //also modify G's labels so each node.label = prebag id
             for(it=newbag.begin();it!=newbag.end();it++)
             {
-                this->G->get_node(*it)->set_label(temp);
+                this->G->get_node(*it)->set_label(*it+1);// undo fuse_vertices label changes
+                //this->G->get_node(*it)->set_label(temp);
             }
-    
+
             treenodelist.push_back(next_tree_node); 
             bagsize =0;
         }
-        bagsperlevel[level]=numbags;
-        numbags =0;
-    }
-    //end loop to build bags
+    }//end loop to build "pre"-bags
 
-	//build TDTree (i.e. add parent, child lists from H, take unions of bags)
-	temp = treenodelist.size();
-	this->num_tree_nodes = temp;
+	//build TDTree (i.e. add parent, child lists from H, build bags from prebags)
+    //Node has "bag" list and "all_ind_set_values" list
+    //we will place a prebag in each list, the bag list will contain the prebag that we formed in the intermediate stage above
+    //the all_ind_set_values list will contain the prebag from the parent node
+    //in the bfs paper, these lists are joined to create the bag
+    //here we try to form a separator, and split a single D&G node into 2 nodes, so it will be useful to have the two lists in one node
+    //but stored separately for now
+	int num_prebags = treenodelist.size(); 
+	this->num_tree_nodes = num_prebags;
 
-	/// resize tree node vector
-	/// each node in original tree has even index and a reserved node at +1 index in case of splitting
-	this->tree_nodes.resize(2*temp,NULL); 
-
+	/// each node in original tree has index 3*n and a reserved node at +1 and -1 index in case of splitting
+	this->tree_nodes.resize(3*num_prebags,NULL); 
 	// resize H to fit new nodes we will add to it
-	H.resize_graph(2*this->G->get_capacity());
+	H.resize_graph(3*this->G->get_capacity());
 
-	// an array for tracking parents.
-	// traversing tree from root to leafs, set to true once node has been reached
-	reached = new int[H.get_capacity()];
-	allowed = new bool[H.get_capacity()];
-	memset(allowed,false,H.get_capacity());
-	memset(reached,0,H.get_capacity());
+    // id2node_index maps id -> index in tree_node + 1 ( why +1? because if(0)=if(false)  )
+    // traversing tree from root to leafs, same as if(node previously reached)
+    // will need to use this to access neighbours' information. e.g. get neighbor from adj list, then get neighbor's index from id2node_index
+    // then can use index to look up neighbors bag
+    int sizeH = H.get_capacity();
+    int *id2node_index;
+	id2node_index = new int[sizeH];
+	std::fill(id2node_index, id2node_index + sizeH, 0);
 
 	// root node
 	this->root_node = treenodelist.back()->id;
@@ -1023,189 +981,462 @@ void TDTree::construct_dg(int root)
     //use all_ind_set_values to store 2nd list on each node
 	this->tree_nodes[0]->all_ind_set_values=this->tree_nodes[0]->bag;
 	this->width = this->tree_nodes[0]->bag.size();
-
 	treenodelist.pop_back();
-	this->tree_nodes[0]->adj = H.get_node(this->root_node)->get_nbrs();
+	this->tree_nodes[0]->adj = H.get_node(this->root_node)->get_nbrs(); // all nbrs are children
 
-	nodelistiter = treenodelist.end();
-	nodelistiter--;
+	id2node_index[this->root_node]=1;//may need to do +1 on indices so that root node isn't = 0
 
-	allowed[this->root_node]=true;
-	reached[this->root_node]=1;//may need to do +1 on indices so that root node isn't = 0
-
-	// loop through list of nodes, temp = # of prebags in intermediate tree
-	// # of bags in final tree will be greater, due to splitting
+	// # of bags in final tree will be > num_prebags, due to splitting
 	int split = 0;
-	for(int prebagcounter = 1; prebagcounter < temp; prebagcounter++) 
+    int parent_index;
+    int current_index;
+	for(int prebagcounter = 1; prebagcounter < num_prebags; prebagcounter++) 
 	{
-		this->tree_nodes[2*prebagcounter] = treenodelist.back();// add node, reverse order
-		reached[this->tree_nodes[2*prebagcounter]->id]=2*prebagcounter+1; 
+        current_index = 3*prebagcounter;
+		this->tree_nodes[current_index] = treenodelist.back();// add node, reverse order
+		id2node_index[this->tree_nodes[current_index]->id]=current_index+1; 
 		treenodelist.pop_back();// delete from list
-	
+
 		//fill adjacency list, parent at front, children at back          
-		n2 = H.get_node(this->tree_nodes[2*prebagcounter]->id);
+		n2 = H.get_node(this->tree_nodes[current_index]->id);
 		nbrs2 = n2->get_nbrs();
 
 		// make the adj list of the node
-		for(it=nbrs2.begin();it!=nbrs2.end();it++)
+	  	for( list<int>::iterator temp_it = nbrs2.begin();temp_it!=nbrs2.end();temp_it++)
 		{
-			
-			if(allowed[*it]) //parent
+			if(id2node_index[*temp_it]) //parent
 			{
-				this->tree_nodes[2*prebagcounter]->adj.push_front(*it);
+				this->tree_nodes[current_index]->adj.push_front(*temp_it);
 				//copy bag for children to have access to original
-				this->tree_nodes[2*prebagcounter]->all_ind_set_values=this->tree_nodes[2*prebagcounter]->bag; 
+				this->tree_nodes[current_index]->all_ind_set_values=this->tree_nodes[current_index]->bag; 
 			}
 			else // children 
 			{
-				this->tree_nodes[2*prebagcounter]->adj.push_back(*it);
+				this->tree_nodes[current_index]->adj.push_back(*temp_it);
 			}
-		}
+        }
 		
-		if(this->tree_nodes[2*prebagcounter]->bag.size() > 1 && this->tree_nodes[2*prebagcounter]->adj.size()>1)
-		{
-			// create node at +1 index
-			this->tree_nodes[2*prebagcounter+1] = new TDTreeNode;
-			this->tree_nodes[2*prebagcounter+1]->bag = this->tree_nodes[2*prebagcounter]->bag;
-			this->tree_nodes[2*prebagcounter+1]->id = this->tree_nodes[2*prebagcounter]->id + this->G->get_capacity();
-		}
+        // should i move this to directly before a new node is created???, also 
+		// create node at +1 index, later need to delete unused nodes?
+		this->tree_nodes[current_index+1] = new TDTreeNode;
+		this->tree_nodes[current_index+1]->bag = this->tree_nodes[current_index]->bag;
+		this->tree_nodes[current_index+1]->id = this->tree_nodes[current_index]->id + this->G->get_capacity();
+		this->tree_nodes[current_index+2] = new TDTreeNode;
+		this->tree_nodes[current_index+2]->bag = this->tree_nodes[current_index]->bag;  /// not sure if this is right
+		this->tree_nodes[current_index+2]->id = this->tree_nodes[current_index]->id + 2*this->G->get_capacity(); // may not be needed, hopefully not used
 
-		// decide if we are separatign the bag into two bags
-		// contruct P(L) subset of prebag from parent node
-		list<int> parentbaglist = tree_nodes[reached[this->tree_nodes[2*prebagcounter]->adj.front()]-1]->all_ind_set_values; 
+        parent_index = id2node_index[this->tree_nodes[current_index]->adj.front()]-1; // reverse lookup of nodes in original intermediate tree that have been dealt with
+		list<int> parentbaglist = this->tree_nodes[parent_index]->all_ind_set_values; 
+		list<int> templist; //subset of parent bag list = intersection of parent prebag and adj list
 
-		list<int> templist; 
-		bool ishfwilf = true; //i still haven't found what i'm looking for
-		for(it = parentbaglist.begin(); it!=parentbaglist.end();it++)
-		{
-			n2 = G->get_node(*it); /// go to original graph, get nbrs
-			nbrs2 = n2->get_nbrs();
-			nbr_it2 = nbrs2.begin();
+        //temporary bool to switch between old splitting and new splitting
+        // eventually want to either delete 2nd separator, or chain them so that both are used
+        //bool separator = false;
+        int separator_switch = 0; // 0 = bfs only, no separator, 1 = metis separator, 2 = parent separator, 3 = parent then metis/// should have a switch to turn both off, to just use bfs
+        if(separator_switch==0)
+        {
+            templist = this->tree_nodes[current_index+1]->bag;
+            // construct bag 
+            this->tree_nodes[current_index]->bag = templist;
+            // update tree's width
+            if( this->width < this->tree_nodes[current_index]->bag.size() )
+                this->width = this->tree_nodes[current_index]->bag.size();
+        }
+        else if(separator_switch==1)
+        {
+            templist = this->tree_nodes[current_index+1]->bag;
+            // parentbaglist = prebag from parent node, templist = prebag from current node
+            // in bfs algorithm the union of these prebags gives the bag for the current node
+            // we call a separator, resulting in 2 possible outcomes
+            // a) no separator formed, then top list or bottom list come back empty. don't split. non-empty list = bag
+            //  (when does this happend? only for very small lists? in my tests it only happened for lists of size 3)
+            // b) separator formed, top, bottom returned. split into 2 nodes, 
+            //  top goes into the top node as its bag, bottom into the bottom node as its bag.
+            // metis_ConstructSeparator(VertexWeightedGraph, top list, bottom list)
+            // if no separator is constructed by METIS, this returns union of toplist and bottomlist, in bottomlist. toplist is returned empty
+            // input lists are no longer available after calling this function (copies are still in bag, and all_ind_set_values)
+std::cout << "0, ConstructSeparator 1\n";
+			util.metis_ConstructSeparator(G,&parentbaglist,&templist);
 
-			// loop through nbrs of element from parent prebag
-			while(ishfwilf && nbr_it2!= nbrs2.end())
-			{
-				
-				nbr_it = this->tree_nodes[2*prebagcounter]->bag.begin();
+			if(parentbaglist.empty()) // i.e. ConstructSeparator did not return 2 lists, no splittting, create a single node
+    		{
+std::cout << "constructsep did nothing\n";
+                // construct bag 
+                this->tree_nodes[current_index]->bag = templist;
 
-				//loop through current prebag
-				while((ishfwilf) && (nbr_it!= this->tree_nodes[2*prebagcounter]->bag.end()) )
-				{
-					if(*nbr_it2 == *nbr_it)
-					{
-						ishfwilf = false;
-						templist.push_back(*it);
-					}
-					nbr_it++;
-				}
-				nbr_it2++;
-			}
-			ishfwilf = true;// reset bool
-		}
+                // update tree's width
+                if( this->width < this->tree_nodes[current_index]->bag.size() )
+                    this->width = this->tree_nodes[current_index]->bag.size();
+            }
+            else // create 2 nodes with bags already created in parentbaglist, templist... 
+            {
+    			int w = this->tree_nodes[current_index-1]->id;
+    			//int w = this->tree_nodes[parent_index+1]->id;
+    			list<int>::iterator it;
+    
+                // original tree: parent-\-current, new tree: parent-\-(newnode id=w)-\-current
+				H.edge_subdivision(this->tree_nodes[current_index]->adj.front(),this->tree_nodes[current_index]->id, w);// order = parent, child, new node
 
-		if(templist.size() < parentbaglist.size()) // create two nodes
-		{
-			int w = this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->id;
-			list<int>::iterator it;
-			// modify H graph, maybe
+				//fix the adj lists: new node, then parent, then current
+                //new node; current node's parent becomes parent of new node. current node becomes it's only child
+                this->tree_nodes[current_index-1]->adj.push_back(this->tree_nodes[current_index]->id);
+		        this->tree_nodes[current_index-1]->adj.push_front(this->tree_nodes[current_index]->adj.front());
 
-			// add node  if it hasn't already been added
-			// if it already exists, change edge from parent to w
-			if(this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->adj.empty())
-			{
-				// this isn't needed - currently
-				H.edge_subdivision(this->tree_nodes[2*prebagcounter]->adj.front(),this->tree_nodes[2*prebagcounter]->id, w);// order = parent, child, new node
-
-				//fix the adj lists
-				//new node
-		    	this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->adj.push_back(this->tree_nodes[2*prebagcounter]->id);
-			    this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->adj.push_front(this->tree_nodes[2*prebagcounter]->adj.front());
-				it = this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.begin();
-
-				while(it != this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.end())
+   				for(it = this->tree_nodes[parent_index]->adj.begin(); it != this->tree_nodes[ parent_index ]->adj.end(); it++)
 				//old parent's adj list, replace child  with new node
+   				{
+                    if(*it == this->tree_nodes[current_index]->id)
+                    {
+   			            *it = w;
+				        break;
+				    }
+                }
+
+                //current node has a new parent
+                this->tree_nodes[current_index]->adj.pop_front();
+                this->tree_nodes[current_index]->adj.push_front(w);
+    
+                // construct bag
+                // D&G's bfs alg created the bag L^k \union L^{k+1}
+                // old separator construction created 2 bags: P^k and P^k \union L^{k+1}
+                // the L^j are stored in tree_nodes[]->bag
+                // the P^j are given by templist 
+                //   (not parentbaglist which is a larger set of all elements in parent bag, not just the neighbouring elements)
+                // to create the nodes, apparently templist bag is already done, and just need a single line inserting templist into bag
+                // old code:
+                // this->tree_nodes[current_index]->bag.insert(this->tree_nodes[current_index]->bag.begin(),templist.begin(),templist.end());
+                // in this new construction we want to creat 2 bags: toplist, bottomlist
+                // instead of inserting anything in bottom bag, need to replace the bag with bottomlist
+                // but also need to do this for top bag
+
+		        // recall: util.metis_ConstructSeparator(G,&parentbaglist,&templist); i.e. toplist = parentbaglist and bottomlist = templist
+                this->tree_nodes[current_index]->bag=templist;
+                this->tree_nodes[current_index-1]->bag=parentbaglist;
+
+
+                if(this->width < this->tree_nodes[current_index]->bag.size() )
+                    this->width = this->tree_nodes[current_index]->bag.size();
+
+                if(this->width < this->tree_nodes[current_index-1]->bag.size() )
+                    this->width = this->tree_nodes[current_index-1]->bag.size();
+    
+                split++;
+            }
+        }
+        else if(separator_switch==2)
+        {
+            // this separator is based on taking a subset of parent bag, and is actually 2 steps in 1
+            // separator step: bfs algorithm creates a bag from union of current and parent prebags
+            // but only direct parents \subset parent bag share edges to current bag
+            // direct parents are a separator -> create 2 bags, top bag has parent prebag, bottom has current prebag union direct parents
+            // but if multiple children of same parent do this, will end up with multiple copies of node with bag = parent prebag
+            // so we should merge all those identical nodes into a single node
+            // so what this code does is attach the new node to the parent (i.e. build it at parent_index+1, instead of current_index-1)
+            // that means we have to search for existence of this
+            // construct templist = subset of parentbaglist that has a neighbor in (pre)bag at current node
+    		bool keepsearching = true;
+    		for(it = parentbaglist.begin(); it!=parentbaglist.end();it++)
+    		{
+    			n2 = G->get_node(*it); /// go to original graph, get nbrs
+    			nbrs2 = n2->get_nbrs();
+                for(nbr_it2 = nbrs2.begin() ; keepsearching && nbr_it2 != nbrs2.end() ; nbr_it2++)
+                {
+                    for ( nbr_it = this->tree_nodes[current_index]->bag.begin(); keepsearching && nbr_it != this->tree_nodes[current_index]->bag.end() ; nbr_it++)
+                    {
+                        if(*nbr_it2 == *nbr_it)
+                        {
+                            keepsearching = false;
+                            templist.push_back(*it);
+                        }
+                    }
+                }
+    			keepsearching = true;// reset to true
+    		}
+    
+    		if(templist.size() < parentbaglist.size()) // create two nodes
+    		//if(false) 
+    		{
+                //recall that: parent_index = id2node_index[this->tree_nodes[current_index]->adj.front()]-1;
+                // w is id of potential node paired to parent
+    			int w = this->tree_nodes[parent_index+1]->id;
+    			list<int>::iterator it;
+    			// modify H graph, maybe
+    
+    			// add node  if it hasn't already been added
+    			// if it already exists, change edge from parent to w
+    			if(this->tree_nodes[parent_index+1]->adj.empty())
+    			{
+    				H.edge_subdivision(this->tree_nodes[current_index]->adj.front(),this->tree_nodes[current_index]->id, w);// order = parent, child, new node
+    
+    				//fix the adj lists
+    				//new node
+    		    	this->tree_nodes[parent_index+1]->adj.push_back(this->tree_nodes[current_index]->id);
+    			    this->tree_nodes[parent_index+1]->adj.push_front(this->tree_nodes[current_index]->adj.front());
+    				
+    				for(it = this->tree_nodes[parent_index]->adj.begin(); it != this->tree_nodes[parent_index]->adj.end(); it++)
+    				//old parent's adj list, replace child  with new node
+    				{
+    					if(*it == this->tree_nodes[current_index]->id)
+    					{
+    						*it = w;
+    						break;
+    					}
+    				}
+    			}
+    			else
+    			{
+    				// this block hasn't been tested
+    				H.remove_edge(this->tree_nodes[current_index]->id,this->tree_nodes[current_index]->adj.front());
+    				H.add_edge(this->tree_nodes[current_index]->id,w);
+    
+    				//new node, already connected to parent
+    				this->tree_nodes[parent_index+1]->adj.push_back(this->tree_nodes[current_index]->id);
+    				//old parent, already connected to new node, just delete child from adj list
+    				for( it = this->tree_nodes[parent_index]->adj.begin(); it != this->tree_nodes[parent_index]->adj.end(); it++)
+    				{
+    					if(*it == this->tree_nodes[current_index]->id)
+    					{
+    						it = this->tree_nodes[parent_index]->adj.erase(it);
+    						break;
+    					}
+    				}
+    			}
+    
+                // construct bag
+                this->tree_nodes[current_index]->bag.insert(this->tree_nodes[current_index]->bag.begin(),templist.begin(),templist.end());
+    
+                if(this->width < this->tree_nodes[current_index]->bag.size() )
+                    this->width = this->tree_nodes[current_index]->bag.size();
+    
+                //child adj list
+                this->tree_nodes[current_index]->adj.pop_front();
+                this->tree_nodes[current_index]->adj.push_front(w);
+                split++;
+            }
+    
+            else // creat a single node
+            {
+                // construct bag
+                this->tree_nodes[current_index]->bag.insert(this->tree_nodes[current_index]->bag.begin(),this->tree_nodes[parent_index]->all_ind_set_values.begin(),this->tree_nodes[parent_index]->all_ind_set_values.end());
+    
+                if( this->width < this->tree_nodes[current_index]->bag.size() )
+                    this->width = this->tree_nodes[current_index]->bag.size();
+            }
+        }
+        else if(separator_switch==3)
+        {
+            // combine both of the above separators.  create parent separator first, then call metis
+            // put new bag from parent separator in parent_index+1, new bag from metis separator in current_index-1
+
+    		bool keepsearching = true;
+    		for(it = parentbaglist.begin(); it!=parentbaglist.end();it++)
+    		{
+    			n2 = G->get_node(*it); /// go to original graph, get nbrs
+    			nbrs2 = n2->get_nbrs();
+                for(nbr_it2 = nbrs2.begin() ; keepsearching && nbr_it2 != nbrs2.end() ; nbr_it2++)
+                {
+                    for ( nbr_it = this->tree_nodes[current_index]->bag.begin(); keepsearching && nbr_it != this->tree_nodes[current_index]->bag.end() ; nbr_it++)
+                    {
+                        if(*nbr_it2 == *nbr_it)
+                        {
+                            keepsearching = false;
+                            templist.push_back(*it);
+                        }
+                    }
+                }
+    			keepsearching = true;// reset to true
+    		}
+    
+    		if(templist.size() < parentbaglist.size()) // create two nodes plus whatever metis dictates
+    		{
+                // w is id of potential node paired to parent
+    			int w = this->tree_nodes[parent_index+1]->id;/// this node already exists, but should we in fact only be creating it here?... if yes, then we need to test if it exists because multiple nodes could have the same parent, and the same parent+1
+    			list<int>::iterator it;
+    			// modify H graph, maybe
+    
+    			// add node  if it hasn't already been added
+    			// if it already exists, change edge from parent to w
+    			if(this->tree_nodes[parent_index+1]->adj.empty())
+    			{
+    				H.edge_subdivision(this->tree_nodes[current_index]->adj.front(),this->tree_nodes[current_index]->id, w);// order = parent, child, new node
+    
+    				//fix the adj lists
+    				//new node
+    		    	this->tree_nodes[parent_index+1]->adj.push_back(this->tree_nodes[current_index]->id);
+    			    this->tree_nodes[parent_index+1]->adj.push_front(this->tree_nodes[current_index]->adj.front());
+    				
+    				for(it = this->tree_nodes[parent_index]->adj.begin(); it != this->tree_nodes[parent_index]->adj.end(); it++ )
+    				{
+    				    //old parent's adj list, replace child  with new node
+    					if(*it == this->tree_nodes[current_index]->id)
+    					{
+    						*it = w;
+    						break;
+    					}
+    				}
+                    split++;
+    			}
+    			else
+    			{
+    				// this block hasnt been tested
+std::cout << "flag 2\n";
+    				H.remove_edge(this->tree_nodes[current_index]->id,this->tree_nodes[current_index]->adj.front());
+    				H.add_edge(this->tree_nodes[current_index]->id,w);
+    
+    				//new node, already connected to parent
+    				this->tree_nodes[parent_index+1]->adj.push_back(this->tree_nodes[current_index]->id);
+    				//old parent, already connected to new node, just delete child from adj list
+    				for( it = this->tree_nodes[parent_index]->adj.begin(); it != this->tree_nodes[parent_index]->adj.end(); it++)
+    				{
+    					if(*it == this->tree_nodes[current_index]->id)
+    					{
+    						it = this->tree_nodes[parent_index]->adj.erase(it);
+    						break;
+    					}
+    				}
+    			}
+
+                //child adj list
+                this->tree_nodes[current_index]->adj.pop_front();
+                this->tree_nodes[current_index]->adj.push_front(w);
+    
+                // pass the templist and bag lists to metis_ConstructSeparator
+                list<int> bottomlist = this->tree_nodes[current_index]->bag; // possibly this is not needed. just use tree_nodes[index]->bag
+std::cout << "2, ConstructSeparator 1: both separators, potentially\n";
+                util.metis_ConstructSeparator(G,&templist,&bottomlist);
+
+                if(templist.empty()) // i.e. ConstructSeparator did not return 2 lists, no splittting, create a single node
+                {
+std::cout << "constructsep did nothing\n";
+                    this->tree_nodes[current_index]->bag = bottomlist; //if we don't use bottomlist, can we avoid this line?
+
+                    if( this->width < this->tree_nodes[current_index]->bag.size() )
+                        this->width = this->tree_nodes[current_index]->bag.size();
+                }
+				else // create 2 nodes with 2 lists from ConstructSeparator
 				{
-					if(*it == tree_nodes[2*prebagcounter]->id)
-					{
-						*it = w;
-						break;
-					}
-					it++;
-				}
-			}
-			else
-			{
-				// this isn't needed - currently
-				H.remove_edge(this->tree_nodes[2*prebagcounter]->id,this->tree_nodes[2*prebagcounter]->adj.front());
-				H.add_edge(this->tree_nodes[2*prebagcounter]->id,w);
+					int w2 = this->tree_nodes[current_index-1]->id;
+					list<int>::iterator it;
+		
+					// original tree: parent-\-subparent-\-current, new tree: parent-\-subparent-\-(newnode id=w)-\-current 
+					H.edge_subdivision(this->tree_nodes[current_index]->adj.front(),this->tree_nodes[current_index]->id, w2);// order = parent, child, new node
 
-				//new node, already connected to parent
-				this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]]->adj.push_back(this->tree_nodes[2*prebagcounter]->id);
-				//old parent, already connected to new node, just delete child from adj list
-				it = this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.begin();
-				while(it != this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.end())
+					//fix the adj lists: new node, then (sub)parent, then current
+					//new node; current node's parent becomes parent of new node. current node becomes it's only child
+					this->tree_nodes[current_index-1]->adj.push_back(this->tree_nodes[current_index]->id);
+					this->tree_nodes[current_index-1]->adj.push_front(this->tree_nodes[current_index]->adj.front());
+
+					for(it = this->tree_nodes[parent_index+1]->adj.begin(); it != this->tree_nodes[ parent_index+1 ]->adj.end(); it++)
+					//old parent's adj list, replace child  with new node
+					{
+						if(*it == this->tree_nodes[current_index]->id)
+						{
+							*it = w2;
+							break;
+						}
+					}
+
+					//current node has a new parent
+					this->tree_nodes[current_index]->adj.pop_front();
+					this->tree_nodes[current_index]->adj.push_front(w2);
+		
+					// recall: util.metis_ConstructSeparator(G,&parentbaglist,&templist); i.e. toplist = parentbaglist and bottomlist = templist
+                    // actually, in this block of code toplist = templist, bottomlist=bottomlist
+					this->tree_nodes[current_index]->bag=bottomlist;
+					this->tree_nodes[current_index-1]->bag=templist;
+
+                    //no need to test parent_index+1 since it has smaller width than parent_index
+					if(this->width < this->tree_nodes[current_index]->bag.size() )
+						this->width = this->tree_nodes[current_index]->bag.size();
+
+					if(this->width < this->tree_nodes[current_index-1]->bag.size() )
+						this->width = this->tree_nodes[current_index-1]->bag.size();
+		
+					split++;
+				}
+            }
+            else // creat a single node plus whatever comes out of metis
+            {
+                // construct bag /// all of this code is reused from above. maybe move this out into a separate function: metis_sep_node_construct()...
+                list<int> bottomlist = this->tree_nodes[current_index]->bag; // possibly this is not needed. just use tree_nodes[index]->bag
+                list<int> toplist = this->tree_nodes[parent_index]->all_ind_set_values; // possibly this is not needed. just use tree_nodes[parent_index]->all_ind_set_values
+std::cout << "2, ConstructSeparator 2: at most, METIS separator\n";
+                util.metis_ConstructSeparator(G,&toplist,&bottomlist);
+
+                if(toplist.empty()) // i.e. ConstructSeparator did not return 2 lists, no splittting, create a single node
+                {
+std::cout << "constructsep did nothing\n";
+                    this->tree_nodes[current_index]->bag = bottomlist; //if we don't use bottomlist, can we avoid this line?
+
+                    if( this->width < this->tree_nodes[current_index]->bag.size() )
+                        this->width = this->tree_nodes[current_index]->bag.size();
+                }
+				else // create 2 nodes with 2 lists from ConstructSeparator
 				{
-					if(*it == tree_nodes[2*prebagcounter]->id)
+					int w2 = this->tree_nodes[current_index-1]->id;
+					list<int>::iterator it;
+		
+					// original tree: parent-\-subparent-\-current, new tree: parent-\-subparent-\-(newnode id=w)-\-current 
+					H.edge_subdivision(this->tree_nodes[current_index]->adj.front(),this->tree_nodes[current_index]->id, w2);// order = parent, child, new node
+
+					//fix the adj lists: new node, then (sub)parent, then current
+					//new node; current node's parent becomes parent of new node. current node becomes it's only child
+					this->tree_nodes[current_index-1]->adj.push_back(this->tree_nodes[current_index]->id);
+					this->tree_nodes[current_index-1]->adj.push_front(this->tree_nodes[current_index]->adj.front());
+
+                    // parent_index + 1 not used here, only splitting is from metis separator
+					for(it = this->tree_nodes[parent_index]->adj.begin(); it != this->tree_nodes[ parent_index ]->adj.end(); it++ )
+					//old parent's adj list, replace child  with new node
 					{
-						it = this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->adj.erase(it);
-						break;
+						if(*it == this->tree_nodes[current_index]->id)
+						{
+							*it = w2;
+							break;
+						}
 					}
-					it++;
+
+					//current node has a new parent
+					this->tree_nodes[current_index]->adj.pop_front();
+					this->tree_nodes[current_index]->adj.push_front(w2);
+		
+					// recall: util.metis_ConstructSeparator(G,&parentbaglist,&templist); i.e. toplist = parentbaglist and bottomlist = templist
+					this->tree_nodes[current_index]->bag=bottomlist;
+					this->tree_nodes[current_index-1]->bag=toplist;
+
+                    //no need to test parent_index+1 since it has smaller width than parent_index
+					if(this->width < this->tree_nodes[current_index]->bag.size() )
+						this->width = this->tree_nodes[current_index]->bag.size();
+
+					if(this->width < this->tree_nodes[current_index-1]->bag.size() )
+						this->width = this->tree_nodes[current_index-1]->bag.size();
+		
+					split++;
 				}
-			}
-
-
-///  separator goes here
-//   use templist, and bag to construct new Graph to send to separator function 
-// possibly using get_node to copy nodes over, or just starting from scratch creating new nodes using get_label only
-Graph::GraphCreatorFile *creator;
-creator = new Graph::GraphCreatorFile();
-list<int> H1_members(this->tree_nodes[2*prebagcounter]->bag);
-H1_members.insert(H1_members.begin(),templist.begin(),templist.end());
-Graph::WeightedMutableGraph *H1;
-H1 = creator->separator_prep(this->G, &templist,&this->tree_nodes[2*prebagcounter]->bag, true); //  <<-- this is creating the graph correctly, but its labels are all off...
-
-util.metis_ConstructSeparator(H1);
-
-//test
-/*
-Graph::GraphWriter *writer;
-Graph::GraphReaderWriterFactory rwf;
-writer = rwf.create_writer("graphviz");
-char filename[100];
-sprintf(filename,"debugH%d.gviz",prebagcounter);
-writer->set_out_file_name(filename);
-writer->write_graph(H1); 
-*/
-
-/////////////////////////
-
-			// construct bag
-			this->tree_nodes[2*prebagcounter]->bag.insert(this->tree_nodes[2*prebagcounter]->bag.begin(),templist.begin(),templist.end());
-
-            if(this->width < this->tree_nodes[2*prebagcounter]->bag.size() )
-				this->width = this->tree_nodes[2*prebagcounter]->bag.size();
-
-			//child adj list
-			this->tree_nodes[2*prebagcounter]->adj.pop_front();
-			this->tree_nodes[2*prebagcounter]->adj.push_front(w);
-			split++;
-		}
-
-		else // creat a single node
-		{
-			// construct bag
-			this->tree_nodes[2*prebagcounter]->bag.insert(this->tree_nodes[2*prebagcounter]->bag.begin(),this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->all_ind_set_values.begin(),this->tree_nodes[reached[tree_nodes[2*prebagcounter]->adj.front()]-1]->all_ind_set_values.end());
-
-            if(this->width < this->tree_nodes[2*prebagcounter]->bag.size() )
-				this->width = this->tree_nodes[2*prebagcounter]->bag.size();
-		}
-
-		allowed[this->tree_nodes[2*prebagcounter]->id]=true;
+            }
+        }
 	}
 
+    //////  DAG: do we want to remap tree's id values, and G's label values so they go from 1 to |T|
+    //////  instead of taking values of lowest index in each bag?
+    //////  when we take union of bags, that feature will no longer hold
+    //////  answer: yes, do this
+
 	//the correct solution might be to resize the vector and eliminate both NULL and unused nodes
-	for(int k = 0; k < 2*temp-1; k++)
+    //old2new_tree_index maps the tree index in the larger vector into the index in the smaller vector
+    //label2index maps the label (which is currently an element of the graph) into the old index
+    //int *old2new_tree_index;
+	//old2new_tree_index = new int[sizeH];
+	//memset(old2new_tree_index,-1,sizeH*sizeof(int));
+    int *label2index;
+	label2index = new int[sizeH];
+	//memset(label2index,-1,sizeH*sizeof(int));
+	std::fill(label2index, label2index+sizeH, -1);
+    int nodecount=0;
+
+    // 2 possibilities: new vector of smaller size with no NULL nodes
+    // or leave NULLs, and just fix adj lists
+
+	for(int k = 0; k < 3*num_prebags; k++)
 	{
 		if(this->tree_nodes[k]!=NULL)
 		{
@@ -1213,20 +1444,48 @@ writer->write_graph(H1);
 			{
 				this->tree_nodes[k]=NULL;
 			}
+            else
+            {
+                //old2new_tree_index[k] = nodecount;
+                label2index[this->tree_nodes[k]->id]=k;
+                //nodecount++;
+            }
 		}
 	}
+	for(int k = 0; k < 3*num_prebags; k++)
+	{
+		if(this->tree_nodes[k]!=NULL)
+		{
+            for(it = this->tree_nodes[k]->adj.begin();it!=this->tree_nodes[k]->adj.end();it++)
+            {
+                *it = label2index[*it];
+            }
+		}
+	}
+    /*for(int k = 0; k < 3*num_prebags; k++)
+    {
+      std::cout << "k= " << k << " old2new_tree_index[k] = " << old2new_tree_index[k] << " id of tree node if it exists = ";
+if(old2new_tree_index[k] != -1)
+std::cout << this->tree_nodes[k]->id << std::endl;
+else std::cout << std::endl;
+    }*/
+    delete [] id2node_index;
+    //delete [] old2new_tree_index;
+    delete [] label2index;
 	return;
 }
 
 
-/** Constructs a tree decomposition of this->G using
- * Bodlaender-Koster's algorithm 2 from Treewidth Computations I, Upper Bounds.   
- * The graph G is assumed to have 
- * a single connected component since tree decompositions
- * of disconnected components can be joined together in
- * an arbitrary way.
- */
->>>>>>> layering tree work in progress
+
+
+/** 
+* Constructs a tree decomposition of the graph in the current TDTree using
+* Bodlaender-Koster's algorithm 2 from Treewidth Computations I, Upper Bounds.   
+* The graph G is assumed to have 
+* a single connected component since tree decompositions
+* of disconnected components can be joined together in
+* an arbitrary way.
+*/
 void TDTree::construct_BK(vector<int> *elim_order)
 {
 	// First make sure this->G has one connected component
@@ -2250,10 +2509,8 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 		{
 			if(style == GV_BAG_LABELS)
 			{
-				//fprintf(out,"%d [label=\"",i+1);
-				fprintf(out,"%d [label=\"",this->tree_nodes[i]->id+1);
-				//print_message(10, "Bag %d:\n", i+1);
-				print_message(10, "Bag %d:\n", this->tree_nodes[i]->id +1);
+				fprintf(out,"%d [label=\"",i+1);
+				print_message(10, "Bag %d:\n", i+1);
 				// Sort the bags before outputting
 				this->tree_nodes[i]->bag.sort();
 				for(L=this->tree_nodes[i]->bag.begin();
@@ -2261,15 +2518,12 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 				{
 					// Get the actual node label if necessary (we have a pointer to G)
 					j=*L;
-					//print_message(10, "Looking for %d\n", j);
-					print_message(10, "Looking for %d\n", j+1);
+					print_message(10, "Looking for %d\n", j);
 					n1=this->G->get_node(j);
 					j=n1->get_label();
 					//j=G->nodes[j].label;
-					//print_message(10, "Found %d\n", j);
-					print_message(10, "Found %d\n", j+1);
-					//fprintf(out,"%d ",j);
-					fprintf(out,"%d ",*L+1);
+					print_message(10, "Found %d\n", j);
+					fprintf(out,"%d ",j);
 					// NOTE!! The bags store the DIMACS labels (1,2,..,num_total_nodes) so if there
 					// are disconnected nodes, then the union of all the bags
 					// will NOT be equal to (1,2,...,num_total_nodes)
@@ -2284,8 +2538,7 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 			}
 			else if(style == GV_TREE_ONLY)
 			{
-				//fprintf(out,"%d;\n",i+1);
-				fprintf(out,"%d;\n",this->tree_nodes[i]->id + 1);
+				fprintf(out,"%d;\n",i+1);
 			}
 			else if(style == GV_COLORS)
 			{
@@ -2317,11 +2570,9 @@ void TDTree::write_graphviz_file(bool spline, const char *GVIZ_file, int style)
 			for(L=this->tree_nodes[i]->adj.begin();L!=this->tree_nodes[i]->adj.end();++L)
 			{
 				j=*L;
-				//if(i < j)
-				if(this->tree_nodes[i]->id < j)
+				if(i < j)
 					// Make this 1-based in true DIMACS spirit
-					//fprintf(out,"%d -- %d;\n",i+1,j+1);
-					fprintf(out,"%d -- %d;\n",this->tree_nodes[i]->id + 1,j+1);
+					fprintf(out,"%d -- %d;\n",i+1,j+1);
 			}
 		}
 	}
