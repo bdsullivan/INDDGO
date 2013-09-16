@@ -636,7 +636,7 @@ namespace Graph {
 	/**
      * Calls CreateSeparator from metis
      * top and bottom cannot have any overlap coming in, going out they will share the elements of the separator
-     * they bring in the top and bottom pre-bags, and take out the top and bottom bags
+     * they bring in the top and bottom lists, and take out the top and bottom bags
      */
 	void GraphUtil::metis_ConstructSeparator(VertexWeightedGraph *g, list<int> *top, list<int> *bottom)
 	{
@@ -783,21 +783,16 @@ namespace Graph {
         graph = SetupGraph(ctrl,nvtxs,1,xadj,adjncy,NULL,NULL,NULL);
         // allocate workspace memory //
         AllocateWorkSpace(ctrl, graph);
-        //real_t ntpwgts[2] = {0.5, 0.5};
-        //Setup2WayBalMultipliers(ctrl, graph, ntpwgts);
-        //RandomBisection(ctrl, graph, ntpwgts, 3);
-        //Compute2WayPartitionParams(ctrl, graph);
-
-		//ConstructSeparator(ctrl, graph);
         SetupGraph_tvwgt(graph);
+
+        //Call to METIS function that provides a separator
         MlevelNodeBisectionMultiple(ctrl, graph);
 
-        /// where = 0 is left set, =1 is right, =2 is separator
+        /// where = 0 left set, =1 right, =2 separator
         idx_t *where;
         where = graph->where;
 
-        // need to test if a separator was created, i.e. are there 3 sets?
-        // and also test to see if left = bottom or right = bottom
+        // are there 3 sets?  is left = bottom or right = bottom
         int bot_i=0;
         bool keepgoing = true;
         bool bottom0;
