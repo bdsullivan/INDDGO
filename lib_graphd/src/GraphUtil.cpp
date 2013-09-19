@@ -938,12 +938,12 @@ namespace Graph {
             find_all_components(g, &members);
             // traverse the list and find the one with the most members
             for(vlit = members.begin(); vlit != members.end(); ++vlit){
-                cout << "Got list with size: " << ((*vlit)->size()) << endl;
+                //cout << "Got list with size: " << ((*vlit)->size()) << endl;
                 if(((*vlit)->size()) >= maxlen){
                     maxlen = (*vlit)->size();
-                    cout << "New list with maxlen > " << maxlen << endl;
+                    //cout << "New list with maxlen > " << maxlen << endl;
                     maxlist = *vlit;
-                    cout << maxlist << endl;
+                    //cout << maxlist << endl;
                 }
             }
 

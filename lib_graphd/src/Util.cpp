@@ -857,7 +857,7 @@ void write_degree_distribution(string filename, const vector<int> &dist){
     else {
         int i;
         for(i = 0; i < dist.size(); i++){
-            outfile << dist[i] << "\n";
+            outfile << i << " " <<  dist[i] << "\n";
         }
     }
 
