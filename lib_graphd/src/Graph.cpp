@@ -164,6 +164,10 @@ namespace Graph {
         return this->degree[v];
     }
 
+    int Graph::get_num_connected_components() const {
+        return this->num_connected_components;
+    }
+
     /**
      * \param[in] n number of elements
      * */
