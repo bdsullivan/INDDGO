@@ -951,7 +951,7 @@ void write_apsp_matrix(string filename, vector< vector<int> > &apsp){
     int n = apsp.size();  //assuming it's sized correctly
     cerr << "Writing apsp matrix of size: " << n << endl;
 
-    FILE * outfile;
+    FILE *outfile;
     outfile = fopen(filename.c_str(), "w+");
 
     if(!outfile){
@@ -962,10 +962,11 @@ void write_apsp_matrix(string filename, vector< vector<int> > &apsp){
 
     //#pragma omp parallel for default(none) share(n, apsp)
     int ret;
-    for(i=0; i< n; i++) {
-        int * arr = &apsp[i].front();
+    for(i = 0; i < n; i++){
+        int *arr = &apsp[i].front();
         fwrite(arr, n, sizeof(int), outfile);
     }
 
     fclose(outfile);
-}
+} // write_apsp_matrix
+

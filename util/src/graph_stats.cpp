@@ -107,9 +107,9 @@ int parse_options(int argc, char **argv, string& infile, string& intype, string&
         case 's':
             *spectrum_spread = atoi(optarg);
             break;
-	case 'a':
+        case 'a':
             file_append = true;
-	    break;
+            break;
         }
     }
 
@@ -146,7 +146,6 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
     print_time(timing_file, "Time(make_simple)", t1, t2);
     int num_components = g->get_num_connected_components();
     outfile << "connected_components " << num_components << endl;
-
 
     if(req_methods["edge_density"] == true){
         cout << "Calculating edge density" << endl;
@@ -380,7 +379,7 @@ int main(int argc, char **argv){
     ORB_t t1, t2;
     int spectrum_spread = 0;
     create_map(allowed_methods, val_methods);
-    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, record_timings, file_append, &spectrum_spread) ;
+    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, record_timings, file_append, &spectrum_spread);
     if(outprefix.length() == 0){
         outprefix = infile;
     }
@@ -413,20 +412,21 @@ int main(int argc, char **argv){
     Graph::GraphUtil gu;
 
     // Set up output streams
-    if(file_append == true) {
-      outfile.open(outfilename.c_str());
-    } else {
-      outfile.open(outfilename.c_str(), ios_base::out|ios_base::app);
+    if(file_append == true){
+        outfile.open(outfilename.c_str());
+    }
+    else {
+        outfile.open(outfilename.c_str(), ios_base::out | ios_base::app);
     }
     if(!outfile.is_open()){
         cerr << "Error opening " << outfilename << " for writing, exiting" << endl;
         exit(1);
     }
 
-    if(outfile.tellp() == 0) {
-      outfile << "filename" << infile << endl;
-      outfile << "num_nodes " << g->get_num_nodes() << endl;
-      outfile << "num_edges " << g->get_num_edges() << endl;
+    if(outfile.tellp() == 0){
+        outfile << "filename" << infile << endl;
+        outfile << "num_nodes " << g->get_num_nodes() << endl;
+        outfile << "num_edges " << g->get_num_edges() << endl;
     }
 
     if(record_timings){
@@ -469,19 +469,20 @@ int main(int argc, char **argv){
     if(not is_connected){  // run everything against the other algorithms
         cout << "Graph is not connected, re-running stats on largest connected component" << endl;
         outfilename += ".largest_component";
-        if(file_append == true) {
-          outfile.open(outfilename.c_str());
-        } else {
-          outfile.open(outfilename.c_str(), ios_base::out|ios_base::app);
+        if(file_append == true){
+            outfile.open(outfilename.c_str());
+        }
+        else {
+            outfile.open(outfilename.c_str(), ios_base::out | ios_base::app);
         }
         if(!outfile.is_open()){
             cerr << "Error opening " << outfilename << " for writing, exiting" << endl;
             exit(1);
         }
-        if(outfile.tellp() == 0) {
-          outfile << "filename " << infile << endl;
-          outfile << "num_nodes " << g->get_num_nodes() << endl;
-          outfile << "num_edges " << g->get_num_edges() << endl;
+        if(outfile.tellp() == 0){
+            outfile << "filename " << infile << endl;
+            outfile << "num_nodes " << g->get_num_nodes() << endl;
+            outfile << "num_edges " << g->get_num_edges() << endl;
         }
         if(record_timings){
             string of = outfilename + ".timings";
