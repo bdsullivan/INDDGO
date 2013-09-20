@@ -1,6 +1,15 @@
 The INDDGO software was originally developed by Blair D. Sullivan, 
 Chris Groer, and Dinesh Weerapurage at Oak Ridge National Laboratory. 
 
-The developers gratefully acknowledge the support of the Department of Energy 
-Office of Science, Office of Advanced Scientific Computing Research as 
-part of the Applied Mathematics program.
+The current functionality provided by INDDGO would not be possible without significant additional development 
+and major contributions from several other researchers at ORNL (listed alphabetically): 
+Matthew Baker 
+Joshua Lothian 
+Jonathan Schrock 
+Sarah Powers 
+
+The developers gratefully acknowledge the support of the Department of Energy, Office of Science, 
+Office of Advanced Scientific Computing Research, under contract DE-AC05-00OR22725 with Oak Ridge 
+National Laboratory and the GRAPHS program of the Defense Advanced Research Projects Agency (DARPA). 
+This work was also supported in part by the United States Department of Defense and used resources 
+of the Extreme Scale Systems Center at Oak Ridge National Laboratory.
