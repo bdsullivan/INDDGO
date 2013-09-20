@@ -857,67 +857,71 @@ namespace Graph {
         return max;
     } // subset_max_dist
 
-    /**
-     * Calculates the k-core number of every vertex and stores in kcore vector
-     * Return value is degeneracy (maximum non-empty k-core).
-     * Uses algorithm of Batagelj and Zaversnik (2003)
-     * Implemented by Timothy Goodrich and Matthew Farrell (2013)
-     */
-    int GraphUtil::find_kcore(Graph *g, vector<int> *kcore){
-        int n = g->num_nodes;
-        int k = 0;
-        int last_deg = 0;
-        kcore->resize(n);
+  /**
+   * Calculates the k-core number of every vertex and stores in kcore vector
+   * Return value is degeneracy (maximum non-empty k-core). 
+   * Uses algorithm of Batagelj and Zaversnik (2003)
+   * Implemented by Timothy Goodrich and Matthew Farrell (2013)
+   */
+  int GraphUtil::find_kcore(Graph *g, vector<int> *kcore) {
+    int n = g->num_nodes;
+    int k = 0;
+    int last_deg = 0;
+    kcore->resize(n);
 
-        vector<int> deg_lookup(n);
-        int max_deg = 0;
-        for(int i = 0; i < deg_lookup.size(); i++){
-            deg_lookup[i] = g->degree[i];
-            if(deg_lookup[i] > max_deg){
-                max_deg = deg_lookup[i];
-            }
-        }
-        vector<vector<int> > D;
-        D.resize(max_deg + 1);
-        int depth[n];
-        //can also create an L output list for coloring number optimal ordering
+    vector<int> deg_lookup(n);
+    int max_deg = 0;
+	int deg_size=deg_lookup.size();
+    for(int i = 0; i < deg_size; i++) { 
+      deg_lookup[i] = g->degree[i];
+      if(deg_lookup[i] > max_deg)
+	max_deg = deg_lookup[i];
+    }
+    vector<vector<int> > D;
+    D.resize(max_deg+1);    
 
-        for(int i = 0; i < n; i++){
-            deg_lookup[i] = g->degree[i];
-            D[deg_lookup[i]].push_back(i);
-            depth[i] = D[deg_lookup[i]].size() - 1;
-        }
-
-        for(int i = 0; i < n; i++){
-            int v;
-            for(int j = last_deg; j <= max_deg; j++){
-                if(D[j].size() != 0){
-                    v = D[j].back();
-                    D[j].pop_back();
-                    break;
-                }
-            }
-
-            (*kcore)[v] = k = max(k,deg_lookup[v]);
-            last_deg = max(0, deg_lookup[v] - 1);
-            deg_lookup[v] = -1;
-
-            //shift each of v's neighbors down one degree
-            list<int> *nbrs = g->nodes[v].get_nbrs_ptr();
-            list<int>::const_iterator it;
-            for(it = nbrs->begin(); it != nbrs->end(); it++){
-                if(deg_lookup[*it] != -1){
-                    int it_deg = deg_lookup[*it]--;
-                    D[it_deg][depth[*it]] = D[it_deg][D[it_deg].size() - 1];
-                    depth[D[it_deg][depth[*it]]] = depth[*it];
-                    D[it_deg].pop_back();
-                    D[it_deg - 1].push_back(*it);
-                    depth[*it] = D[it_deg - 1].size() - 1;
-                }
-            }
-        }
-        return k;
-    } // find_degen
+	int *depth;
+	depth=new int[n];
+    //int depth[n];
+    //can also create an L output list for coloring number optimal ordering
+    
+    for(int i = 0; i < n; i++) {
+      deg_lookup[i] = g->degree[i];
+      D[deg_lookup[i]].push_back(i);
+      depth[i] = D[deg_lookup[i]].size()-1;
+    }
+     
+    for(int i = 0; i < n; i++) {
+      int v;      
+      for(int j = last_deg; j <= max_deg; j++) {
+	if(D[j].size() != 0) {
+	  v = D[j].back();
+	  D[j].pop_back();
+	  break;
+	}
+      }
+      
+      (*kcore)[v] = k = max(k,deg_lookup[v]);
+      last_deg = max(0, deg_lookup[v]-1);
+      deg_lookup[v] = -1;
+      
+      //shift each of v's neighbors down one degree
+      list<int> * nbrs = g->nodes[v].get_nbrs_ptr();
+      list<int>::const_iterator it;
+      for(it = nbrs->begin(); it != nbrs->end(); it++) {
+	if(deg_lookup[*it] != -1) {
+	  int it_deg = deg_lookup[*it]--;
+	  D[it_deg][depth[*it]] = D[it_deg][D[it_deg].size()-1];
+	  depth[D[it_deg][depth[*it]]] = depth[*it];
+	  D[it_deg].pop_back();
+	  D[it_deg-1].push_back(*it);
+	  depth[*it] = D[it_deg-1].size()-1;
+	}
+      }
+    }
+	delete [] depth;
+    return k;
+  } // find_degen
 
     /**
      * \input g input graph

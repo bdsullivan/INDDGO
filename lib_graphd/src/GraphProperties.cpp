@@ -22,7 +22,9 @@
 #include "GraphDecomposition.h"
 #include "Log.h"
 #include <sys/types.h>
+#if !WIN32
 #include <sched.h>
+#endif
 
 #include <algorithm>
 #include <vector>
@@ -378,10 +380,8 @@ namespace Graph {
      * \param[out] t output vector of per-vertex triangle counts
      */
     void GraphProperties::all_triangles_compact_forward(Graph *g, vector<long int> &t){
-        int i, j;
+        int i;
         int u, v;
-        int retcode;
-        Node *vn;
 
         std::list<int>::const_reverse_iterator rit;
 
@@ -412,8 +412,6 @@ namespace Graph {
          */
 
         Node *nv, *nu;
-        int vp, up;
-        int iu, iv;
         int fakev;
         int uprime, vprime;
         const int n = g->get_num_nodes();
@@ -498,8 +496,9 @@ namespace Graph {
                     } //if revmap
                 } //for vtxs
             } //for fakev
+			int tsize=(int)t.size();
             #pragma omp for
-            for(i = 0; i < t.size(); i++){
+            for(i = 0; i < tsize; i++){
                 for(int j = 0; j < omp_get_num_threads(); j++){
                     t[i] += local_t[j][i];
                 }
@@ -513,7 +512,7 @@ namespace Graph {
      * \param[out] t vector of long ints, length |V|, returns 3x number of triangles for each vertex
      */
     void GraphProperties::all_triangles_edge_listing(Graph *g, vector<long int> &t){
-        int i, j, u, v;
+        int i, u, v;
         vector<int>::iterator it;
         list<int>::const_iterator cit;
         list<int>::iterator lt;
@@ -841,13 +840,16 @@ namespace Graph {
         freq_ecc.resize(*(std::max_element(ecc.begin(), ecc.end())) + 1);
 
         //compute diameter of each vertex
-        for(int i = 0; i < ecc.size(); i++){
+		int eccsize=ecc.size();
+		// This could be slow with resizing
+        for(int i = 0; i < eccsize ; i++){
             freq_ecc[ecc[i]]++; //add to tally for this diameter size
         }
         //printf("Graph diameter is %d\n", freq_ecc.size()-1);
 
-        #pragma omp parallel for default(none) shared(freq_ecc)
-        for(int i = 0; i <= freq_ecc.size() - 1; i++){
+		int freq_ecc_size=freq_ecc.size();
+        #pragma omp parallel for default(none) shared(freq_ecc, freq_ecc_size)
+        for(int i = 0; i <= freq_ecc_size - 1; i++){
             freq_ecc[i] = freq_ecc[i] / n;
             //printf("i=%d and n=%d with freq eccentricity %f\n",i,n,freq_ecc[i]);
         }
@@ -1151,7 +1153,6 @@ namespace Graph {
         const vector<int> &degrees = g->get_degree_ref();
         int i;
         double di, dc;
-        int nbr;
         std::list<int>::const_iterator cit;
         Node *node;
 

@@ -32,6 +32,7 @@
 #include "Util.h"
 #include "GraphException.h"
 
+#if !WIN32 && !CYGWIN
 #include "orbconfig.h"
 #include "orbtimer.h"
 
@@ -509,3 +510,10 @@ int main(int argc, char **argv){
     exit(0);
 } // main
 
+#else
+int main()
+{
+	fprintf(stderr,"Can't run under windows or cygwin\n");
+	return 0;
+}
+#endif

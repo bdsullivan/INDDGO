@@ -19,6 +19,14 @@
 
  */
 
+/*This fixes any issues with MSVC always having HAS_METIS defined*/
+#ifdef _MSC_VER
+  #if !HAS_METIS 
+    #undef HAS_METIS 
+  #endif
+#endif 
+
+
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
@@ -34,6 +42,10 @@
 
 #ifdef HAS_PETSC
   #include <petscksp.h>
+#endif
+
+#if WIN32
+#define strncasecmp strncmp
 #endif
 
 #include "GraphInterface.h"
