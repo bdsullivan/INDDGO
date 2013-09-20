@@ -19,6 +19,8 @@
 
  */
 
+#if !WIN32 && !CYGWIN
+
 #include "GraphDecomposition.h"
 #include "GraphProperties.h"
 #include "Log.h"
@@ -133,4 +135,14 @@ int main(int argc, char **argv){
 
     return 0;
 } // main
+
+
+#else
+#include <stdio.h>
+int main()
+{
+	fprintf(stderr,"Can't build under windows or cygwin\n");
+	return 0;
+}
+#endif
 

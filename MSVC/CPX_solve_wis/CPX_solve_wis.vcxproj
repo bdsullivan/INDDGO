@@ -11,12 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\max_wis\src\DPinfo.cpp" />
-    <ClCompile Include="..\..\max_wis\src\main.cpp" />
-    <ClCompile Include="..\..\max_wis\src\weighted_ind_set.cpp" />
+    <ClCompile Include="..\..\util\src\CPX_solve_wis.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F0033BB8-C99B-4696-9350-F6B97850C220}</ProjectGuid>
+    <ProjectGuid>{141CEE83-9865-4982-A304-65ED2248F0BA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>metis502</RootNamespace>
   </PropertyGroup>
@@ -43,7 +41,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -54,14 +52,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../mpir-2.5.2;../../max_wis/inc;../../uthash-1.9.3/src/;../../lib_graphd/inc/;../../lib_treed/inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAS_GMP;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../mpir-2.5.2;../../max_wis/inc;../../../uthash-1.9.5/src/;../../lib_graphd/inc/;../../lib_treed/inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../$(Configuration);../../../mpir-2.5.2/build.vc10/Win32/$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_graphd.lib;lib_treed.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lib_graphd.lib;lib_treed.lib;mpir.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -73,15 +71,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../../mpir-2.5.2;../../max_wis/inc;../../uthash-1.9.3/src;../../lib_graphd/inc/;../../lib_treed/inc/;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\IBM\ILOG\CPLEX_Studio125\cplex\include;../../lib_graphd/inc/;../../../glpk-4.47/src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>../$(Configuration);../../../mpir-2.5.2/build.vc10/Win32/$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>lib_graphd.lib;lib_treed.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../$(Configuration);C:\ILOG\CPLEX111\lib\x86_windows_vs2008\stat_mda;C:\Program Files\IBM\ILOG\CPLEX_Studio125\cplex\lib\x86_windows_vs2010\stat_mda;../../../glpk-4.47/w32</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;cplex125.lib;lib_graphd.lib;glpk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
