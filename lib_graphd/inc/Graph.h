@@ -127,8 +127,10 @@ public:
     int add_vertex();
     bool remove_edge(int u, int v);
     void remove_vertex(int u);
-
+    int edge_subdivision(int u, int v, int w);
     int contract_edge(int u, int v);
+    int fuse_vertices(int u, int v, bool contract_edge);
+    void resize_graph(int n);
     void resize_adj_vec(int n);
     void eliminate_vertex(int v, list<int> *forward_neighbors, bool remove);
     void initialize_params();
