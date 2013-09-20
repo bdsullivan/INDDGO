@@ -231,6 +231,10 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
         gp.paths_dijkstra_boost_all(g, shortest_path_distances);
         ORB_read(t2);
         print_time(timing_file, "Time(shortest_paths_dijkstra_boost)", t1, t2);
+        string of = outprefix + ".apsp";
+        write_apsp_matrix(of, shortest_path_distances);
+        ORB_read(t2);
+        print_time(timing_file, "Time(write_apsp_matrix)", t1, t2);
     }
     if(req_methods["betweenness"]){
         /* cout << "Creating BOOST representation of g" << endl;
