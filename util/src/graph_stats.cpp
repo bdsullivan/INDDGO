@@ -413,7 +413,7 @@ int main(int argc, char **argv){
     Graph::GraphUtil gu;
 
     // Set up output streams
-    if(file_append == true){
+    if(file_append == false){
         outfile.open(outfilename.c_str());
     }
     else {
@@ -432,7 +432,11 @@ int main(int argc, char **argv){
 
     if(record_timings){
         string of = outfilename + ".timings";
-        timing_file.open(of.c_str());
+        if(file_append == false){
+            timing_file.open(of.c_str());
+        } else {
+            timing_file.open(of.c_str(), ios_base::out | ios_base::app);
+        }
         if(!timing_file.is_open()){
             cerr << "Error opening " << timing_file << " for writing, exiting" << endl;
             exit(1);
@@ -470,7 +474,7 @@ int main(int argc, char **argv){
     if(not is_connected){  // run everything against the other algorithms
         cout << "Graph is not connected, re-running stats on largest connected component" << endl;
         outfilename += ".largest_component";
-        if(file_append == true){
+        if(file_append == false){
             outfile.open(outfilename.c_str());
         }
         else {
@@ -487,7 +491,12 @@ int main(int argc, char **argv){
         }
         if(record_timings){
             string of = outfilename + ".timings";
-            timing_file.open(of.c_str());
+            if(file_append == false){
+                timing_file.open(of.c_str());
+            } else {
+                timing_file.open(of.c_str(), ios_base::out | ios_base::app);
+            }
+
             if(!timing_file.is_open()){
                 cerr << "Error opening " << timing_file << " for writing, exiting" << endl;
                 exit(1);
