@@ -231,12 +231,6 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
         gp.paths_dijkstra_boost_all(g, shortest_path_distances);
         ORB_read(t2);
         print_time(timing_file, "Time(shortest_paths_dijkstra_boost)", t1, t2);
-        if((req_methods["apsp_output"] == true)){
-            string of = outprefix + ".apsp";
-            write_apsp_matrix(of, shortest_path_distances);
-            ORB_read(t2);
-            print_time(timing_file, "Time(write_apsp_matrix)", t1, t2);
-        }
     }
     if(req_methods["betweenness"]){
         /* cout << "Creating BOOST representation of g" << endl;
@@ -291,6 +285,13 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
         ORB_read(t2);
         print_time(timing_file, "Time(avg_path_length)", t1, t2);
         outfile << "avg_path_length " << avg_path_length << endl;
+    }
+    if((req_methods["apsp_output"] == true)){
+        string of = outprefix + ".apsp";
+        ORB_read(t1);
+        write_apsp_matrix(of, shortest_path_distances);
+        ORB_read(t2);
+        print_time(timing_file, "Time(write_apsp_matrix)", t1, t2);
     }
 
     #ifdef HAS_PETSC
