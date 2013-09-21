@@ -368,7 +368,7 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
 
 int main(int argc, char **argv){
     string infile;
-    string outfilename ("graph-stats.txt");
+    string outfilename;
     string outprefix;
     ofstream outfile;
     ofstream timing_file;
@@ -381,6 +381,13 @@ int main(int argc, char **argv){
     int spectrum_spread = 0;
     create_map(allowed_methods, val_methods);
     parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, record_timings, file_append, &spectrum_spread);
+    if(outfilename.length() == 0){
+        if(outprefix.length() != 0) {
+            outfilename = outprefix+".stats";
+        } else {
+            outfilename = "graph-stats.txt";
+        }
+    }
     if(outprefix.length() == 0){
         outprefix = infile;
     }
@@ -425,7 +432,7 @@ int main(int argc, char **argv){
     }
 
     if(outfile.tellp() == 0){
-        outfile << "filename" << infile << endl;
+        outfile << "filename " << infile << endl;
         outfile << "num_nodes " << g->get_num_nodes() << endl;
         outfile << "num_edges " << g->get_num_edges() << endl;
     }
@@ -473,7 +480,7 @@ int main(int argc, char **argv){
     // some algorithms only make sense to run on a connected graph/component
     if(not is_connected){  // run everything against the other algorithms
         cout << "Graph is not connected, re-running stats on largest connected component" << endl;
-        outfilename += ".largest_component";
+        outfilename = outprefix+".largest_component.stats";
         if(file_append == false){
             outfile.open(outfilename.c_str());
         }
