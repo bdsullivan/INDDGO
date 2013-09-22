@@ -433,6 +433,20 @@ int main(int argc, char **argv){
     }
 
 
+    // Read in the graph and start recording things to output streams
+    cout << "Reading graph" << endl;
+    ORB_read(t1);
+    if(gr.read_graph(g, infile, intype, false) == -1){
+        exit(1);
+    }
+    ORB_read(t2);
+
+    if(outfile.tellp() == 0){
+        outfile << "filename " << infile << endl;
+        outfile << "num_nodes " << g->get_num_nodes() << endl;
+        outfile << "num_edges " << g->get_num_edges() << endl;
+    }
+
     if(record_timings){
         string of = outfilename + ".timings";
         if(file_append == false){
@@ -444,23 +458,11 @@ int main(int argc, char **argv){
             cerr << "Error opening " << timing_file << " for writing, exiting" << endl;
             exit(1);
         }
-        outfile << "Recording timings to " << of << endl;
+        outfile << "timing_file " << of << endl;
     }
 
-    // Read in the graph and start recording things to output streams
-    cout << "Reading graph" << endl;
-    ORB_read(t1);
-    if(gr.read_graph(g, infile, intype, false) == -1){
-        exit(1);
-    }
-    ORB_read(t2);
     print_time(timing_file, "Time(read_graph)", t1, t2);
 
-    if(outfile.tellp() == 0){
-        outfile << "filename " << infile << endl;
-        outfile << "num_nodes " << g->get_num_nodes() << endl;
-        outfile << "num_edges " << g->get_num_edges() << endl;
-    }
 
     outfile.precision(16);
     vector<int> components;
@@ -509,7 +511,7 @@ int main(int argc, char **argv){
                 cerr << "Error opening " << timing_file << " for writing, exiting" << endl;
                 exit(1);
             }
-            outfile << "Recording timings to " << of << endl;
+            outfile << "timing_file " << of << endl;
         }
 
         outprefix = outprefix + ".largest_component";
