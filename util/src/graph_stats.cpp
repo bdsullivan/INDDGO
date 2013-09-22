@@ -432,11 +432,6 @@ int main(int argc, char **argv){
         exit(1);
     }
 
-    if(outfile.tellp() == 0){
-        outfile << "filename " << infile << endl;
-        outfile << "num_nodes " << g->get_num_nodes() << endl;
-        outfile << "num_edges " << g->get_num_edges() << endl;
-    }
 
     if(record_timings){
         string of = outfilename + ".timings";
@@ -461,8 +456,13 @@ int main(int argc, char **argv){
     ORB_read(t2);
     print_time(timing_file, "Time(read_graph)", t1, t2);
 
+    if(outfile.tellp() == 0){
+        outfile << "filename " << infile << endl;
+        outfile << "num_nodes " << g->get_num_nodes() << endl;
+        outfile << "num_edges " << g->get_num_edges() << endl;
+    }
+
     outfile.precision(16);
-    outfile << "filename " << infile << endl;
     vector<int> components;
     cout << "Graph is connected?: " << std::boolalpha << gp.is_connected(g) << endl;
     ORB_read(t1);
