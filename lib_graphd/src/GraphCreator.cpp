@@ -397,11 +397,9 @@ namespace Graph {
     VertexWeightedGraph *GraphCreator::create_component(VertexWeightedGraph *g,
                                                         list<int> *members, bool make_simple){
         VertexWeightedGraph *wmg;
-        cout << typeid(g).name() << endl;
         wmg = create_induced_subgraph(g, members, make_simple);
         // Set num_connected_components to 1 since g is known - not verified - should it be??
         wmg->num_connected_components = 1;
-        cout << "create_component called for vwg" << endl;
         return wmg;
     }
 

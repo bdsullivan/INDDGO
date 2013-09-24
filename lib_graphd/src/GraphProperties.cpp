@@ -673,7 +673,7 @@ namespace Graph {
             }
         }
         //store the results
-        g->set_shortest_path_dist(pAll);
+        g->set_shortest_path_dist(&pAll);
     } // paths_dijkstra_boost_all
 
     /**
@@ -785,7 +785,7 @@ namespace Graph {
         } //end loop over vertices
 
         //store the results
-        g->set_shortest_path_dist(pAll);
+        g->set_shortest_path_dist(&pAll);
 
         //print out results
         //for(int i = 0; i < n; i++){

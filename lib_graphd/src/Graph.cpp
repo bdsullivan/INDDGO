@@ -85,6 +85,7 @@ namespace Graph {
         this->simple = true;   //FIXME: check if this is correct behavior
         this->canonical = true;
         this->key = 0;
+        this->apsp_dist = NULL;
         #ifdef HAS_BOOST
         this->boost_graph = NULL;
         #endif
@@ -752,7 +753,7 @@ namespace Graph {
     /**
      * \param[in] apsp_dist all pairs shortest paths distances
      **/
-    void Graph::set_shortest_path_dist(vector< vector<int> > apsp_dist){
+    void Graph::set_shortest_path_dist(vector< vector<int> > *apsp_dist){
         this->apsp_dist = apsp_dist;
     }
 
@@ -777,24 +778,27 @@ namespace Graph {
      * otherwise computes then returns
      **/
     const vector< vector<int> > &Graph::get_shortest_path_dist_ref(){
-        if(this->apsp_dist.empty()){
+        if(this->apsp_dist == NULL) {
+            this->apsp_dist = new(vector< vector<int> >);
+        }
+        if(this->apsp_dist->empty()){
             cout << "Empty -- calling function to compute shortest paths" << endl;
             GraphProperties properties;
-            properties.paths_dijkstra_all(this,this->apsp_dist);   //sets this>apsp_dist with values
-            return this->apsp_dist;
+            properties.paths_dijkstra_all(this,*(this->apsp_dist));   //sets this>apsp_dist with values
         }
-        return this->apsp_dist;
+        return *(this->apsp_dist);
     }
 
     const vector<int> &Graph::get_u_shortest_path_dist(int u){
+        if(this->apsp_dist == NULL) {
+            this->apsp_dist = new(vector< vector<int> >);
+        }
         if(this->apsp_dist[u].empty()){
             cout << "u Empty -- calling function to compute shortest paths" << endl;
             GraphProperties properties;
-            properties.paths_dijkstra_single(this,this->apsp_dist[u], u);   //sets this>apsp_dist[u] with values
-
-            return this->apsp_dist[u];
+            properties.paths_dijkstra_single(this,(*(this->apsp_dist))[u], u);   //sets this>apsp_dist[u] with values
         }
 
-        return this->apsp_dist[u];
+        return (*(this->apsp_dist))[u];
     }
 }

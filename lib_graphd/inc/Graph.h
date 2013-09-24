@@ -97,7 +97,7 @@ protected:
     vector<int> xadj;
     vector<int> adjncy;
     vector<int> adj_vec;
-    vector< vector<int> > apsp_dist;
+    vector< vector<int> > *apsp_dist;
 
     // Currently this is only calculated if you have Boost.
     vector<double> betweenness;
@@ -133,7 +133,7 @@ public:
     /** \brief Try to pre-allocate memory for node and degree vectors **/
     void resize(int n);
     /** \brief set shortest path distances **/
-    void set_shortest_path_dist(vector< vector<int> > apsp_dist);
+    void set_shortest_path_dist(vector< vector<int> > *apsp_dist);
     /** \brief set betweenness centrality vector **/
     void set_betweenness(vector<double> bc);
 
