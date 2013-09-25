@@ -509,10 +509,15 @@ int main(int argc, char **argv){
             cerr << "Error opening " << outfilename << " for writing, exiting" << endl;
             exit(1);
         }
+
+        // get the largest component
+        Graph::Graph *largest_component = gu.get_largest_component_graph(g);
+        delete(g);  // delete g here to save on memory
+
         if(outfile.tellp() == 0){
             outfile << "filename " << infile << endl;
-            outfile << "num_nodes " << g->get_num_nodes() << endl;
-            outfile << "num_edges " << g->get_num_edges() << endl;
+            outfile << "num_nodes " << largest_component->get_num_nodes() << endl;
+            outfile << "num_edges " << largest_component->get_num_edges() << endl;
         }
         if(record_timings){
             string of = outfilename + ".timings";
@@ -532,10 +537,6 @@ int main(int argc, char **argv){
         outprefix = outprefix + ".largest_component";
 
         outfile.precision(16);
-        outfile << "filename" << infile << endl;
-        Graph::Graph *largest_component = gu.get_largest_component_graph(g);
-        delete(g);  // delete g here to save on memory
-
         run_all_methods(largest_component, outfile, timing_file, outprefix, req_methods, file_append, spectrum_spread);
         outfile.close();
         timing_file.close();
