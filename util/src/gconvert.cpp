@@ -28,13 +28,14 @@
 #include "GraphWriter.h"
 
 #if !WIN32 && !CYGWIN
-#include "orbconfig.h"
-#include "orbtimer.h"
+  #include "orbconfig.h"
+  #include "orbtimer.h"
 using namespace std;
 
 void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << "\n";
 }
+
 #endif
 
 void usage(const char *s){
@@ -42,7 +43,7 @@ void usage(const char *s){
 }
 
 int main(int argc, char **argv){
-#if !WIN32 & !CYGWIN
+    #if !WIN32 & !CYGWIN
     ORB_t t1, t2;
 
     char *intype, *outtype, *infile, *outfile;
@@ -108,9 +109,9 @@ int main(int argc, char **argv){
     print_time("Time(write_graph)", t1, t2);
 
     return 0;
-#else
-	fprintf(stderr,"Can't build under Cygwin or Windows\n");
-	return 1;
-#endif
+    #else // if !WIN32 & !CYGWIN
+    fprintf(stderr,"Can't build under Cygwin or Windows\n");
+    return 1;
+    #endif // if !WIN32 & !CYGWIN
 } // main
 

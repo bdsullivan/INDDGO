@@ -21,60 +21,59 @@
 
 /*This fixes any issues with MSVC always having HAS_METIS defined*/
 #ifdef _MSC_VER
-  #if !HAS_METIS 
-    #undef HAS_METIS 
+  #if !HAS_METIS
+    #undef HAS_METIS
   #endif
-#endif 
-
+#endif
 
 #ifndef GRAPH_H_
-#define GRAPH_H_
+  #define GRAPH_H_
 
-#ifdef _OPENMP
-  #include <omp.h>
-#else
-  #ifndef HAS_METIS
-    #define omp_get_num_threads() 1
-    #define omp_get_thread_num() 0
-    #define omp_get_max_threads() 1
+  #ifdef _OPENMP
+    #include <omp.h>
+  #else
+    #ifndef HAS_METIS
+      #define omp_get_num_threads() 1
+      #define omp_get_thread_num() 0
+      #define omp_get_max_threads() 1
+    #endif
   #endif
-#endif
 
-#ifdef HAS_PETSC
-  #include <petscksp.h>
-#endif
+  #ifdef HAS_PETSC
+    #include <petscksp.h>
+  #endif
 
-#if WIN32
-#define strncasecmp strncmp
-#endif
+  #if WIN32
+    #define strncasecmp strncmp
+  #endif
 
-#include "GraphInterface.h"
-#include "Node.h"
-#include "GraphException.h"
-#include "Log.h"
-#include <string>
+  #include "GraphInterface.h"
+  #include "Node.h"
+  #include "GraphException.h"
+  #include "Log.h"
+  #include <string>
 
-#ifdef HAS_BOOST
-  #include <iostream>
-  #include <deque>
-  #include <iterator>
+  #ifdef HAS_BOOST
+    #include <iostream>
+    #include <deque>
+    #include <iterator>
 
-  #include "boost/graph/adjacency_list.hpp"
-  #include "boost/graph/topological_sort.hpp"
-  #include <boost/graph/dijkstra_shortest_paths.hpp>
-#endif
+    #include "boost/graph/adjacency_list.hpp"
+    #include "boost/graph/topological_sort.hpp"
+    #include <boost/graph/dijkstra_shortest_paths.hpp>
+  #endif
 
 using namespace std;
 
-#define INDDGO_INFINITY INT_MAX - 16
+  #define INDDGO_INFINITY INT_MAX - 16
 
-#ifdef HAS_BOOST
+  #ifdef HAS_BOOST
 typedef boost::property<boost::edge_weight_t, int> EdgeWeightProperty;
 typedef boost::property <boost::vertex_centrality_t, double > CentralityMap;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, CentralityMap, EdgeWeightProperty> BoostUndirected;
 typedef boost::graph_traits < BoostUndirected >::vertex_descriptor vertex_descriptor;
 typedef boost::graph_traits < BoostUndirected >::edge_descriptor edge_descriptor;
-#endif //HAS_BOOST
+  #endif //HAS_BOOST
 
 namespace Graph {
     class Graph : public GraphInterface
