@@ -24,6 +24,7 @@
 #include <limits>
 #include <string>
 #include <sstream>
+#include <stdio.h>
 
 /*BDS - added to get memory highwater mark*/
 int parseLine(char *line){
@@ -36,7 +37,11 @@ int parseLine(char *line){
     return i;
 }
 
-int getHWmem(){ //Note: this value is in KB!
+int getHWmem(){ 
+#if WIN32
+	return -1;
+#endif
+	//Note: this value is in KB!
     FILE *file = fopen("/proc/self/status", "r");
     if(file == NULL){
         fprintf(stderr, "Error opening processor status file!\n");
@@ -841,6 +846,11 @@ void split(const std::string& s, char sep, vector<int>& v){
     }
 }     // split
 
+/**
+ * Write a degree distribution out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] dist a vector<int>, indexed on degree
+ */
 void write_degree_distribution(string filename, const vector<int> &dist){
     ofstream outfile;
 
@@ -852,10 +862,115 @@ void write_degree_distribution(string filename, const vector<int> &dist){
     else {
         int i;
         for(i = 0; i < dist.size(); i++){
-            outfile << dist[i] << "\n";
+            outfile << i << " " <<  dist[i] << "\n";
         }
     }
 
     outfile.close();
 } // write_degree_distribution
+
+/**
+ * Write a kcore list out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] kcores a vector<int>, indexed on vertex number
+ */
+void write_kcores(string filename, const vector<int> &kcores){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        int i;
+        for(i = 0; i < kcores.size(); i++){
+            outfile << i << " " << kcores[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_k_cores
+
+/**
+ * Write a betweenness centrality vecotr out to file.
+ *
+ * \param[in] filename filename to write output to
+ * \param[in] bc a vector<uint64_t>, indexed on vertex number
+ */
+void write_betweenness(string filename, const vector<double> &bc){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        outfile.precision(10);
+        int i;
+        for(i = 0; i < bc.size(); i++){
+            outfile << fixed << i << " " << bc[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_betweenness
+
+/**
+ * Write a delta hyperbolicity vector out to file.
+ *
+ * \param[in] filename filename to write output to
+ * \param[in] bc a vector<uint64_t>, indexed on vertex number
+ */
+void write_delta_hyperbolicity(string filename, const vector< vector<double> > &delta){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        outfile.precision(10);
+        for(int idx = 0; idx < delta.size(); idx++){
+            for(int jdx = 0; jdx < delta[idx].size(); jdx++){
+                outfile << delta[idx][jdx] << " ";
+            }
+            outfile << endl;
+        }
+    }
+
+    outfile.close();
+} // write_betweenness
+
+/**
+ * Write a all pairs shortest path matrix  out to file.
+ *
+ * \param[in] filename filename to write output to
+ * \param[in] apsp a vector< vector<int> >, indexed on vertex number, assumed to be |V|x|V|
+ */
+void write_apsp_matrix(string filename, vector< vector<int> > &apsp){
+    int i;
+    int n = apsp.size();  //assuming it's sized correctly
+    cerr << "Writing apsp matrix of size: " << n << endl;
+
+    FILE *outfile;
+    outfile = fopen(filename.c_str(), "w+");
+
+    if(!outfile){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+
+    fwrite((void *) &n, 1, sizeof(int), outfile);
+
+    //#pragma omp parallel for default(none) share(n, apsp)
+    int ret;
+    for(i = 0; i < n; i++){
+        int *arr = &apsp[i].front();
+        fwrite(arr, n, sizeof(int), outfile);
+    }
+
+    fclose(outfile);
+} // write_apsp_matrix
 

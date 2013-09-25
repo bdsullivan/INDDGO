@@ -43,6 +43,14 @@ public:
     // Specialized induced subgraph functionality for components. Sets num_connected_components to 1.
     virtual VertexWeightedGraph *create_component(VertexWeightedGraph *g,
                                                   list<int> *members, bool make_simple);
+    /**
+     * \brief Create an induced subgraph on g
+     */
+    virtual Graph *create_induced_subgraph(Graph *g, list<int> *members, bool make_simple);
+    /**
+     * \brief Create a component graph of g
+     */
+    virtual Graph *create_component(Graph *g, list<int> *members, bool make_simple);
 
     // Recursive and non-recursive functions that create all connected components of the graph,
     // which it places in the given vector

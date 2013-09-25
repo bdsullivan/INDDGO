@@ -23,7 +23,9 @@
 #include "Log.h"
 #include "Debug.h"
 #include "Util.h"
+#if !WIN32
 #include <strings.h>
+#endif
 #include <stdlib.h>
 #include <iostream>
 #include <algorithm>
@@ -105,8 +107,6 @@ namespace Graph {
  * \return code 0 on success, nonzero on failure
  */
     int GraphReader::read_adjlist(Graph *g, const string filename){
-        int i, j, m, n, retval;
-        char *retp;
         int new_vid;
         int new_nbr;
 
@@ -136,6 +136,7 @@ namespace Graph {
                 }
             }
         }
+        return 0;
     } // read_adjlist
 
 /**

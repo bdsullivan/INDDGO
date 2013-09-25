@@ -30,11 +30,12 @@ using namespace std;
 class GraphReaderTest : public testing::Test {
 public:
 Graph::GraphReader gr;
-Graph::Graph g;
+Graph::Graph *g;
 
 virtual void SetUp(){
+    g = new Graph::Graph();
     LOG_INIT("test.log", NULL, 0);
-    gr.read_graph(&g, string("data/1dc.128.txt"), string("DIMACS"), false );
+    gr.read_graph(g, string("data/1dc.128.txt"), string("DIMACS"), false );
 }
 
 virtual void TearDown(){
@@ -44,19 +45,20 @@ virtual void TearDown(){
 
 TEST_F(GraphReaderTest, testCapacity)
 {
-    EXPECT_EQ(128, g.get_capacity());
+    int capacity = g->get_capacity();
+    EXPECT_EQ(128, capacity);
 }
 
 TEST_F(GraphReaderTest, testNumEdges)
 {
-    EXPECT_EQ(1471, g.get_num_edges());
+    EXPECT_EQ(1471, g->get_num_edges());
 }
 
 TEST_F(GraphReaderTest, testNodeNbrs)
 {
     vector<Graph::Node> n;
     int i;
-    n = g.get_nodes();
+    n = g->get_nodes();
 
     EXPECT_EQ(128, n.size());
 
