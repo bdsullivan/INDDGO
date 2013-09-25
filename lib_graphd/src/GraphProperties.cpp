@@ -979,23 +979,35 @@ namespace Graph {
         const int n = g->get_num_nodes();
         const vector< vector<int> > &short_paths = g->get_shortest_path_dist_ref();
         double sum = 0;
-        double intermediate = 0.0;
+        int intermediate = 0;
         int i, j;
         int inf_path = 0;
 
-        #pragma omp parallel for schedule(dynamic, 16) default(none) private(j) reduction(+:sum,inf_path) shared(short_paths)
-        for(i = 0; i < n; i++){
-            for(j = 0; j < n; j++){
-                if(INDDGO_INFINITY != short_paths[i][j]){
-                    sum += short_paths[i][j];
-                }
-                else {
-                    inf_path++;
+        #pragma omp parallel default(none) private(j, intermediate) reduction(+:sum) shared(short_paths, inf_path)
+        {
+            #pragma omp for reduction(+:inf_path)
+            for(i=0; i<n ; i++){
+                for(j = 0; j < n; j++){
+                    if(INDDGO_INFINITY == short_paths[i][j]){
+                        inf_path++;
+                    }
                 }
             }
-        }
+                
+            #pragma omp for
+            for(i = 0; i < n; i++){
+                intermediate=0;
+                for(j = 0; j < n; j++){
+                    if(INDDGO_INFINITY != short_paths[i][j]){
+                        intermediate += short_paths[i][j];
+                    }
+                }
+                sum += intermediate / (double)((n * (n - 1)) - inf_path);
+            }
 
-        sum = sum /  (double)((n * (n - 1)) - inf_path);
+            
+            //sum = sum /  (double)((n * (n - 1)) - inf_path);
+        }
         pl = sum;
     } // avg_path_length
 
