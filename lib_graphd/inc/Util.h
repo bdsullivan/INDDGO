@@ -116,6 +116,12 @@ void write_delta_hyperbolicity(string filename, const vector< vector<double> > &
  * \brief Write an all pairs shortest path matrix  out to file.
  */
 void write_apsp_matrix(string filename, vector< vector<int> > &apsp);
+
+/**
+ * \brief Reads an all pairs shortest path matrix from file
+ */
+void read_apsp_matrix(string filename, vector< vector<int> > &apsp);
+
 int_int mylog2(int x);
 
 #endif /* UTIL_H_ */

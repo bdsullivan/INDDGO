@@ -37,11 +37,11 @@ int parseLine(char *line){
     return i;
 }
 
-int getHWmem(){ 
-#if WIN32
-	return -1;
-#endif
-	//Note: this value is in KB!
+int getHWmem(){
+    #if WIN32
+    return -1;
+    #endif
+    //Note: this value is in KB!
     FILE *file = fopen("/proc/self/status", "r");
     if(file == NULL){
         fprintf(stderr, "Error opening processor status file!\n");
@@ -945,7 +945,7 @@ void write_delta_hyperbolicity(string filename, const vector< vector<double> > &
 } // write_betweenness
 
 /**
- * Write a all pairs shortest path matrix  out to file.
+ * Write an all pairs shortest path matrix  out to file.
  *
  * \param[in] filename filename to write output to
  * \param[in] apsp a vector< vector<int> >, indexed on vertex number, assumed to be |V|x|V|
@@ -972,5 +972,38 @@ void write_apsp_matrix(string filename, vector< vector<int> > &apsp){
     }
 
     fclose(outfile);
+} // write_apsp_matrix
+
+/**
+ * Read an all pairs shortest path matrixfrom file.
+ *
+ * \param[in] filename filename to read
+ * \param[out] apsp a vector< vector<int> >, indexed on vertex number, assumed to be |V|x|V|
+ */
+void read_apsp_matrix(string filename, vector< vector<int> > &apsp){
+    int i;
+    int n;
+
+    FILE *infile;
+    infile = fopen(filename.c_str(), "r");
+
+    if(!infile){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+
+    fread((void *) &n, 1, sizeof(int), infile);
+    cerr << "Reading apsp matrix of size: " << n << endl;
+
+    apsp.resize(n);
+
+    //#pragma omp parallel for default(none) share(n, apsp)
+    int ret;
+    for(i = 0; i < n; i++){
+        apsp[i].resize(n);
+        int *arr = &apsp[i].front();
+        fread(arr, n, sizeof(int), infile);
+    }
+
+    fclose(infile);
 } // write_apsp_matrix
 
