@@ -870,6 +870,52 @@ void write_degree_distribution(string filename, const vector<int> &dist){
 } // write_degree_distribution
 
 /**
+ * Write an eccentricity distribution out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] dist a vector<int>, indexed on degree
+ */
+void write_eccentricity_distribution(string filename, const vector<double> &dist){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        int i;
+        for(i = 0; i < dist.size(); i++){
+            outfile << i << " " <<  dist[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_eccentricity_distribution
+
+/**
+ * Write a expansion out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] dist a vector<int>, indexed on degree
+ */
+void write_expansion(string filename, const vector<double> &expansion){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        int i;
+        for(i = 0; i < expansion.size(); i++){
+            outfile << i << " " <<  expansion[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_expansion
+
+/**
  * Write a kcore list out to file.
  * \param[in] filename filename to write output to
  * \param[in] kcores a vector<int>, indexed on vertex number
@@ -886,6 +932,29 @@ void write_kcores(string filename, const vector<int> &kcores){
         int i;
         for(i = 0; i < kcores.size(); i++){
             outfile << i << " " << kcores[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_k_cores
+
+/**
+ * Write an eccentricity list out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] ecc a vector<int>, indexed on vertex number
+ */
+void write_eccentricity(string filename, const vector<int> &ecc){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        int i;
+        for(i = 0; i < ecc.size(); i++){
+            outfile << i << " " << ecc[i] << "\n";
         }
     }
 

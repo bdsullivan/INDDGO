@@ -883,7 +883,7 @@ namespace Graph {
 
         #pragma omp parallel for default(none) shared(norm_hops, hops)
         for(int h = 1; h < n; h++){
-            norm_hops[h] = (double)hops[h] / (n * (n - 1));
+            norm_hops[h] = (double)hops[h] / ((double)n * (n - 1));
             //printf("h = %d and number is %d; norm value is %f\n",h,hops[h],norm_hops[h]);
         }
     } //expansion
@@ -976,38 +976,35 @@ namespace Graph {
     }
 
     void GraphProperties::avg_path_length(Graph *g, double &pl){
-        const int n = g->get_num_nodes();
+        const uint64_t n = g->get_num_nodes();
         const vector< vector<int> > &short_paths = g->get_shortest_path_dist_ref();
         double sum = 0;
-        int intermediate = 0;
+        uint64_t intermediate = 0;
         int i, j;
         int inf_path = 0;
 
-        #pragma omp parallel default(none) private(j, intermediate) reduction(+:sum) shared(short_paths, inf_path)
-        {
-            #pragma omp for reduction(+:inf_path)
-            for(i=0; i<n ; i++){
-                for(j = 0; j < n; j++){
-                    if(INDDGO_INFINITY == short_paths[i][j]){
-                        inf_path++;
-                    }
+        #pragma omp parallel for default(none) reduction(+:inf_path) private(j) shared(short_paths)
+        for(i = 0; i < n; i++){
+            for(j = 0; j < n; j++){
+                if(INDDGO_INFINITY == short_paths[i][j]){
+                    inf_path++;
                 }
             }
-                
-            #pragma omp for
-            for(i = 0; i < n; i++){
-                intermediate=0;
-                for(j = 0; j < n; j++){
-                    if(INDDGO_INFINITY != short_paths[i][j]){
-                        intermediate += short_paths[i][j];
-                    }
-                }
-                sum += intermediate / (double)((n * (n - 1)) - inf_path);
-            }
+        }
 
-            
+        #pragma omp parallel for default(none) private(j, intermediate) reduction(+:sum) shared(short_paths, inf_path, std::cout)
+        for(i = 0; i < n; i++){
+            intermediate = 0;
+            for(j = 0; j < n; j++){
+                if(INDDGO_INFINITY != short_paths[i][j]){
+                    intermediate += short_paths[i][j];
+                }
+            }
+            sum += (double)(intermediate / (double)((n * (n - 1)) - inf_path));
+            //cout << "For node " << i << " got sum " << sum << endl;
             //sum = sum /  (double)((n * (n - 1)) - inf_path);
         }
+        cout << "Got a SUM: " << sum << endl;
         pl = sum;
     } // avg_path_length
 

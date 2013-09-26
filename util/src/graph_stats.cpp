@@ -261,6 +261,9 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
             gp.eccentricity(g, ecc);
             ORB_read(t2);
             print_time(timing_file, "Time(eccentricity)",t1,t2);
+            string of = outprefix + ".eccentricity";
+            outfile << "eccentricity_file " << of << endl;
+            write_eccentricity(of, ecc);
         }
         if(req_methods["eccentricity_dist"] == true){
             cout << "Calculating distribution of eccentricities" << endl;
@@ -268,6 +271,9 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
             gp.eccentricity_dist(g, ecc, freq_ecc);
             ORB_read(t2);
             print_time(timing_file, "Time(eccentricity distribution)",t1,t2);
+            string of = outprefix + ".eccentricity_dist";
+            outfile << "eccentricity_dist_file " << of << endl;
+            write_eccentricity_distribution(of, freq_ecc);
         }
     }
     else {
@@ -280,6 +286,9 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
         gp.expansion(g, norm_hops);
         ORB_read(t2);
         print_time(timing_file, "Time(expansion)",t1,t2);
+        string of = outprefix + ".expansion";
+        outfile << "expansion_file " << of << endl;
+        write_expansion(of, norm_hops);
     }
     if(req_methods["avg_shortest_path"] == true){
         cout << "Calculating average shortest path length" << endl;
@@ -480,16 +489,14 @@ int main(int argc, char **argv){
 
     outfile.precision(16);
     vector<int> components;
-    cout << "Graph is connected?: " << std::boolalpha << gp.is_connected(g) << endl;
     ORB_read(t1);
     cout << "GU.label_all_components says: " << gu.label_all_components(g, &components) << endl;
     ORB_read(t2);
     print_time(timing_file, "Time(label_all_components)", t1, t2);
     bool is_connected = gp.is_connected(g);
     cout << "Connected components: " << g->get_num_connected_components() << endl;
-    cout << "Graph is connected?: " << std::boolalpha << is_connected << endl;
+    cout << "Graph is connected: " << std::boolalpha << is_connected << endl;
 
-    cout << "Creating largest connected component graph" << endl;
     run_all_methods(g, outfile, timing_file, outprefix, req_methods, file_append, spectrum_spread);
     outfile.close();
     timing_file.close();
@@ -510,6 +517,7 @@ int main(int argc, char **argv){
         }
 
         // get the largest component
+        cout << "Creating largest connected component graph" << endl;
         Graph::Graph *largest_component = gu.get_largest_component_graph(g);
         delete(g);  // delete g here to save on memory
 
