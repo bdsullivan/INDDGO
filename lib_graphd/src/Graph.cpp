@@ -101,6 +101,7 @@ namespace Graph {
             nodes[i].set_label(i + 1);
         }
         this->next_label = n + 1;
+        this->apsp_dist = NULL;
         #ifdef HAS_BOOST
         this->boost_graph = NULL;
         #endif
@@ -778,10 +779,10 @@ namespace Graph {
      **/
     const vector< vector<int> > &Graph::get_shortest_path_dist_ref(){
         if(this->apsp_dist == NULL){
-            this->apsp_dist = new(vector< vector<int> >);
+            this->apsp_dist = new vector< vector<int> >;
         }
         if(this->apsp_dist->empty()){
-            cout << "Empty -- calling function to compute shortest paths" << endl;
+            cout << "APSP matrix is empty -- calling function to compute shortest paths" << endl;
             GraphProperties properties;
             properties.paths_dijkstra_all(this,*(this->apsp_dist));   //sets this>apsp_dist with values
         }
@@ -790,10 +791,10 @@ namespace Graph {
 
     const vector<int> &Graph::get_u_shortest_path_dist(int u){
         if(this->apsp_dist == NULL){
-            this->apsp_dist = new(vector< vector<int> >);
+            this->apsp_dist = new vector< vector<int> >;
         }
         if(this->apsp_dist[u].empty()){
-            cout << "u Empty -- calling function to compute shortest paths" << endl;
+            cout << "SSSP vector is empty -- calling function to compute shortest paths" << endl;
             GraphProperties properties;
             properties.paths_dijkstra_single(this,(*(this->apsp_dist))[u], u);   //sets this>apsp_dist[u] with values
         }

@@ -65,7 +65,7 @@ void create_map(string list, map<string, bool> &outmap){
 }
 
 void print_usage(char **argv){
-    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods] [-s eigen spectrum size] [-r]" << endl;
+    cerr << "Usage: " << argv[0] << " [-h] -i infile [-t input-type] [-o outfile] [-p output-prefix] [-m methods] [-s eigen spectrum size] [-r] [-x APSP matrix input]" << endl;
     cerr << "Allowed methods: " << allowed_methods << endl;
     cerr << "Input type should be one of: edge, adjlist, adjmatrix, dimacs" << endl;
 }
@@ -80,9 +80,9 @@ void print_usage(char **argv){
  * \param[out] methods list of methods we want to run.  Valid values currently: edge_density,avg_degree,degree_dist,global_cc, avg_cc, local_ccs
  */
 
-int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods, bool& record_timings, bool &file_append, int *spectrum_spread){
+int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods, bool& record_timings, bool &file_append, int *spectrum_spread, string &apsp_input){
     int flags, opt;
-    while((opt = getopt(argc, argv, "hi:t:o:m:p:s:ra")) != -1){
+    while((opt = getopt(argc, argv, "hi:t:o:m:p:s:rax:")) != -1){
         switch(opt){
         case 'h':
             print_usage(argv);
@@ -110,6 +110,9 @@ int parse_options(int argc, char **argv, string& infile, string& intype, string&
             break;
         case 'a':
             file_append = true;
+            break;
+        case 'x':
+            apsp_input = optarg;
             break;
         }
     }
@@ -258,6 +261,9 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
             gp.eccentricity(g, ecc);
             ORB_read(t2);
             print_time(timing_file, "Time(eccentricity)",t1,t2);
+            string of = outprefix + ".eccentricity";
+            outfile << "eccentricity_file " << of << endl;
+            write_eccentricity(of, ecc);
         }
         if(req_methods["eccentricity_dist"] == true){
             cout << "Calculating distribution of eccentricities" << endl;
@@ -265,6 +271,9 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
             gp.eccentricity_dist(g, ecc, freq_ecc);
             ORB_read(t2);
             print_time(timing_file, "Time(eccentricity distribution)",t1,t2);
+            string of = outprefix + ".eccentricity_dist";
+            outfile << "eccentricity_dist_file " << of << endl;
+            write_eccentricity_distribution(of, freq_ecc);
         }
     }
     else {
@@ -277,6 +286,9 @@ void run_all_methods(Graph::Graph *g, ofstream &outfile, ofstream &timing_file, 
         gp.expansion(g, norm_hops);
         ORB_read(t2);
         print_time(timing_file, "Time(expansion)",t1,t2);
+        string of = outprefix + ".expansion";
+        outfile << "expansion_file " << of << endl;
+        write_expansion(of, norm_hops);
     }
     if(req_methods["avg_shortest_path"] == true){
         cout << "Calculating average shortest path length" << endl;
@@ -371,6 +383,7 @@ int main(int argc, char **argv){
     string infile;
     string outfilename;
     string outprefix;
+    string apspinputfilename;
     ofstream outfile;
     ofstream timing_file;
     bool record_timings = false;
@@ -381,7 +394,7 @@ int main(int argc, char **argv){
     ORB_t t1, t2;
     int spectrum_spread = 0;
     create_map(allowed_methods, val_methods);
-    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, record_timings, file_append, &spectrum_spread);
+    parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, record_timings, file_append, &spectrum_spread, apspinputfilename);
     if(outfilename.length() == 0){
         if(outprefix.length() != 0){
             outfilename = outprefix + ".stats";
@@ -464,18 +477,26 @@ int main(int argc, char **argv){
 
     print_time(timing_file, "Time(read_graph)", t1, t2);
 
+    if(apspinputfilename.length() != 0){
+        cout << "Reading APSP matrix from " << apspinputfilename << endl;
+        vector< vector<int> > *apsp_dists = new vector< vector<int> >;
+        ORB_read(t1);
+        read_apsp_matrix(apspinputfilename, *apsp_dists);
+        ORB_read(t2);
+        print_time(timing_file, "Time(read_apsp_matrix)", t1, t2);
+        g->set_shortest_path_dist(apsp_dists);
+    }
+
     outfile.precision(16);
     vector<int> components;
-    cout << "Graph is connected?: " << std::boolalpha << gp.is_connected(g) << endl;
     ORB_read(t1);
     cout << "GU.label_all_components says: " << gu.label_all_components(g, &components) << endl;
     ORB_read(t2);
     print_time(timing_file, "Time(label_all_components)", t1, t2);
     bool is_connected = gp.is_connected(g);
     cout << "Connected components: " << g->get_num_connected_components() << endl;
-    cout << "Graph is connected?: " << std::boolalpha << is_connected << endl;
+    cout << "Graph is connected: " << std::boolalpha << is_connected << endl;
 
-    cout << "Creating largest connected component graph" << endl;
     run_all_methods(g, outfile, timing_file, outprefix, req_methods, file_append, spectrum_spread);
     outfile.close();
     timing_file.close();

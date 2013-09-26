@@ -870,6 +870,52 @@ void write_degree_distribution(string filename, const vector<int> &dist){
 } // write_degree_distribution
 
 /**
+ * Write an eccentricity distribution out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] dist a vector<int>, indexed on degree
+ */
+void write_eccentricity_distribution(string filename, const vector<double> &dist){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        int i;
+        for(i = 0; i < dist.size(); i++){
+            outfile << i << " " <<  dist[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_eccentricity_distribution
+
+/**
+ * Write a expansion out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] dist a vector<int>, indexed on degree
+ */
+void write_expansion(string filename, const vector<double> &expansion){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        int i;
+        for(i = 0; i < expansion.size(); i++){
+            outfile << i << " " <<  expansion[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_expansion
+
+/**
  * Write a kcore list out to file.
  * \param[in] filename filename to write output to
  * \param[in] kcores a vector<int>, indexed on vertex number
@@ -886,6 +932,29 @@ void write_kcores(string filename, const vector<int> &kcores){
         int i;
         for(i = 0; i < kcores.size(); i++){
             outfile << i << " " << kcores[i] << "\n";
+        }
+    }
+
+    outfile.close();
+} // write_k_cores
+
+/**
+ * Write an eccentricity list out to file.
+ * \param[in] filename filename to write output to
+ * \param[in] ecc a vector<int>, indexed on vertex number
+ */
+void write_eccentricity(string filename, const vector<int> &ecc){
+    ofstream outfile;
+
+    outfile.open(filename.c_str());
+
+    if(!outfile.is_open()){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+    else {
+        int i;
+        for(i = 0; i < ecc.size(); i++){
+            outfile << i << " " << ecc[i] << "\n";
         }
     }
 
@@ -945,7 +1014,7 @@ void write_delta_hyperbolicity(string filename, const vector< vector<double> > &
 } // write_betweenness
 
 /**
- * Write a all pairs shortest path matrix  out to file.
+ * Write an all pairs shortest path matrix  out to file.
  *
  * \param[in] filename filename to write output to
  * \param[in] apsp a vector< vector<int> >, indexed on vertex number, assumed to be |V|x|V|
@@ -972,5 +1041,38 @@ void write_apsp_matrix(string filename, vector< vector<int> > &apsp){
     }
 
     fclose(outfile);
+} // write_apsp_matrix
+
+/**
+ * Read an all pairs shortest path matrixfrom file.
+ *
+ * \param[in] filename filename to read
+ * \param[out] apsp a vector< vector<int> >, indexed on vertex number, assumed to be |V|x|V|
+ */
+void read_apsp_matrix(string filename, vector< vector<int> > &apsp){
+    int i;
+    int n;
+
+    FILE *infile;
+    infile = fopen(filename.c_str(), "r");
+
+    if(!infile){
+        cerr << "Error opening " << filename << "for writing\n";
+    }
+
+    fread((void *) &n, 1, sizeof(int), infile);
+    cerr << "Reading apsp matrix of size: " << n << endl;
+
+    apsp.resize(n);
+
+    //#pragma omp parallel for default(none) share(n, apsp)
+    int ret;
+    for(i = 0; i < n; i++){
+        apsp[i].resize(n);
+        int *arr = &apsp[i].front();
+        fread(arr, n, sizeof(int), infile);
+    }
+
+    fclose(infile);
 } // write_apsp_matrix
 
