@@ -24,7 +24,7 @@
 #include "Debug.h"
 #include "Util.h"
 #if !WIN32
-#include <strings.h>
+  #include <strings.h>
 #endif
 #include <stdlib.h>
 #include <iostream>

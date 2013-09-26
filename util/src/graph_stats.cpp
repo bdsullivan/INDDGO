@@ -33,12 +33,12 @@
 #include "GraphException.h"
 
 #if !WIN32 && !CYGWIN
-#include "orbconfig.h"
-#include "orbtimer.h"
+  #include "orbconfig.h"
+  #include "orbtimer.h"
 
-#ifdef HAS_SLEPC
-  #include <slepceps.h>
-#endif
+  #ifdef HAS_SLEPC
+    #include <slepceps.h>
+  #endif
 
 using namespace std;
 
@@ -387,9 +387,10 @@ int main(int argc, char **argv){
     create_map(allowed_methods, val_methods);
     parse_options(argc, argv, infile, intype, outfilename, outprefix, req_methods, record_timings, file_append, &spectrum_spread, apspinputfilename);
     if(outfilename.length() == 0){
-        if(outprefix.length() != 0) {
-            outfilename = outprefix+".stats";
-        } else {
+        if(outprefix.length() != 0){
+            outfilename = outprefix + ".stats";
+        }
+        else {
             outfilename = "graph-stats.txt";
         }
     }
@@ -436,7 +437,6 @@ int main(int argc, char **argv){
         exit(1);
     }
 
-
     // Read in the graph and start recording things to output streams
     cout << "Reading graph" << endl;
     ORB_read(t1);
@@ -455,7 +455,8 @@ int main(int argc, char **argv){
         string of = outfilename + ".timings";
         if(file_append == false){
             timing_file.open(of.c_str());
-        } else {
+        }
+        else {
             timing_file.open(of.c_str(), ios_base::out | ios_base::app);
         }
         if(!timing_file.is_open()){
@@ -477,8 +478,6 @@ int main(int argc, char **argv){
         g->set_shortest_path_dist(apsp_dists);
     }
 
-
-
     outfile.precision(16);
     vector<int> components;
     cout << "Graph is connected?: " << std::boolalpha << gp.is_connected(g) << endl;
@@ -498,7 +497,7 @@ int main(int argc, char **argv){
     // some algorithms only make sense to run on a connected graph/component
     if(not is_connected){  // run everything against the other algorithms
         cout << "Graph is not connected, re-running stats on largest connected component" << endl;
-        outfilename = outprefix+".largest_component.stats";
+        outfilename = outprefix + ".largest_component.stats";
         if(file_append == false){
             outfile.open(outfilename.c_str());
         }
@@ -523,7 +522,8 @@ int main(int argc, char **argv){
             string of = outfilename + ".timings";
             if(file_append == false){
                 timing_file.open(of.c_str());
-            } else {
+            }
+            else {
                 timing_file.open(of.c_str(), ios_base::out | ios_base::app);
             }
 
@@ -545,10 +545,10 @@ int main(int argc, char **argv){
     exit(0);
 } // main
 
-#else
-int main()
-{
-	fprintf(stderr,"Can't run under windows or cygwin\n");
-	return 0;
+#else // if !WIN32 && !CYGWIN
+int main(){
+    fprintf(stderr,"Can't run under windows or cygwin\n");
+    return 0;
 }
-#endif
+
+#endif // if !WIN32 && !CYGWIN

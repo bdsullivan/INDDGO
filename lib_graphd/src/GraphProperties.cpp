@@ -23,7 +23,7 @@
 #include "Log.h"
 #include <sys/types.h>
 #if !WIN32
-#include <sched.h>
+  #include <sched.h>
 #endif
 
 #include <algorithm>
@@ -496,7 +496,7 @@ namespace Graph {
                     } //if revmap
                 } //for vtxs
             } //for fakev
-			int tsize=(int)t.size();
+            int tsize = (int)t.size();
             #pragma omp for
             for(i = 0; i < tsize; i++){
                 for(int j = 0; j < omp_get_num_threads(); j++){
@@ -840,14 +840,14 @@ namespace Graph {
         freq_ecc.resize(*(std::max_element(ecc.begin(), ecc.end())) + 1);
 
         //compute diameter of each vertex
-		int eccsize=ecc.size();
-		// This could be slow with resizing
-        for(int i = 0; i < eccsize ; i++){
+        int eccsize = ecc.size();
+        // This could be slow with resizing
+        for(int i = 0; i < eccsize; i++){
             freq_ecc[ecc[i]]++; //add to tally for this diameter size
         }
         //printf("Graph diameter is %d\n", freq_ecc.size()-1);
 
-		int freq_ecc_size=freq_ecc.size();
+        int freq_ecc_size = freq_ecc.size();
         #pragma omp parallel for default(none) shared(freq_ecc, freq_ecc_size)
         for(int i = 0; i <= freq_ecc_size - 1; i++){
             freq_ecc[i] = freq_ecc[i] / n;

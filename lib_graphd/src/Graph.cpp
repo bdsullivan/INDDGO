@@ -28,7 +28,6 @@
 #include <algorithm>
 #include <string.h>
 
-
 #ifndef _OPENMP
   #ifdef HAS_METIS
 void omp_set_num_threads(int num_threads){
@@ -778,7 +777,7 @@ namespace Graph {
      * otherwise computes then returns
      **/
     const vector< vector<int> > &Graph::get_shortest_path_dist_ref(){
-        if(this->apsp_dist == NULL) {
+        if(this->apsp_dist == NULL){
             this->apsp_dist = new(vector< vector<int> >);
         }
         if(this->apsp_dist->empty()){
@@ -790,7 +789,7 @@ namespace Graph {
     }
 
     const vector<int> &Graph::get_u_shortest_path_dist(int u){
-        if(this->apsp_dist == NULL) {
+        if(this->apsp_dist == NULL){
             this->apsp_dist = new(vector< vector<int> >);
         }
         if(this->apsp_dist[u].empty()){
