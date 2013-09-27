@@ -21,21 +21,21 @@
 
 #if !WIN32 && !CYGWIN
 
-#include "GraphDecomposition.h"
-#include "GraphProperties.h"
-#include "Log.h"
-#include "VertexWeightedGraph.h"
-#include "GraphException.h"
-#include "GraphReader.h"
-#include "GraphWriter.h"
-#include <numeric>
-#include <ctime>
-#include <sys/time.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <stdint.h>
-#include "orbconfig.h"
-#include "orbtimer.h"
+  #include "GraphDecomposition.h"
+  #include "GraphProperties.h"
+  #include "Log.h"
+  #include "VertexWeightedGraph.h"
+  #include "GraphException.h"
+  #include "GraphReader.h"
+  #include "GraphWriter.h"
+  #include <numeric>
+  #include <ctime>
+  #include <sys/time.h>
+  #include <sys/syscall.h>
+  #include <sys/types.h>
+  #include <stdint.h>
+  #include "orbconfig.h"
+  #include "orbtimer.h"
 
 using namespace std;
 
@@ -136,13 +136,12 @@ int main(int argc, char **argv){
     return 0;
 } // main
 
-
-#else
-#include <stdio.h>
-int main()
-{
-	fprintf(stderr,"Can't build under windows or cygwin\n");
-	return 0;
+#else // if !WIN32 && !CYGWIN
+  #include <stdio.h>
+int main(){
+    fprintf(stderr,"Can't build under windows or cygwin\n");
+    return 0;
 }
-#endif
+
+#endif // if !WIN32 && !CYGWIN
 
