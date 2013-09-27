@@ -54,6 +54,11 @@
   #include <boost/math/special_functions/zeta.hpp>
 #endif
 
+#ifndef HAS_BOOST
+  #include <stdint.h>
+#endif
+
+
 #include <set>
 #include <map>
 #include <limits.h>
