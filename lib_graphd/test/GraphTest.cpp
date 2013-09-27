@@ -85,6 +85,11 @@ TEST_F(GraphTest, testIsEdge)
 
     EXPECT_EQ(24, nbrs.size());
     EXPECT_TRUE(g->is_edge(108, 100));
+
+    n = g->get_node(80);
+    list<int> nbrs2 = n->get_nbrs();
+    EXPECT_EQ(22, nbrs2.size());
+    EXPECT_FALSE(g->is_edge(80, 12));
 }
 
 TEST_F(GraphTest, testGetDegree)
@@ -269,6 +274,47 @@ TEST_F(GraphTest, testContractEdge)
     EXPECT_EQ(final_degree, g->get_degree(108));
 }
 
+TEST_F(GraphTest, testFuseVertices)
+{
+    EXPECT_FALSE(g->is_edge(80, 12));
+    EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(22, g->get_degree(80));
+    EXPECT_EQ(19, g->get_degree(12));
+
+    Graph::Node *na;
+    na = g->get_node(80);
+    list<int> nbrs_a = na->get_nbrs();
+    vector<int> nbrsvec_a(nbrs_a.begin(), nbrs_a.end());
+
+    Graph::Node *nb;
+    nb = g->get_node(12);
+    list<int> nbrs_b = nb->get_nbrs();
+    vector<int> nbrsvec_b(nbrs_b.begin(), nbrs_b.end());
+
+    int common_nbrs = 0;
+    int final_degree = 0;
+    int new_edges = 0;
+
+    for(int ia = 0; ia < nbrsvec_a.size(); ia++){
+        for(int ib = 0; ib < nbrsvec_b.size(); ib++){
+            if(nbrsvec_a[ia] == nbrsvec_b[ib]){
+                common_nbrs++;
+            }
+        }
+    }
+
+    final_degree = g->get_degree(80) + g->get_degree(12) - common_nbrs;
+    new_edges = g->get_num_edges() - common_nbrs;
+
+    int x = g->fuse_vertices(80, 12, false);
+
+    EXPECT_FALSE(g->is_edge(80, 12));
+    EXPECT_FALSE(g->is_edge(12, 80));
+    EXPECT_EQ(0, g->get_degree(12));
+    EXPECT_EQ(new_edges, g->get_num_edges());
+    EXPECT_EQ(final_degree, g->get_degree(80));
+}
+
 TEST_F(GraphTest, testEliminateVertex)
 {
     EXPECT_TRUE(g->is_edge(108, 100));
@@ -308,4 +354,33 @@ TEST_F(GraphTest, testEliminateVertex)
     EXPECT_EQ(1597, g->get_num_edges());
     EXPECT_EQ(new_edges, g->get_degree(100));
     EXPECT_EQ(0, g->get_degree(108));
+}
+
+TEST_F(GraphTest, testEdgeSubdivision)
+{
+    EXPECT_TRUE(g->is_edge(108, 100));
+    EXPECT_EQ(1471, g->get_num_edges());
+    EXPECT_EQ(24, g->get_degree(108));
+    EXPECT_EQ(24, g->get_degree(100));
+
+    //We are creating a new vertex w of degree 2, with neighbors 108 and 100. The neighbors of
+    //108 and 100 should change by losing each other and adding w.
+    int w = 130; //out of current range of vertice
+    int u_old = g->get_degree(108);
+    int v_old = g->get_degree(100);
+
+    int x = g->edge_subdivision(108, 100, w);
+
+    //Check existence of correct edges
+    EXPECT_FALSE(g->is_edge(108, 100));
+    EXPECT_FALSE(g->is_edge(100, 108));
+    EXPECT_TRUE(g->is_edge(100, w));
+    EXPECT_TRUE(g->is_edge(108, w));
+    EXPECT_TRUE(g->is_edge(w, 100));
+    EXPECT_TRUE(g->is_edge(w, 108));
+
+    //Check vertex degrees
+    EXPECT_EQ(2, g->get_degree(w));
+    EXPECT_EQ(u_old, g->get_degree(108));
+    EXPECT_EQ(v_old, g->get_degree(100));
 }

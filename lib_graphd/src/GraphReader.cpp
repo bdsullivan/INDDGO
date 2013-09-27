@@ -24,7 +24,7 @@
 #include "Debug.h"
 #include "Util.h"
 #if !WIN32
-#include <strings.h>
+  #include <strings.h>
 #endif
 #include <stdlib.h>
 #include <iostream>
@@ -136,8 +136,8 @@ namespace Graph {
                 }
             }
         }
-		// CSG - what should this return?
-		return 1;
+        // CSG - what should this return?
+        return 1;
     } // read_adjlist
 
 /**

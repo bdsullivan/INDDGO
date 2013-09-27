@@ -68,20 +68,22 @@ public:
     int vertex_separator(Graph *g, list<int> *V,
                          vector<list<int> *> *members);
 
+    //ConstructSeparator from metis
+    void metis_ConstructSeparator(VertexWeightedGraph *g, list<int> *top, list<int> *bottom);
+
     //runs a BFS from start using
     //only vertices with allowed[v] = true.
     //you need to delete the memory in the returned bool array.
     //num_reached is the number of vertices which are reachable. This does not include
     //disallowed vertices, and does include the start.
     bool *bfs(Graph *g, int start, bool *allowed, int *num_reached);
-    bool *bfs_old(Graph *g, int start, bool *allowed, int *num_reached);
     int *bfs_dist(Graph *g, int start, bool *allowed, int *num_reached);
     int *bfs_dist(Graph *g, int start, bool *allowed, int *num_reached, int *ecc);
 
     //Find the eccentricity of each vertex and store it in ecc.
     void find_ecc(Graph *g, vector<int> *ecc);
 
-    //Find the k-core number of each vertex and store it in kcore. 
+    //Find the k-core number of each vertex and store it in kcore.
     //Return degeneracy.
     int find_kcore(Graph *g, vector<int> *kcore);
 
