@@ -94,6 +94,11 @@ will be identified through a message to standard out.
  (sample graphviz command: neato -Tpdf -o tree.pdf tree.dot). 
  * ./bin/td_viz -f ./sample_graphs/1dc.64.dimacs -t ./sample_graphs/1dc.64.tree -e 
 
+###Calculate graph statistics
+Generates a set of output files containing the results of your selection of a broad spectrum of graph statistics (run with -h to see all options) when 
+calculated on the specified input graph. The single value statistics are stored in sample_graphs/pkt-stats.stats, and that file lists where to find any features that create a vector (or more) of data. Note that without BOOST, distance-based features may not be available.
+* ./bin/graph_stats -i ./sample_graphs/1dc.64.dimacs -t dimacs -p ./sample_graphs/pkt-stats -m edge_density,degree_dist,global_cc,avg_cc,assortativity,eccentricity,expansion,avg_shortest_path -r 
+
 More information on the output formats for the weighted independent set executables is in the README in max_wis.
 
 ##Getting Help

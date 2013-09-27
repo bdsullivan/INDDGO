@@ -136,8 +136,7 @@ namespace Graph {
                 }
             }
         }
-        // CSG - what should this return?
-        return 1;
+        return 0;
     } // read_adjlist
 
 /**

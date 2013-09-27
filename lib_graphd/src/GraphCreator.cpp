@@ -25,6 +25,8 @@
 #include "GraphUtil.h"
 #include "VertexWeightedGraph.h"
 
+#include <typeinfo>
+
 namespace Graph {
     GraphCreator::GraphCreator(){
     }
@@ -112,13 +114,12 @@ namespace Graph {
         for(it = probs->begin(); it != probs->end(); it++){
             //compute which actors have a given attribute
             vector<int> connect;
-            for(int i = 0; i < n; i++){
+            for(unsigned long i = 0; i < n; i++){
                 if(lcgrand(0) < *it){
                     connect.push_back(i);
                 }
             }
             //attach these actors to the graph
-            // CSG - if you call size over and over here this will be sloooow!
             int conn_size = connect.size();
             for(int i = 0; i < conn_size; i++){
                 for(int j = i + 1; j < conn_size; j++){
@@ -403,6 +404,133 @@ namespace Graph {
         // Set num_connected_components to 1 since g is known - not verified - should it be??
         wmg->num_connected_components = 1;
         return wmg;
+    }
+
+    /**
+     * Creates a graph G with vertex set equal to the set in the members list.
+     * The entries in the members list are the positions in the nodes[] array.
+     * The edges in G are created by constructing the subgraph induced
+     * by the members list.  If make_simple is true, then the resulting graph
+     * is guaranteed to be simple.
+     */
+    Graph *GraphCreator::create_induced_subgraph(Graph *g, list<int> *members, bool make_simple){
+        Graph *wmg = new Graph(members->size());
+        // The caller of g function is responsible for allocating a Graph
+        // of the appropriate size - make sure!
+
+        if(wmg->capacity != (int) (((members->size())))){
+            fatal_error(
+                "%s:  Graph of members->size() must be allocated before calling\ncreate_component\n",
+                __FUNCTION__);
+        }
+
+        // Sort the members - not necessary, but convenient?
+        members->sort();
+        // Create a subgraph_labels[] array and a graph_indices[]
+        // array
+
+        int *subgraph_labels = new int[members->size()];
+        memset(subgraph_labels, GD_UNDEFINED, members->size() * sizeof(int));
+        int *graph_indices = new int[g->capacity];
+        memset(graph_indices, GD_UNDEFINED, g->capacity * sizeof(int));
+        list<int>::iterator i, j;
+        int k = 0;
+        for(i = members->begin(); i != members->end(); ++i){
+            subgraph_labels[k] = g->nodes[*i].label;
+            graph_indices[*i] = k;
+            k++;
+        }
+
+        k = 0;
+        int new_i, new_j;
+        // Use g for make_simple checking
+        char *neighbor_vec = new char[g->capacity];
+        bool multiple_edges = false;
+        wmg->num_edges = 0;
+        for(i = members->begin(); i != members->end(); ++i){
+            memset(neighbor_vec, 0, g->capacity * sizeof(char));
+            new_i = graph_indices[*i];
+            if(new_i == GD_UNDEFINED){
+                fatal_error(
+                    "%s: Encountered GD_UNDEFINED entry for new_i at position %d in graph_indices array\n",
+                    __FUNCTION__, *i);
+            }
+
+            wmg->nodes[new_i].label = subgraph_labels[k];
+            for(j = g->nodes[*i].nbrs.begin(); j != g->nodes[*i].nbrs.end(); ++j){
+                // We have an edge between *i and *j in the original graph
+                // g should be stored as an edge between
+                // graph_indices[*i] and graph_indices[*j] in the subgraph
+
+                new_j = graph_indices[*j];
+                print_message(1, "Translating old edge %d-%d to new edge %d-%d\n",
+                              *i, *j, new_i, new_j);
+
+                if(new_j == GD_UNDEFINED){
+                    print_message(
+                        1,
+                        "%s: Encountered GD_UNDEFINED entry for new_j at position %d in graph_indices array\n",
+                        __FUNCTION__, *j);
+                }
+                else {
+                    if(new_i <= new_j){
+                        if(!make_simple || (neighbor_vec[*j] == 0) ){
+                            if(neighbor_vec[*j] == 1){
+                                // We are adding a duplicate edge to G - G will not be simple
+                                multiple_edges = true;
+                            }
+                            // CSG added make_simple functionality - just check if we have seen g edge before by checking
+                            // the neighbor_vec
+                            wmg->num_edges++;
+                            wmg->nodes[new_i].nbrs.push_back(new_j);
+                            if(new_i != new_j){                             // added check Dec 29
+                                wmg->nodes[new_j].nbrs.push_back(new_i);
+                            }
+                        }
+                    }
+                }
+                neighbor_vec[*j] = 1;
+            }
+            // k is used for the subgraph labels
+            k++;
+        }
+        // If the original was simple, G will be. If make_simple, then it had better be simple!
+        // Otherwise, unknown.
+        if((g->simple == GD_TRUE) || make_simple){
+            wmg->simple = GD_TRUE;
+        }
+        else {
+            wmg->simple = false;
+            wmg->canonical = false;
+        }
+        if(multiple_edges){
+            wmg->simple = false;
+            wmg->canonical = false;
+        }
+        // We don't know number of components
+        wmg->num_connected_components = GD_UNDEFINED;
+        GraphUtil util;
+        util.recompute_degrees(wmg);
+
+        delete[] subgraph_labels;
+        delete[] graph_indices;
+        delete[] neighbor_vec;
+
+        return wmg;
+    } // create_induced_subgraph
+
+    /**
+     * Creates the subgraph G induced by the members list where it is known
+     * that g subgraph is a connected component.  Sets G->num_components=1
+     * although g is not verified!  If make_simple is true, then the component
+     * is guaranteed to be simple.
+     */
+    Graph *GraphCreator::create_component(Graph *g, list<int> *members, bool make_simple){
+        Graph *comp;
+        comp = create_induced_subgraph(g, members, make_simple);
+        // Set num_connected_components to 1 since g is known - not verified - should it be??
+        comp->num_connected_components = 1;
+        return comp;
     }
 
     /**

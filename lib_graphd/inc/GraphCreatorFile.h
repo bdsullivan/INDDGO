@@ -22,6 +22,12 @@
 #ifndef GRAPHCREATORFILE_H_
 #define GRAPHCREATORFILE_H_
 
+#ifdef HAS_BOOST
+  #ifdef HAS_GTEST
+    #define GTEST_HAS_TR1_TUPLE 0
+  #endif
+#endif
+
 #include "GraphCreator.h"
 #include "GraphReader.h"
 #include <string>

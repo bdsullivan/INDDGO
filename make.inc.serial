@@ -32,6 +32,9 @@ HAS_METIS	= 0
 HAS_IGRAPH	= 0
 HAS_GMP		= 0
 HAS_GTEST	= 0
+# Set to 1 if you have boost installed on your system
+# Many linux systems have it installed by default
+HAS_BOOST = 0
 # Set whether serial or parallel version is desired for WIS.
 IS_PARALLEL	= 0
 HAS_MADNESS	= 0
@@ -89,6 +92,10 @@ endif
 
 ifeq ($(LOG_ENABLED), 1)
 CFLAGS := $(CFLAGS) -D__LOG_ENABLE__ 
+endif
+
+ifeq ($(HAS_BOOST),1)
+CFLAGS := $(CFLAGS) -DHAS_BOOST
 endif
 
 ifeq ($(HAS_MADNESS),1)
