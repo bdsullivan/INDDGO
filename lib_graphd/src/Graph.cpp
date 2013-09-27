@@ -414,6 +414,14 @@ namespace Graph {
         num_nodes--;
     } // remove_vertex
 
+
+  /**
+   * Subdivides the edge (u,v) by placing a new vertex, numbered w 
+   * in the graph, deleting (u,v) and adding (u,w) and (w,v). 
+   * WARNING: If w is a current vertex, this function will remove 
+   * all its current edges, and may have unpredictable behavior.
+   *
+   */
 	int Graph::edge_subdivision(int u, int v, int w)	{
 		if (nodes[u].label == -1 || nodes[v].label == -1){
 			fatal_error(
@@ -433,7 +441,7 @@ namespace Graph {
 	    }
 
 		// if w provided, check that it is in bounds
-		if(w > capacity){
+		if(w >= capacity){
 			nodes.resize(2*capacity);
 			capacity*=2;
 		}
