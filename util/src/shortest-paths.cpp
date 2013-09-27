@@ -65,21 +65,26 @@ int main(int argc, char **argv){
     //compute shortest paths from source node
     begin = clock();
     //for each node run it
-    int source = 0;
+    int source = 8;
     vector<int> onePaths;
 
     printf("\nRunning Dijsktra for source %d\n",source);
     prop.paths_dijkstra_single(g, onePaths, source);
     end = clock();
+
+    int i;
+    for(i = 0; i < onePaths.size(); i++){
+        printf("%d: %d\n", i, onePaths[i]);
+    }
     printf("Alg Time (single): %f\n", double(end - begin) / CLOCKS_PER_SEC);
 
     //compute all pairs shortest paths
     begin = clock();
-    vector< vector<int> > allPaths;
+//    vector< vector<int> > allPaths;
 
-    printf("\nRunning Dijsktra for all pairs \n");
-    prop.paths_dijkstra_all(g,allPaths); //alternate: vector< vector<int> > pt2 =  g->get_shortest_path_dist_ref();
-    end = clock();
-    printf("Alg Time (all): %f\n", double(end - begin) / CLOCKS_PER_SEC);
+    //   printf("\nRunning Dijsktra for all pairs \n");
+    //  prop.paths_dijkstra_all(g,allPaths); //alternate: vector< vector<int> > pt2 =  g->get_shortest_path_dist_ref();
+    // end = clock();
+    //printf("Alg Time (all): %f\n", double(end - begin) / CLOCKS_PER_SEC);
 } // main
 

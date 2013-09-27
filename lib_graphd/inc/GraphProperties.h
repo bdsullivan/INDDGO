@@ -23,6 +23,15 @@
 #define GRAPHPROPERTIES_H_
 #include "GraphDecomposition.h"
 
+#ifdef HAS_BOOST
+  #ifdef HAS_GTEST
+    #define GTEST_HAS_TR1_TUPLE 0
+  #endif
+  #include "boost/graph/adjacency_list.hpp"
+  #include "boost/graph/topological_sort.hpp"
+  #include "boost/graph/betweenness_centrality.hpp"
+#endif
+
 using namespace std;
 
 namespace Graph {
@@ -72,6 +81,24 @@ public:
      */
     void paths_dijkstra_single(Graph *g, vector<int> &p, int source);
 
+    #ifdef HAS_BOOST
+    /**
+     * \brief returns shortest paths from source to all other nodes
+     */
+    void paths_dijkstra_boost_single(Graph *g, vector<int> &dists, vector<vertex_descriptor> &preds, int source);
+
+    /**
+     * \brief returns shortest paths from all nodes to all nodes
+     */
+    void paths_dijkstra_boost_all(Graph *g, vector< vector<int> > &p);
+
+    /**
+     * \brief calculations betweenness centrality for all vertices
+     */
+    void betweenness_centrality(Graph *g, vector<double> &bc);
+
+    #endif
+
     /**
      * \brief returns shortest paths from all nodes to all nodes
      */
@@ -113,14 +140,36 @@ public:
     void avg_degree(Graph *g, float &ad);
 
     /**
+     * \brief Calculates the average shortest path length of the specified graph
+     */
+    void avg_path_length(Graph *g, double &pl);
+
+    /**
      * \brief Calculates the degree distribution of the specified graph
      */
     void deg_dist(Graph *g, vector<int> &dist);
+
+    #ifdef HAS_BOOST
+    /**
+     * \brief Fits the degree distribution of the specified graph to a power law distribution
+     */
+    void powerlaw(Graph *g, int &xmin, double &alpha, double &KS, double start = 1.5, double inc = 0.01, double end = 3.5);
+    #endif
 
     /**
      * \brief Returns the degree assortativity coefficient of a graph
      */
     void deg_assortativity(Graph *g, double &coeff);
+
+    /**
+     * \brief Returns the delta hyperbolicity of a graph
+     */
+    void delta_hyperbolicity(Graph *g, double &max_delta, vector<vector<double> > &delta);
+
+    /**
+     * \brief Calculates the eign spectrum. By default it does the top 5 and bottom 5.
+     */
+    void eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread = 5);
     };
 }
 
