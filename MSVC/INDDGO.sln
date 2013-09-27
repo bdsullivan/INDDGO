@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C++ Express 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_treed", "lib_treed\lib_treed.vcxproj", "{E88CD5F0-B70E-4504-B83B-393FC3FC12BD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BFE092BE-DF45-44F1-B013-A98820441A40} = {BFE092BE-DF45-44F1-B013-A98820441A40}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_graphd", "lib_graphd\lib_graphd.vcxproj", "{BFE092BE-DF45-44F1-B013-A98820441A40}"
 EndProject
@@ -10,6 +13,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "serial_wis", "serial_wis\se
 		{BFE092BE-DF45-44F1-B013-A98820441A40} = {BFE092BE-DF45-44F1-B013-A98820441A40}
 		{E88CD5F0-B70E-4504-B83B-393FC3FC12BD} = {E88CD5F0-B70E-4504-B83B-393FC3FC12BD}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gen_pkt", "gen_pkt\gen_pkt.vcxproj", "{F0C0ECD8-3A00-4D40-8A06-62938979C5A6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BFE092BE-DF45-44F1-B013-A98820441A40} = {BFE092BE-DF45-44F1-B013-A98820441A40}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complement", "complement\complement.vcxproj", "{E8670ED1-EA47-4A7F-858E-2781A04901C3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BFE092BE-DF45-44F1-B013-A98820441A40} = {BFE092BE-DF45-44F1-B013-A98820441A40}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPX_solve_wis", "CPX_solve_wis\CPX_solve_wis.vcxproj", "{141CEE83-9865-4982-A304-65ED2248F0BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +44,18 @@ Global
 		{F0033BB8-C99B-4696-9350-F6B97850C220}.Debug|Win32.Build.0 = Debug|Win32
 		{F0033BB8-C99B-4696-9350-F6B97850C220}.Release|Win32.ActiveCfg = Release|Win32
 		{F0033BB8-C99B-4696-9350-F6B97850C220}.Release|Win32.Build.0 = Release|Win32
+		{F0C0ECD8-3A00-4D40-8A06-62938979C5A6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F0C0ECD8-3A00-4D40-8A06-62938979C5A6}.Debug|Win32.Build.0 = Debug|Win32
+		{F0C0ECD8-3A00-4D40-8A06-62938979C5A6}.Release|Win32.ActiveCfg = Release|Win32
+		{F0C0ECD8-3A00-4D40-8A06-62938979C5A6}.Release|Win32.Build.0 = Release|Win32
+		{E8670ED1-EA47-4A7F-858E-2781A04901C3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E8670ED1-EA47-4A7F-858E-2781A04901C3}.Debug|Win32.Build.0 = Debug|Win32
+		{E8670ED1-EA47-4A7F-858E-2781A04901C3}.Release|Win32.ActiveCfg = Release|Win32
+		{E8670ED1-EA47-4A7F-858E-2781A04901C3}.Release|Win32.Build.0 = Release|Win32
+		{141CEE83-9865-4982-A304-65ED2248F0BA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{141CEE83-9865-4982-A304-65ED2248F0BA}.Debug|Win32.Build.0 = Debug|Win32
+		{141CEE83-9865-4982-A304-65ED2248F0BA}.Release|Win32.ActiveCfg = Release|Win32
+		{141CEE83-9865-4982-A304-65ED2248F0BA}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

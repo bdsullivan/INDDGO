@@ -28,7 +28,9 @@
 #include "Log.h"
 #include "Debug.h"
 #include <stdio.h>
-#include <strings.h>
+#if !WIN32
+  #include <strings.h>
+#endif
 #include <stdlib.h>
 #include <iostream>
 #include <algorithm>

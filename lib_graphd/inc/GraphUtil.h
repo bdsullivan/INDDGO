@@ -64,6 +64,13 @@ public:
     void populate_CRS(Graph *g);
     void free_CRS(Graph *g);
 
+    #ifdef HAS_BOOST
+    /**
+     * \brief Populate the boost version of the graph
+     */
+    void populate_boost(Graph *g);
+    #endif
+
     //uses V as a vertex separator of G. Returns the number of components in G\V, and fills in members with their vertex lists..
     int vertex_separator(Graph *g, list<int> *V,
                          vector<list<int> *> *members);
@@ -83,13 +90,27 @@ public:
     //Find the eccentricity of each vertex and store it in ecc.
     void find_ecc(Graph *g, vector<int> *ecc);
 
-    //Find the k-core number of each vertex and store it in kcore. 
-    //Return degeneracy.
+    /**
+     * \brief Find the k-core number of each vertex and store it in kcore.
+     */
     int find_kcore(Graph *g, vector<int> *kcore);
 
     //Calculate the maximum distance between nodes within a subset of vertices
     //given as a list
     int subset_max_dist(Graph *g, vector<int> subset);
+    /**
+     * \brief Populate adjency matrix as a Petsc Matrix
+     */
+    void populate_PetscMat(Graph *g);
+    /**
+     * \brief Releases PetscMat.
+     */
+    void free_PetscMat(Graph *g);
+
+    /**
+     * \brief returns a new graph that is the largest component of g
+     */
+    Graph *get_largest_component_graph(Graph *g);
     };
 
     void create_largestcomponent_graph(char *graph_file, VertexWeightedGraph *&G);

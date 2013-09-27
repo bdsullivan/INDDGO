@@ -20,12 +20,20 @@
  */
 
 #include "GraphDecomposition.h"
-//No longer used 7/22/13
-//#include <sys/syscall.h>
+#include "Log.h"
 #include <sys/types.h>
-#include <sched.h>
+#if !WIN32
+  #include <sched.h>
+#endif
+
+#include <algorithm>
+#include <vector>
+#include <cmath>
 
 #include <numeric>
+#ifdef HAS_SLEPC
+  #include <slepceps.h>
+#endif
 
 namespace Graph {
     GraphProperties::GraphProperties(){
@@ -372,10 +380,8 @@ namespace Graph {
      * \param[out] t output vector of per-vertex triangle counts
      */
     void GraphProperties::all_triangles_compact_forward(Graph *g, vector<long int> &t){
-        int i, j;
+        int i;
         int u, v;
-        int retcode;
-        Node *vn;
 
         std::list<int>::const_reverse_iterator rit;
 
@@ -406,8 +412,6 @@ namespace Graph {
          */
 
         Node *nv, *nu;
-        int vp, up;
-        int iu, iv;
         int fakev;
         int uprime, vprime;
         const int n = g->get_num_nodes();
@@ -492,8 +496,9 @@ namespace Graph {
                     } //if revmap
                 } //for vtxs
             } //for fakev
+            int tsize = (int)t.size();
             #pragma omp for
-            for(i = 0; i < t.size(); i++){
+            for(i = 0; i < tsize; i++){
                 for(int j = 0; j < omp_get_num_threads(); j++){
                     t[i] += local_t[j][i];
                 }
@@ -507,7 +512,7 @@ namespace Graph {
      * \param[out] t vector of long ints, length |V|, returns 3x number of triangles for each vertex
      */
     void GraphProperties::all_triangles_edge_listing(Graph *g, vector<long int> &t){
-        int i, j, u, v;
+        int i, u, v;
         vector<int>::iterator it;
         list<int>::const_iterator cit;
         list<int>::iterator lt;
@@ -617,6 +622,83 @@ namespace Graph {
         global_cc = (double)num_triangles / (double)total_possible_triangles;
     } // clustering_coefficients
 
+    #ifdef HAS_BOOST
+    /**
+     * We assume that edge weights are all 1
+     *
+     * \param[in] g input graph
+     * \param[in] source node id
+     * \param[out] p path distances from source to all other vertices
+     */
+    void GraphProperties::paths_dijkstra_boost_single(Graph *g, vector<int> &dists, vector<vertex_descriptor> &preds, int source){
+        BoostUndirected *bg = g->boost_graph;
+        //std::vector<vertex_descriptor> p(boost::num_vertices(*bg));
+        dists.resize(g->get_num_nodes());
+        //std::vector<int> d(boost::num_vertices(*bg));
+        vertex_descriptor s = vertex(source, *bg);
+        boost::dijkstra_shortest_paths(*bg, s, boost::predecessor_map(&preds[0]).distance_map(&dists[0]).distance_inf(INDDGO_INFINITY));
+        int i;
+        //for(i=0;i<preds.size();i++){
+        //    cout << "node " << i << " pred " << preds[i] << "\n";
+        //}
+    }
+
+    /**
+     *  All pairs shortest paths
+     * \param[in] g input graph
+     * \param[out] p multidimentional list of all pairs shortest paths
+     */
+
+    void GraphProperties::paths_dijkstra_boost_all(Graph *g, vector< vector<int> > &pAll){
+        int inf = INDDGO_INFINITY;
+        int minD = inf;
+
+        const int n = g->get_num_nodes();
+
+        std::vector<uint64_t> betweenness_counts(n, 0);
+        std::vector<double> betweenness(n, 0.0);
+
+        pAll.resize(n);
+
+        //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
+        #pragma omp parallel default(none) shared(g, inf, betweenness_counts, pAll)
+        {
+            std::vector<vertex_descriptor> p(boost::num_vertices(*(g->boost_graph)));
+            int i;
+            #pragma omp for schedule(dynamic, 8)
+            for(int v = 0; v < n; v++){
+                //reset all distances to INF and mark all vertices as unvisited
+                fill(pAll[v].begin(),pAll[v].end(),inf);
+                paths_dijkstra_boost_single(g, pAll[v], p, v); //stores shortest paths from this vertex to all in pAll[v]
+            }
+        }
+        //store the results
+        g->set_shortest_path_dist(&pAll);
+    } // paths_dijkstra_boost_all
+
+    /**
+     * Calculate the relative betweenness centrality for all nodes
+     * \param[in] g input graph
+     * \param[out] bc vector<double> with one BC value for each vertex
+     */
+
+    void GraphProperties::betweenness_centrality(Graph *g, vector<double> &bc){
+        BoostUndirected *bg = g->boost_graph;
+        bc.resize(g->get_num_nodes());
+        //boost::brandes_betweenness_centrality(*bg, get(boost::vertex_centrality, *bg));
+        boost::brandes_betweenness_centrality(*bg,
+                                              boost::centrality_map(
+                                                  boost::make_iterator_property_map(bc.begin(), get(boost::vertex_index, *bg), double())).vertex_index_map(get(boost::vertex_index, *bg)
+                                                                                                                                                           )
+                                              );
+
+        boost::relative_betweenness_centrality(*bg,
+                                               boost::make_iterator_property_map(bc.begin(), get(boost::vertex_index, *bg), double()));
+        g->set_betweenness(bc);
+    }
+
+    #endif // ifdef HAS_BOOST
+
     /**
      * \param[in] g input graph
      * \param[in] source node id
@@ -624,8 +706,7 @@ namespace Graph {
      */
 
     void GraphProperties::paths_dijkstra_single(Graph *g, vector<int> &p, int source){
-        //int inf = 100000;
-        int inf = INT_MAX;
+        int inf = INDDGO_INFINITY;
         int nVisited = 0;
         int minD;
         int nvisiting;
@@ -687,7 +768,7 @@ namespace Graph {
      */
 
     void GraphProperties::paths_dijkstra_all(Graph *g, vector< vector<int> > &pAll){
-        int inf = INT_MAX;
+        int inf = INDDGO_INFINITY;
 
         int minD = inf;
         const int n = g->get_num_nodes();
@@ -695,7 +776,7 @@ namespace Graph {
         pAll.resize(n);
 
         //#pragma omp parallel for default(none) shared(g, inf, pAll) private(nvisiting, nVisited, nv) firstprivate(dist, minD, visited)
-        #pragma omp parallel for default(none) shared(g, inf, pAll)
+        #pragma omp parallel for schedule(dynamic, 8)  default(none) shared(g, inf, pAll)
         //loop over all vertices
         for(int v = 0; v < n; v++){ //0; v < n; v++){
             //reset all distances to INF and mark all vertices as unvisited
@@ -704,7 +785,7 @@ namespace Graph {
         } //end loop over vertices
 
         //store the results
-        g->set_shortest_path_dist(pAll);
+        g->set_shortest_path_dist(&pAll);
 
         //print out results
         //for(int i = 0; i < n; i++){
@@ -723,7 +804,7 @@ namespace Graph {
      */
     void GraphProperties::eccentricity(Graph *g, vector<int> &ecc){
         const int n = g->get_num_nodes();
-        vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();   //computes if not already
+        const vector< vector<int> > &short_paths = g->get_shortest_path_dist_ref();   //computes if not already
         int bestMax = 0;
         ecc.resize(n);
 
@@ -756,17 +837,19 @@ namespace Graph {
             eccentricity(g,ecc);
         }
 
+        freq_ecc.resize(*(std::max_element(ecc.begin(), ecc.end())) + 1);
+
         //compute diameter of each vertex
-        for(int i = 0; i < ecc.size(); i++){
-            if(ecc[i] > freq_ecc.size() ){
-                freq_ecc.resize(ecc[i] + 1); //because vector numbering starts at 0
-            }
+        int eccsize = ecc.size();
+        // This could be slow with resizing
+        for(int i = 0; i < eccsize; i++){
             freq_ecc[ecc[i]]++; //add to tally for this diameter size
         }
         //printf("Graph diameter is %d\n", freq_ecc.size()-1);
 
-        #pragma omp parallel for default(none) shared(freq_ecc)
-        for(int i = 0; i <= freq_ecc.size() - 1; i++){
+        int freq_ecc_size = freq_ecc.size();
+        #pragma omp parallel for default(none) shared(freq_ecc, freq_ecc_size)
+        for(int i = 0; i <= freq_ecc_size - 1; i++){
             freq_ecc[i] = freq_ecc[i] / n;
             //printf("i=%d and n=%d with freq eccentricity %f\n",i,n,freq_ecc[i]);
         }
@@ -780,14 +863,18 @@ namespace Graph {
      */
     void GraphProperties::expansion(Graph *g, vector<double> &norm_hops){
         const int n = g->get_num_nodes();
-        vector< vector<int> > short_paths = g->get_shortest_path_dist_ref();   //computes if not already
+        const vector< vector<int> > &short_paths = g->get_shortest_path_dist_ref();   //computes if not already
         vector <int> hops(n,0);  //largest possible dist is n-1
         norm_hops.resize(n);
+        int k;
 
         //for each vertex, find the number of vertices reachable for all hops; add to tally
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
-                hops[ short_paths[i][j] ]++;
+                k = short_paths[i][j];
+                if(k != INDDGO_INFINITY){
+                    hops[k]++;
+                }
             }
         }
 
@@ -796,7 +883,7 @@ namespace Graph {
 
         #pragma omp parallel for default(none) shared(norm_hops, hops)
         for(int h = 1; h < n; h++){
-            norm_hops[h] = (double)hops[h] / (n * (n - 1));
+            norm_hops[h] = (double)hops[h] / ((double)n * (n - 1));
             //printf("h = %d and number is %d; norm value is %f\n",h,hops[h],norm_hops[h]);
         }
     } //expansion
@@ -808,16 +895,15 @@ namespace Graph {
      */
     void GraphProperties::diameter(Graph *g, int &diam){
         int i, j, size, temp;
-        vector< vector<int> > dist_mat;
-
-        paths_dijkstra_all(g, dist_mat);
+        const vector< vector<int> > &dist_mat = g->get_shortest_path_dist_ref();   //computes if not already
 
         size = dist_mat.size();
         diam = dist_mat[0][0];
         for(i = 0; i < size; i++){
             for(j = 0; j < i; j++){
                 temp = dist_mat[i][j];
-                if((temp > diam) && (temp < INT_MAX)){
+
+                if((temp > diam) && (temp < INDDGO_INFINITY)){
                     diam = temp;
                 }
             }
@@ -834,16 +920,14 @@ namespace Graph {
         int i, j, d, size, temp, diam = 0;
         int n0, numer, tot_con_pairs = 0;
         float gd;
-        vector< vector<int> > dist_mat;
+        const vector< vector<int> > &dist_mat = g->get_shortest_path_dist_ref();   //computes if not already
         vector<int> bins (g->num_nodes, 0);
-
-        paths_dijkstra_all(g, dist_mat);
 
         size = dist_mat.size();
         for(i = 0; i < size; i++){
             for(j = 0; j < i; j++){
                 temp = dist_mat[i][j];
-                if(temp < INT_MAX){
+                if(temp < INDDGO_INFINITY){
                     tot_con_pairs++;
                     if(temp > diam){
                         diam = temp;
@@ -891,6 +975,39 @@ namespace Graph {
         ad = (2.0 * E) / V;
     }
 
+    void GraphProperties::avg_path_length(Graph *g, double &pl){
+        const uint64_t n = g->get_num_nodes();
+        const vector< vector<int> > &short_paths = g->get_shortest_path_dist_ref();
+        double sum = 0;
+        uint64_t intermediate = 0;
+        int i, j;
+        int inf_path = 0;
+
+        #pragma omp parallel for default(none) reduction(+:inf_path) private(j) shared(short_paths)
+        for(i = 0; i < n; i++){
+            for(j = 0; j < n; j++){
+                if(INDDGO_INFINITY == short_paths[i][j]){
+                    inf_path++;
+                }
+            }
+        }
+
+        #pragma omp parallel for default(none) private(j, intermediate) reduction(+:sum) shared(short_paths, inf_path, std::cout)
+        for(i = 0; i < n; i++){
+            intermediate = 0;
+            for(j = 0; j < n; j++){
+                if(INDDGO_INFINITY != short_paths[i][j]){
+                    intermediate += short_paths[i][j];
+                }
+            }
+            sum += (double)(intermediate / (double)((n * (n - 1)) - inf_path));
+            //cout << "For node " << i << " got sum " << sum << endl;
+            //sum = sum /  (double)((n * (n - 1)) - inf_path);
+        }
+        cout << "Got a SUM: " << sum << endl;
+        pl = sum;
+    } // avg_path_length
+
     /**
      * Calculates the degree distribution of graph g
      * \param[in] g Pointer to a graph
@@ -909,6 +1026,131 @@ namespace Graph {
         }
     }
 
+    #ifdef HAS_BOOST
+    /**
+     * Fits the degree distribution of g to a power law distribution
+     * \param[in] g Pointer to a graph
+     * \param[out] xmin Integer value holding the degree at which the data begins behaving like a power law
+     * \param[out] alpha Double holding the most likely value for the exponent
+     * \param[out] KS Double holding the Kolmogorov-Smirnov statistic
+     * \param[in] start Lower bound for exponent, defaults to 1.5
+     * \param[in] inc Determines granularity of the exponent search range, defaults to 0.01
+     * \param[in] end Upper bound for exponent, defaults to 3.5
+     */
+    void GraphProperties::powerlaw(Graph *g, int &xmin, double &alpha, double &KS, double start, double inc, double end){
+        int xm, i, k, n, I;
+        int prev, pprev;
+        int size = 1 + (int)(end - start) / inc;
+        double slogz, L, MLE;
+        double znorm, denom;
+        double f, fn, D, tD;
+        double exp;
+
+        vector<int> x(g->degree);
+
+        //Holds the possible \alpha values from start to end with a delta of inc
+        vector< double > vec( size );
+        //Holds the zeta of the \alpha values, since it is used a lot, no need to keep calculating
+        vector< double > zvec( size );
+        f = start;
+        for(i = 0; i < size; i++ ){
+            vec[i] = f;
+            zvec[i] = boost::math::zeta<double>(f);
+            f += inc;
+        }
+
+        sort(x.begin(), x.end());
+
+        KS = -1;
+        prev = 0;
+        for( xm = 0; xm < x.size(); xm++ ){
+            if(x[xm] == prev){
+                continue;
+            }
+
+            n = x.size() - xm;
+
+            slogz = 0;
+            for(i = xm; i < x.size(); i++){
+                slogz += log(x[i]);
+            }
+
+            //MLE loop: for each possible \alpha value in the specified grid with the current test xmin
+            //          calculate the log-likelihood, normalizing the Hurwitz zeta to the Riemann zeta
+            MLE = -1;
+            I = 0;
+            for( k = 0; k < vec.size(); k++ ){
+                exp = vec[k];
+
+                znorm = 0;
+                for(i = 1; i < x[xm]; i++){
+                    znorm += pow(i, -exp);
+                }
+
+                L = -exp * slogz - n * log( zvec[k] - znorm );
+
+                if(MLE != -1){
+                    if(L > MLE){
+                        MLE = L;
+                        I = k;
+                    }
+                }
+                else {
+                    MLE = L;
+                    I = k;
+                }
+            }
+
+            //compute KS statistic
+            exp = vec[I];
+
+            znorm = 0;
+            for(i = 1; i < x[xm]; i++){
+                znorm += pow(i, -exp);
+            }
+            denom = zvec[I] - znorm;
+
+            pprev = 0;
+            fn = f = 0;
+            D = 0;
+            for(i = xm; i < x.size(); i++){
+                if(x[i] == pprev){
+                    continue;
+                }
+
+                //CDF (f) and EDF (fn)
+                for(k = i; k < x.size() && x[k] <= x[i]; k++){
+                    fn += (1.0) / n;
+                }
+                f += pow(x[i], -exp) / denom;
+
+                tD = abs(fn - f);
+                if(tD > D){
+                    D = tD;
+                }
+
+                pprev = x[i];
+            }
+
+            if(KS > -1){
+                if(D < KS){
+                    KS = D;
+                    xmin = x[xm];
+                    alpha = exp;
+                }
+            }
+            else {
+                KS = D;
+                xmin = x[xm];
+                alpha = exp;
+            }
+
+            prev = x[xm];
+        }
+    } // powerlaw
+
+    #endif // ifdef HAS_BOOST
+
     /**
      * Calculates the degree assortativity of a graph g
      * \param[in] g input graph
@@ -920,7 +1162,6 @@ namespace Graph {
         const vector<int> &degrees = g->get_degree_ref();
         int i;
         double di, dc;
-        int nbr;
         std::list<int>::const_iterator cit;
         Node *node;
 
@@ -946,4 +1187,441 @@ namespace Graph {
 
         coeff = (n1 - n2) / (de - n2);
     } // deg_assortativity
+
+    /**
+     * Calculates the delta hyperbolicity of a graph g and returns the hyperbolicity distribution
+     * \param[in] g Pointer to a graph
+     * \param[out] mex_delta Double value holding the maximum delta value encountered
+     * \param[out] delta Vector of vectors of doubles holding the delta hyperbolicity distribution
+     */
+    void GraphProperties::delta_hyperbolicity(Graph *g, double &max_delta, vector<vector<double> > &delta){
+        const vector< vector<int> > &dist_mat = g->get_shortest_path_dist_ref();
+        int size = dist_mat.size();
+        int mat_size = dist_mat.size();
+        int counter = 0;
+        int row = 0;
+        int diam;
+
+        if(g->num_nodes < 4){
+            cerr << "Graph is too small for hyperbolicity, returning zero\n";
+            vector<double> delta_vec(1, 0);
+            delta.push_back(delta_vec);
+            return;
+        }
+
+        if(!is_connected(g)){
+            cerr << "Graph passed to calc_gromov has multiple components\n";
+
+            //Find the largest connected component
+            int temp = 0;
+            size = 0;
+            for(int i = 0; i < mat_size; i++){
+                temp = 0;
+                for(int j = 0; j < mat_size; j++){
+                    if(dist_mat[i][j] != INDDGO_INFINITY){
+                        temp++;
+                    }
+                }
+                //temp++; //count the vertex currently being tested
+                if(temp > size){
+                    size = temp;
+                    row = i;
+                }
+            }
+        }
+
+        //build vertex set of largest connected component and find its diameter
+        int temp_diam = 0;
+        vector<int> vert_vec(size);
+        for(int j = 0; j < mat_size; j++){
+            if(dist_mat[row][j] != INDDGO_INFINITY){
+                vert_vec[counter] = j;
+                counter++;
+                if(dist_mat[row][j] > temp_diam){
+                    temp_diam = dist_mat[row][j];
+                }
+            }
+            else if(j == row){
+                vert_vec[counter] = j;
+                counter++;
+            }
+        }
+        diam = temp_diam;
+
+        max_delta = 0;
+
+        for(int i = 0; i < diam; i++){
+            vector<double> zero_dist(2 * diam + 1,0);
+            delta.push_back(zero_dist);
+        }
+
+        int num_threads = omp_get_max_threads();
+
+        ////////////////////////////////////////////////////////////
+        //These are the shared variables between threads.  Each thread has access to a certain pointer.
+        //The pointer should then point to a copy of the variable for the thread's private (local) use.
+        //Shared max_delta and shared_delta are updated by each thread, must be careful to avoid contention.
+        ////////////////////////////////////////////////////////////
+
+        int size_of_array = 64 / sizeof(double *);  //64 is cacheline size, needs to be updated on different machines for performance
+        int type_size = sizeof(double *);
+        if(type_size < sizeof(vector< vector<double> > *)){
+            type_size = sizeof(vector< vector<double> > *);
+        }
+
+        counter = 1;
+        while(num_threads * type_size > size_of_array){
+            ++counter;
+            size_of_array = counter * 64 / sizeof(double *);
+        }
+
+        ////////////////////////////////////////////////////////////
+        //Pointers to shared data arrays that have copy of the delta information for each thread,
+        //ie, if there are 8 threads, there will be an 8 (pointers to) arrays each accessed by only one thread,
+        //At the end of the parallel section of code, the 8 arrays will be combined into a single array
+        ///////////////////////////////////////////////////////////
+
+        double **shared_max_delta;
+        shared_max_delta = new double * [size_of_array];
+
+        vector< vector<double> > **shared_delta;
+        shared_delta = new vector< vector<double> > * [size_of_array];
+
+        #if defined (TASK_PROFILE) || defined(TASK_PROFILE_OVERHEAD)
+        int num_tasks1[1024][1024];
+        int num_tasks2[1024][1024];
+        int num_tasks1_switch[1024][1024];
+        int num_tasks2_switch[1024][1024];
+        int total_threads = 0;
+        double task_time[1024][512];
+        double time_starts = 0.0;
+        double time_stops = 0.0;
+        #endif
+
+        //OMP parallel region, this current implementation generates tasks at two of the four levels of the nested for loop,
+        //    these tasks are then passed to threads which execute them and update their private copy of the results array
+        //After the tasks have all been generated and executed the results are collated
+        #pragma omp parallel shared(delta, max_delta, shared_max_delta, diam, shared_delta, dist_mat, vert_vec, size)
+        {
+            double max_delta_loc = 0;
+
+            vector<double> zero_dist(2 * diam + 1,0);
+            zero_dist.reserve(256 / sizeof(double));
+
+            vector< vector<double> > delta_loc(diam,zero_dist);
+
+            int thread_id = omp_get_thread_num();
+
+            #ifdef TASK_PROFILE
+            num_tasks1[thread_id][0] = 0;
+            num_tasks2[thread_id][0] = 0;
+            num_tasks1_switch[thread_id][0] = 0;
+            num_tasks2_switch[thread_id][0] = 0;
+            int total_threads = 0;
+            #endif
+            #ifdef TASK_PROFILE_OVERHEAD
+            task_time[thread_id][0] = 0.0;
+            #endif
+
+            shared_max_delta[thread_id] = &max_delta_loc;
+
+            shared_delta[thread_id] = &delta_loc;
+
+            //size_t size = vert_vec.size();
+
+            #pragma omp single
+            {
+                #ifdef TASK_PROFILE_OVERHEAD
+                time_starts = omp_get_wtime();
+                #endif
+
+                for(int i = 0; i < size; ++i){
+                    #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
+                    #pragma omp task shared(shared_delta, shared_max_delta, dist_mat, vert_vec, size, num_tasks1, num_tasks2, task_time)
+                    #else
+                    #pragma omp task shared(shared_delta, shared_max_delta, dist_mat, vert_vec, size)
+                    #endif
+                    {
+                        #ifdef TASK_PROFILE
+                        int thread_id = omp_get_thread_num();
+                        num_tasks1[thread_id][0]++;
+                        #endif
+                        #ifdef TASK_PROFILE_OVERHEAD
+                        double tt1 = omp_get_wtime();
+                        #endif
+
+                        for(int j = i + 1; j < size; ++j){
+                            #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
+                            #pragma omp task shared(shared_delta, shared_max_delta, dist_mat, vert_vec, size, num_tasks1, num_tasks2, task_time)
+                            #else
+                            #pragma omp task shared(shared_delta, shared_max_delta, dist_mat, vert_vec, size)
+                            #endif
+                            {
+                                int thread_num = omp_get_thread_num();
+
+                                #ifdef TASK_PROFILE
+                                num_tasks2[thread_num][0]++;
+                                #endif
+                                #ifdef TASK_PROFILE_OVERHEAD
+                                double ttt1 = omp_get_wtime();
+                                #endif
+
+                                vector<vector<double> > &loc_delta = *shared_delta[thread_num];
+
+                                double &max_delta_loc = *shared_max_delta[thread_num];
+
+                                for(int k = j + 1; k < size; ++k){
+                                    for(int l = k + 1; l < size; ++l){
+                                        const int ui = vert_vec[i];
+
+                                        const int vi = vert_vec[j];
+                                        const int uv = (dist_mat)[ui][vi];
+
+                                        const int xi = vert_vec[k];
+                                        const int ux = (dist_mat)[ui][xi];
+                                        const int vx = (dist_mat)[vi][xi];
+
+                                        const int yi = vert_vec[l];
+                                        const int uy = (dist_mat)[ui][yi];
+                                        const int vy = (dist_mat)[vi][yi];
+                                        const int xy = (dist_mat)[xi][yi];
+
+                                        const int s1 = uv + xy;
+                                        const int s2 = ux + vy;
+                                        const int s3 = uy + vx;
+
+                                        double currDelta = 0;
+                                        unsigned long maxPair = 1;
+
+                                        //find max pair distance
+                                        maxPair = uv;
+
+                                        if(xy > maxPair){
+                                            maxPair = xy;
+                                        }
+
+                                        if(ux > maxPair){
+                                            maxPair = ux;
+                                        }
+
+                                        if(vy > maxPair){
+                                            maxPair = vy;
+                                        }
+
+                                        if(uy > maxPair){
+                                            maxPair = uy;
+                                        }
+
+                                        if(vx > maxPair){
+                                            maxPair = vx;
+                                        }
+
+                                        //Delta calculations
+
+                                        if((s1 >= s2) && (s3 >= s2) ){
+                                            currDelta = abs(s1 - s3) / 2.0; //works since s1 and s2 are positive
+                                        }
+                                        else if((s2 >= s1) && (s3 >= s1) ){
+                                            currDelta = abs(s2 - s3) / 2.0;
+                                        }
+                                        else {
+                                            currDelta = abs(s1 - s2) / 2.0;
+                                        }
+
+                                        ++(loc_delta)[maxPair - 1][2 * currDelta + 1];
+
+                                        if(currDelta > max_delta_loc){
+                                            max_delta_loc = currDelta;
+                                        }
+
+                                        ++(loc_delta)[maxPair - 1][0];
+                                    }
+                                }
+
+                                #ifdef TASK_PROFILE_OVERHEAD
+                                double ttt2 = omp_get_wtime();
+                                task_time[thread_num][0] += (ttt2 - ttt1);
+                                #endif
+                                #ifdef TASK_PROFILE
+                                int thread_id_end = omp_get_thread_num();
+                                if(thread_id != thread_id_end){
+                                    num_tasks2_switch[thread_id_end][0]++;
+                                }
+                                #endif
+                            } // end task
+                        }
+
+                        #ifdef TASK_PROFILE_OVERHEAD
+                        //double tt2 = omp_get_wtime();
+                        //task_time[thread_id][0]+= (tt2 - tt1);
+                        #endif
+                        #ifdef TASK_PROFILE
+                        int thread_id_end = omp_get_thread_num();
+                        if(thread_id != thread_id_end){
+                            num_tasks1_switch[thread_id_end][0]++;
+                        }
+                        #endif
+                    } // end task
+                }
+            } // end single
+
+            #ifdef TASK_PROFILE_OVERHEAD
+            #pragma omp single nowait
+            {
+                time_stops = omp_get_wtime();
+            }
+            #endif
+
+            double t1 = time(NULL);
+
+            #pragma omp critical (collate_delta)
+            {
+                int thread_num = omp_get_thread_num();
+                vector<vector<double> > *delta_point = shared_delta[thread_num];
+                vector<vector<double> > &loc_delta = *delta_point;
+
+                int i_size = loc_delta.size();
+                for(int i = 0; i < i_size; ++i){
+                    int j_size = loc_delta[i].size();
+                    for(int j = 0; j < j_size; ++j){
+                        delta[i][j] += loc_delta[i][j];
+                    }
+                }
+
+                if(max_delta_loc > max_delta){
+                    max_delta = max_delta_loc;
+                }
+            }
+
+            double t2 = time(NULL);
+
+            #pragma omp single
+            {
+                cout << "Critical Region time: " << t2 - t1 << "\n";
+            }
+        } //END OF FIRST PRAGMA
+
+        //take care of pointer!
+        delete [] shared_delta;
+        delete [] shared_max_delta;
+
+        //Needs removed before parallel code is implemented
+        for(int i = 0; i < diam; ++i){
+            delta[i].erase(delta[i].begin() + 2 * max_delta + 2, delta[i].end());
+        }
+
+        #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
+
+        #pragma omp parallel shared(total_threads)
+        {
+            #pragma omp master
+            {
+                total_threads = omp_get_num_threads();
+            }
+        }
+
+        cout << endl << endl << "******Tasks Statistics: (num_task, num_tasks, migrated_tasks, switched_task, task_time)" << endl;
+
+        for(int i = 0; i < total_threads; i++){
+            cout << i
+        #endif
+        #ifdef TASK_PROFILE
+            << "," << num_tasks1[i][0] << "," << num_tasks2[i][0] << "," << num_tasks1_switch[i][0] << "," << num_tasks2_switch[i][0]
+            #endif
+            #ifdef TASK_PROFILE_OVERHEAD
+            << "," << task_time[i][0]
+            #endif
+            #if defined (TASK_PROFILE) || defined (TASK_PROFILE_OVERHEAD)
+            << endl;
+    } // delta_hyperbolicity
+
+    cout << endl;
+
+        #endif
+        #ifdef TASK_PROFILE_OVERHEAD
+        cout << "Time in task region = " << time_stops - time_starts << endl;
+        #endif
+    } // delta_hyperbolicity
+
+    #ifdef HAS_PETSC
+    /**
+     * Built in self tester for the eigen solver. Looks at Ax - yx and looks for the
+     * largest magnitude of error.
+     */
+    void check_eigen_values(Mat A, Vec eigen_vec, PetscScalar eigen_val){
+        Vec xr, xi, xr2, result1, result2;
+        MatGetVecs(A, PETSC_NULL, &xr2);
+        MatGetVecs(A, PETSC_NULL, &result1);
+        MatGetVecs(A, PETSC_NULL, &result2);
+
+        cout << "Eigen vector is:\n";
+        VecView(eigen_vec,PETSC_VIEWER_STDOUT_SELF);
+        cout << "Eigen value is: " << eigen_val << endl;
+
+        MatMult(A,eigen_vec,result1);
+        VecSet(xr2,eigen_val);
+        VecPointwiseMult(result2,xr2,eigen_vec);
+        cout << "Ax = " << endl;
+        VecView(result1,PETSC_VIEWER_STDOUT_SELF);
+        cout << "yx = " << endl;
+        VecView(result1,PETSC_VIEWER_STDOUT_SELF);
+        PetscScalar *a;
+        PetscScalar *b;
+        VecGetArray(result1, &a);
+        VecGetArray(result2, &b);
+        PetscInt size;
+        VecGetLocalSize(result1, &size);
+        double max = 0.0,current;
+        for(int idx = 0; idx < size; idx++){
+            current = fabs(a[idx] - b[idx]);
+            max = current > max ? current : max;
+        }
+        cout << "Magnitude of greatest error is: " << max << endl;
+        VecRestoreArray(result1, &a);
+        VecRestoreArray(result2, &b);
+    } // check_eigen_values
+
+    /**
+     * looks for eigen values in the adjacency matrix
+     * \param[in] g input graph
+     * \param[out] eigen_values vector of eigen values found
+     * \param[in] spread the number of values wanted, spread high values and spred low values, so eigen_values can be upto 2*spread in size
+     */
+    void GraphProperties::eigen_spectrum(Graph *g, vector<double> &eigen_values, int spread){
+        #ifndef HAS_SLEPC
+        fatal_error("Called SLEPC eigen solvers without HAS_SLEPC.\n");
+        #else
+        GraphUtil graph_util;
+        graph_util.populate_PetscMat(g);
+        EPS eps;
+        PetscInt nconv;
+        PetscScalar kr,ki;
+        EPSCreate(PETSC_COMM_WORLD, &eps);
+        EPSSetType(eps, EPSPOWER);
+        EPSSetOperators(eps,g->PetscMat,PETSC_NULL);
+        EPSSetLeftVectorsWanted(eps,PETSC_TRUE);
+        EPSSetFromOptions(eps);
+        EPSSetDimensions(eps,spread * 2,spread * 8,spread * 8);
+        EPSSolve(eps);
+        EPSGetConverged(eps,&nconv);
+        EPSGetConverged(eps,&nconv);
+        eigen_values.resize(nconv);
+        for(int idx = 0; idx < nconv; idx++){
+            EPSGetEigenvalue(eps,idx,&kr,&ki);
+            eigen_values[idx] = kr;
+            #ifdef EIGENSOLVER_SELFTEST
+            //built in self tester. Don't use in production runs.
+            Vec xr, xi;
+            MatGetVecs(g->PetscMat, PETSC_NULL, &xr);
+            MatGetVecs(g->PetscMat, PETSC_NULL, &xi);
+            EPSGetEigenpair(eps,idx,&kr,&ki, xr, xi);
+            check_eigen_values(g->PetscMat, xr, kr);
+            #endif
+        }
+        EPSDestroy(&eps);
+
+        #endif // ifndef HAS_SLEPC
+    } // eigen_spectrum
+
+    #endif // ifdef HAS_PETSC
 }

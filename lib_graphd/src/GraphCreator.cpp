@@ -25,25 +25,28 @@
 #include "GraphUtil.h"
 #include "VertexWeightedGraph.h"
 
+#include <typeinfo>
+
 namespace Graph {
     GraphCreator::GraphCreator(){
     }
 
     /**
      * Initialization of an R-MAT graph with 2^l vertices and <= m edges.
-     * Four probabilities in *probs used for quadrants, must sum to 1. 
+     * Four probabilities in *probs used for quadrants, must sum to 1.
      * lc rng initialized with seed. Setting self_loop true throws another
-     * edge if a self loop occurs. 
+     * edge if a self loop occurs.
      */
-    Graph *GraphCreator::initialize_rmat(int l, int m, double *probs, int seed, bool self_loop) {
+    Graph *GraphCreator::initialize_rmat(int l, int m, double *probs, int seed, bool self_loop){
         try {
-	    //check neighborhood to account for float errors
-	    if(probs[0]+probs[1]+probs[2]+probs[3] > 1.001 || probs[0]+probs[1]+probs[2]+probs[3] < 0.999) {
-		fatal_error("initialize_rmat: Probabilities did not sum to 1: %f, %f, %f, %f", probs[0], probs[1], probs[2], probs[3]);
-	    }
-        } catch(...) {
-	    fatal_error("initialize_rmat: Error occured when checking probabilities");
-	}
+            //check neighborhood to account for float errors
+            if((probs[0] + probs[1] + probs[2] + probs[3] > 1.001) || (probs[0] + probs[1] + probs[2] + probs[3] < 0.999)){
+                fatal_error("initialize_rmat: Probabilities did not sum to 1: %f, %f, %f, %f", probs[0], probs[1], probs[2], probs[3]);
+            }
+        }
+        catch(...){
+            fatal_error("initialize_rmat: Error occured when checking probabilities");
+        }
 
         //set up quadrants
         const double q1 = probs[0];
@@ -55,65 +58,71 @@ namespace Graph {
         init_lcgrand(0,seed);
 
         //throw m edges
-        for(int i = 0; i < m; i++) {
+        for(int i = 0; i < m; i++){
             unsigned long x = 0;
             unsigned long y = 0;
-            for(int j = l-1; j >= 0; j--) {
+            for(int j = l - 1; j >= 0; j--){
                 double r = lcgrand(0);
-                if(r < q1) {
-                } else if(r < q2) {
-                    x += pow(2,j);
-                } else if(r < q3) {
-                    y += pow(2,j);
-                } else {
-                    x += pow(2,j);
-                    y += pow(2,j);
+                if(r < q1){
+                }
+                else if(r < q2){
+                    // pow(2,j)?? 1<<j might be slightly faster...
+                    x += (int)pow((double)2,j);
+                }
+                else if(r < q3){
+                    y += (int)pow((double)2,j);
+                }
+                else {
+                    x += (int)pow((double)2,j);
+                    y += (int)pow((double)2,j);
                 }
             }
 
             //keep edges in order so we don't have a (x,y) and (y,x) duplicate
-            if(x == y) {
-                if(self_loop) {
+            if(x == y){
+                if(self_loop){
                     i--;
                 }
-            } else if(y > x) {
-		edges.insert(make_pair(x,y));
-            } else {
+            }
+            else if(y > x){
+                edges.insert(make_pair(x,y));
+            }
+            else {
                 edges.insert(make_pair(y,x));
             }
-	}
+        }
 
-        Graph *g = new Graph(pow(2,l));
+        Graph *g = new Graph((int)pow((double)2,l));
         set< pair<unsigned long, unsigned long> >::const_iterator it;
-        for(it = edges.begin(); it != edges.end(); it++) {
+        for(it = edges.begin(); it != edges.end(); it++){
             g->add_edge(it->first,it->second);
         }
 
         return g;
     } //initialize_rmat
 
-
     /**
-     * Initialization of a random intersection graph with n vertices, probs->size() attributes, 
-     * with probabilities on the attributes. lc rng initialized with seed. 
+     * Initialization of a random intersection graph with n vertices, probs->size() attributes,
+     * with probabilities on the attributes. lc rng initialized with seed.
      */
-    Graph *GraphCreator::initialize_rig(int n, int seed, list<double> *probs) {
+    Graph *GraphCreator::initialize_rig(int n, int seed, list<double> *probs){
         set< pair<unsigned long, unsigned long> > edges;
         init_lcgrand(0, seed);
 
         //for all the attributes, construct a clique in G
         list<double>::const_iterator it;
-        for(it = probs->begin(); it != probs->end(); it++) {
+        for(it = probs->begin(); it != probs->end(); it++){
             //compute which actors have a given attribute
             vector<int> connect;
-            for(unsigned long i = 0; i < n; i++) {
-                if(lcgrand(0) < *it) {
+            for(unsigned long i = 0; i < n; i++){
+                if(lcgrand(0) < *it){
                     connect.push_back(i);
                 }
             }
             //attach these actors to the graph
-            for(int i = 0; i < connect.size(); i++) {
-                for(int j = i + 1; j < connect.size(); j++) {
+            int conn_size = connect.size();
+            for(int i = 0; i < conn_size; i++){
+                for(int j = i + 1; j < conn_size; j++){
                     edges.insert(make_pair(connect[i],connect[j]));
                 }
             }
@@ -121,13 +130,12 @@ namespace Graph {
 
         Graph *g = new Graph(n);
         set< pair<unsigned long, unsigned long> >::const_iterator edge_it;
-        for(edge_it = edges.begin(); edge_it != edges.end(); edge_it++) {
-	    g->add_edge(edge_it->first,edge_it->second);
+        for(edge_it = edges.begin(); edge_it != edges.end(); edge_it++){
+            g->add_edge(edge_it->first,edge_it->second);
         }
 
         return g;
     } //initialize_rig
-
 
     /**
      * Initialization of a k-tree with n vertices. RNG seeded with seed.
@@ -396,6 +404,133 @@ namespace Graph {
         // Set num_connected_components to 1 since g is known - not verified - should it be??
         wmg->num_connected_components = 1;
         return wmg;
+    }
+
+    /**
+     * Creates a graph G with vertex set equal to the set in the members list.
+     * The entries in the members list are the positions in the nodes[] array.
+     * The edges in G are created by constructing the subgraph induced
+     * by the members list.  If make_simple is true, then the resulting graph
+     * is guaranteed to be simple.
+     */
+    Graph *GraphCreator::create_induced_subgraph(Graph *g, list<int> *members, bool make_simple){
+        Graph *wmg = new Graph(members->size());
+        // The caller of g function is responsible for allocating a Graph
+        // of the appropriate size - make sure!
+
+        if(wmg->capacity != (int) (((members->size())))){
+            fatal_error(
+                "%s:  Graph of members->size() must be allocated before calling\ncreate_component\n",
+                __FUNCTION__);
+        }
+
+        // Sort the members - not necessary, but convenient?
+        members->sort();
+        // Create a subgraph_labels[] array and a graph_indices[]
+        // array
+
+        int *subgraph_labels = new int[members->size()];
+        memset(subgraph_labels, GD_UNDEFINED, members->size() * sizeof(int));
+        int *graph_indices = new int[g->capacity];
+        memset(graph_indices, GD_UNDEFINED, g->capacity * sizeof(int));
+        list<int>::iterator i, j;
+        int k = 0;
+        for(i = members->begin(); i != members->end(); ++i){
+            subgraph_labels[k] = g->nodes[*i].label;
+            graph_indices[*i] = k;
+            k++;
+        }
+
+        k = 0;
+        int new_i, new_j;
+        // Use g for make_simple checking
+        char *neighbor_vec = new char[g->capacity];
+        bool multiple_edges = false;
+        wmg->num_edges = 0;
+        for(i = members->begin(); i != members->end(); ++i){
+            memset(neighbor_vec, 0, g->capacity * sizeof(char));
+            new_i = graph_indices[*i];
+            if(new_i == GD_UNDEFINED){
+                fatal_error(
+                    "%s: Encountered GD_UNDEFINED entry for new_i at position %d in graph_indices array\n",
+                    __FUNCTION__, *i);
+            }
+
+            wmg->nodes[new_i].label = subgraph_labels[k];
+            for(j = g->nodes[*i].nbrs.begin(); j != g->nodes[*i].nbrs.end(); ++j){
+                // We have an edge between *i and *j in the original graph
+                // g should be stored as an edge between
+                // graph_indices[*i] and graph_indices[*j] in the subgraph
+
+                new_j = graph_indices[*j];
+                print_message(1, "Translating old edge %d-%d to new edge %d-%d\n",
+                              *i, *j, new_i, new_j);
+
+                if(new_j == GD_UNDEFINED){
+                    print_message(
+                        1,
+                        "%s: Encountered GD_UNDEFINED entry for new_j at position %d in graph_indices array\n",
+                        __FUNCTION__, *j);
+                }
+                else {
+                    if(new_i <= new_j){
+                        if(!make_simple || (neighbor_vec[*j] == 0) ){
+                            if(neighbor_vec[*j] == 1){
+                                // We are adding a duplicate edge to G - G will not be simple
+                                multiple_edges = true;
+                            }
+                            // CSG added make_simple functionality - just check if we have seen g edge before by checking
+                            // the neighbor_vec
+                            wmg->num_edges++;
+                            wmg->nodes[new_i].nbrs.push_back(new_j);
+                            if(new_i != new_j){                             // added check Dec 29
+                                wmg->nodes[new_j].nbrs.push_back(new_i);
+                            }
+                        }
+                    }
+                }
+                neighbor_vec[*j] = 1;
+            }
+            // k is used for the subgraph labels
+            k++;
+        }
+        // If the original was simple, G will be. If make_simple, then it had better be simple!
+        // Otherwise, unknown.
+        if((g->simple == GD_TRUE) || make_simple){
+            wmg->simple = GD_TRUE;
+        }
+        else {
+            wmg->simple = false;
+            wmg->canonical = false;
+        }
+        if(multiple_edges){
+            wmg->simple = false;
+            wmg->canonical = false;
+        }
+        // We don't know number of components
+        wmg->num_connected_components = GD_UNDEFINED;
+        GraphUtil util;
+        util.recompute_degrees(wmg);
+
+        delete[] subgraph_labels;
+        delete[] graph_indices;
+        delete[] neighbor_vec;
+
+        return wmg;
+    } // create_induced_subgraph
+
+    /**
+     * Creates the subgraph G induced by the members list where it is known
+     * that g subgraph is a connected component.  Sets G->num_components=1
+     * although g is not verified!  If make_simple is true, then the component
+     * is guaranteed to be simple.
+     */
+    Graph *GraphCreator::create_component(Graph *g, list<int> *members, bool make_simple){
+        Graph *comp;
+        comp = create_induced_subgraph(g, members, make_simple);
+        // Set num_connected_components to 1 since g is known - not verified - should it be??
+        comp->num_connected_components = 1;
+        return comp;
     }
 
     /**

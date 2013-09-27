@@ -19,23 +19,61 @@
 
  */
 
-#ifndef GRAPH_H_
-#define GRAPH_H_
+/*This fixes any issues with MSVC always having HAS_METIS defined*/
+#ifdef _MSC_VER
+  #if !HAS_METIS
+    #undef HAS_METIS
+  #endif
+#endif
 
-#ifdef _OPENMP
-  #include <omp.h>
-#else
+#ifndef GRAPH_H_
+  #define GRAPH_H_
+
+  #ifdef _OPENMP
+    #include <omp.h>
+  #else
     #ifndef HAS_METIS
       #define omp_get_num_threads() 1
       #define omp_get_thread_num() 0
+      #define omp_get_max_threads() 1
     #endif
-#endif
+  #endif
 
-#include "GraphInterface.h"
-#include "Node.h"
-#include <string>
+  #ifdef HAS_PETSC
+    #include <petscksp.h>
+  #endif
+
+  #if WIN32
+    #define strncasecmp strncmp
+  #endif
+
+  #include "GraphInterface.h"
+  #include "Node.h"
+  #include "GraphException.h"
+  #include "Log.h"
+  #include <string>
+
+  #ifdef HAS_BOOST
+    #include <iostream>
+    #include <deque>
+    #include <iterator>
+
+    #include "boost/graph/adjacency_list.hpp"
+    #include "boost/graph/topological_sort.hpp"
+    #include <boost/graph/dijkstra_shortest_paths.hpp>
+  #endif
 
 using namespace std;
+
+  #define INDDGO_INFINITY INT_MAX - 16
+
+  #ifdef HAS_BOOST
+typedef boost::property<boost::edge_weight_t, int> EdgeWeightProperty;
+typedef boost::property <boost::vertex_centrality_t, double > CentralityMap;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, CentralityMap, EdgeWeightProperty> BoostUndirected;
+typedef boost::graph_traits < BoostUndirected >::vertex_descriptor vertex_descriptor;
+typedef boost::graph_traits < BoostUndirected >::edge_descriptor edge_descriptor;
+  #endif //HAS_BOOST
 
 namespace Graph {
     class Graph : public GraphInterface
@@ -58,7 +96,17 @@ protected:
     vector<int> xadj;
     vector<int> adjncy;
     vector<int> adj_vec;
-    vector< vector<int> > apsp_dist;
+    vector< vector<int> > *apsp_dist;
+
+    // Currently this is only calculated if you have Boost.
+    vector<double> betweenness;
+    #ifdef HAS_BOOST
+    BoostUndirected *boost_graph;
+    #endif //HAS_BOOST
+
+    #ifdef HAS_PETSC
+    Mat PetscMat;
+    #endif
 
 public:
     Graph();
@@ -84,7 +132,9 @@ public:
     /** \brief Try to pre-allocate memory for node and degree vectors **/
     void resize(int n);
     /** \brief set shortest path distances **/
-    void set_shortest_path_dist(vector< vector<int> > apsp_dist);
+    void set_shortest_path_dist(vector< vector<int> > *apsp_dist);
+    /** \brief set betweenness centrality vector **/
+    void set_betweenness(vector<double> bc);
 
     vector<int> get_adj_vec() const;
     vector<int> *get_adj_vec_ptr();
@@ -102,7 +152,11 @@ public:
     int get_num_edges() const;
     int get_num_edges_in_subgraph(list<int> *vertices);
     int get_num_nodes() const;
+    int get_num_connected_components() const;
     vector<int> get_xadj() const;
+
+    /** \brief get a const ref to the betweenness vector **/
+    const vector<double> &get_betweenness_ref();
 
     virtual bool is_edge(int i, int j) const;
     bool is_canonical() const;
@@ -140,6 +194,14 @@ public:
     const vector< vector<int> > &get_shortest_path_dist_ref();
     /** \brief get shortest path distances from vertex u to all **/
     const vector<int> &get_u_shortest_path_dist(int u);
+
+    inline Node *get_node_inline(int i){
+        if(i > capacity){
+            FERROR("%s: element is out of bounds", __FUNCTION__);
+            throw GraphException("element is out of bounds\n");
+        }
+        return &nodes[i];
+    }
 
     friend class GraphUtil;
     friend class GraphProperties;

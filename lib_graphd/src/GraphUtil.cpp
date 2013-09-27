@@ -19,7 +19,17 @@
 
  */
 
+#include "GraphUtil.h"
 #include "GraphDecomposition.h"
+
+#ifdef HAS_BOOST
+  #include <iostream>
+  #include <deque>
+  #include <iterator>
+
+  #include "boost/graph/adjacency_list.hpp"
+  #include "boost/graph/topological_sort.hpp"
+#endif
 
 namespace Graph {
     GraphUtil::GraphUtil(){
@@ -497,6 +507,89 @@ namespace Graph {
         g->xadj.clear();
         g->adjncy.clear();
     }
+
+    #ifdef HAS_BOOST
+    /**
+     * Populates the boost_graph member of g
+     * \param[in] g the input graph
+     */
+    void GraphUtil::populate_boost(Graph *g){
+        const int n = g->get_num_nodes();
+        int v;
+        boost::graph_traits < BoostUndirected >::vertex_descriptor a, b;
+        list<int>::const_iterator it;
+        g->boost_graph = new BoostUndirected(n);
+        BoostUndirected *bg = g->boost_graph;
+        for(v = 0; v < n; v++){
+            const list<int> &nbrs = g->get_node(v)->get_nbrs_ref();
+            for(it = nbrs.begin(); it != nbrs.end(); ++it){
+                if(v < *it){
+                    a = boost::vertex(v, *bg);
+                    b = boost::vertex(*it, *bg);
+                    boost::add_edge(a, b, 1, *bg);
+                }
+            }
+        }
+    } // populate_boost
+
+    #endif //HAS_BOOST
+
+    #ifdef HAS_PETSC
+    /**
+     * Populates the PetscMat member of graph g. This function will also call populate_CRS() if it hasn't been already.
+     * Durring cleanup a free_CRS() also needs to be done.
+     * \param[in] g the input graph
+     */
+    void GraphUtil::populate_PetscMat(Graph *g){
+        if(g->adjncy.size() == 0){
+            populate_CRS(g);
+        }
+        int start, end;
+
+        //Matrix is g->PetscMat
+        PetscErrorCode ierror;
+        ierror = MatCreate(PETSC_COMM_WORLD,&(g->PetscMat));
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetSizes(g->PetscMat,PETSC_DECIDE,PETSC_DECIDE,g->num_nodes,g->num_nodes);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetFromOptions(g->PetscMat);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetUp(g->PetscMat);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        int row, col, size;
+        const PetscScalar one_val = 1;
+        for(int node = 0; node < g->num_nodes; node++){
+            start = g->xadj[node];
+            end = g->xadj[node + 1];
+            size = 1 + end - start;
+            row = node;
+            PetscScalar ones[size];
+            PetscInt columns[size];
+            for(int idx = 0; idx < size; idx++){
+                ones[idx] = 1.0;
+                columns[idx] = g->adjncy[start + idx];
+            }
+            ierror = MatSetValues(g->PetscMat, 1, &row, size, columns, ones, INSERT_VALUES);
+            CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        }
+
+        ierror = MatAssemblyBegin(g->PetscMat,MAT_FINAL_ASSEMBLY);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatAssemblyEnd(g->PetscMat,MAT_FINAL_ASSEMBLY);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+    } // populate_PetscMat
+
+    /**
+     * Frees the PetscMat member of g. This function will not cleanup CRS, even if populate_PetscMat() filled it.
+     * You will have to also call free_CRS();
+     * \param[in] g the input graph
+     */
+    void GraphUtil::free_PetscMat(Graph *g){
+        PetscErrorCode ierror = MatDestroy(&(g->PetscMat));
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+    }
+
+    #endif // ifdef HAS_PETSC
 
     /**
      * Non-recursive function that fills the members vector with the
@@ -1025,67 +1118,109 @@ namespace Graph {
         return max;
     } // subset_max_dist
 
-  /**
-   * Calculates the k-core number of every vertex and stores in kcore vector
-   * Return value is degeneracy (maximum non-empty k-core). 
-   * Uses algorithm of Batagelj and Zaversnik (2003)
-   * Implemented by Timothy Goodrich and Matthew Farrell (2013)
-   */
-  int GraphUtil::find_kcore(Graph *g, vector<int> *kcore) {
-    int n = g->num_nodes;
-    int k = 0;
-    int last_deg = 0;
-    kcore->resize(n);
+    /**
+     * Calculates the k-core number of every vertex and stores in kcore vector
+     * Return value is degeneracy (maximum non-empty k-core).
+     * Uses algorithm of Batagelj and Zaversnik (2003)
+     * Implemented by Timothy Goodrich and Matthew Farrell (2013)
+     */
+    int GraphUtil::find_kcore(Graph *g, vector<int> *kcore){
+        int n = g->num_nodes;
+        int k = 0;
+        int last_deg = 0;
+        kcore->resize(n);
 
-    vector<int> deg_lookup(n);
-    int max_deg = 0;
-    for(int i = 0; i < deg_lookup.size(); i++) { 
-      deg_lookup[i] = g->degree[i];
-      if(deg_lookup[i] > max_deg)
-	max_deg = deg_lookup[i];
-    }
-    vector<vector<int> > D;
-    D.resize(max_deg+1);    
-    int depth[n];
-    //can also create an L output list for coloring number optimal ordering
-    
-    for(int i = 0; i < n; i++) {
-      deg_lookup[i] = g->degree[i];
-      D[deg_lookup[i]].push_back(i);
-      depth[i] = D[deg_lookup[i]].size()-1;
-    }
-     
-    for(int i = 0; i < n; i++) {
-      int v;      
-      for(int j = last_deg; j <= max_deg; j++) {
-	if(D[j].size() != 0) {
-	  v = D[j].back();
-	  D[j].pop_back();
-	  break;
-	}
-      }
-      
-      (*kcore)[v] = k = max(k,deg_lookup[v]);
-      last_deg = max(0, deg_lookup[v]-1);
-      deg_lookup[v] = -1;
-      
-      //shift each of v's neighbors down one degree
-      list<int> * nbrs = g->nodes[v].get_nbrs_ptr();
-      list<int>::const_iterator it;
-      for(it = nbrs->begin(); it != nbrs->end(); it++) {
-	if(deg_lookup[*it] != -1) {
-	  int it_deg = deg_lookup[*it]--;
-	  D[it_deg][depth[*it]] = D[it_deg][D[it_deg].size()-1];
-	  depth[D[it_deg][depth[*it]]] = depth[*it];
-	  D[it_deg].pop_back();
-	  D[it_deg-1].push_back(*it);
-	  depth[*it] = D[it_deg-1].size()-1;
-	}
-      }
-    }
-    return k;
-  } // find_degen
+        vector<int> deg_lookup(n);
+        int max_deg = 0;
+        int deg_size = deg_lookup.size();
+        for(int i = 0; i < deg_size; i++){
+            deg_lookup[i] = g->degree[i];
+            if(deg_lookup[i] > max_deg){
+                max_deg = deg_lookup[i];
+            }
+        }
+        vector<vector<int> > D;
+        D.resize(max_deg + 1);
 
+        int *depth;
+        depth = new int[n];
+        //int depth[n];
+        //can also create an L output list for coloring number optimal ordering
+
+        for(int i = 0; i < n; i++){
+            deg_lookup[i] = g->degree[i];
+            D[deg_lookup[i]].push_back(i);
+            depth[i] = D[deg_lookup[i]].size() - 1;
+        }
+
+        for(int i = 0; i < n; i++){
+            int v;
+            for(int j = last_deg; j <= max_deg; j++){
+                if(D[j].size() != 0){
+                    v = D[j].back();
+                    D[j].pop_back();
+                    break;
+                }
+            }
+
+            (*kcore)[v] = k = max(k,deg_lookup[v]);
+            last_deg = max(0, deg_lookup[v] - 1);
+            deg_lookup[v] = -1;
+
+            //shift each of v's neighbors down one degree
+            list<int> *nbrs = g->nodes[v].get_nbrs_ptr();
+            list<int>::const_iterator it;
+            for(it = nbrs->begin(); it != nbrs->end(); it++){
+                if(deg_lookup[*it] != -1){
+                    int it_deg = deg_lookup[*it]--;
+                    D[it_deg][depth[*it]] = D[it_deg][D[it_deg].size() - 1];
+                    depth[D[it_deg][depth[*it]]] = depth[*it];
+                    D[it_deg].pop_back();
+                    D[it_deg - 1].push_back(*it);
+                    depth[*it] = D[it_deg - 1].size() - 1;
+                }
+            }
+        }
+        delete [] depth;
+        return k;
+    } // find_degen
+
+    /**
+     * \input g input graph
+     * \output new graph consisting of largest component, or NULL if the input graph is connected
+     * NOTE: this function *will* canonicalize your graph!!!
+     **/
+    Graph *GraphUtil::get_largest_component_graph(Graph *g){
+        GraphProperties properties;
+        GraphCreatorFile creator;
+        Graph *largecomp;
+        list<int> *maxlist = NULL;
+        size_t maxlen = 0;
+
+        if(!properties.is_connected(g)){
+            properties.make_canonical(g);
+            vector<list<int> *> members;
+            vector<list<int> *>::iterator vlit;
+            find_all_components(g, &members);
+            // traverse the list and find the one with the most members
+            for(vlit = members.begin(); vlit != members.end(); ++vlit){
+                //cout << "Got list with size: " << ((*vlit)->size()) << endl;
+                if(((*vlit)->size()) >= maxlen){
+                    maxlen = (*vlit)->size();
+                    //cout << "New list with maxlen > " << maxlen << endl;
+                    maxlist = *vlit;
+                    //cout << maxlist << endl;
+                }
+            }
+
+            // found the max component, let's create the graph
+            largecomp = creator.create_component((Graph *)g, maxlist, true);
+            return largecomp;
+        }
+        else {
+            return NULL;
+        }
+    } // get_largest_component_graph
 }
 using namespace std;
 /**

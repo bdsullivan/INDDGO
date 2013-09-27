@@ -15,19 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\lib_graphd\src\AdjMatrixGraphReader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\AdjMatrixGraphWriter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\lib_graphd\src\Debug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\DIMACSGraphReader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\DIMACSGraphWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\lib_graphd\src\Graph.cpp">
@@ -51,28 +39,13 @@
     <ClCompile Include="..\..\lib_graphd\src\GraphReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\GraphReaderWriterFactory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\lib_graphd\src\GraphUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\GraphVizGraphWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\lib_graphd\src\GraphWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\lib_graphd\src\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\MetisGraphReader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\MetisGraphWriter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\MutableGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\lib_graphd\src\Node.cpp">
@@ -84,10 +57,7 @@
     <ClCompile Include="..\..\lib_graphd\src\Util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\WeightedGraph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\lib_graphd\src\WeightedMutableGraph.cpp">
+    <ClCompile Include="..\..\lib_graphd\src\VertexWeightedGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
