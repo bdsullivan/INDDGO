@@ -19,16 +19,28 @@
 
  */
 
+/*This fixes any issues with MSVC always having HAS_METIS defined*/
+#ifdef _MSC_VER
+  #if !HAS_METIS 
+    #undef HAS_METIS 
+  #endif
+#endif 
+
+
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
 #ifdef _OPENMP
   #include <omp.h>
 #else
-    #ifndef HAS_METIS
-      #define omp_get_num_threads() 1
-      #define omp_get_thread_num() 0
-    #endif
+  #ifndef HAS_METIS
+    #define omp_get_num_threads() 1
+    #define omp_get_thread_num() 0
+  #endif
+#endif
+
+#if WIN32
+#define strncasecmp strncmp
 #endif
 
 #include "GraphInterface.h"

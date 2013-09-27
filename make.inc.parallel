@@ -55,6 +55,8 @@ IGRAPH_INSTALL_DIR = $(IGRAPH)/deploy
 
 GMP    = 
 
+GTEST_INCLUDE_DIR = 
+
 #----------------------------------------------------------------
 #
 # Compilers, Flags and System Tools
@@ -91,6 +93,10 @@ endif
 
 ifeq ($(HAS_PARMETIS),1)
 CXX     = mpicxx
+endif
+
+ifeq ($(HAS_GTEST),1)
+CFLAGS	:= $(CFLAGS) -I$(GTEST_INCLUDE_DIR)
 endif
 
 #FC      = gfortran

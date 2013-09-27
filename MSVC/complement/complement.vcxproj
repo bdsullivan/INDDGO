@@ -11,12 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\max_wis\src\DPinfo.cpp" />
-    <ClCompile Include="..\..\max_wis\src\main.cpp" />
-    <ClCompile Include="..\..\max_wis\src\weighted_ind_set.cpp" />
+    <ClCompile Include="..\..\util\src\complement.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F0033BB8-C99B-4696-9350-F6B97850C220}</ProjectGuid>
+    <ProjectGuid>{E8670ED1-EA47-4A7F-858E-2781A04901C3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>metis502</RootNamespace>
   </PropertyGroup>
@@ -54,7 +52,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAS_GMP;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../../mpir-2.5.2;../../max_wis/inc;../../uthash-1.9.3/src/;../../lib_graphd/inc/;../../lib_treed/inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

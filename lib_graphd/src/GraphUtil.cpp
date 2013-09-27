@@ -1039,14 +1039,18 @@ namespace Graph {
 
     vector<int> deg_lookup(n);
     int max_deg = 0;
-    for(int i = 0; i < deg_lookup.size(); i++) { 
+	int deg_size=deg_lookup.size();
+    for(int i = 0; i < deg_size; i++) { 
       deg_lookup[i] = g->degree[i];
       if(deg_lookup[i] > max_deg)
 	max_deg = deg_lookup[i];
     }
     vector<vector<int> > D;
     D.resize(max_deg+1);    
-    int depth[n];
+
+	int *depth;
+	depth=new int[n];
+    //int depth[n];
     //can also create an L output list for coloring number optimal ordering
     
     for(int i = 0; i < n; i++) {
@@ -1083,6 +1087,7 @@ namespace Graph {
 	}
       }
     }
+	delete [] depth;
     return k;
   } // find_degen
 

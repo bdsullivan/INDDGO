@@ -26,6 +26,7 @@ The default binaries created by INSTALL include executables to:
 * compute elimination orderings, tree decompositions, and maximum weighted independent sets 
 	(./bin/serial_wis and/or ./bin/parallel_wis)
 * provide various visualization output (./bin/td_viz)
+* calculate a wide variety of graph features and statistics (./bin/graph_stats)
 
 Currently, all tree decomposition functionality is accessible through the 
 weighted independent set executables - flags are provided to disable the 

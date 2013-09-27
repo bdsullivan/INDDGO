@@ -46,10 +46,10 @@ EXECUTABLES = bin/testGraphReader bin/testGraphCreatorFile \
 bin/testGraph bin/testWeightedGraph  \
 bin/testVertexWeightedGraph bin/testAdjMatrixGraphWriter bin/testAdjMatrixGraphReader \
 bin/testDIMACSGraphWriter bin/testGraphVizGraphWriter bin/testGraphProperty bin/testGraphUtil\
-bin/testMetisGraphWriter bin/testMetisGraphReader
+bin/testMetisGraphWriter bin/testMetisGraphReader bin/testGraphEOUtil
 
 ifeq ($(HAS_PARMETIS), 1)
-EXECUTABLES = $(EXECUTABLES) testParMetis testGraphEOUtil
+EXECUTABLES = $(EXECUTABLES) bin/testParMetis 
 endif
 
 SRC=DIMACSReaderTest.cpp GraphReaderTest.cpp GraphCreatorFileTest.cpp \
@@ -114,9 +114,10 @@ bin/testMetisGraphWriter: MetisGraphWriterTest.o
 bin/testMetisGraphReader: MetisGraphReaderTest.o
 	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
 
-ifeq ($(HAS_PARMETIS), 1)
 bin/testGraphEOUtil: GraphEOUtilTest.o
-	${CXX} ${LFLAGS} -o $@   $< $(PARMETISOBJ) ${INCLUDES} $(LIBDIR) $(LIB)
+	${CXX} ${LFLAGS} -o $@   $< ${INCLUDES} $(LIBDIR) $(LIB)
+
+ifeq ($(HAS_PARMETIS), 1)
 
 bin/testParMetis: ParmetisTest.o 
 	${CXX} ${LFLAGS} -o $@   $^ $(PARMETISOBJ) ${INCLUDES} $(LIBDIR) $(LIB)

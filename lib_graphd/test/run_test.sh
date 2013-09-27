@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in "testGraphReader" "testGraphCreatorFile"  "testGraph" "testWeightedGraph" "testVertexWeightedGraph" "testAdjMatrixGraphWriter" "testAdjMatrixGraphReader" "testDIMACSGraphWriter" "testMetisGraphWriter" "testMetisGraphReader" "testGraphVizGraphWriter" "testGraphProperty" "testGraphUtil" "testGraphEOUtil" "parmetis.sh"
+for i in "testGraphReader" "testGraphCreatorFile"  "testGraph" "testWeightedGraph" "testVertexWeightedGraph" "testAdjMatrixGraphWriter" "testAdjMatrixGraphReader" "testDIMACSGraphWriter" "testMetisGraphWriter" "testMetisGraphReader" "testGraphVizGraphWriter" "testGraphProperty" "testGraphUtil" "testGraphEOUtil" 
 do 
 echo "======== Starting $i ==================="
 #cd bin

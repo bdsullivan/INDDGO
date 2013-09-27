@@ -32,6 +32,7 @@
 #include "Util.h"
 #include "GraphException.h"
 
+#if !WIN32 && !CYGWIN
 #include "orbconfig.h"
 #include "orbtimer.h"
 
@@ -40,6 +41,7 @@ using namespace std;
 void print_time(string prefix, ORB_t start, ORB_t end){
     cout << prefix + ": " << ORB_seconds(end, start) << "\n";
 }
+
 
 const string allowed_methods ("edge_density,avg_degree,degree_dist,global_cc,avg_cc,local_ccs,shortest_paths,assortativity,eccentricity,eccentricity_dist,expansion");
 
@@ -253,3 +255,10 @@ int main(int argc, char **argv){
     exit(0);
 } // main
 
+#else
+int main()
+{
+	fprintf(stderr,"Can't run under windows or cygwin\n");
+	return 0;
+}
+#endif
