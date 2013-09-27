@@ -31,19 +31,20 @@ namespace Graph {
 
     /**
      * Initialization of an R-MAT graph with 2^l vertices and <= m edges.
-     * Four probabilities in *probs used for quadrants, must sum to 1. 
+     * Four probabilities in *probs used for quadrants, must sum to 1.
      * lc rng initialized with seed. Setting self_loop true throws another
-     * edge if a self loop occurs. 
+     * edge if a self loop occurs.
      */
-    Graph *GraphCreator::initialize_rmat(int l, int m, double *probs, int seed, bool self_loop) {
+    Graph *GraphCreator::initialize_rmat(int l, int m, double *probs, int seed, bool self_loop){
         try {
-	    //check neighborhood to account for float errors
-	    if(probs[0]+probs[1]+probs[2]+probs[3] > 1.001 || probs[0]+probs[1]+probs[2]+probs[3] < 0.999) {
-		fatal_error("initialize_rmat: Probabilities did not sum to 1: %f, %f, %f, %f", probs[0], probs[1], probs[2], probs[3]);
-	    }
-        } catch(...) {
-	    fatal_error("initialize_rmat: Error occured when checking probabilities");
-	}
+            //check neighborhood to account for float errors
+            if((probs[0] + probs[1] + probs[2] + probs[3] > 1.001) || (probs[0] + probs[1] + probs[2] + probs[3] < 0.999)){
+                fatal_error("initialize_rmat: Probabilities did not sum to 1: %f, %f, %f, %f", probs[0], probs[1], probs[2], probs[3]);
+            }
+        }
+        catch(...){
+            fatal_error("initialize_rmat: Error occured when checking probabilities");
+        }
 
         //set up quadrants
         const double q1 = probs[0];
@@ -55,68 +56,72 @@ namespace Graph {
         init_lcgrand(0,seed);
 
         //throw m edges
-        for(int i = 0; i < m; i++) {
+        for(int i = 0; i < m; i++){
             unsigned long x = 0;
             unsigned long y = 0;
-            for(int j = l-1; j >= 0; j--) {
+            for(int j = l - 1; j >= 0; j--){
                 double r = lcgrand(0);
-                if(r < q1) {
-                } else if(r < q2) {
-					// pow(2,j)?? 1<<j might be slightly faster...
+                if(r < q1){
+                }
+                else if(r < q2){
+                    // pow(2,j)?? 1<<j might be slightly faster...
                     x += (int)pow((double)2,j);
-                } else if(r < q3) {
+                }
+                else if(r < q3){
                     y += (int)pow((double)2,j);
-                } else {
+                }
+                else {
                     x += (int)pow((double)2,j);
                     y += (int)pow((double)2,j);
                 }
             }
 
             //keep edges in order so we don't have a (x,y) and (y,x) duplicate
-            if(x == y) {
-                if(self_loop) {
+            if(x == y){
+                if(self_loop){
                     i--;
                 }
-            } else if(y > x) {
-		edges.insert(make_pair(x,y));
-            } else {
+            }
+            else if(y > x){
+                edges.insert(make_pair(x,y));
+            }
+            else {
                 edges.insert(make_pair(y,x));
             }
-	}
+        }
 
         Graph *g = new Graph((int)pow((double)2,l));
         set< pair<unsigned long, unsigned long> >::const_iterator it;
-        for(it = edges.begin(); it != edges.end(); it++) {
+        for(it = edges.begin(); it != edges.end(); it++){
             g->add_edge(it->first,it->second);
         }
 
         return g;
     } //initialize_rmat
 
-
     /**
-     * Initialization of a random intersection graph with n vertices, probs->size() attributes, 
-     * with probabilities on the attributes. lc rng initialized with seed. 
+     * Initialization of a random intersection graph with n vertices, probs->size() attributes,
+     * with probabilities on the attributes. lc rng initialized with seed.
      */
-    Graph *GraphCreator::initialize_rig(int n, int seed, list<double> *probs) {
+    Graph *GraphCreator::initialize_rig(int n, int seed, list<double> *probs){
         set< pair<unsigned long, unsigned long> > edges;
         init_lcgrand(0, seed);
 
         //for all the attributes, construct a clique in G
         list<double>::const_iterator it;
-        for(it = probs->begin(); it != probs->end(); it++) {
+        for(it = probs->begin(); it != probs->end(); it++){
             //compute which actors have a given attribute
             vector<int> connect;
-            for(int i = 0; i < n; i++) {
-                if(lcgrand(0) < *it) {
+            for(int i = 0; i < n; i++){
+                if(lcgrand(0) < *it){
                     connect.push_back(i);
                 }
             }
             //attach these actors to the graph
-			// CSG - if you call size over and over here this will be sloooow!
-			int conn_size=connect.size();
-            for(int i = 0; i < conn_size; i++) {
-                for(int j = i + 1; j < conn_size; j++) {
+            // CSG - if you call size over and over here this will be sloooow!
+            int conn_size = connect.size();
+            for(int i = 0; i < conn_size; i++){
+                for(int j = i + 1; j < conn_size; j++){
                     edges.insert(make_pair(connect[i],connect[j]));
                 }
             }
@@ -124,13 +129,12 @@ namespace Graph {
 
         Graph *g = new Graph(n);
         set< pair<unsigned long, unsigned long> >::const_iterator edge_it;
-        for(edge_it = edges.begin(); edge_it != edges.end(); edge_it++) {
-	    g->add_edge(edge_it->first,edge_it->second);
+        for(edge_it = edges.begin(); edge_it != edges.end(); edge_it++){
+            g->add_edge(edge_it->first,edge_it->second);
         }
 
         return g;
     } //initialize_rig
-
 
     /**
      * Initialization of a k-tree with n vertices. RNG seeded with seed.

@@ -308,7 +308,7 @@ TEST_F(GraphEOUtilTest, testFindBetaOrdering)
 
 TEST_F(GraphEOUtilTest, testFindMetisMmdOrdering)
 {
-#if HAS_METIS
+    #if HAS_METIS
     vector<int> ordering(mg->get_num_nodes(), -1);
     //eoutil.find_metis_mmd_ordering(mg, &ordering);
     eoutil.find_elimination_ordering(mg, &ordering, GD_METIS_MMD, false);
@@ -331,15 +331,15 @@ TEST_F(GraphEOUtilTest, testFindMetisMmdOrdering)
         EXPECT_EQ(mcs_output[i], ordering[i])
         ;
     }
-#else
+    #else // if HAS_METIS
     //no METIS, auto-pass
     EXPECT_TRUE(1) << "METIS not enabled. Method not tested.";
-#endif
+    #endif // if HAS_METIS
 }
 
 TEST_F(GraphEOUtilTest, testFindMetisNodeNdOrdering)
 {
-#if HAS_METIS
+    #if HAS_METIS
     vector<int> ordering(mg->get_num_nodes(), -1);
     //	eoutil.find_metis_node_nd_ordering(mg, &ordering);
     eoutil.find_elimination_ordering(mg, &ordering, GD_METIS_NODE_ND, false);
@@ -362,10 +362,10 @@ TEST_F(GraphEOUtilTest, testFindMetisNodeNdOrdering)
         EXPECT_EQ(mcs_output[i], ordering[i])
         ;
     }
-#else
+    #else // if HAS_METIS
     //no METIS, auto-pass
     EXPECT_TRUE(1) << "METIS not enabled. Method not tested.";
-#endif
+    #endif // if HAS_METIS
 }
 
 // TEST_F(GraphEOUtilTest, testFindMetisEdgeNdOrdering)
@@ -395,7 +395,7 @@ TEST_F(GraphEOUtilTest, testFindMetisNodeNdOrdering)
 
 TEST_F(GraphEOUtilTest, testFindAmdOrdering)
 {
-#if HAS_SUITESPARSE
+    #if HAS_SUITESPARSE
     vector<int> ordering(mg->get_num_nodes(), -1);
     //	eoutil.find_amd_ordering(mg, &ordering);
     eoutil.find_elimination_ordering(mg, &ordering, GD_AMD, false);
@@ -418,10 +418,10 @@ TEST_F(GraphEOUtilTest, testFindAmdOrdering)
         EXPECT_EQ(mcs_output[i], ordering[i])
         ;
     }
-#else
+    #else // if HAS_SUITESPARSE
     //no SUITESPARSE, auto-pass
     EXPECT_TRUE(1) << "SuiteSparse not enabled. Method not tested.";
-#endif
+    #endif // if HAS_SUITESPARSE
 }
 
 TEST_F(GraphEOUtilTest, testFindMinMaxDegreeOrdering)
@@ -462,17 +462,17 @@ TEST_F(GraphEOUtilTest, testTriangulate)
 
 TEST_F(GraphEOUtilTest, testMETISTriangulate)
 {
-#if HAS_METIS
+    #if HAS_METIS
     int width = 0;
     vector<int> ordering(mg->get_num_nodes(), -1);
     eoutil.find_elimination_ordering(mg, &ordering, GD_MCS, false);
     width = eoutil.METIS_triangulate(mg, &ordering);
     EXPECT_EQ(73, width)
     ;
-#else
+    #else
     //no METIS, auto-pass
     EXPECT_TRUE(1) << "METIS not enabled. Method not tested.";
-#endif
+    #endif
 }
 
 TEST_F(GraphEOUtilTest, testGetTwLowerBound)

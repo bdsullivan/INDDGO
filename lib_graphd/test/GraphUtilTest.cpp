@@ -301,3 +301,6 @@ TEST_F(GraphUtilTest, testVertexSeparator)
         }
     }
 }
+
+//Currently UNTESTED
+// void metis_ConstructSeparator(VertexWeightedGraph *g, list<int> *top, list<int> *bottom);

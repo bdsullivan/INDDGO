@@ -28,21 +28,50 @@
 #include <algorithm>
 #include <string.h>
 
-
 #ifndef _OPENMP
-    #ifdef HAS_METIS
-        void omp_set_num_threads(int num_threads) { return; }
-        int omp_get_num_threads() { return 1; }
-        int omp_get_max_threads(void) { return 1; }
-        int omp_get_thread_num(void) { return 0; }
-        int omp_get_num_procs(void) { return 1; }
-        int omp_in_parallel(void) { return 0; }
-        void omp_set_dynamic(int num_threads) { return; }
-        int omp_get_dynamic(void) { return 0; }
-        void omp_set_nested(int nested) { return; }
-        int omp_get_nested(void) { return 0; }
-    #endif
-#endif
+  #ifdef HAS_METIS
+void omp_set_num_threads(int num_threads){
+    return;
+}
+
+int omp_get_num_threads(){
+    return 1;
+}
+
+int omp_get_max_threads(void){
+    return 1;
+}
+
+int omp_get_thread_num(void){
+    return 0;
+}
+
+int omp_get_num_procs(void){
+    return 1;
+}
+
+int omp_in_parallel(void){
+    return 0;
+}
+
+void omp_set_dynamic(int num_threads){
+    return;
+}
+
+int omp_get_dynamic(void){
+    return 0;
+}
+
+void omp_set_nested(int nested){
+    return;
+}
+
+int omp_get_nested(void){
+    return 0;
+}
+
+  #endif // ifdef HAS_METIS
+#endif // ifndef _OPENMP
 
 /* GRAPH_H_ */
 namespace Graph {
@@ -198,7 +227,7 @@ namespace Graph {
 
     int Graph::get_num_edges_in_subgraph(list<int> *vertices){
         vertices->sort();
-        int highest_index = vertices->back();
+        //int highest_index = vertices->back();
         vector<bool> v(this->num_nodes,false);
         list<int>::iterator ii;
         for(ii = vertices->begin(); ii != vertices->end(); ++ii){
@@ -414,7 +443,75 @@ namespace Graph {
         num_nodes--;
     } // remove_vertex
 
+    /**
+     * Subdivides the edge (u,v) by placing a new vertex, numbered w
+     * in the graph, deleting (u,v) and adding (u,w) and (w,v).
+     * WARNING: If w is a current vertex, this function will remove
+     * all its current edges, and may have unpredictable behavior.
+     *
+     */
+    int Graph::edge_subdivision(int u, int v, int w){
+        if((nodes[u].label == -1) || (nodes[v].label == -1) ){
+            fatal_error(
+                "%s: Cannot remove edge (%d, %d) as one of its vertices is undefined!\n",
+                __FUNCTION__, u, v);
+        }
+        list<int>::iterator it;
+
+        // check that v is a neighbour of u
+        bool foundv = false;
+        for(it = nodes[u].nbrs.begin(); it != nodes[u].nbrs.end(); ++it){
+            if(*it == v){
+                foundv = true;
+            }
+        }
+        if(foundv == false){
+            return false;
+        }
+
+        // if w provided, check that it is in bounds
+        if(w >= capacity){
+            nodes.resize(2 * capacity);
+            capacity *= 2;
+        }
+
+        nodes[w].nbrs.clear();
+        if(!nodes[w].nbrs.empty()){
+            FERROR("%s: node is not empty", __FUNCTION__);
+            throw GraphException("node is not empty\n");
+        }
+        else {
+            nodes[w].label = w;
+            degree[w] = 2;
+            nodes[w].nbrs.push_back(u);
+            nodes[w].nbrs.push_back(v);
+
+            // remove u from v's nbrs list and vice versa
+            for(it = nodes[u].nbrs.begin(); it != nodes[u].nbrs.end(); it++){
+                if(*it == v){
+                    *it = w;
+                    break;
+                }
+            }
+            for(it = nodes[v].nbrs.begin(); it != nodes[v].nbrs.end(); it++){
+                if(*it == u){
+                    *it = w;
+                    break;
+                }
+            }
+        }
+        num_edges++;
+        next_label++;
+        num_nodes++;
+        return w;
+    } // Graph::edge_subdivision
+
+    // contract_edge and fuse_vertices, differ only in whether or not e=(u,v) has to be an edge
     int Graph::contract_edge(int u, int v){
+        return fuse_vertices(u,v,true);
+    }
+
+    int Graph::fuse_vertices(int u, int v, bool contract_edge = false){
         int i;
         if(simple != true){
             fatal_error("%s: called on a non-simple graph!\n", __FUNCTION__);
@@ -427,24 +524,27 @@ namespace Graph {
         vector<bool> neighbors(capacity);
         fill(neighbors.begin(), neighbors.end(), false);
         list<int>::iterator it;
+
+        if(v == u){ //maybe don't need this
+            return false;
+        }
+
         bool foundv = false;
-        it = nodes[u].nbrs.begin();
-        while(it != nodes[u].nbrs.end()){
+        for(it = nodes[u].nbrs.begin(); it != nodes[u].nbrs.end(); ++it){
             neighbors[*it] = true;
             if(*it == v){
                 foundv = true;
             }
-
-            ++it;
-        }
-        if(foundv == false){
-            return false;
         }
 
-        it = nodes[v].nbrs.begin();
-        while(it != nodes[v].nbrs.end()){
+        if(contract_edge){ // for fuse_vertices alone, don't need to be neighbours. for contract_edge you do
+            if(foundv == false){
+                return false;
+            }
+        }
+
+        for(it = nodes[v].nbrs.begin(); it != nodes[v].nbrs.end(); ++it){
             neighbors[*it] = true;
-            ++it;
         }
         remove_vertex(u);
         remove_vertex(v);
@@ -462,9 +562,21 @@ namespace Graph {
                 }
             }
         }
-
         return u;
-    } // contract_edge
+    } // fuse_vertices
+
+    void Graph::resize_graph(int size){
+        if(size < capacity){
+            fatal_error(
+                "%s:  resize_graph() called with new size %d less than capacity %d\n",
+                __FUNCTION__, size, capacity);
+        }
+        else {
+            nodes.resize(size,Node());
+            degree.resize(size,0);
+            this->set_capacity(size);
+        }
+    }
 
     void Graph::set_simple(bool si){
         simple = si;
