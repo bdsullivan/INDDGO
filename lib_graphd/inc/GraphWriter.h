@@ -29,7 +29,7 @@
 #include "Debug.h"
 #include <stdio.h>
 #if !WIN32
-#include <strings.h>
+  #include <strings.h>
 #endif
 #include <stdlib.h>
 #include <iostream>

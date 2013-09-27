@@ -21,31 +21,30 @@
 
 /*This fixes any issues with MSVC always having HAS_METIS defined*/
 #ifdef _MSC_VER
-  #if !HAS_METIS 
-    #undef HAS_METIS 
+  #if !HAS_METIS
+    #undef HAS_METIS
   #endif
-#endif 
-
+#endif
 
 #ifndef GRAPH_H_
-#define GRAPH_H_
+  #define GRAPH_H_
 
-#ifdef _OPENMP
-  #include <omp.h>
-#else
-  #ifndef HAS_METIS
-    #define omp_get_num_threads() 1
-    #define omp_get_thread_num() 0
+  #ifdef _OPENMP
+    #include <omp.h>
+  #else
+    #ifndef HAS_METIS
+      #define omp_get_num_threads() 1
+      #define omp_get_thread_num() 0
+    #endif
   #endif
-#endif
 
-#if WIN32
-#define strncasecmp strncmp
-#endif
+  #if WIN32
+    #define strncasecmp strncmp
+  #endif
 
-#include "GraphInterface.h"
-#include "Node.h"
-#include <string>
+  #include "GraphInterface.h"
+  #include "Node.h"
+  #include <string>
 
 using namespace std;
 

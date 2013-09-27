@@ -90,7 +90,6 @@ TEST_F(GraphTest, testIsEdge)
     list<int> nbrs2 = n->get_nbrs();
     EXPECT_EQ(22, nbrs2.size());
     EXPECT_FALSE(g->is_edge(80, 12));
-
 }
 
 TEST_F(GraphTest, testGetDegree)
@@ -367,9 +366,9 @@ TEST_F(GraphTest, testEdgeSubdivision)
     //We are creating a new vertex w of degree 2, with neighbors 108 and 100. The neighbors of
     //108 and 100 should change by losing each other and adding w.
     int w = 130; //out of current range of vertice
-    int u_old = g->get_degree(108); 
-    int v_old = g->get_degree(100); 
-    
+    int u_old = g->get_degree(108);
+    int v_old = g->get_degree(100);
+
     int x = g->edge_subdivision(108, 100, w);
 
     //Check existence of correct edges
@@ -384,5 +383,4 @@ TEST_F(GraphTest, testEdgeSubdivision)
     EXPECT_EQ(2, g->get_degree(w));
     EXPECT_EQ(u_old, g->get_degree(108));
     EXPECT_EQ(v_old, g->get_degree(100));
-
 }
