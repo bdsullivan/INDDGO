@@ -29,19 +29,50 @@
 #include <string.h>
 
 #ifndef _OPENMP
-    #ifdef HAS_METIS
-        void omp_set_num_threads(int num_threads) { return; }
-        int omp_get_num_threads(void) { return 1; }
-        int omp_get_max_threads(void) { return 1; }
-        int omp_get_thread_num(void) { return 0; }
-        int omp_get_num_procs(void) { return 1; }
-        int omp_in_parallel(void) { return 0; }
-        void omp_set_dynamic(int num_threads) { return; }
-        int omp_get_dynamic(void) { return 0; }
-        void omp_set_nested(int nested) { return; }
-        int omp_get_nested(void) { return 0; }
-    #endif
-#endif
+  #ifdef HAS_METIS
+void omp_set_num_threads(int num_threads){
+    return;
+}
+
+
+int omp_get_num_threads(void){
+    return 1;
+}
+
+int omp_get_max_threads(void){
+    return 1;
+}
+
+int omp_get_thread_num(void){
+    return 0;
+}
+
+int omp_get_num_procs(void){
+    return 1;
+}
+
+int omp_in_parallel(void){
+    return 0;
+}
+
+void omp_set_dynamic(int num_threads){
+    return;
+}
+
+int omp_get_dynamic(void){
+    return 0;
+}
+
+void omp_set_nested(int nested){
+    return;
+}
+
+int omp_get_nested(void){
+    return 0;
+}
+
+  #endif // ifdef HAS_METIS
+#endif // ifndef _OPENMP
 
 /* GRAPH_H_ */
 namespace Graph {
@@ -54,6 +85,10 @@ namespace Graph {
         this->simple = true;   //FIXME: check if this is correct behavior
         this->canonical = true;
         this->key = 0;
+        this->apsp_dist = NULL;
+        #ifdef HAS_BOOST
+        this->boost_graph = NULL;
+        #endif
     }
 
     Graph::Graph(int n){
@@ -67,9 +102,17 @@ namespace Graph {
             nodes[i].set_label(i + 1);
         }
         this->next_label = n + 1;
+        this->apsp_dist = NULL;
+        #ifdef HAS_BOOST
+        this->boost_graph = NULL;
+        #endif
     }
 
     Graph::~Graph(){
+        #ifdef HAS_BOOST
+        delete boost_graph;
+        boost_graph = NULL;
+        #endif
     }
 
     void Graph::set_canonical(bool c){
@@ -122,6 +165,10 @@ namespace Graph {
 
     int Graph::get_degree(int v) const {
         return this->degree[v];
+    }
+
+    int Graph::get_num_connected_components() const {
+        return this->num_connected_components;
     }
 
     /**
@@ -413,67 +460,75 @@ namespace Graph {
         num_nodes--;
     } // remove_vertex
 
-	int Graph::edge_subdivision(int u, int v, int w)	{
-		if (nodes[u].label == -1 || nodes[v].label == -1){
-			fatal_error(
-				"%s: Cannot remove edge (%d, %d) as one of its vertices is undefined!\n",
-				__FUNCTION__, u, v);
-	    }
+    /**
+     * Subdivides the edge (u,v) by placing a new vertex, numbered w
+     * in the graph, deleting (u,v) and adding (u,w) and (w,v).
+     * WARNING: If w is a current vertex, this function will remove
+     * all its current edges, and may have unpredictable behavior.
+     *
+     */
+    int Graph::edge_subdivision(int u, int v, int w){
+        if((nodes[u].label == -1) || (nodes[v].label == -1) ){
+            fatal_error(
+                "%s: Cannot remove edge (%d, %d) as one of its vertices is undefined!\n",
+                __FUNCTION__, u, v);
+        }
         list<int>::iterator it;
 
         // check that v is a neighbour of u
-		bool foundv = false;
-		for (it = nodes[u].nbrs.begin(); it != nodes[u].nbrs.end(); ++it){
-			if(*it == v)
-				foundv = true;
-		}
-	    if(foundv == false){
-		   return false;
-	    }
+        bool foundv = false;
+        for(it = nodes[u].nbrs.begin(); it != nodes[u].nbrs.end(); ++it){
+            if(*it == v){
+                foundv = true;
+            }
+        }
+        if(foundv == false){
+            return false;
+        }
 
-		// if w provided, check that it is in bounds
-		if(w > capacity){
-			nodes.resize(2*capacity);
-			capacity*=2;
-		}
+        // if w provided, check that it is in bounds
+        if(w >= capacity){
+            nodes.resize(2 * capacity);
+            capacity *= 2;
+        }
 
-		nodes[w].nbrs.clear();
-		if(!nodes[w].nbrs.empty()){
-			FERROR("%s: node is not empty", __FUNCTION__);
-			throw GraphException("node is not empty\n");
-		}
-		else{
-			nodes[w].label=w;
-			degree[w] = 2;
-			nodes[w].nbrs.push_back(u);
-			nodes[w].nbrs.push_back(v);
+        nodes[w].nbrs.clear();
+        if(!nodes[w].nbrs.empty()){
+            FERROR("%s: node is not empty", __FUNCTION__);
+            throw GraphException("node is not empty\n");
+        }
+        else {
+            nodes[w].label = w;
+            degree[w] = 2;
+            nodes[w].nbrs.push_back(u);
+            nodes[w].nbrs.push_back(v);
 
-			// remove u from v's nbrs list and vice versa
-			for(it = nodes[u].nbrs.begin() ; it != nodes[u].nbrs.end();it++){
-				if(*it==v) {
-                       *it=w;
-                       break;
-                   }
-			}
-			for(it = nodes[v].nbrs.begin() ; it != nodes[v].nbrs.end();it++){
-				if(*it==u) {
-                    *it=w;
-                	break;
-				}
-			}
-		}
-		num_edges++;
-		next_label++;
-		num_nodes++;
-		return w;
-	}
+            // remove u from v's nbrs list and vice versa
+            for(it = nodes[u].nbrs.begin(); it != nodes[u].nbrs.end(); it++){
+                if(*it == v){
+                    *it = w;
+                    break;
+                }
+            }
+            for(it = nodes[v].nbrs.begin(); it != nodes[v].nbrs.end(); it++){
+                if(*it == u){
+                    *it = w;
+                    break;
+                }
+            }
+        }
+        num_edges++;
+        next_label++;
+        num_nodes++;
+        return w;
+    } // Graph::edge_subdivision
 
     // contract_edge and fuse_vertices, differ only in whether or not e=(u,v) has to be an edge
     int Graph::contract_edge(int u, int v){
         return fuse_vertices(u,v,true);
     }
 
-    int Graph::fuse_vertices(int u, int v, bool contract_edge=false){
+    int Graph::fuse_vertices(int u, int v, bool contract_edge = false){
         int i;
         if(simple != true){
             fatal_error("%s: called on a non-simple graph!\n", __FUNCTION__);
@@ -487,11 +542,12 @@ namespace Graph {
         fill(neighbors.begin(), neighbors.end(), false);
         list<int>::iterator it;
 
-        if (v == u)//maybe don't need this 
+        if(v == u){ //maybe don't need this
             return false;
+        }
 
         bool foundv = false;
-        for (it = nodes[u].nbrs.begin(); it != nodes[u].nbrs.end(); ++it){
+        for(it = nodes[u].nbrs.begin(); it != nodes[u].nbrs.end(); ++it){
             neighbors[*it] = true;
             if(*it == v){
                 foundv = true;
@@ -499,12 +555,12 @@ namespace Graph {
         }
 
         if(contract_edge){ // for fuse_vertices alone, don't need to be neighbours. for contract_edge you do
-          if(foundv == false){
-              return false;
-          }
+            if(foundv == false){
+                return false;
+            }
         }
 
-        for (it = nodes[v].nbrs.begin(); it != nodes[v].nbrs.end(); ++it){
+        for(it = nodes[v].nbrs.begin(); it != nodes[v].nbrs.end(); ++it){
             neighbors[*it] = true;
         }
         remove_vertex(u);
@@ -529,10 +585,10 @@ namespace Graph {
     void Graph::resize_graph(int size){
         if(size < capacity){
             fatal_error(
-            "%s:  resize_graph() called with new size %d less than capacity %d\n",
-            __FUNCTION__, size, capacity);
+                "%s:  resize_graph() called with new size %d less than capacity %d\n",
+                __FUNCTION__, size, capacity);
         }
-        else{
+        else {
             nodes.resize(size,Node());
             degree.resize(size,0);
             this->set_capacity(size);
@@ -781,8 +837,23 @@ namespace Graph {
     /**
      * \param[in] apsp_dist all pairs shortest paths distances
      **/
-    void Graph::set_shortest_path_dist(vector< vector<int> > apsp_dist){
+    void Graph::set_shortest_path_dist(vector< vector<int> > *apsp_dist){
         this->apsp_dist = apsp_dist;
+    }
+
+    /**
+     * \param[in] bc betweenness centrality measures for all vertices
+     */
+    void Graph::set_betweenness(vector<double> bc){
+        this->betweenness = bc;
+    }
+
+    /**
+     * return a const ref to the betweenness centrality vector
+     */
+    const vector<double> &Graph::get_betweenness_ref(){
+        //FIXME:  should this check to see if it's not-empty?
+        return this->betweenness;
     }
 
     /**
@@ -791,24 +862,27 @@ namespace Graph {
      * otherwise computes then returns
      **/
     const vector< vector<int> > &Graph::get_shortest_path_dist_ref(){
-        if(this->apsp_dist.empty()){
-            cout << "Empty -- calling function to compute shortest paths" << endl;
-            GraphProperties properties;
-            properties.paths_dijkstra_all(this,this->apsp_dist);   //sets this>apsp_dist with values
-            return this->apsp_dist;
+        if(this->apsp_dist == NULL){
+            this->apsp_dist = new vector< vector<int> >;
         }
-        return this->apsp_dist;
+        if(this->apsp_dist->empty()){
+            cout << "APSP matrix is empty -- calling function to compute shortest paths" << endl;
+            GraphProperties properties;
+            properties.paths_dijkstra_all(this,*(this->apsp_dist));   //sets this>apsp_dist with values
+        }
+        return *(this->apsp_dist);
     }
 
     const vector<int> &Graph::get_u_shortest_path_dist(int u){
+        if(this->apsp_dist == NULL){
+            this->apsp_dist = new vector< vector<int> >;
+        }
         if(this->apsp_dist[u].empty()){
-            cout << "u Empty -- calling function to compute shortest paths" << endl;
+            cout << "SSSP vector is empty -- calling function to compute shortest paths" << endl;
             GraphProperties properties;
-            properties.paths_dijkstra_single(this,this->apsp_dist[u], u);   //sets this>apsp_dist[u] with values
-
-            return this->apsp_dist[u];
+            properties.paths_dijkstra_single(this,(*(this->apsp_dist))[u], u);   //sets this>apsp_dist[u] with values
         }
 
-        return this->apsp_dist[u];
+        return (*(this->apsp_dist))[u];
     }
 }

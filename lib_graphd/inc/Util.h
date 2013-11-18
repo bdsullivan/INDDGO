@@ -92,7 +92,51 @@ const char *eo_name(int eo_id);
 std::string str_to_up(std::string s);
 void split(const std::string& s, char sep, vector<int>& v);      // used in metisgraph reader
 
+/**
+ * \brief write a degree distribution out to a file
+ */
 void write_degree_distribution(string filename, const vector<int> &dist);
+
+/**
+ * \brief write an eccentricity distribution out to a file
+ */
+void write_eccentricity_distribution(string filename, const vector<double> &dist);
+
+/**
+ * \brief write a k_core list out to a file
+ */
+void write_kcores(string filename, const vector<int> &kcores);
+
+/**
+ * \brief write an eccentricity list out to a file
+ */
+void write_eccentricity(string filename, const vector<int> &ecc);
+
+/**
+ * \brief write a betweenness centrality list out to a file
+ */
+void write_betweenness(string filename, const vector<double> &bc);
+
+/**
+ * \brief write a delta hyperbolicity distribution out to a file
+ */
+void write_delta_hyperbolicity(string filename, const vector< vector<double> > &delta);
+
+/**
+ * \brief write an expansion list out to a file
+ */
+void write_expansion(string filename, const vector<double> &expansion);
+
+/**
+ * \brief Write an all pairs shortest path matrix  out to file.
+ */
+void write_apsp_matrix(string filename, vector< vector<int> > &apsp);
+
+/**
+ * \brief Reads an all pairs shortest path matrix from file
+ */
+void read_apsp_matrix(string filename, vector< vector<int> > &apsp);
+
 int_int mylog2(int x);
 
 #endif /* UTIL_H_ */

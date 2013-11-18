@@ -25,8 +25,15 @@
 #include "GraphException.h"
 #include "GraphWriter.h"
 
-#include "orbconfig.h"
-#include "orbtimer.h"
+#if !WIN32 && !CYGWIN
+  #include "orbconfig.h"
+  #include "orbtimer.h"
+#else
+  #define ORB_t clock_t
+  #define ORB_seconds(x,y) "lame"
+  #define ORB_calibrate()
+  #define ORB_read(x)
+#endif
 
 using namespace std;
 
@@ -61,7 +68,7 @@ int main(int argc, char **argv){
         exit(-1);
     }
 
-    ORB_t t1, t2, t3;
+    ORB_t t1 = 0, t2 = 0, t3 = 0;
     int i;
     int t = 1;
     int ktree_n = -1, ktree_k = -1, ktree_p = -1;

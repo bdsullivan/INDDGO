@@ -19,7 +19,17 @@
 
  */
 
+#include "GraphUtil.h"
 #include "GraphDecomposition.h"
+
+#ifdef HAS_BOOST
+  #include <iostream>
+  #include <deque>
+  #include <iterator>
+
+  #include "boost/graph/adjacency_list.hpp"
+  #include "boost/graph/topological_sort.hpp"
+#endif
 
 namespace Graph {
     GraphUtil::GraphUtil(){
@@ -498,6 +508,89 @@ namespace Graph {
         g->adjncy.clear();
     }
 
+    #ifdef HAS_BOOST
+    /**
+     * Populates the boost_graph member of g
+     * \param[in] g the input graph
+     */
+    void GraphUtil::populate_boost(Graph *g){
+        const int n = g->get_num_nodes();
+        int v;
+        boost::graph_traits < BoostUndirected >::vertex_descriptor a, b;
+        list<int>::const_iterator it;
+        g->boost_graph = new BoostUndirected(n);
+        BoostUndirected *bg = g->boost_graph;
+        for(v = 0; v < n; v++){
+            const list<int> &nbrs = g->get_node(v)->get_nbrs_ref();
+            for(it = nbrs.begin(); it != nbrs.end(); ++it){
+                if(v < *it){
+                    a = boost::vertex(v, *bg);
+                    b = boost::vertex(*it, *bg);
+                    boost::add_edge(a, b, 1, *bg);
+                }
+            }
+        }
+    } // populate_boost
+
+    #endif //HAS_BOOST
+
+    #ifdef HAS_PETSC
+    /**
+     * Populates the PetscMat member of graph g. This function will also call populate_CRS() if it hasn't been already.
+     * Durring cleanup a free_CRS() also needs to be done.
+     * \param[in] g the input graph
+     */
+    void GraphUtil::populate_PetscMat(Graph *g){
+        if(g->adjncy.size() == 0){
+            populate_CRS(g);
+        }
+        int start, end;
+
+        //Matrix is g->PetscMat
+        PetscErrorCode ierror;
+        ierror = MatCreate(PETSC_COMM_WORLD,&(g->PetscMat));
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetSizes(g->PetscMat,PETSC_DECIDE,PETSC_DECIDE,g->num_nodes,g->num_nodes);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetFromOptions(g->PetscMat);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatSetUp(g->PetscMat);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        int row, col, size;
+        const PetscScalar one_val = 1;
+        for(int node = 0; node < g->num_nodes; node++){
+            start = g->xadj[node];
+            end = g->xadj[node + 1];
+            size = 1 + end - start;
+            row = node;
+            PetscScalar ones[size];
+            PetscInt columns[size];
+            for(int idx = 0; idx < size; idx++){
+                ones[idx] = 1.0;
+                columns[idx] = g->adjncy[start + idx];
+            }
+            ierror = MatSetValues(g->PetscMat, 1, &row, size, columns, ones, INSERT_VALUES);
+            CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        }
+
+        ierror = MatAssemblyBegin(g->PetscMat,MAT_FINAL_ASSEMBLY);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+        ierror = MatAssemblyEnd(g->PetscMat,MAT_FINAL_ASSEMBLY);
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+    } // populate_PetscMat
+
+    /**
+     * Frees the PetscMat member of g. This function will not cleanup CRS, even if populate_PetscMat() filled it.
+     * You will have to also call free_CRS();
+     * \param[in] g the input graph
+     */
+    void GraphUtil::free_PetscMat(Graph *g){
+        PetscErrorCode ierror = MatDestroy(&(g->PetscMat));
+        CHKERRABORT(PETSC_COMM_WORLD,ierror);
+    }
+
+    #endif // ifdef HAS_PETSC
+
     /**
      * Non-recursive function that fills the members vector with the
      * lists of nodes belonging to the components.  The members vector
@@ -633,34 +726,33 @@ namespace Graph {
         return k;
     }
 
-	/**
+    /**
      * Calls CreateSeparator from metis
      * top and bottom cannot have any overlap coming in, going out they will share the elements of the separator
      * they bring in the top and bottom lists, and take out the top and bottom bags
      */
-	void GraphUtil::metis_ConstructSeparator(VertexWeightedGraph *g, list<int> *top, list<int> *bottom)
-	{
-#if !HAS_METIS
-    	fatal_error("Called METIS CreateSeparator without HAS_METIS.\n");
-		return;
-#else
+    void GraphUtil::metis_ConstructSeparator(VertexWeightedGraph *g, list<int> *top, list<int> *bottom){
+        #if !HAS_METIS
+        fatal_error("Called METIS CreateSeparator without HAS_METIS.\n");
+        return;
+        #else
 
         GraphUtil util;
         util.populate_CRS(g); /// construct xadj, adjncy
 
-		graph_t *graph;
+        graph_t *graph;
         ctrl_t *ctrl;
 
         list<int> temp;
 
         int topsize = top->size();
         int bottomsize = bottom->size();
-        int *originalid = new int[bottomsize+topsize];
+        int *originalid = new int[bottomsize + topsize];
 
-		list<int>::iterator ii, jj, kk;
-        int id=0;
+        list<int>::iterator ii, jj, kk;
+        int id = 0;
 
-		for(ii = bottom->begin(); ii != bottom->end(); ++ii){
+        for(ii = bottom->begin(); ii != bottom->end(); ++ii){
             originalid[id] = *ii;
             id++;
         }
@@ -670,108 +762,94 @@ namespace Graph {
         }
         idx_t nvtxs = topsize + bottomsize;
 
-        int sizexa = topsize + bottomsize+1;
+        int sizexa = topsize + bottomsize + 1;
         idx_t *xadj = new idx_t[sizexa];
-        int sizead = (sizexa-1)*(sizexa-2);
+        int sizead = (sizexa - 1) * (sizexa - 2);
         idx_t *adjncy = new idx_t[sizead];
-        
-        id=0; // position of ii iterator in originalid[], and position in xadj[]
-        int jd=0; // position of jj iterator in originalid[]
+
+        id = 0; // position of ii iterator in originalid[], and position in xadj[]
+        int jd = 0; // position of jj iterator in originalid[]
         int j = 0; // position in adjncy
 
         bool include = false;
 
         // construct xadj, edges come from completion of each list, plus edges between lists
-        for(ii = bottom->begin(); ii != bottom->end(); ++ii)
-        {
+        for(ii = bottom->begin(); ii != bottom->end(); ++ii){
             xadj[id] = j;
 
-            jd=0;
-            for(jj = bottom->begin(); jj!= bottom->end(); ++jj)
-            {
-                if(*jj != *ii)
-                {
+            jd = 0;
+            for(jj = bottom->begin(); jj != bottom->end(); ++jj){
+                if(*jj != *ii){
                     temp.push_back(jd);
                     j++;
-                } 
+                }
                 jd++;
             }
-            for(jj = top->begin(); jj != top->end(); ++jj)
-            {
-                include=false;
-                for(kk = g->nodes[*jj].nbrs.begin(); kk!= g->nodes[*jj].nbrs.end() && !include; ++kk)
-                {
-                    if(*kk == *ii)
-                    {
+            for(jj = top->begin(); jj != top->end(); ++jj){
+                include = false;
+                for(kk = g->nodes[*jj].nbrs.begin(); kk != g->nodes[*jj].nbrs.end() && !include; ++kk){
+                    if(*kk == *ii){
                         include = true;
                     }
                 }
-                if(include)
-                {
+                if(include){
                     temp.push_back(jd);
                     j++;
                 }
                 jd++;
             }
-            temp.sort();// ?unnecessary?
-            
+            temp.sort(); // ?unnecessary?
+
             // adjncy[] needs to be filled from position xadj[id] to j inclusive
             jj = temp.begin();
-            for(int k=xadj[id]; k < j; k++){
-                adjncy[k]=*jj;
-                jj++;
-            }
-            temp.clear();
-            id++;
-        }
-        for(ii = top->begin(); ii != top->end(); ++ii)
-        {
-            xadj[id] = j;
-
-            jd=bottomsize; // adjncy already contains bottom list's elements
-            for(jj = top->begin(); jj!= top->end(); jj++)
-            {
-                if(*jj != *ii)
-                {
-                    temp.push_back(jd);
-                    j++;
-                } 
-                jd++;
-            }
-            jd = 0;
-
-            for(jj = bottom->begin(); jj != bottom->end(); ++jj)
-            {
-                include=false;
-                for(kk = g->nodes[*jj].nbrs.begin(); kk!= g->nodes[*jj].nbrs.end() && !include; ++kk)
-                {
-                    if(*kk == *ii)
-                    {
-                        include = true;
-                    }
-                }
-                if(include)
-                {
-                    temp.push_back(jd);
-                    j++;
-                }
-                jd++;
-            }
-            temp.sort();
-            
-            jj = temp.begin();
-            for(int k=xadj[id]; k < j; k++){
+            for(int k = xadj[id]; k < j; k++){
                 adjncy[k] = *jj;
                 jj++;
             }
             temp.clear();
             id++;
         }
-        xadj[id]=j;
+        for(ii = top->begin(); ii != top->end(); ++ii){
+            xadj[id] = j;
+
+            jd = bottomsize; // adjncy already contains bottom list's elements
+            for(jj = top->begin(); jj != top->end(); jj++){
+                if(*jj != *ii){
+                    temp.push_back(jd);
+                    j++;
+                }
+                jd++;
+            }
+            jd = 0;
+
+            for(jj = bottom->begin(); jj != bottom->end(); ++jj){
+                include = false;
+                for(kk = g->nodes[*jj].nbrs.begin(); kk != g->nodes[*jj].nbrs.end() && !include; ++kk){
+                    if(*kk == *ii){
+                        include = true;
+                    }
+                }
+                if(include){
+                    temp.push_back(jd);
+                    j++;
+                }
+                jd++;
+            }
+            temp.sort();
+
+            jj = temp.begin();
+            for(int k = xadj[id]; k < j; k++){
+                adjncy[k] = *jj;
+                jj++;
+            }
+            temp.clear();
+            id++;
+        }
+        xadj[id] = j;
 
         //copy to an array of correct size
         idx_t *adjncysmall = new idx_t[j];
-        for(id = 0; id<j; ++id){
+        for(id = 0; id < j; ++id){
             adjncysmall[id] = adjncy[id];
         }
 
@@ -793,104 +871,83 @@ namespace Graph {
         where = graph->where;
 
         // are there 3 sets?  is left = bottom or right = bottom
-        int bot_i=0;
+        int bot_i = 0;
         bool keepgoing = true;
         bool bottom0;
         bool leftexists = false;
         bool rightexists = false;
         bool separatorexists = false;
 
-        while((bot_i < bottomsize) && keepgoing)
-        {
-          if(where[bot_i]==0)
-          {
-            bottom0 = true;
-			leftexists = true;
-            keepgoing=false;
-          }
-          else if(where[bot_i]==1)
-          {
-            bottom0=false;
-            rightexists = true;
-            keepgoing=false;
-          }
-          else if(where[bot_i]==2)
-          {
-            separatorexists = true;
-          }
-          bot_i++;
+        while((bot_i < bottomsize) && keepgoing){
+            if(where[bot_i] == 0){
+                bottom0 = true;
+                leftexists = true;
+                keepgoing = false;
+            }
+            else if(where[bot_i] == 1){
+                bottom0 = false;
+                rightexists = true;
+                keepgoing = false;
+            }
+            else if(where[bot_i] == 2){
+                separatorexists = true;
+            }
+            bot_i++;
         }
 
-        while( !(separatorexists && leftexists && rightexists) && (bot_i < bottomsize + topsize) )
-        {
-          if(where[bot_i]==2)
-          {
-            separatorexists=true;
-          }
-          else if(where[bot_i]==0)
-          {
-            leftexists=true;
-          }
-          else if(where[bot_i]==1)
-          {
-            rightexists=true;
-          }
-          bot_i++;
+        while( !(separatorexists && leftexists && rightexists) && (bot_i < bottomsize + topsize) ){
+            if(where[bot_i] == 2){
+                separatorexists = true;
+            }
+            else if(where[bot_i] == 0){
+                leftexists = true;
+            }
+            else if(where[bot_i] == 1){
+                rightexists = true;
+            }
+            bot_i++;
         }
 
         // if don't have all 3 sets, then return everything in a bottom list, with top list empty.
-        if(separatorexists && leftexists && rightexists)
-        {
-          // get original position in larger graph g from originalid[s]
-          for(int s = 0; s<nvtxs;s++)
-          {
-            if(where[s] == 0)
-            {
-              if(bottom0)
-              {
-                bottom->push_back(originalid[s]);
-              }
-              else
-              {
-                top->push_back(originalid[s]);
-              }
+        if(separatorexists && leftexists && rightexists){
+            // get original position in larger graph g from originalid[s]
+            for(int s = 0; s < nvtxs; s++){
+                if(where[s] == 0){
+                    if(bottom0){
+                        bottom->push_back(originalid[s]);
+                    }
+                    else {
+                        top->push_back(originalid[s]);
+                    }
+                }
+                else if(where[s] == 1){
+                    if(bottom0){
+                        top->push_back(originalid[s]);
+                    }
+                    else {
+                        bottom->push_back(originalid[s]);
+                    }
+                }
+                else if(where[s] == 2){
+                    top->push_back(originalid[s]);
+                    bottom->push_back(originalid[s]);
+                }
             }
-            else if(where[s] == 1)
-            {
-              if(bottom0)
-              {
-                top->push_back(originalid[s]);
-              }
-              else
-              {
-                bottom->push_back(originalid[s]);
-              }  
-            }
-            else if(where[s] == 2)
-            {
-              top->push_back(originalid[s]);
-              bottom->push_back(originalid[s]);
-            }
-          }
         }
-        else
-        {
-          for(int s = 0; s<nvtxs;s++)
-          {
-             bottom->push_back(originalid[s]);
-          }
+        else {
+            for(int s = 0; s < nvtxs; s++){
+                bottom->push_back(originalid[s]);
+            }
         }
 
         FreeWorkSpace(ctrl);
-        FreeGraph(&graph); 
+        FreeGraph(&graph);
         util.free_CRS(g);
         delete [] xadj;
         delete [] adjncy;
         return;
-#endif
-	}
-
-
+        #endif // if !HAS_METIS
+    } // GraphUtil::metis_ConstructSeparator
 
     //runs a BFS from start using only vertices with allowed[v] = true.
     //Returns an array of integers giving distance from the source (0 for source).
@@ -936,7 +993,7 @@ namespace Graph {
             j = S.front();
             S.pop_front();
             left_in_level--;
-            if(dists[j] == GD_INFINITY || dists[j] == -1){
+            if((dists[j] == GD_INFINITY) || (dists[j] == -1)){
                 // We have now visited j
                 dists[j] = curr_level;
                 num_found++;
@@ -949,7 +1006,7 @@ namespace Graph {
                         // We haven't seen *ii before and it is an "acceptable" vertex,
                         // so it is a candidate to be in the path - add it to the Stack
                         S.push_back(*ii);                         // must be push_back since we pop_front and need FIFO.
-                        dists[*ii]=-1;
+                        dists[*ii] = -1;
                         next_level++;
                     }
                 }
@@ -1025,66 +1082,108 @@ namespace Graph {
         return max;
     } // subset_max_dist
 
-  /**
-   * Calculates the k-core number of every vertex and stores in kcore vector
-   * Return value is degeneracy (maximum non-empty k-core). 
-   * Uses algorithm of Batagelj and Zaversnik (2003)
-   * Implemented by Timothy Goodrich and Matthew Farrell (2013)
-   */
-  int GraphUtil::find_kcore(Graph *g, vector<int> *kcore) {
-    int n = g->num_nodes;
-    int k = 0;
-    int last_deg = 0;
-    kcore->resize(n);
+    /**
+     * Calculates the k-core number of every vertex and stores in kcore vector
+     * Return value is degeneracy (maximum non-empty k-core).
+     * Uses algorithm of Batagelj and Zaversnik (2003)
+     * Implemented by Timothy Goodrich and Matthew Farrell (2013)
+     */
+    int GraphUtil::find_kcore(Graph *g, vector<int> *kcore){
+        int n = g->num_nodes;
+        int k = 0;
+        int last_deg = 0;
+        kcore->resize(n);
 
-    vector<int> deg_lookup(n);
-    int max_deg = 0;
-    for(int i = 0; i < deg_lookup.size(); i++) { 
-      deg_lookup[i] = g->degree[i];
-      if(deg_lookup[i] > max_deg)
-	max_deg = deg_lookup[i];
-    }
-    vector<vector<int> > D;
-    D.resize(max_deg+1);    
-    int depth[n];
-    //can also create an L output list for coloring number optimal ordering
-    
-    for(int i = 0; i < n; i++) {
-      deg_lookup[i] = g->degree[i];
-      D[deg_lookup[i]].push_back(i);
-      depth[i] = D[deg_lookup[i]].size()-1;
-    }
-     
-    for(int i = 0; i < n; i++) {
-      int v;      
-      for(int j = last_deg; j <= max_deg; j++) {
-	if(D[j].size() != 0) {
-	  v = D[j].back();
-	  D[j].pop_back();
-	  break;
-	}
-      }
-      
-      (*kcore)[v] = k = max(k,deg_lookup[v]);
-      last_deg = max(0, deg_lookup[v]-1);
-      deg_lookup[v] = -1;
-      
-      //shift each of v's neighbors down one degree
-      list<int> * nbrs = g->nodes[v].get_nbrs_ptr();
-      list<int>::const_iterator it;
-      for(it = nbrs->begin(); it != nbrs->end(); it++) {
-	if(deg_lookup[*it] != -1) {
-	  int it_deg = deg_lookup[*it]--;
-	  D[it_deg][depth[*it]] = D[it_deg][D[it_deg].size()-1];
-	  depth[D[it_deg][depth[*it]]] = depth[*it];
-	  D[it_deg].pop_back();
-	  D[it_deg-1].push_back(*it);
-	  depth[*it] = D[it_deg-1].size()-1;
-	}
-      }
-    }
-    return k;
-  } // find_degen
+        vector<int> deg_lookup(n);
+        int max_deg = 0;
+        int deg_size = deg_lookup.size();
+        for(int i = 0; i < deg_size; i++){
+            deg_lookup[i] = g->degree[i];
+            if(deg_lookup[i] > max_deg){
+                max_deg = deg_lookup[i];
+            }
+        }
+        vector<vector<int> > D;
+        D.resize(max_deg + 1);
+
+        int *depth;
+        depth = new int[n];
+        //int depth[n];
+        //can also create an L output list for coloring number optimal ordering
+
+        for(int i = 0; i < n; i++){
+            deg_lookup[i] = g->degree[i];
+            D[deg_lookup[i]].push_back(i);
+            depth[i] = D[deg_lookup[i]].size() - 1;
+        }
+
+        for(int i = 0; i < n; i++){
+            int v;
+            for(int j = last_deg; j <= max_deg; j++){
+                if(D[j].size() != 0){
+                    v = D[j].back();
+                    D[j].pop_back();
+                    break;
+                }
+            }
+            (*kcore)[v] = k = max(k,deg_lookup[v]);
+            last_deg = max(0, deg_lookup[v] - 1);
+            deg_lookup[v] = -1;
+
+            //shift each of v's neighbors down one degree
+            list<int> *nbrs = g->nodes[v].get_nbrs_ptr();
+            list<int>::const_iterator it;
+            for(it = nbrs->begin(); it != nbrs->end(); it++){
+                if(deg_lookup[*it] != -1){
+                    int it_deg = deg_lookup[*it]--;
+                    D[it_deg][depth[*it]] = D[it_deg][D[it_deg].size() - 1];
+                    depth[D[it_deg][depth[*it]]] = depth[*it];
+                    D[it_deg].pop_back();
+                    D[it_deg - 1].push_back(*it);
+                    depth[*it] = D[it_deg - 1].size() - 1;
+                }
+            }
+        }
+        delete [] depth;
+        return k;
+    } // find_degen
+
+    /**
+     * \input g input graph
+     * \output new graph consisting of largest component, or NULL if the input graph is connected
+     * NOTE: this function *will* canonicalize your graph!!!
+     **/
+    Graph *GraphUtil::get_largest_component_graph(Graph *g){
+        GraphProperties properties;
+        GraphCreatorFile creator;
+        Graph *largecomp;
+        list<int> *maxlist = NULL;
+        size_t maxlen = 0;
+
+        if(!properties.is_connected(g)){
+            properties.make_canonical(g);
+            vector<list<int> *> members;
+            vector<list<int> *>::iterator vlit;
+            find_all_components(g, &members);
+            // traverse the list and find the one with the most members
+            for(vlit = members.begin(); vlit != members.end(); ++vlit){
+                //cout << "Got list with size: " << ((*vlit)->size()) << endl;
+                if(((*vlit)->size()) >= maxlen){
+                    maxlen = (*vlit)->size();
+                    //cout << "New list with maxlen > " << maxlen << endl;
+                    maxlist = *vlit;
+                    //cout << maxlist << endl;
+                }
+            }
+
+            // found the max component, let's create the graph
+            largecomp = creator.create_component((Graph *)g, maxlist, true);
+            return largecomp;
+        }
+        else {
+            return NULL;
+        }
+    } // get_largest_component_graph
 
 }
 using namespace std;

@@ -46,6 +46,19 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+
+#ifdef HAS_BOOST
+  #ifdef HAS_GTEST
+    #define GTEST_HAS_TR1_TUPLE 0
+  #endif
+  #include <boost/math/special_functions/zeta.hpp>
+#endif
+
+#ifndef HAS_BOOST
+  #include <stdint.h>
+#endif
+
+
 #include <set>
 #include <map>
 #include <limits.h>
@@ -117,7 +130,7 @@ static const char EO_NAMES[][30] = {
 // Include header files
 #include "GraphDecomposition.h"
 #include "Graph.h"
-#include "Graph.h"
+//#include "Graph.h"
 #include "DIMACSGraphReader.h"
 #include "DIMACSGraphWriter.h"
 #include "GraphDisplay.h"

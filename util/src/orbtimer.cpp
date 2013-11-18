@@ -27,20 +27,27 @@
 * All Rights Reserved.
 *
 **************************************************************************/
+#if !WIN32
+  #if !CYGWIN
 
-#include <unistd.h>
-#include <sys/time.h>
-#include "orbconfig.h"
+    #include <unistd.h>
+    #include <sys/time.h>
+    #include "orbconfig.h"
 
-#define  ORBTIMER_LIBRARY
-#include "orbtimer.h"
+    #define  ORBTIMER_LIBRARY
+    #include "orbtimer.h"
 
 static ORB_tick_t Csum = 0;
 static ORB_tick_t Gsum = 0;
 static ORB_tick_t nsamples = 0;
 static ORB_tick_t ndummy = 0;
+  #endif
+#endif
 
 void ORB_calibrate(){
+    #if WIN32 || CYGWIN || _CYGWIN
+    return;
+    #else
     int i, j;
     double seconds;
     struct timeval tv1, tv2;
@@ -104,5 +111,6 @@ void ORB_calibrate(){
     ORB_min_lat_sec = ORB_min_lat_cyc / ORB_ref_freq;
     GTD_avg_lat_sec = GTD_avg_lat_cyc / ORB_ref_freq;
     GTD_min_lat_sec = GTD_min_lat_cyc / ORB_ref_freq;
+    #endif // if WIN32 || CYGWIN || _CYGWIN
 } // ORB_calibrate
 

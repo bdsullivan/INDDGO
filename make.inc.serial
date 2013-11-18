@@ -32,6 +32,9 @@ HAS_METIS	= 0
 HAS_IGRAPH	= 0
 HAS_GMP		= 0
 HAS_GTEST	= 0
+# Set to 1 if you have boost installed on your system
+# Many linux systems have it installed by default
+HAS_BOOST = 0
 # Set whether serial or parallel version is desired for WIS.
 IS_PARALLEL	= 0
 HAS_MADNESS	= 0
@@ -66,6 +69,8 @@ IGRAPH_INSTALL_DIR = $(IGRAPH)/deploy
 
 GMP    = 
 
+GTEST_INCLUDE_DIR = 
+
 #----------------------------------------------------------------
 #
 # Compilers, Flags and System Tools
@@ -89,6 +94,10 @@ ifeq ($(LOG_ENABLED), 1)
 CFLAGS := $(CFLAGS) -D__LOG_ENABLE__ 
 endif
 
+ifeq ($(HAS_BOOST),1)
+CFLAGS := $(CFLAGS) -DHAS_BOOST
+endif
+
 ifeq ($(HAS_MADNESS),1)
 CXX     = mpicxx
 ifeq ($(OLDGCC), 1)
@@ -107,6 +116,10 @@ endif
 
 ifeq ($(HAS_PARMETIS),1)
 CXX     = mpicxx
+endif
+
+ifeq ($(HAS_GTEST),1)
+CFLAGS	:= $(CFLAGS) -I$(GTEST_INCLUDE_DIR)
 endif
 
 #FC      = gfortran
