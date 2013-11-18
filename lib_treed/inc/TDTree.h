@@ -150,10 +150,8 @@ public:
 
     // Constructs a tree dcomposition using Dourisboure-Gavoille's BFS-Layering algorithm
     // doesn't require an elimination ordering
-    void construct_bfs(int root);
-    //int build_bags( int separator_switch, int current_index, int parent_index, Graph::VertexWeightedGraph *H, list<int> *parentbaglist, Graph::GraphUtil *util, Graph::Node *n2, list<int> *nbrs2 );
-    void build_bags( int separator_switch, int* newbags, int current_index, int parent_index, Graph::VertexWeightedGraph *H, list<int> *parentbaglist, Graph::GraphUtil *util, Graph::Node *n2, list<int> *nbrs2 );
-    //void build_bags( int separator_switch, int* newbags, int current_index, int parent_index, Graph::VertexWeightedGraph *H, list<int> *parentbaglist, list<int> *templist, Graph::GraphUtil *util, Graph::Node *n2, list<int> *nbrs2 );
+    void construct_bfs(int root=1);
+    void build_bags( int separator_type, int* newbags, int current_index, int parent_index, Graph::VertexWeightedGraph *H, list<int> *parentbaglist, Graph::GraphUtil *util, Graph::Node *n2, list<int> *nbrs2 );
 
 	// Constructs a tree decomposition using Bodlaender-Koster's "Algorithm 2"
 	// with the provided elimination order

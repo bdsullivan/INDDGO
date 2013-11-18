@@ -40,6 +40,8 @@ void form_td(int td_alg, TDTree**T, vector<int>* ordering)
       break; 
     case TD_NICE: 
       (*T)->construct_knice(ordering, (*T)->width, false);
+    case TD_BFS: 
+      (*T)->construct_bfs();
       break;
     default: 
       throw(Graph::GraphException("Unrecognized td construction algorithm.\n"));
@@ -108,11 +110,14 @@ void create_tree_decomposition(Graph::VertexWeightedGraph *G, TDTree **T, bool r
     }
   else
     {
-	Graph::form_eo(read_ordering, scotch, ord_file, elim_order_type, start_v, &H, &ordering);
-	
+	if(td_alg != TD_BFS)
+    {
+      Graph::form_eo(read_ordering, scotch, ord_file, elim_order_type, start_v, &H, &ordering);
+	}
+
 	// Triangulate the graph
 	clock_t tri_start = clock(), tri_stop;
-	if(td_alg == TD_SUPERETREE)
+	if(td_alg == TD_SUPERETREE || td_alg == TD_BFS)
 	  {
 	    //no need to triangulate
 	    tri_stop = tri_start;	
@@ -144,7 +149,7 @@ void create_tree_decomposition(Graph::VertexWeightedGraph *G, TDTree **T, bool r
     }//end of creation from ordering
 
   // Sort the bags
-  if(td_alg != TD_SUPERETREE)//bags already sorted
+  if(td_alg != TD_SUPERETREE && td_alg != TD_BFS )//bags already sorted
       (*T)->sort_bags();
 
   // Reset (*T)'s graph is the original, non-triangulated graph!

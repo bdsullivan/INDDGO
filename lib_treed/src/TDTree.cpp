@@ -794,14 +794,13 @@ int TDTree::replace_by_join_tree(int old_node, int max_id)
 }
 
 
-
 /** Constructs a tree decomposition of this->G using
  * Dourisboure & Gavoille's bfs algorithm
  * The graph G is assumed to have a single connected
  * component since tree decompositions of disconnected
  * components can be joined together in an arbitrary way.
  */
-void TDTree::construct_bfs(int root=1)
+void TDTree::construct_bfs(int root)
 {
 	// First make sure this->G has one connected component
 	if(this->G->get_num_components()!=1)
@@ -941,8 +940,7 @@ void TDTree::construct_bfs(int root=1)
             //also modify G's labels so each node.label = prebag id
             for(it=newbag.begin();it!=newbag.end();it++)
             {
-                this->G->get_node(*it)->set_label(*it+1);// undo fuse_vertices label changes
-                //this->G->get_node(*it)->set_label(temp);
+                this->G->get_node(*it)->set_label(*it+1);
             }
 
             treenodelist.push_back(next_tree_node); 
@@ -954,15 +952,11 @@ void TDTree::construct_bfs(int root=1)
     //Node has 2 lists "bag" "all_ind_set_values"
     //bag will contain the local list
     //all_ind_set_values list will contain the parent node's local list
-    //in the bfs paper, these lists are joined to create the bag
-    //here we try to form a separator, and split a single D&G node into 2 or 3 nodes, so it will be useful to have the two lists in one node
+    //in the D&G BFS paper, these lists are joined to create the bag (think of each node as a domino, with the top half matching the parent node's bottom half)
 	int num_prebags = treenodelist.size(); 
 	this->num_tree_nodes = num_prebags;
 
-    //////  DAG: need to remap tree's id values, and G and H's label values so they go from 1 to |T|
-    //////  currently tree id takes value of lowest index in each bag
-
-	/// each node in original tree has index 3*n and a reserved node at +1 and -1 index in case of splitting
+	/// each node in original tree has index 3*n and a reserved node at +1 and -1 index in case separators are found
 	this->tree_nodes.resize(3*num_prebags,NULL); 
 	// resize H to fit new nodes we will add to it
 	H.resize_graph(2*num_prebags+this->G->get_capacity());//2*num_prebags is an upper bound on possible new nodes
@@ -1075,7 +1069,6 @@ void TDTree::construct_bfs(int root=1)
 }
 
 
-
 // parentbaglist = list from parent node
 // templist = list from current node
 //
@@ -1085,14 +1078,12 @@ void TDTree::construct_bfs(int root=1)
 // separator_type 1, 2:
 // call a separator (metis for type 1, our own separator for type 2, both for type 3), resulting in 2 possible outcomes
 // a) no separator formed, then separator function returns one empty list and one list with merged parent and current lists. non-empty list = bag
-//  (not sure why this happens, possibly only for very small lists? in my tests it only happened for lists of size 3)
 // b) separator formed, top, bottom lists returned. create 2 nodes instead of 1 (unless top node already exists in type 2 case)
 //  top goes into the top node as its bag, bottom into the bottom node as its bag.
 // separator_type 3:
 // call both type 1 and type 2 separators
 void TDTree::build_bags( int separator_type, int* newnodes, int current_index, int parent_index, Graph::VertexWeightedGraph *H, list<int> *parentbaglist, Graph::GraphUtil *util, Graph::Node *n2, list<int> *nbrs2 )
 {
-    //int newnodes = 0;
     list<int> templist;
 	list<int>::iterator it;
 	list<int>::iterator nbr_it;
@@ -1122,9 +1113,7 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
         }
         else // create 2 nodes with bags already created in parentbaglist, templist... 
         {
-			//int w = this->tree_nodes[current_index-1]->id;
-    		//int w = this->tree_nodes[parent_index+1]->id;
-            int w = (*newnodes) + 1 + this->G->get_capacity();// ??? +1 may not be needed
+            int w = (*newnodes) + 1 + this->G->get_capacity();
             this->tree_nodes[current_index-1]->id = w;
     
             // original tree: parent--current, new tree: parent--(newnode id=w)--current
@@ -1150,7 +1139,6 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
             this->tree_nodes[current_index]->adj.push_front(w);
     
             // construct bags
-            // recall: util.metis_ConstructSeparator(G,&parentbaglist,&templist); i.e. toplist = parentbaglist and bottomlist = templist
             this->tree_nodes[current_index]->bag=templist;
             this->tree_nodes[current_index-1]->bag=*parentbaglist;
 
@@ -1167,10 +1155,8 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
     {
         // separator step: only direct parents \subset parent bag share edges to current bag
         // direct parents set is a separator
-        // search for existing parent node: top bag has parent list, bottom has current list + direct parents
-        // but if multiple children of same parent do this, will end up with multiple copies of node with bag = parent list
-        // so we should merge all those identical nodes into a single node
-        // we have to search for existence of this node
+        // search for existing parent node: top bag has parentlist, bottom has current list + direct parents
+        // but if multiple children of same parent do this, will end up with multiple copies of node with bag = parentlist
 
         // construct templist = subset of parentbaglist that has a neighbor in (pre)bag at current node
 		bool keepsearching = true;
@@ -1196,14 +1182,13 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
 		{
             
             // w is id of potential node paired to parent
-			//int w = this->tree_nodes[parent_index+1]->id;
             int w;
     
 			// modify H graph: add node if it hasn't already been added
 			// if it already exists, change edge from parent to w
 			if(this->tree_nodes[parent_index+1]->adj.empty())
 			{
-                w = (*newnodes) + 1 + this->G->get_capacity();// ??? +1 may not be needed
+                w = (*newnodes) + 1 + this->G->get_capacity();
                 this->tree_nodes[parent_index+1]->id = w;
 
 				H->edge_subdivision(this->tree_nodes[current_index]->adj.front(),this->tree_nodes[current_index]->id, w);// order = parent, child, new node
@@ -1291,15 +1276,13 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
 		if(templist.size() < parentbaglist->size()) // create two nodes plus whatever metis dictates
 		{
             // w is id of potential node paired to parent
-			//int w = this->tree_nodes[parent_index+1]->id;
-
             int w;
 
 			// add node if it hasn't already been added
 			// if it already exists, change edge from parent to w
 			if(this->tree_nodes[parent_index+1]->adj.empty())
 			{
-				w = (*newnodes) + 1 + this->G->get_capacity();// ??? +1 may not be needed
+				w = (*newnodes) + 1 + this->G->get_capacity();
 				this->tree_nodes[parent_index+1]->id = w;
 				H->edge_subdivision(this->tree_nodes[current_index]->adj.front(),this->tree_nodes[current_index]->id, w);// order = parent, child, new node
 
@@ -1349,15 +1332,14 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
 
             if(templist.empty()) // i.e. ConstructSeparator did not return 2 lists, no splittting, create a single node
             {
-                this->tree_nodes[current_index]->bag = bottomlist; //if we don't use bottomlist, can we avoid this line?
+                this->tree_nodes[current_index]->bag = bottomlist; //
 
                 if( this->width < this->tree_nodes[current_index]->bag.size() )
                     this->width = this->tree_nodes[current_index]->bag.size();
             }
 			else // create 2 nodes with 2 lists from ConstructSeparator
 			{
-				//int w2 = this->tree_nodes[current_index-1]->id;
-                int w2 = (*newnodes) + 1 + this->G->get_capacity();// ??? +1 may not be needed
+                int w2 = (*newnodes) + 1 + this->G->get_capacity();
                 this->tree_nodes[current_index-1]->id = w2;
 
 				// original tree: parent-\-subparent-\-current, new tree: parent-\-subparent-\-(newnode id=w)-\-current 
@@ -1382,12 +1364,10 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
 				this->tree_nodes[current_index]->adj.pop_front();
 				this->tree_nodes[current_index]->adj.push_front(w2);
 	
-				// recall: util.metis_ConstructSeparator(G,&parentbaglist,&templist); i.e. toplist = parentbaglist and bottomlist = templist
-                // actually, in this block of code toplist = templist, bottomlist=bottomlist
 				this->tree_nodes[current_index]->bag=bottomlist;
 				this->tree_nodes[current_index-1]->bag=templist;
 
-                //no need to test parent_index+1 since it has smaller width than parent_index
+                //parent_index+1 has smaller width than parent_index
 				if(this->width < this->tree_nodes[current_index]->bag.size() )
 					this->width = this->tree_nodes[current_index]->bag.size();
 
@@ -1400,8 +1380,8 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
         else // creat a single node plus whatever comes out of metis
         {
             // construct bag /// all of this code is reused from above.
-            list<int> bottomlist = this->tree_nodes[current_index]->bag; // possibly this is not needed. just use tree_nodes[index]->bag
-            list<int> toplist = this->tree_nodes[parent_index]->all_ind_set_values; // possibly this is not needed. just use tree_nodes[parent_index]->all_ind_set_values
+            list<int> bottomlist = this->tree_nodes[current_index]->bag;
+            list<int> toplist = this->tree_nodes[parent_index]->all_ind_set_values;
             util->metis_ConstructSeparator(this->G,&toplist,&bottomlist);
 
             if(toplist.empty()) // i.e. ConstructSeparator did not return 2 lists, create a single node
@@ -1413,8 +1393,7 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
             }
 			else // create 2 nodes with 2 lists from ConstructSeparator
 			{
-				//int w2 = this->tree_nodes[current_index-1]->id;
-				int w2 = (*newnodes) + 1 + this->G->get_capacity();// ??? +1 may not be needed
+				int w2 = (*newnodes) + 1 + this->G->get_capacity();
 				this->tree_nodes[current_index-1]->id = w2;
 
 				list<int>::iterator it;
@@ -1426,7 +1405,6 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
 				this->tree_nodes[current_index-1]->adj.push_back(this->tree_nodes[current_index]->id);
 				this->tree_nodes[current_index-1]->adj.push_front(this->tree_nodes[current_index]->adj.front());
 
-                // parent_index + 1 not used here, only splitting is from metis separator
 				for(it = this->tree_nodes[parent_index]->adj.begin(); it != this->tree_nodes[ parent_index ]->adj.end(); it++ )
 				//old parent's adj list, replace child  with new node
 				{
@@ -1441,11 +1419,10 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
 				this->tree_nodes[current_index]->adj.pop_front();
 				this->tree_nodes[current_index]->adj.push_front(w2);
 
-				// recall: util.metis_ConstructSeparator(G,&parentbaglist,&templist); i.e. toplist = parentbaglist and bottomlist = templist
 				this->tree_nodes[current_index]->bag=bottomlist;
 				this->tree_nodes[current_index-1]->bag=toplist;
 
-                //no need to test parent_index+1 since it has smaller width than parent_index
+                //node at parent_index+1 has smaller width than node at parent_index
 				if(this->width < this->tree_nodes[current_index]->bag.size() )
 					this->width = this->tree_nodes[current_index]->bag.size();
 
@@ -1458,11 +1435,6 @@ void TDTree::build_bags( int separator_type, int* newnodes, int current_index, i
     }
     return;
 }
-
-
-
-
-
 
 
 /** 
