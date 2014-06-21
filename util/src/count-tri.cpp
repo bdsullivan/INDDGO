@@ -31,6 +31,7 @@
   #include <numeric>
   #include <ctime>
   #include <sys/time.h>
+  #include <unistd.h>
   #include <sys/syscall.h>
   #include <sys/types.h>
   #include <stdint.h>
