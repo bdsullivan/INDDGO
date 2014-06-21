@@ -8,7 +8,7 @@
 # This should be a full path to the root directory for INDDGO.
 # (i.e. the parent of lib_graphd, libtree_d, madness, wis, etc.)
 #
-SRC_DIR = 
+SRC_DIR =
 
 #----------------------------------------------------------------
 # REQUIRED USER-SUPPLIED OPTIONS
@@ -19,10 +19,16 @@ SRC_DIR =
 #WARNING: If HAS_PARMETIS=1, you must also set HAS_METIS=1 (metis is
 #included in the parmetis install).
 
+# Set to 1 if building on CYGWIN
+# This then defines the variable _GK_ERROR_C_ which
+# cures a compile error when building with gcc and g++ 
+# under cygwin 
+CYGWIN = 0
+
 HAS_ARPACK	= 0
-HAS_SUITESPARSE = 1
-HAS_PARMETIS	= 1
-HAS_METIS	= 1
+HAS_SUITESPARSE = 0
+HAS_PARMETIS	= 0
+HAS_METIS	= 0
 HAS_IGRAPH	= 0
 HAS_GMP		= 0
 HAS_GTEST	= 0
@@ -30,8 +36,8 @@ HAS_GTEST	= 0
 # Many linux systems have it installed by default
 HAS_BOOST = 0
 #Slepc is needed if you want eigen values
-HAS_PETSC	= 1
-HAS_SLEPC	= 1
+HAS_PETSC	= 0
+HAS_SLEPC	= 0
 # Set whether serial or parallel version is desired for WIS.
 IS_PARALLEL	= 1
 HAS_MADNESS	= 1
@@ -55,6 +61,9 @@ SUITESPARSE =
 #NOTE: the build directory is usually platform dependent.
 PARMETIS_SRC_DIR = 
 PARMETIS_LIB_DIR =  
+#NOTE: the METIS_SRC_DIR should be the directory containing programs/ and GKLib/ dirs
+#NOTE: when building Metis, we have seen cases where setting IDXTYPEWIDTH=64 in
+#metis.h on a 64-bit system fails, so we recommend leaving IDXTYPEWIDTH=32
 METIS_SRC_DIR  = $(PARMETIS_SRC_DIR)/metis
 METIS_LIB_DIR = $(PARMETIS_SRC_DIR)/metis/build/Linux-x86_64/libmetis/
 
@@ -81,6 +90,11 @@ OLDGCC	= 0
 CFLAGS = -O3
 CPPFLAGS =
 LDFLAGS = 
+
+ifeq ($(CYGWIN), 1)
+CFLAGS:= $(CFLAGS) -D_GK_ERROR_C_
+CPPFLAGS:= $(CPPFLAGS) -D_GK_ERROR_C_
+endif
 
 ifeq ($(HAS_BOOST),1)
 CFLAGS := $(CFLAGS) -DHAS_BOOST
@@ -210,7 +224,7 @@ $(error When HAS_SLEPC = 1, you must define the SLEPC_DIR directory variable)
 endif
 endif
 
-ifeq ($(HAS_METIS),1)
+ifeq ($(HAS_PETSC),1)
 ifeq ($(PETSC_DIR), )
 $(error When HAS_PETSC = 1, you must define the PETSC_DIR directory variable)
 endif
