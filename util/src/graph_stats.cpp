@@ -82,6 +82,10 @@ void print_usage(char **argv){
 
 int parse_options(int argc, char **argv, string& infile, string& intype, string& outfilename, string &outprefix, std::map<string, bool>& methods, bool& record_timings, bool &file_append, int *spectrum_spread, string &apsp_input){
     int flags, opt;
+    if (argc == 1) {
+        print_usage(argv);
+        exit(-1);
+    }
     while((opt = getopt(argc, argv, "hi:t:o:m:p:s:rax:")) != -1){
         switch(opt){
         case 'h':
