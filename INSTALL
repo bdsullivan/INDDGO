@@ -74,7 +74,7 @@ It will contain INDDGO, Metis, and SuiteSparse.
 > make
 > OPTIONAL: make install
 > cd ..
-> wget http://www.cise.ufl.edu/research/sparse/SuiteSparse/SuiteSparse-4.0.2.tar.gz
+> wget http://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-4.0.2.tar.gz
 > tar xzvf SuiteSparse-4.0.2.tar.gz
 > cd SuiteSparse
 > make

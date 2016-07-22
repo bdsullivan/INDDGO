@@ -14,7 +14,7 @@ SUITESPARSE /*tested with 4.0.0*/
  * you must compile with -DNPARTITION, which can be added to a compile flag 
  * in SuiteSparse_config.mk. For use with INDDGO 'make library' is sufficient. 
  */
-http://www.cise.ufl.edu/research/sparse/ 
+http://faculty.cse.tamu.edu/davis/suitesparse.html
 
 
 /*THESE ARE SUPERCEDED BY SUITESPARSE COMPLETE PACKAGE*/
